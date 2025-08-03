@@ -400,7 +400,7 @@ main .container:not(.legal-page-container) {
     padding: 4rem 0;
 }
 
-/* 8. Mission Section - UPDATED */
+/* 8. Mission Section */
 .mission-section {
     padding: 4rem 0;
     text-align: center;
@@ -835,7 +835,7 @@ main .container:not(.legal-page-container) {
         color: #eaeaea;
     }
 
-    .legal-page-container {
+    .legal-page-container, .container {
         background-color: #2a2a2a;
         color: #eaeaea;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -875,6 +875,14 @@ main .container:not(.legal-page-container) {
 
     .close-button:hover {
         color: var(--color-primary-light);
+    }
+    
+    /* THIS IS THE FIX FOR THE FOOTER */
+    .site-footer {
+        background-color: #1e1e1e;
+    }
+    .site-footer .container {
+        background-color: #2a2a2a;
     }
 }
 
@@ -1246,38 +1254,4 @@ main .container:not(.legal-page-container) {
 }
 .logout-button:hover {
     text-decoration: underline;
-}
-
-/* --- NEW: Mission Section --- */
-.mission-card {
-    display: inline-block; /* Allows for centering */
-    max-width: 700px; /* Constrains width for readability */
-    width: 100%;
-    background-color: var(--color-primary);
-    color: var(--color-surface);
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    text-align: center;
-    box-shadow: var(--shadow);
-    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-}
-
-.mission-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
-}
-
-.mission-card i {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-
-.mission-card h3 {
-    color: var(--color-surface);
-    font-size: 1.75rem;
-}
-
-.mission-card p {
-    color: rgba(255, 255, 255, 0.9);
-    line-height: 1.8;
 }
