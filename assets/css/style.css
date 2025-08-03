@@ -877,7 +877,6 @@ main .container:not(.legal-page-container) {
         color: var(--color-primary-light);
     }
     
-    /* THIS IS THE FIX FOR THE FOOTER */
     .site-footer {
         background-color: #1e1e1e;
     }
