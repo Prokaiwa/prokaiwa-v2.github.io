@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Prokaiwa | Contact Us</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* Additional styles for the form layout */
+    .contact-form {
+      margin-top: 3rem;
+      padding: 2rem;
+      background-color: var(--color-card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+    }
+    .form-row {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .form-group label {
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--color-text-light);
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      font-family: var(--font-primary);
+      font-size: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-light);
+    }
+    .form-group textarea {
+      resize: vertical;
+      min-height: 150px;
+    }
+    .form-submit-button {
+      width: 100%;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" />
+            <button class="burger-menu" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html" class="active">Contact</a></li>
+                    <li><a href="login.html">Log In</a></li>
+                    <li>
+                        <div class="nav-lang-toggle">
+                            <button data-lang="ja">日本語</button>
+                            <button data-lang="en">English</button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+  <main>
+    <div class="container legal-page-container">
+      <button class="close-button" aria-label="Go back to previous page" onclick="history.back()">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <div lang="en">
+        <h1 class="page-title">Contact Us</h1>
+        <p class="page-subtitle">Have questions about our services? Reach out to us and we'll get back to you soon.</p>
+      </div>
+      <div lang="ja">
+        <h1 class="page-title">お問い合わせ</h1>
+        <p class="page-subtitle">サービスに関するご質問はありますか？お気軽にお問い合わせください。すぐに返信いたします。</p>
+      </div>
+      
+      <section id="en-contact" class="lang-section" lang="en">
+        <div class="process-grid">
+            <article class="process-card">
+                <i class="fas fa-envelope" aria-hidden="true"></i>
+                <h3 class="process-title">Email</h3>
+                <p class="process-description"><a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
+            </article>
+            <article class="process-card">
+                <i class="fab fa-line" aria-hidden="true"></i>
+                <h3 class="process-title">Contact us on LINE at</h3>
+                <p class="process-description"><a href="https://page.line.me/845irjbc" target="_blank">@prokaiwa</a></p>
+            </article>
+            <article class="process-card">
+                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                <h3 class="process-title">Business Hours</h3>
+                <p class="process-description">10:00 – 18:00 JST<br>(Excluding weekends & holidays)</p>
+            </article>
+        </div>
+        <div class="contact-form">
+          <form action="https://formsubmit.co/prokaiwa.english@gmail.com" method="POST">
+             <input type="hidden" name="_subject" value="New message from Prokaiwa Website">
+            <input type="hidden" name="_captcha" value="false">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name-en">Full Name</label>
+                <input type="text" id="name-en" name="name" required>
+              </div>
+              <div class="form-group">
+                <label for="email-en">Email Address</label>
+                <input type="email" id="email-en" name="email" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="subject-en">Subject</label>
+              <input type="text" id="subject-en" name="subject" required>
+            </div>
+            <div class="form-group">
+              <label for="message-en">Message</label>
+              <textarea id="message-en" name="message" required></textarea>
+            </div>
+            <button type="submit" class="cta-button form-submit-button">Send Message</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="ja-contact" class="lang-section" lang="ja">
+        <div class="process-grid">
+            <article class="process-card">
+                <i class="fas fa-envelope" aria-hidden="true"></i>
+                <h3 class="process-title">Eメール</h3>
+                <p class="process-description"><a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
+            </article>
+            <article class="process-card">
+                <i class="fab fa-line" aria-hidden="true"></i>
+                <h3 class="process-title">LINEでお問い合わせ</h3>
+                <p class="process-description"><a href="https://page.line.me/845irjbc" target="_blank">@prokaiwa</a></p>
+            </article>
+            <article class="process-card">
+                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                <h3 class="process-title">営業時間</h3>
+                <p class="process-description">10:00 – 18:00 JST<br>（週末・祝日を除く）</p>
+            </article>
+        </div>
+        <div class="contact-form">
+          <form action="https://formsubmit.co/prokaiwa.english@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="【プロカイワHP】新規お問合わせ">
+            <input type="hidden" name="_captcha" value="false">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name-ja">氏名</label>
+                <input type="text" id="name-ja" name="name" required>
+              </div>
+              <div class="form-group">
+                <label for="email-ja">メールアドレス</label>
+                <input type="email" id="email-ja" name="email" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="subject-ja">件名</label>
+              <input type="text" id="subject-ja" name="subject" required>
+            </div>
+            <div class="form-group">
+              <label for="message-ja">メッセージ</label>
+              <textarea id="message-ja" name="message" required></textarea>
+            </div>
+            <button type="submit" class="cta-button form-submit-button">メッセージを送信</button>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="commerce-disclosure.html">Commerce Disclosure</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-of-service.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Connect</h3>
+                    <div class="footer-social-icons">
+                        <a href="https://page.line.me/845irjbc" class="social-icon" target="_blank" aria-label="LINE"><i class="fab fa-line"></i></a>
+                        <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
+                    </div>
+                    <a href="mailto:prokaiwa.english@gmail.com" class="footer-email">prokaiwa.english@gmail.com</a>
+                </div>
+            </div>
+            <p>© <span id="year"></span> Prokaiwa. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Element Selectors ---
+            const burgerMenu = document.querySelector('.burger-menu');
+            const mainNav = document.querySelector('.main-nav');
+            const langToggle = document.querySelector('.nav-lang-toggle'); // Updated selector
+            
+            // --- Language Toggle Functionality ---
+            function setLanguage(lang) {
+                // NEW: Save the selected language to localStorage
+                localStorage.setItem('prokaiwaLang', lang);
+
+                const isJapanese = lang === 'ja';
+                document.documentElement.lang = lang; // Set <html lang="...">
+
+                // Hide/show all elements with a lang attribute within the body
+                const allLangElements = document.body.querySelectorAll('[lang="ja"], [lang="en"]');
+                allLangElements.forEach(el => {
+                    if (el.getAttribute('lang') === lang) {
+                        el.style.display = '';
+                        if (el.classList.contains('lang-section')) {
+                            el.classList.add('show');
+                        }
+                    } else {
+                        el.style.display = 'none';
+                        if (el.classList.contains('lang-section')) {
+                            el.classList.remove('show');
+                        }
+                    }
+                });
+
+                // Update active state on toggle buttons
+                langToggle.querySelector('[data-lang="ja"]').classList.toggle('active', isJapanese);
+                langToggle.querySelector('[data-lang="en"]').classList.toggle('active', !isJapanese);
+            }
+
+            langToggle.addEventListener('click', event => {
+                const button = event.target.closest('button[data-lang]');
+                if (button) {
+                    setLanguage(button.dataset.lang);
+                }
+            });
+
+            // --- Initial Language Setup ---
+            // 1. Check for a saved language in localStorage
+            const savedLang = localStorage.getItem('prokaiwaLang');
+            if (savedLang) {
+                setLanguage(savedLang);
+            } else {
+                // 2. If no saved language, detect browser preference
+                const userLang = (navigator.language || navigator.userLanguage).split('-')[0];
+                setLanguage(userLang === 'ja' ? 'ja' : 'en');
+            }
+
+            // --- Burger Menu Functionality ---
+            burgerMenu.addEventListener('click', () => {
+                mainNav.classList.toggle('open');
+                burgerMenu.querySelector('i').classList.toggle('fa-bars');
+                burgerMenu.querySelector('i').classList.toggle('fa-times');
+            });
+            
+            // --- Footer Year ---
+            const yearSpan = document.getElementById('year');
+            if (yearSpan) {
+                yearSpan.textContent = new Date().getFullYear();
+            }
+
+            // --- FAQ Accordion (if it exists on the page) ---
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            if (faqQuestions.length > 0) {
+                faqQuestions.forEach(question => {
+                    question.addEventListener('click', () => {
+                        const answer = question.nextElementSibling;
+                        const isOpen = answer.style.maxHeight;
+
+                        // Close all other answers
+                        faqQuestions.forEach(q => {
+                            if (q !== question) {
+                                q.nextElementSibling.style.maxHeight = null;
+                                q.nextElementSibling.classList.remove('open');
+                            }
+                        });
+
+                        // Toggle the clicked answer
+                        if (!isOpen) {
+                            answer.style.maxHeight = (answer.scrollHeight + 20) + 'px';
+                            answer.classList.add('open');
+                        } else {
+                            answer.style.maxHeight = null;
+                            answer.classList.remove('open');
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
