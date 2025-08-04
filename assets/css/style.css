@@ -861,7 +861,8 @@ main .container:not(.legal-page-container) {
     .page-title,
     .section-heading,
     .subsection-heading,
-    .section-subtitle { /* Added section-subtitle */
+    .section-subtitle,
+    .page-subtitle { /* UPDATED: Added page-subtitle for About/Contact */
         color: var(--color-primary-light);
     }
 
@@ -893,7 +894,7 @@ main .container:not(.legal-page-container) {
         color: var(--color-primary-light);
     }
 
-    .social-icon { /* Added for footer icons */
+    .social-icon { /* UPDATED: Styles for footer icons in dark mode */
         background-color: #444;
         color: #eaeaea;
     }
