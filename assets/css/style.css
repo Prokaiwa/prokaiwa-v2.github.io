@@ -860,7 +860,8 @@ main .container:not(.legal-page-container) {
 
     .page-title,
     .section-heading,
-    .subsection-heading {
+    .subsection-heading,
+    .section-subtitle { /* Added section-subtitle */
         color: var(--color-primary-light);
     }
 
@@ -880,16 +881,21 @@ main .container:not(.legal-page-container) {
     .site-footer {
         background-color: #1e1e1e;
     }
-
-    /* === THIS IS THE FIX === */
+    
     .main-nav a,
     .footer-column a,
     .footer-email,
     .site-footer p {
-        color: #eaeaea; /* Light color for text */
+        color: #eaeaea;
     }
+
     .footer-column h3 {
-        color: var(--color-primary-light); /* Lighter color for headings */
+        color: var(--color-primary-light);
+    }
+
+    .social-icon { /* Added for footer icons */
+        background-color: #444;
+        color: #eaeaea;
     }
 }
 
