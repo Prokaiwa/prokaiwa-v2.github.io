@@ -880,8 +880,16 @@ main .container:not(.legal-page-container) {
     .site-footer {
         background-color: #1e1e1e;
     }
-    .site-footer .container {
-        background-color: #2a2a2a;
+
+    /* === THIS IS THE FIX === */
+    .main-nav a,
+    .footer-column a,
+    .footer-email,
+    .site-footer p {
+        color: #eaeaea; /* Light color for text */
+    }
+    .footer-column h3 {
+        color: var(--color-primary-light); /* Lighter color for headings */
     }
 }
 
