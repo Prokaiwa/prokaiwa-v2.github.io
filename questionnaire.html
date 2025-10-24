@@ -116,33 +116,33 @@
                     </div>
                 </fieldset>
 
-                <fieldset class="form-group-checkbox">
-                    <legend><span lang="en">What is your purpose for learning English? (Check all that apply)</span><span lang="ja">英語を学ぶ目的は何ですか？（複数選択可）</span></legend>
-                    <label class="checkbox-option">
-                        <input type="checkbox" name="purpose" value="Fun / Hobby"> <span lang="en">Fun / Hobby</span><span lang="ja">楽しみ・趣味</span>
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" name="purpose" value="Business / Work"> <span lang="en">Business / Work</span><span lang="ja">ビジネス・仕事</span>
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" name="purpose" value="Travel"> <span lang="en">Travel</span><span lang="ja">旅行</span>
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" name="purpose" value="Casual Conversation"> <span lang="en">Casual Conversation</span><span lang="ja">日常会話</span>
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" name="purpose" value="Other" id="purpose-other-checkbox"> <span lang="en">Other</span><span lang="ja">その他</span>
-                        <span class="checkmark"></span>
-                    </label>
-                    <div class="form-group" id="purpose-other-container" style="display:none; margin-top: 1rem;">
-                        <label for="purpose-other-text"><span lang="en">Please specify:</span><span lang="ja">具体的に入力してください：</span></label>
-                        <input type="text" id="purpose-other-text" name="purpose-other-text">
-                    </div>
-                </fieldset>
+<fieldset class="form-group-radio">
+  <legend>
+    <span lang="en">What is your purpose for learning English?</span>
+    <span lang="ja">英語を学ぶ目的は何ですか？</span>
+  </legend>
+  <label class="radio-option">
+    <input type="radio" name="purpose" value="Fun / Hobby" required>
+    <span lang="en">Fun / Hobby</span><span lang="ja">楽しみ・趣味</span>
+    <span class="checkmark"></span>
+  </label>
+  <label class="radio-option">
+    <input type="radio" name="purpose" value="Business / Work">
+    <span lang="en">Business / Work</span><span lang="ja">ビジネス・仕事</span>
+    <span class="checkmark"></span>
+  </label>
+  <label class="radio-option">
+    <input type="radio" name="purpose" value="Travel">
+    <span lang="en">Travel</span><span lang="ja">旅行</span>
+    <span class="checkmark"></span>
+  </label>
+  <label class="radio-option">
+    <input type="radio" name="purpose" value="Casual Conversation">
+    <span lang="en">Casual Conversation</span><span lang="ja">日常会話</span>
+    <span class="checkmark"></span>
+  </label>
+</fieldset>
+
                 
                 <fieldset class="form-group-checkbox">
                     <legend><span lang="en">How did you hear about Prokaiwa?</span><span lang="ja">Prokaiwaをどこで知りましたか？</span></legend>
