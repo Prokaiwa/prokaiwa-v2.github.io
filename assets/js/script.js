@@ -1,3 +1,4 @@
+// Wait for the page to fully load before running any code
 document.addEventListener('DOMContentLoaded', () => {
     // --- Element Selectors ---
     const burgerMenu = document.querySelector('.burger-menu');
@@ -5,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const langToggle = document.querySelector('.nav-lang-toggle');
     const yearSpan = document.getElementById('year');
 
+    console.log('Language toggle initialized');
+    
     // --- Language Toggle Functionality ---
     if (langToggle) {
         function setLanguage(lang) {
@@ -42,20 +45,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const savedLang = localStorage.getItem('prokaiwaLang');
-        if (savedLang) {
+        if (savedLang && (savedLang === 'ja' || savedLang === 'en')) {
             setLanguage(savedLang);
         } else {
             const userLang = (navigator.language || navigator.userLanguage).split('-')[0];
             setLanguage(userLang === 'ja' ? 'ja' : 'en');
         }
     }
-
+    
+    console.log('Burger menu initialized');
+    
     // --- Burger Menu Functionality ---
     if (burgerMenu) {
         burgerMenu.addEventListener('click', () => {
             mainNav.classList.toggle('open');
-            burgerMenu.querySelector('i').classList.toggle('fa-bars');
-            burgerMenu.querySelector('i').classList.toggle('fa-times');
+            const burgerIcon = burgerMenu.querySelector('i');
+            if (burgerIcon) {
+                burgerIcon.classList.toggle('fa-bars');
+                burgerIcon.classList.toggle('fa-times');
+            }
         });
     }
     
@@ -64,16 +72,23 @@ document.addEventListener('DOMContentLoaded', () => {
         yearSpan.textContent = new Date().getFullYear();
     }
 
-    // --- NEW: FAQ Accordion Logic ---
+    // --- FAQ Accordion Logic ---
     const faqQuestions = document.querySelectorAll('.faq-question');
     if (faqQuestions.length > 0) {
+        // Get all answers once, outside the loop
+        const allAnswers = document.querySelectorAll('.faq-answer');
+        
         faqQuestions.forEach(question => {
+            // Make FAQ keyboard accessible
+            question.setAttribute('tabindex', '0');
+            
+            // Handle clicks
             question.addEventListener('click', () => {
                 const answer = question.nextElementSibling;
                 const wasOpen = answer.classList.contains('open');
-
-                // Close all other answers
-                document.querySelectorAll('.faq-answer').forEach(ans => {
+                
+                // Close all answers
+                allAnswers.forEach(ans => {
                     ans.style.maxHeight = null;
                     ans.classList.remove('open');
                 });
@@ -82,6 +97,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!wasOpen) {
                     answer.classList.add('open');
                     answer.style.maxHeight = (answer.scrollHeight + 40) + 'px';
+                }
+            });
+            
+            // Handle Enter and Space key presses
+            question.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault(); // Prevent page scroll on Space
+                    question.click(); // Trigger the click event
                 }
             });
         });
