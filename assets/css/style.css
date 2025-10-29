@@ -49,15 +49,15 @@ body {
 .container {
     width: 95%;
     max-width: 1200px;
-    margin: 0 auto !important;
-    padding: 0 2rem !important;
+    margin: 0 auto;
+    padding: 0 2rem;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius);
 }
 
 .legal-page-container {
-    padding: 2rem !important;
+    padding: 2rem;
     margin-top: 2rem;
     margin-bottom: 2rem;
     border-radius: var(--border-radius);
@@ -69,6 +69,14 @@ img {
     max-width: 100%;
     height: auto;
     display: block;
+}
+
+/* Shared hover effect for cards */
+.process-card:hover,
+.plan-card:hover,
+.mission-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
 }
 
 /* 3. Header & Navigation */
@@ -126,26 +134,28 @@ img {
 .main-nav a.active {
     color: var(--color-primary);
 }
-
+.main-nav a:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
 /* 4. Main Content & Language Toggle */
 main {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+    margin-top: 0;
+    padding-top: 0;
 }
 
 main .container:not(.legal-page-container) {
-    padding: 0 2rem !important;
-    margin-top: 0 !important;
+    padding: 0 2rem;
+    margin-top: 0;
 }
 
 .lang-toggle {
     display: flex;
     justify-content: center;
-    margin-bottom: 0 !important;
     background-color: var(--color-primary-light);
     border-radius: var(--border-radius);
-    padding: 0.3rem;
-    padding-bottom: 0 !important;
+    padding: 0.3rem 0.3rem 0 0.3rem;
     margin-bottom: 1.5rem;
 }
 
@@ -237,7 +247,7 @@ main .container:not(.legal-page-container) {
 
 /* 5. Hero Section (from index.html) */
 .hero-section {
-    padding-top: 0 !important;
+    padding-top: 0;
     padding-bottom: 4rem;
     display: flex;
     flex-direction: row;
@@ -248,9 +258,8 @@ main .container:not(.legal-page-container) {
 }
 
 .hero-section:lang(en) {
-    margin-top: 1.5rem !important;
-    padding-top: 0 !important;
-    border-top: 0 !important;
+    margin-top: 1.5rem;
+    padding-top: 0;
 }
 
 .hero-section:lang(ja) {
@@ -287,6 +296,7 @@ main .container:not(.legal-page-container) {
     align-items: center;
 }
 
+
 .cta-button {
     display: inline-block;
     background-color: var(--color-primary);
@@ -298,6 +308,7 @@ main .container:not(.legal-page-container) {
     font-weight: 700;
     transition: all var(--transition-speed) ease;
     box-shadow: var(--shadow);
+    will-change: transform;
 }
 
 .cta-button:hover,
@@ -305,6 +316,11 @@ main .container:not(.legal-page-container) {
     background-color: var(--color-primary-dark);
     transform: translateY(-3px) scale(1.02);
     box-shadow: var(--shadow-hover);
+}
+
+.cta-button:focus-visible {
+    outline: 3px solid var(--color-primary-dark);
+    outline-offset: 4px;
 }
 
 .cta-secondary {
@@ -370,12 +386,9 @@ main .container:not(.legal-page-container) {
     text-align: center;
     box-shadow: var(--shadow);
     transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    will-change: transform;
 }
 
-.process-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
-}
 
 .process-card i {
     font-size: 2rem;
@@ -419,10 +432,6 @@ main .container:not(.legal-page-container) {
     transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
-.mission-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
-}
 
 .mission-card i {
     font-size: 2.5rem;
@@ -463,10 +472,6 @@ main .container:not(.legal-page-container) {
     flex-direction: column;
 }
 
-.plan-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
-}
 
 .plan-title {
     font-size: 1.25rem;
@@ -707,14 +712,18 @@ main .container:not(.legal-page-container) {
     }
 
     .main-nav {
-        display: none;
-        width: 100%;
-        text-align: center;
-    }
+    display: none;
+    width: 100%;
+    text-align: center;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
 
-    .main-nav.open {
-        display: block;
-    }
+.main-nav.open {
+    display: block;
+    max-height: 500px;
+}
     
     .main-nav ul {
         flex-direction: column;
@@ -724,17 +733,6 @@ main .container:not(.legal-page-container) {
 
     .main-nav li {
         margin: 0.5rem 0;
-    }
-
-    .hero-section {
-        flex-direction: column;
-        text-align: center;
-        padding-top: 0;
-        padding-bottom: 2rem;
-    }
-
-    .hero-section:lang(ja) {
-        margin-top: 1.5rem;
     }
 
     .hero-content {
@@ -879,6 +877,26 @@ main .container:not(.legal-page-container) {
         color: var(--color-primary-light);
     }
     
+    .process-card,
+    .plan-card,
+    .mission-card {
+        background-color: #2a2a2a;
+        border-color: #444;
+    }
+    
+    .faq-question {
+        background-color: #333;
+        color: #eaeaea;
+    }
+    
+    .faq-answer {
+        background-color: #2a2a2a;
+    }
+    
+    .hero-content {
+        background-color: #2a2a2a;
+    }
+    
     .site-footer {
         background-color: #1e1e1e;
     }
@@ -899,7 +917,6 @@ main .container:not(.legal-page-container) {
         color: #eaeaea;
     }
 }
-
 /* --- About Page Styles --- */
 .page-subtitle {
     text-align: center;
