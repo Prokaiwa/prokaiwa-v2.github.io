@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const langToggle = document.querySelector('.nav-lang-toggle');
     const yearSpan = document.getElementById('year');
 
-    console.log('Language toggle initialized');
     
     // --- Language Toggle Functionality ---
     if (langToggle) {
@@ -53,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    console.log('Burger menu initialized');
     
     // --- Burger Menu Functionality ---
     if (burgerMenu) {
