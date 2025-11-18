@@ -916,6 +916,21 @@ main .container:not(.legal-page-container) {
         background-color: #444;
         color: #eaeaea;
     }
+    
+    .contact-form {
+        background-color: #2a2a2a;
+    }
+    
+    .contact-form .form-group input,
+    .contact-form .form-group textarea {
+        background-color: #333;
+        color: #eaeaea;
+        border-color: #555;
+    }
+    
+    .form-intro {
+        color: #ccc;
+    }
 }
 /* --- About Page Styles --- */
 .page-subtitle {
