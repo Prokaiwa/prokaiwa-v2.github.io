@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KLVF2ZG1WX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KLVF2ZG1WX');
+</script>
+  <meta charset="UTF-8">
+  <title>Prokaiwa | Thank You</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    .thank-you-container {
+      max-width: 700px;
+      margin: 4rem auto;
+      padding: 3rem 2rem;
+      text-align: center;
+      background-color: var(--color-surface);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+    }
+    
+    .success-icon {
+      font-size: 4rem;
+      color: #28a745;
+      margin-bottom: 1.5rem;
+      animation: scaleIn 0.5s ease-out;
+    }
+    
+    @keyframes scaleIn {
+      from {
+        transform: scale(0);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .thank-you-title {
+      font-size: 2rem;
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+    }
+    
+    .thank-you-message {
+      font-size: 1.1rem;
+      color: var(--color-text);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+    
+    .next-steps {
+      background-color: var(--color-card-bg);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      margin: 2rem 0;
+      text-align: left;
+    }
+    
+    .next-steps h3 {
+      color: var(--color-primary);
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    
+    .next-steps ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .next-steps li {
+      padding: 0.75rem 0;
+      padding-left: 2rem;
+      position: relative;
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+    
+    .next-steps li::before {
+      content: "\f00c";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+    }
+    
+    .contact-options {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+    
+    .contact-card {
+      flex: 1;
+      min-width: 200px;
+      padding: 1.5rem;
+      background-color: var(--color-card-bg);
+      border-radius: var(--border-radius);
+      text-align: center;
+      transition: transform var(--transition-speed);
+    }
+    
+    .contact-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+    
+    .contact-card i {
+      font-size: 2rem;
+      color: var(--color-primary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .contact-card h4 {
+      font-size: 1rem;
+      color: var(--color-text);
+      margin-bottom: 0.5rem;
+    }
+    
+    .contact-card a {
+      color: var(--color-primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .contact-card a:hover {
+      text-decoration: underline;
+    }
+    
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+      .thank-you-container {
+        margin: 2rem auto;
+        padding: 2rem 1.5rem;
+      }
+      
+      .thank-you-title {
+        font-size: 1.5rem;
+      }
+      
+      .contact-options {
+        flex-direction: column;
+      }
+      
+      .contact-card {
+        min-width: 100%;
+      }
+      
+      .cta-buttons {
+        flex-direction: column;
+      }
+      
+      .cta-button {
+        width: 100%;
+      }
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .thank-you-container,
+      .next-steps,
+      .contact-card {
+        background-color: #2a2a2a;
+      }
+      
+      .success-icon {
+        color: #4ade80;
+      }
+    }
+  </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" />
+            <button class="burger-menu" aria-label="メニューを開く" aria-expanded="false">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="login.html">Log In</a></li>
+                    <li>
+                        <div class="nav-lang-toggle">
+                            <button data-lang="ja" aria-label="日本語に切り替え">日本語</button>
+                            <button data-lang="en" aria-label="Switch to English">English</button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+  <main>
+    <div class="container">
+      <!-- English Version -->
+      <section lang="en" class="lang-section">
+        <div class="thank-you-container">
+          <i class="fas fa-check-circle success-icon" aria-hidden="true"></i>
+          <h1 class="thank-you-title">Message Sent Successfully!</h1>
+          <p class="thank-you-message">
+            Thank you for contacting Prokaiwa. We've received your message and will respond to your inquiry within 24 hours during business days.
+          </p>
+          
+          <div class="next-steps">
+            <h3>What Happens Next?</h3>
+            <ul>
+              <li>Check your email inbox for our reply</li>
+              <li>We respond within 24 hours on weekdays (10:00-18:00 JST)</li>
+              <li>For urgent inquiries, feel free to contact us directly on LINE</li>
+            </ul>
+          </div>
+          
+          <div class="contact-options">
+            <div class="contact-card">
+              <i class="fab fa-line" aria-hidden="true"></i>
+              <h4>Need urgent help?</h4>
+              <a href="https://page.line.me/845irjbc" target="_blank" rel="noopener noreferrer">Message us on LINE</a>
+            </div>
+            <div class="contact-card">
+              <i class="fas fa-envelope" aria-hidden="true"></i>
+              <h4>Email us directly</h4>
+              <a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a>
+            </div>
+          </div>
+          
+          <div class="cta-buttons">
+            <a href="index.html" class="cta-button">Return to Homepage</a>
+            <a href="index.html#en-pricing-title" class="cta-button cta-secondary">View Our Plans</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Japanese Version -->
+      <section lang="ja" class="lang-section">
+        <div class="thank-you-container">
+          <i class="fas fa-check-circle success-icon" aria-hidden="true"></i>
+          <h1 class="thank-you-title">送信完了しました</h1>
+          <p class="thank-you-message">
+            お問い合わせいただき、誠にありがとうございます。<br>
+            メッセージを受信いたしました。営業日の24時間以内にご返信させていただきます。
+          </p>
+          
+          <div class="next-steps">
+            <h3>次のステップ</h3>
+            <ul>
+              <li>メールでのご返信をお待ちください</li>
+              <li>営業時間内（平日10:00-18:00）の24時間以内にご返信いたします</li>
+              <li>お急ぎの場合は、LINEで直接ご連絡ください</li>
+            </ul>
+          </div>
+          
+          <div class="contact-options">
+            <div class="contact-card">
+              <i class="fab fa-line" aria-hidden="true"></i>
+              <h4>お急ぎの方</h4>
+              <a href="https://page.line.me/845irjbc" target="_blank" rel="noopener noreferrer">LINEでお問い合わせ</a>
+            </div>
+            <div class="contact-card">
+              <i class="fas fa-envelope" aria-hidden="true"></i>
+              <h4>メールでのお問い合わせ</h4>
+              <a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a>
+            </div>
+          </div>
+          
+          <div class="cta-buttons">
+            <a href="index.html" class="cta-button">ホームに戻る</a>
+            <a href="index.html#ja-pricing-title" class="cta-button cta-secondary">プランを見る</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="commerce-disclosure.html">Commerce Disclosure</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-of-service.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Connect</h3>
+                    <div class="footer-social-icons">
+                        <a href="https://page.line.me/845irjbc" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="LINE"><i class="fab fa-line"></i></a>
+                        <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
+                    </div>
+                    <a href="mailto:prokaiwa.english@gmail.com" class="footer-email">prokaiwa.english@gmail.com</a>
+                </div>
+            </div>
+            <p>© <span id="year"></span> Prokaiwa. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
