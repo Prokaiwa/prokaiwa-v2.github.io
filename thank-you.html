@@ -331,36 +331,50 @@
   // Auto-redirect after 10 seconds with countdown
   let countdown = 10;
   
+  // Detect current language
+  const currentLang = localStorage.getItem('prokaiwaLang') || 'ja';
+  
   // Create countdown message element
   const countdownMsg = document.createElement('p');
   countdownMsg.style.cssText = 'text-align: center; color: #666; margin-top: 2rem; font-size: 0.95rem;';
-  // Detect current language
-const currentLang = localStorage.getItem('prokaiwaLang') || 'ja';
-const messages = {
-  en: `Redirecting to homepage in <strong>${countdown}</strong> seconds... <a href="#" onclick="clearInterval(timer); this.parentElement.remove(); return false;" style="color: var(--color-primary); text-decoration: underline; cursor: pointer;">Cancel</a>`,
-  ja: `<strong>${countdown}</strong>秒後にホームページへ移動します... <a href="#" onclick="clearInterval(timer); this.parentElement.remove(); return false;" style="color: var(--color-primary); text-decoration: underline; cursor: pointer;">キャンセル</a>`
-};
-countdownMsg.innerHTML = messages[currentLang];
   
-  // Add to thank-you container
-  const container = document.querySelector('.thank-you-container');
+  const messages = {
+    en: `Redirecting to homepage in <strong>${countdown}</strong> seconds... <a href="#" id="cancel-redirect" style="color: var(--color-primary); text-decoration: underline; cursor: pointer;">Cancel</a>`,
+    ja: `<strong>${countdown}</strong>秒後にホームページへ移動します... <a href="#" id="cancel-redirect" style="color: var(--color-primary); text-decoration: underline; cursor: pointer;">キャンセル</a>`
+  };
+  countdownMsg.innerHTML = messages[currentLang];
+  
+  // Add to the VISIBLE thank-you container (based on current language)
+  const visibleSection = document.querySelector(`.lang-section[lang="${currentLang}"]`);
+  const container = visibleSection ? visibleSection.querySelector('.thank-you-container') : null;
+  
   if (container) {
     container.appendChild(countdownMsg);
+    
+    // Add cancel button handler
+    const cancelBtn = document.getElementById('cancel-redirect');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        clearInterval(timer);
+        countdownMsg.remove();
+      });
+    }
   }
   
-// Update countdown every second
-const timer = setInterval(() => {
-  countdown--;
-  const strongTag = countdownMsg.querySelector('strong');
-  if (strongTag) {
-    strongTag.textContent = countdown;
-  }
-  
-  if (countdown <= 0) {
-    clearInterval(timer);
-    window.location.href = 'index.html';
-  }
-}, 1000);
+  // Update countdown every second
+  const timer = setInterval(() => {
+    countdown--;
+    const strongTag = countdownMsg.querySelector('strong');
+    if (strongTag) {
+      strongTag.textContent = countdown;
+    }
+    
+    if (countdown <= 0) {
+      clearInterval(timer);
+      window.location.href = 'index.html';
+    }
+  }, 1000);
 </script>
   <script>
   // Track successful form submission
