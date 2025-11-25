@@ -735,6 +735,15 @@ main .container:not(.legal-page-container) {
         margin: 0.5rem 0;
     }
 
+    .hero-section {
+        padding-bottom: 2rem;
+    }
+    
+    .hero-section:lang(ja),
+    .hero-section:lang(en) {
+        margin-top: 1rem;
+    }
+
     .hero-content {
         order: 2;
         max-width: 100%;
@@ -930,6 +939,23 @@ main .container:not(.legal-page-container) {
     
     .form-intro {
         color: #ccc;
+    }
+    
+    /* Fix text readability in dark mode */
+    .process-title,
+    .plan-title,
+    .plan-description,
+    .process-description,
+    .tagline,
+    .hero-text,
+    .thank-you-message {
+        color: #eaeaea;
+    }
+    
+    .plan-features li,
+    .next-steps li,
+    .faq-answer p {
+        color: #eaeaea;
     }
 }
 /* --- About Page Styles --- */
