@@ -942,16 +942,41 @@ main .container:not(.legal-page-container) {
     }
     
     /* Fix text readability in dark mode */
-    .process-title,
-    .plan-title,
-    .plan-description,
-    .process-description,
-    .tagline,
-    .hero-text,
-    .thank-you-message {
-        color: #eaeaea;
-    }
-    
+.process-title,
+.plan-title,
+.plan-description,
+.process-description,
+.hero-text,
+.thank-you-message {
+    color: #eaeaea;
+}
+
+/* Keep tagline teal in dark mode */
+.tagline,
+.mission-card h3 {
+    color: var(--color-primary-light);
+}
+ /* Fix pricing text */
+.price-value,
+.price-period {
+    color: #eaeaea;
+}
+   /* Fix about page text */
+.page-subtitle,
+.about-page-container p,
+.about-page-container ul li {
+    color: #eaeaea;
+}
+
+/* Keep section headings teal */
+.about-page-container .section-heading {
+    color: var(--color-primary-light);
+}
+   /* Fix contact form labels and intro */
+.contact-form .form-group label,
+.form-intro {
+    color: #eaeaea;
+}
     .plan-features li,
     .next-steps li,
     .faq-answer p {
