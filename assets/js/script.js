@@ -61,13 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Update HTML lang attribute for accessibility
                 document.documentElement.lang = lang;
                 
-                // Add smooth transition effect
-                document.body.style.opacity = '0.7';
-                document.body.style.transition = 'opacity 0.15s ease';
-                
-                setTimeout(() => {
-                    // Get cached elements
-                    const langElements = cacheLangElements();
+                // Get cached elements
+                const langElements = cacheLangElements();
                     
                     // Show selected language elements
                     langElements[lang].forEach(el => {
@@ -107,14 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         jaButton.setAttribute('aria-pressed', isJapanese ? 'true' : 'false');
                         enButton.setAttribute('aria-pressed', isJapanese ? 'false' : 'true');
                     }
-                    
-                    // Remove transition effect
-                    document.body.style.opacity = '';
-                    document.body.style.transition = '';
-                    
-                }, 150);
                 
             } catch (error) {
+                    
+                    // Update button states
+                    const jaButton = langToggle.querySelector('[data-lang="ja"]');
+                    const enButton = langToggle.querySelector('[data-lang="en"]');
                 console.error('Error switching language:', error);
                 // Fail gracefully - keep current language
             }
