@@ -1,13 +1,12 @@
 /**
  * Prokaiwa Website - Main JavaScript
- * Production-Ready Version with Senior Developer Improvements
+ * Improved Version - Stable and Production-Ready
  * 
  * Features:
- * - Language switching with smooth transitions
+ * - Language switching (original working logic kept)
  * - Accessible FAQ accordion
- * - Responsive burger menu
+ * - Responsive burger menu with enhancements
  * - Keyboard navigation support
- * - Performance optimized
  * - WCAG 2.1 AA compliant
  */
 
@@ -31,110 +30,82 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
     
     if (langToggle) {
-        // Cache language elements for better performance
-        let langElementsCache = null;
-        
-        function cacheLangElements() {
-            if (!langElementsCache) {
-                langElementsCache = {
-                    ja: Array.from(document.querySelectorAll('[lang="ja"]')),
-                    en: Array.from(document.querySelectorAll('[lang="en"]'))
-                };
-            }
-            return langElementsCache;
-        }
-        
         function setLanguage(lang) {
-            try {
-                // Validate language
-                if (lang !== 'ja' && lang !== 'en') {
-                    console.warn('Invalid language:', lang);
-                    return;
-                }
-                
-                // Save preference
-                localStorage.setItem('prokaiwa_preferred_language', lang);
-                
-                const isJapanese = lang === 'ja';
-                const otherLang = isJapanese ? 'en' : 'ja';
-                
-                // Update HTML lang attribute for accessibility
-                document.documentElement.lang = lang;
-                
-                // Get cached elements
-                const langElements = cacheLangElements();
+            // Validate language
+            if (lang !== 'ja' && lang !== 'en') {
+                console.warn('Invalid language:', lang);
+                return;
+            }
+            
+            // Save preference with better key name
+            localStorage.setItem('prokaiwa_preferred_language', lang);
+
+            const isJapanese = lang === 'ja';
+            document.documentElement.lang = lang;
+
+            // Use original working logic - query fresh each time
+            const allLangElements = document.body.querySelectorAll('[lang="ja"], [lang="en"]');
+            allLangElements.forEach(el => {
+                if (el.closest('.nav-lang-toggle')) return;
+
+                if (el.getAttribute('lang') === lang) {
+                    el.style.display = '';
+                    el.removeAttribute('aria-hidden');
                     
-                    // Show selected language elements
-                    langElements[lang].forEach(el => {
-                        // Skip language toggle buttons
-                        if (el.closest('.nav-lang-toggle')) return;
-                        
-                        el.style.display = '';
-                        el.removeAttribute('aria-hidden');
-                        
-                        if (el.classList.contains('lang-section')) {
-                            el.classList.add('show');
-                        }
-                    });
-                    
-                    // Hide other language elements
-                    langElements[otherLang].forEach(el => {
-                        // Skip language toggle buttons
-                        if (el.closest('.nav-lang-toggle')) return;
-                        
-                        el.style.display = 'none';
-                        el.setAttribute('aria-hidden', 'true');
-                        
-                        if (el.classList.contains('lang-section')) {
-                            el.classList.remove('show');
-                        }
-                    });
-                    
-                    // Update button states
-                    const jaButton = langToggle.querySelector('[data-lang="ja"]');
-                    const enButton = langToggle.querySelector('[data-lang="en"]');
-                    
-                    if (jaButton && enButton) {
-                        jaButton.classList.toggle('active', isJapanese);
-                        enButton.classList.toggle('active', !isJapanese);
-                        
-                        // Update ARIA for accessibility
-                        jaButton.setAttribute('aria-pressed', isJapanese ? 'true' : 'false');
-                        enButton.setAttribute('aria-pressed', isJapanese ? 'false' : 'true');
+                    if (el.classList.contains('lang-section')) {
+                        el.classList.add('show');
                     }
-                
-            } catch (error) {
+                } else {
+                    el.style.display = 'none';
+                    el.setAttribute('aria-hidden', 'true');
                     
-                    // Update button states
-                    const jaButton = langToggle.querySelector('[data-lang="ja"]');
-                    const enButton = langToggle.querySelector('[data-lang="en"]');
-                console.error('Error switching language:', error);
-                // Fail gracefully - keep current language
+                    if (el.classList.contains('lang-section')) {
+                        el.classList.remove('show');
+                    }
+                }
+            });
+
+            // Update button states with ARIA
+            const jaButton = langToggle.querySelector('[data-lang="ja"]');
+            const enButton = langToggle.querySelector('[data-lang="en"]');
+            
+            if (jaButton && enButton) {
+                jaButton.classList.toggle('active', isJapanese);
+                enButton.classList.toggle('active', !isJapanese);
+                
+                // Add ARIA for accessibility
+                jaButton.setAttribute('aria-pressed', isJapanese ? 'true' : 'false');
+                enButton.setAttribute('aria-pressed', isJapanese ? 'false' : 'true');
             }
         }
-        
-        // Language button click handler
+
         langToggle.addEventListener('click', event => {
             const button = event.target.closest('button[data-lang]');
             if (button) {
                 setLanguage(button.dataset.lang);
             }
         });
-        
+
         // Initialize language on page load
         const savedLang = localStorage.getItem('prokaiwa_preferred_language');
         if (savedLang === 'ja' || savedLang === 'en') {
             setLanguage(savedLang);
         } else {
-            // Detect browser language
-            const userLang = (navigator.language || navigator.userLanguage).split('-')[0];
-            setLanguage(userLang === 'ja' ? 'ja' : 'en');
+            // Fallback to old key for backwards compatibility
+            const oldSavedLang = localStorage.getItem('prokaiwaLang');
+            if (oldSavedLang === 'ja' || oldSavedLang === 'en') {
+                setLanguage(oldSavedLang);
+            } else {
+                // Detect browser language
+                const userLang = (navigator.language || navigator.userLanguage).split('-')[0];
+                setLanguage(userLang === 'ja' ? 'ja' : 'en');
+            }
         }
     }
     
     
     // ==========================================================================
-    // BURGER MENU FUNCTIONALITY
+    // BURGER MENU FUNCTIONALITY (ENHANCED)
     // ==========================================================================
     
     if (burgerMenu && mainNav) {
@@ -150,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Update ARIA for screen readers
             burgerMenu.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-            burgerMenu.setAttribute('aria-label', isOpen ? 'メニューを閉じる' : 'メニューを開く');
             
             // Toggle icon
             const burgerIcon = burgerMenu.querySelector('i');
@@ -173,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Close menu when clicking outside
         document.addEventListener('click', (event) => {
             if (mainNav.classList.contains('open')) {
-                // Check if click is outside menu and burger button
                 if (!mainNav.contains(event.target) && !burgerMenu.contains(event.target)) {
                     toggleMenu(false);
                 }
@@ -184,8 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && mainNav.classList.contains('open')) {
                 toggleMenu(false);
-                // Return focus to burger button for keyboard users
-                burgerMenu.focus();
+                burgerMenu.focus(); // Return focus for keyboard users
             }
         });
         
@@ -194,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                // If desktop size and menu is open, close it
                 if (window.innerWidth > 768 && mainNav.classList.contains('open')) {
                     toggleMenu(false);
                 }
@@ -213,21 +180,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     
     // ==========================================================================
-    // FAQ ACCORDION FUNCTIONALITY
+    // FAQ ACCORDION FUNCTIONALITY (ENHANCED)
     // ==========================================================================
     
     const faqQuestions = document.querySelectorAll('.faq-question');
     
     if (faqQuestions.length > 0) {
+        // Get all answers once, outside the loop
+        const allAnswers = document.querySelectorAll('.faq-answer');
         
-        // Keep track of currently open answer
+        // Keep track of currently open answer for ARIA
         let currentOpenAnswer = null;
         let currentOpenQuestion = null;
         
         faqQuestions.forEach((question, index) => {
             const answer = question.nextElementSibling;
             
-            // Validate that answer exists and is correct element
+            // Validate that answer exists
             if (!answer || !answer.classList.contains('faq-answer')) {
                 console.warn('FAQ answer not found for question:', question);
                 return;
@@ -244,39 +213,36 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Click handler
             function toggleFAQ() {
-                const wasOpen = answer === currentOpenAnswer;
+                const wasOpen = answer.classList.contains('open');
                 
-                // Close previously open FAQ
-                if (currentOpenAnswer && currentOpenAnswer !== answer) {
-                    currentOpenAnswer.style.maxHeight = null;
-                    currentOpenAnswer.classList.remove('open');
-                    if (currentOpenQuestion) {
-                        currentOpenQuestion.setAttribute('aria-expanded', 'false');
-                    }
-                }
+                // Close all answers
+                allAnswers.forEach(ans => {
+                    ans.style.maxHeight = null;
+                    ans.classList.remove('open');
+                });
                 
-                // Toggle current FAQ
+                // Update all questions' ARIA
+                faqQuestions.forEach(q => {
+                    q.setAttribute('aria-expanded', 'false');
+                });
+                
+                // If the clicked one wasn't already open, open it
                 if (!wasOpen) {
-                    // Open this FAQ
                     answer.classList.add('open');
                     answer.style.maxHeight = (answer.scrollHeight + 40) + 'px';
                     question.setAttribute('aria-expanded', 'true');
                     currentOpenAnswer = answer;
                     currentOpenQuestion = question;
                 } else {
-                    // Close this FAQ
-                    answer.style.maxHeight = null;
-                    answer.classList.remove('open');
-                    question.setAttribute('aria-expanded', 'false');
                     currentOpenAnswer = null;
                     currentOpenQuestion = null;
                 }
             }
             
-            // Mouse click
+            // Handle clicks
             question.addEventListener('click', toggleFAQ);
             
-            // Keyboard navigation (Enter or Space)
+            // Handle Enter and Space key presses
             question.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault(); // Prevent page scroll on Space
@@ -285,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        // Recalculate maxHeight on window resize (for responsive design)
+        // Recalculate maxHeight on window resize
         let faqResizeTimer;
         window.addEventListener('resize', () => {
             clearTimeout(faqResizeTimer);
@@ -302,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // SMOOTH SCROLL FOR ANCHOR LINKS (BONUS FEATURE)
     // ==========================================================================
     
-    // Add smooth scrolling to all anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             const targetId = this.getAttribute('href');
@@ -338,72 +303,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (history.pushState) {
                     history.pushState(null, null, targetId);
                 }
-                
-                // Set focus to target for accessibility (if it's focusable)
-                if (targetElement.hasAttribute('tabindex')) {
-                    targetElement.focus();
-                }
             }
         });
     });
     
     
     // ==========================================================================
-    // ACCESSIBILITY: SKIP LINK SUPPORT (If you add skip links later)
-    // ==========================================================================
-    
-    const skipLink = document.querySelector('.skip-link');
-    if (skipLink) {
-        skipLink.addEventListener('click', (e) => {
-            const targetId = skipLink.getAttribute('href');
-            const target = document.querySelector(targetId);
-            if (target) {
-                e.preventDefault();
-                target.setAttribute('tabindex', '-1');
-                target.focus();
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-    }
-    
-    
-    // ==========================================================================
-    // PERFORMANCE: LAZY LOAD IMAGES (BONUS FEATURE)
-    // ==========================================================================
-    
-    // Modern browsers support lazy loading natively
-    // For older browsers, add IntersectionObserver polyfill
-    if ('loading' in HTMLImageElement.prototype) {
-        // Native lazy loading supported
-        const lazyImages = document.querySelectorAll('img[loading="lazy"]');
-        console.log(`Native lazy loading enabled for ${lazyImages.length} images`);
-    } else {
-        // Fallback for older browsers
-        console.log('Native lazy loading not supported, consider adding polyfill');
-    }
-    
-    
-    // ==========================================================================
-    // ERROR TRACKING (Production Enhancement)
-    // ==========================================================================
-    
-    // Global error handler for production debugging
-    window.addEventListener('error', (event) => {
-        console.error('Global error caught:', {
-            message: event.message,
-            filename: event.filename,
-            lineno: event.lineno,
-            colno: event.colno,
-            error: event.error
-        });
-        
-        // In production, you could send this to an error tracking service
-        // Example: Sentry, LogRocket, etc.
-    });
-    
-    
-    // ==========================================================================
-    // CONSOLE MESSAGE (Remove in production or make conditional)
+    // CONSOLE MESSAGE (For Development)
     // ==========================================================================
     
     console.log('✅ Prokaiwa script loaded successfully');
