@@ -13,6 +13,7 @@
   <meta charset="UTF-8">
   <title>Prokaiwa | Thank You (LINE Plan)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Thank you for subscribing to Prokaiwa's LINE Practice Plan.">
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -78,18 +79,24 @@
         margin-bottom: 1.5rem;
         color: var(--color-text-light);
     }
-    .booking-buttons { /* Added for centering single buttons */
+    .booking-buttons {
         display: flex;
         gap: 1rem;
         justify-content: center;
         margin-top: 1rem;
+    }
+    /* Dark mode fix for LINE box */
+    @media (prefers-color-scheme: dark) {
+      .line-add-box {
+        background-color: var(--color-card-bg);
+      }
     }
   </style>
 </head>
 <body>
     <header class="site-header">
         <div class="container">
-            <img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" />
+            <a href="index.html"><img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" /></a>
             <button class="burger-menu" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
             </button>
@@ -101,8 +108,8 @@
                     <li><a href="login.html">Log In</a></li>
                     <li>
                         <div class="nav-lang-toggle">
-                            <button data-lang="ja">日本語</button>
-                            <button data-lang="en">English</button>
+                            <button data-lang="ja" aria-label="日本語に切り替え">日本語</button>
+                            <button data-lang="en" aria-label="Switch to English">English</button>
                         </div>
                     </li>
                 </ul>
@@ -111,18 +118,64 @@
     </header>
 
     <main>
-        <div class="container legal-page-container thank-you-container">
-            <div lang="en">
+        <!-- JAPANESE VERSION -->
+        <section id="ja-thank-you" class="lang-section" lang="ja">
+            <div class="container legal-page-container thank-you-container">
+                <h1 class="page-title">LINE練習プラン（プランA）へのお申し込み、ありがとうございます！</h1>
+                <p class="page-subtitle">毎日の会話練習で、あなたの英語力アップをサポートします。</p>
+                
+                <h2>プラン内容：</h2>
+                <div class="summary-card">
+                    <ul>
+                        <li>LINEで毎日届く会話テーマ</li>
+                        <li>あなた専用のフィードバック</li>
+                        <li>週1回の音声メッセージ添削</li>
+                        <li>自分のペースで練習できる</li>
+                        <li>マンツーマンサポート</li>
+                        <li>ネイティブ講師による指導</li>
+                    </ul>
+                </div>
+
+                <h2>次のステップ：</h2>
+                <h3><span class="step-number">1</span>LINEで友だち追加</h3>
+                <p>下のQRコードを読み取るか、IDで検索して友だち追加してください。</p>
+                <div class="line-add-box">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://line.me/R/ti/p/@845irjbc" alt="Prokaiwa LINE QRコード">
+                    <p>IDで追加する場合: <strong>@845irjbc</strong></p>
+                    <a href="https://line.me/R/ti/p/@845irjbc?from=page&searchId=845irjbc" class="cta-button" target="_blank">LINEで友だち追加</a>
+                </div>
+                
+                <h3><span class="step-number">2</span>LINEでメッセージを送信</h3>
+                <p>お申し込み時と同じLINEアカウントから、メッセージを送ってください。登録情報の確認に使用します。</p>
+
+                <h3><span class="step-number">3</span>講師からの連絡をお待ちください</h3>
+                <p>アカウント確認後、<strong>2営業日以内</strong>に担当講師から最初のメッセージが届きます。</p>
+
+                <h3><span class="step-number">4</span>ダッシュボードを確認</h3>
+                <p>お待ちいただく間、マイページでプラン詳細などを確認できます。</p>
+                <div class="booking-buttons">
+                    <a href="dashboard.html" class="cta-button">マイページへ</a>
+                </div>
+
+                <h2>ご不明な点がありましたら</h2>
+                <p>ご質問やご相談は、お気軽にメールでお問い合わせください：<a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
+                <p><strong>あなたの英語学習を全力でサポートします！</strong></p>
+            </div>
+        </section>
+
+        <!-- ENGLISH VERSION -->
+        <section id="en-thank-you" class="lang-section" lang="en">
+            <div class="container legal-page-container thank-you-container">
                 <h1 class="page-title">Thank you for subscribing to the LINE Practice Plan (Plan A)!</h1>
-                <p class="page-subtitle">We’re excited to help you improve your English through daily conversation.</p>
+                <p class="page-subtitle">We're excited to help you improve your English through daily conversation.</p>
                 
                 <h2>Plan Summary:</h2>
                 <div class="summary-card">
                     <ul>
-                        <li>Daily English conversation prompts via LINE</li>
+                        <li>Daily English conversation topics via LINE</li>
                         <li>Personalized feedback</li>
-                        <li>1 voice memo review per week</li>
-                        <li>Flexible scheduling</li>
+                        <li>1 voice message review per week</li>
+                        <li>Learn at your own pace</li>
                         <li>Private 1-on-1 support</li>
                         <li>Guidance from a native English speaker</li>
                     </ul>
@@ -130,72 +183,30 @@
 
                 <h2>Next Steps:</h2>
                 <h3><span class="step-number">1</span>Add us on LINE</h3>
-                <p>Please add our official LINE account by scanning the QR code, adding our ID, or clicking the button below.</p>
+                <p>Please add our official LINE account by scanning the QR code or adding our ID.</p>
                 <div class="line-add-box">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://line.me/R/ti/p/@845irjbc" alt="Prokaiwa LINE QR Code">
                     <p>Or add by ID: <strong>@845irjbc</strong></p>
                     <a href="https://line.me/R/ti/p/@845irjbc?from=page&searchId=845irjbc" class="cta-button" target="_blank">Add Friend on LINE</a>
                 </div>
 
-                <h3><span class="step-number">2</span>Message us from the same LINE account you signed up with</h3>
-                <p>This helps us verify your subscription and get you started smoothly.</p>
+                <h3><span class="step-number">2</span>Send us a message on LINE</h3>
+                <p>Please message us from the same LINE account you signed up with. This helps us verify your subscription.</p>
 
-                <h3><span class="step-number">3</span>Wait for Confirmation</h3>
-                <p>Once we confirm your account, you’ll receive your first message from a teacher within 48 business hours.</p>
+                <h3><span class="step-number">3</span>Wait for your teacher</h3>
+                <p>Once we confirm your account, you'll receive your first message from a teacher within <strong>2 business days</strong>.</p>
 
                 <h3><span class="step-number">4</span>Explore Your Dashboard</h3>
-                <p>While you wait, you can visit your personal dashboard to review your plan and details.</p>
+                <p>While you wait, you can visit your dashboard to review your plan details.</p>
                 <div class="booking-buttons">
                     <a href="dashboard.html" class="cta-button">Go to My Dashboard</a>
                 </div>
 
                 <h2>Need Help?</h2>
-                <p>If you have any questions, comments, or concerns, feel free to email us at: <a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
-                <p><strong>We’re excited to support your English journey!</strong></p>
+                <p>If you have any questions, feel free to email us at: <a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
+                <p><strong>We're excited to support your English journey!</strong></p>
             </div>
-
-            <div lang="ja">
-                <h1 class="page-title">LINE練習プラン（プランA）へのお申し込み、誠にありがとうございます！</h1>
-                <p class="page-subtitle">日々の会話を通じて、あなたの英語力向上をサポートできることを楽しみにしています。</p>
-                
-                <h2>プラン概要：</h2>
-                <div class="summary-card">
-                    <ul>
-                        <li>LINEによる毎日の英会話プロンプト</li>
-                        <li>個別フィードバック</li>
-                        <li>週1回のボイスメモ添削</li>
-                        <li>柔軟なスケジューリング</li>
-                        <li>1対1のプライベートサポート</li>
-                        <li>ネイティブスピーカーによる指導</li>
-                    </ul>
-                </div>
-
-                <h2>次のステップ：</h2>
-                <h3><span class="step-number">1</span>LINEで友だち追加</h3>
-                <p>下記のQRコードまたはIDを使って、私たちの公式LINEアカウントを追加してください。</p>
-                <div class="line-add-box">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://line.me/R/ti/p/@845irjbc" alt="プロカイワ LINE QRコード">
-                    <p>またはIDで追加: <strong>@845irjbc</strong></p>
-                    <a href="https://line.me/R/ti/p/@845irjbc?from=page&searchId=845irjbc" class="cta-button" target="_blank">LINEで友だち追加</a>
-                </div>
-                
-                <h3><span class="step-number">2</span>お申し込み時と同じLINEアカウントからメッセージを送信</h3>
-                <p>これにより、お客様の登録情報を確認し、スムーズにサービスを開始できます。</p>
-                
-                <h3><span class="step-number">3</span>確認をお待ちください</h3>
-                <p>アカウントの確認が取れ次第、48営業時間以内に担当講師から最初のメッセージが届きます。</p>
-                
-                <h3><span class="step-number">4</span>ダッシュボードを確認</h3>
-                <p>お待ちいただく間、個人のダッシュボードにアクセスしてプランの詳細などを確認できます。</p>
-                <div class="booking-buttons">
-                    <a href="dashboard.html" class="cta-button">ダッシュボードへ移動</a>
-                </div>
-
-                <h2>お困りですか？</h2>
-                <p>ご質問、ご意見、ご不明な点がございましたら、お気軽に下記までメールでお問い合わせください：<a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
-                <p><strong>あなたの英語学習の旅をサポートできることを楽しみにしています！</strong></p>
-            </div>
-        </div>
+        </section>
     </main>
 
     <footer class="site-footer">
