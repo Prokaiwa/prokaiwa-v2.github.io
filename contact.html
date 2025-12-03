@@ -23,7 +23,7 @@
 <body>
     <header class="site-header">
         <div class="container">
-            <img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" />
+            <a href="index.html"><img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" /></a>
             <button class="burger-menu" aria-label="メニューを開く" aria-expanded="false">
                 <i class="fas fa-bars"></i>
             </button>
@@ -190,5 +190,60 @@
     </footer>
 
     <script src="assets/js/script.js"></script>
+    
+    <!-- Pre-fill form based on URL parameters -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const subjectParam = urlParams.get('subject');
+            
+            // Pre-defined subjects for common requests
+            const subjects = {
+                'plan-change': {
+                    en: 'Plan Change Request',
+                    ja: 'プラン変更のご相談'
+                },
+                'cancel': {
+                    en: 'Cancellation Request',
+                    ja: '解約のご相談'
+                },
+                'question': {
+                    en: 'General Question',
+                    ja: 'ご質問'
+                },
+                'feedback': {
+                    en: 'Feedback',
+                    ja: 'ご意見・ご感想'
+                }
+            };
+            
+            if (subjectParam && subjects[subjectParam]) {
+                // Get current language
+                const currentLang = localStorage.getItem('prokaiwa-lang') || 'ja';
+                const subjectText = subjects[subjectParam][currentLang];
+                
+                // Pre-fill both language versions
+                const subjectEn = document.getElementById('subject-en');
+                const subjectJa = document.getElementById('subject-ja');
+                
+                if (subjectEn) subjectEn.value = subjects[subjectParam]['en'];
+                if (subjectJa) subjectJa.value = subjects[subjectParam]['ja'];
+                
+                // Also pre-fill message with a template for plan changes
+                if (subjectParam === 'plan-change') {
+                    const messageEn = document.getElementById('message-en');
+                    const messageJa = document.getElementById('message-ja');
+                    
+                    if (messageEn) {
+                        messageEn.value = 'Hello,\n\nI would like to discuss changing my plan.\n\nCurrent plan: \nDesired plan: \n\nThank you.';
+                    }
+                    if (messageJa) {
+                        messageJa.value = 'お世話になっております。\n\nプランの変更についてご相談させてください。\n\n現在のプラン：\n希望のプラン：\n\nよろしくお願いいたします。';
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
