@@ -13,6 +13,7 @@
   <meta charset="UTF-8">
   <title>Prokaiwa | Thank You (Power Pack)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Thank you for subscribing to a Prokaiwa Power Pack plan.">
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -23,6 +24,11 @@
       border-radius: var(--border-radius);
       padding: 1.5rem;
       margin: 1.5rem 0;
+    }
+    .summary-card hr {
+      border: none;
+      border-top: 1px solid var(--color-border);
+      margin: 1rem 0;
     }
     .thank-you-container h2 {
       font-size: 1.5rem;
@@ -78,18 +84,24 @@
         margin-bottom: 1.5rem;
         color: var(--color-text-light);
     }
-    .booking-buttons { /* Added for centering single buttons */
+    .booking-buttons {
         display: flex;
         gap: 1rem;
         justify-content: center;
         margin-top: 1rem;
+    }
+    /* Dark mode fix for LINE box */
+    @media (prefers-color-scheme: dark) {
+      .line-add-box {
+        background-color: var(--color-card-bg);
+      }
     }
   </style>
 </head>
 <body>
     <header class="site-header">
         <div class="container">
-            <img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" />
+            <a href="index.html"><img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" /></a>
             <button class="burger-menu" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
             </button>
@@ -101,8 +113,8 @@
                     <li><a href="login.html">Log In</a></li>
                     <li>
                         <div class="nav-lang-toggle">
-                            <button data-lang="ja">日本語</button>
-                            <button data-lang="en">English</button>
+                            <button data-lang="ja" aria-label="日本語に切り替え">日本語</button>
+                            <button data-lang="en" aria-label="Switch to English">English</button>
                         </div>
                     </li>
                 </ul>
@@ -111,111 +123,115 @@
     </header>
 
     <main>
-        <div class="container legal-page-container thank-you-container">
-            <div lang="en">
-                <h1 class="page-title">Thank you for subscribing to a Prokaiwa Power Pack!</h1>
-                <p class="page-subtitle">We’re excited to work with you on your English learning goals.</p>
+        <!-- JAPANESE VERSION -->
+        <section id="ja-thank-you" class="lang-section" lang="ja">
+            <div class="container legal-page-container thank-you-container">
+                <h1 class="page-title">パワーパックへのお申し込み、ありがとうございます！</h1>
+                <p class="page-subtitle">LINE練習とビデオレッスンで、効率よく英語力を伸ばしましょう。</p>
+
+                <h2>プラン内容：</h2>
+                <div class="summary-card">
+                    <p><strong>ご登録いただいたプラン：</strong></p>
+                    <hr>
+                    <p><strong>パワーパック・ライト（C1）– 月額¥10,000</strong></p>
+                    <ul>
+                        <li>月2回の45分Zoomレッスン</li>
+                        <li>毎日届くLINE会話テーマ</li>
+                        <li>あなた専用のフィードバック</li>
+                    </ul>
+                    <hr>
+                    <p><strong>パワーパック・プロ（C2）– 月額¥16,000</strong></p>
+                    <ul>
+                        <li>月4回の45分Zoomレッスン</li>
+                        <li>無制限のLINEサポート</li>
+                        <li>音声メッセージ添削＆オリジナル教材</li>
+                    </ul>
+                </div>
+                
+                <h2>次のステップ：</h2>
+                <h3><span class="step-number">1</span>LINEで友だち追加</h3>
+                <p>下のQRコードを読み取るか、IDで検索して友だち追加してください。</p>
+                <div class="line-add-box">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://line.me/R/ti/p/@845irjbc" alt="Prokaiwa LINE QRコード">
+                    <p>IDで追加する場合: <strong>@845irjbc</strong></p>
+                    <a href="https://line.me/R/ti/p/@845irjbc?from=page&searchId=845irjbc" class="cta-button" target="_blank">LINEで友だち追加</a>
+                </div>
+                
+                <h3><span class="step-number">2</span>LINEでメッセージを送信</h3>
+                <p>お申し込み時と同じLINEアカウントから、メッセージを送ってください。<strong>2営業日以内</strong>に担当講師からご連絡します。</p>
+
+                <h3><span class="step-number">3</span>Zoomレッスンを予約</h3>
+                <p>下のボタンからご都合の良い時間を選んで予約してください。予約後、Zoomリンクがメールで届きます。</p>
+                <div class="booking-buttons">
+                    <a href="https://calendly.com/prokaiwa-english/power-pack-lesson" target="_blank" class="cta-button">レッスンを予約する</a>
+                </div>
+
+                <h3><span class="step-number">4</span>ダッシュボードを確認</h3>
+                <p>マイページでプラン詳細などを確認できます。</p>
+                <div class="booking-buttons">
+                    <a href="dashboard.html" class="cta-button">マイページへ</a>
+                </div>
+
+                <h2>ご不明な点がありましたら</h2>
+                <p>ご質問やご相談は、お気軽にメールでお問い合わせください：<a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
+                <p><strong>どんなことでもお気軽にどうぞ！</strong></p>
+            </div>
+        </section>
+
+        <!-- ENGLISH VERSION -->
+        <section id="en-thank-you" class="lang-section" lang="en">
+            <div class="container legal-page-container thank-you-container">
+                <h1 class="page-title">Thank you for subscribing to a Power Pack!</h1>
+                <p class="page-subtitle">Combining LINE practice with video lessons is the fastest way to improve your English.</p>
 
                 <h2>Your Plan Summary:</h2>
                 <div class="summary-card">
-                    <p><strong>You’ve subscribed to one of the following:</strong></p>
-                    <hr style="margin: 1rem 0;">
+                    <p><strong>You've subscribed to one of the following:</strong></p>
+                    <hr>
                     <p><strong>Power Pack Lite (C1) – ¥10,000 / month</strong></p>
                     <ul>
                         <li>2 x 45min Zoom lessons per month</li>
-                        <li>Daily LINE conversation prompts</li>
+                        <li>Daily LINE conversation topics</li>
                         <li>Personalized feedback</li>
                     </ul>
-                    <hr style="margin: 1rem 0;">
+                    <hr>
                     <p><strong>Power Pack Pro (C2) – ¥16,000 / month</strong></p>
                     <ul>
                         <li>4 x 45min Zoom lessons per month</li>
-                        <li>Unlimited LINE coaching</li>
-                        <li>Voice memo reviews & Custom learning materials</li>
+                        <li>Unlimited LINE support</li>
+                        <li>Voice message reviews & custom learning materials</li>
                     </ul>
                 </div>
                 
                 <h2>Next Steps:</h2>
                 <h3><span class="step-number">1</span>Add us on LINE</h3>
-                <p>Please add our official LINE account by scanning the QR code, adding our ID, or clicking the button below.</p>
+                <p>Please add our official LINE account by scanning the QR code or adding our ID.</p>
                  <div class="line-add-box">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://line.me/R/ti/p/@845irjbc" alt="Prokaiwa LINE QR Code">
                     <p>Or add by ID: <strong>@845irjbc</strong></p>
                     <a href="https://line.me/R/ti/p/@845irjbc?from=page&searchId=845irjbc" class="cta-button" target="_blank">Add Friend on LINE</a>
                 </div>
                 
-                <h3><span class="step-number">2</span>Message us from the same LINE account you signed up with</h3>
-                <p>This helps us match your subscription to your LINE account. A teacher will reach out within 48 business hours.</p>
+                <h3><span class="step-number">2</span>Send us a message on LINE</h3>
+                <p>Please message us from the same LINE account you signed up with. A teacher will reach out within <strong>2 business days</strong>.</p>
 
-                <h3><span class="step-number">3</span>Book your Zoom sessions below</h3>
-                <p>You’ll receive a Zoom link for each session via email after booking through Calendly. Please join at the scheduled time.</p>
+                <h3><span class="step-number">3</span>Book your Zoom lessons</h3>
+                <p>Click the button below to schedule your lessons. You'll receive a Zoom link for each session via email.</p>
                 <div class="booking-buttons">
                     <a href="https://calendly.com/prokaiwa-english/power-pack-lesson" target="_blank" class="cta-button">Book Your Lesson</a>
                 </div>
                 
                 <h3><span class="step-number">4</span>Explore Your Dashboard</h3>
-                <p>While you wait for your first LINE message, you can visit your personal dashboard to review your plan and details.</p>
+                <p>Visit your dashboard to review your plan details.</p>
                 <div class="booking-buttons">
                     <a href="dashboard.html" class="cta-button">Go to My Dashboard</a>
                 </div>
 
                 <h2>Need Help?</h2>
-                <p>If you have any questions, comments, or concerns, feel free to email us at: <a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
-                <p><strong>We’re happy to assist you with any questions.</strong></p>
+                <p>If you have any questions, feel free to email us at: <a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
+                <p><strong>We're happy to help with anything!</strong></p>
             </div>
-
-            <div lang="ja">
-                <h1 class="page-title">プロカイワ・パワーパックへのお申し込み、誠にありがとうございます！</h1>
-                <p class="page-subtitle">あなたの英語学習の目標達成に向けて、共に取り組めることを楽しみにしています。</p>
-
-                <h2>プラン概要：</h2>
-                <div class="summary-card">
-                    <p><strong>以下のいずれかのプランにお申し込みいただきました：</strong></p>
-                    <hr style="margin: 1rem 0;">
-                    <p><strong>パワーパック・ライト（C1）– ¥10,000 / 月</strong></p>
-                    <ul>
-                        <li>月2回の45分Zoomレッスン</li>
-                        <li>毎日のLINE会話プロンプト</li>
-                        <li>個別フィードバック</li>
-                    </ul>
-                    <hr style="margin: 1rem 0;">
-                    <p><strong>パワーパック・プロ（C2）– ¥16,000 / 月</strong></p>
-                    <ul>
-                        <li>月4回の45分Zoomレッスン</li>
-                        <li>無制限のLINEコーチング</li>
-                        <li>ボイスメモ添削＆カスタム学習教材</li>
-                    </ul>
-                </div>
-                
-                <h2>次のステップ：</h2>
-                <h3><span class="step-number">1</span>LINEで友だち追加</h3>
-                <p>QRコードをスキャンするか、IDで検索、または下のボタンをクリックして、公式LINEアカウントを追加してください。</p>
-                <div class="line-add-box">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://line.me/R/ti/p/@845irjbc" alt="プロカイワ LINE QRコード">
-                    <p>またはIDで追加: <strong>@845irjbc</strong></p>
-                    <a href="https://line.me/R/ti/p/@845irjbc?from=page&searchId=845irjbc" class="cta-button" target="_blank">LINEで友だち追加</a>
-                </div>
-                
-                <h3><span class="step-number">2</span>お申し込み時と同じLINEアカウントからメッセージを送信</h3>
-                <p>これにより、お客様の登録情報とLINEアカウントを照合します。担当講師から48営業時間以内にご連絡いたします。</p>
-
-                <h3><span class="step-number">3</span>以下からZoomセッションを予約してください</h3>
-                <p>Calendlyで予約後、各セッションのZoomリンクがメールで届きます。予約した時間にご参加ください。</p>
-                <div class="booking-buttons">
-                    <a href="https://calendly.com/prokaiwa-english/power-pack-lesson" target="_blank" class="cta-button">レッスンを予約する</a>
-                </div>
-
-                <h3><span class="step-number">4</span>ダッシュボードを確認</h3>
-                <p>最初のLINEメッセージをお待ちいただく間、個人のダッシュボードにアクセスしてプランの詳細などを確認できます。</p>
-                <div class="booking-buttons">
-                    <a href="dashboard.html" class="cta-button">ダッシュボードへ移動</a>
-                </div>
-
-                <h2>お困りですか？</h2>
-                <p>ご質問、ご意見、ご不明な点がございましたら、お気軽に下記までメールでお問い合わせください：<a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
-                <p><strong>どんなご質問でも、喜んでお手伝いいたします。</strong></p>
-            </div>
-        </div>
+        </section>
     </main>
     
     <footer class="site-footer">
