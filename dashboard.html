@@ -11,28 +11,531 @@
   gtag('config', 'G-KLVF2ZG1WX');
 </script>
   <meta charset="UTF-8">
-  <title>Prokaiwa | Contact Us</title>
+  <title>Prokaiwa | Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="プロ会話へのお問い合わせ - 英会話レッスンに関するご質問やご相談はこちらから。LINEまたはメールでお気軽にご連絡ください。">
-  <meta name="keywords" content="お問い合わせ, 英会話レッスン, LINE英語, プロ会話, 連絡先">
-  <link rel="canonical" href="https://prokaiwa.com/contact.html">
+  <meta name="description" content="Your Prokaiwa learning dashboard - track progress, access resources, and manage your English learning journey.">
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* ========================================
+       DASHBOARD-SPECIFIC STYLES
+       ======================================== */
+    
+    /* Loading State */
+    .dashboard-loading {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    .dashboard-loading i {
+      font-size: 2rem;
+      color: var(--color-primary);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Welcome Banner */
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .welcome-banner h1 {
+      font-size: 1.75rem;
+      margin: 0 0 0.5rem 0;
+      color: white;
+    }
+    .welcome-banner p {
+      margin: 0;
+      opacity: 0.9;
+    }
+    .welcome-stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .welcome-stat {
+      text-align: center;
+    }
+    .welcome-stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      display: block;
+    }
+    .welcome-stat-label {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    
+    /* Practice Check-in Card */
+    .checkin-card {
+      background: linear-gradient(135deg, #28a745 0%, #20863d 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .checkin-card.completed {
+      background: linear-gradient(135deg, var(--color-gold) 0%, #b8860b 100%);
+    }
+    .checkin-card h2 {
+      color: white;
+      margin: 0 0 0.5rem 0;
+      font-size: 1.25rem;
+    }
+    .checkin-card p {
+      margin: 0 0 1rem 0;
+      opacity: 0.95;
+    }
+    .checkin-btn {
+      background: white;
+      color: #28a745;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .checkin-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .checkin-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .checkin-btn.loading::after {
+      content: "";
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-left: 8px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+    }
+    .checkin-success {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+    }
+    .checkin-success i {
+      font-size: 1.5rem;
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .quick-action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem 1rem;
+      background-color: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      text-decoration: none;
+      color: var(--color-text);
+      transition: all var(--transition-speed) ease;
+      text-align: center;
+    }
+    .quick-action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--color-primary);
+    }
+    .quick-action-btn i {
+      font-size: 1.5rem;
+      color: var(--color-primary);
+      margin-bottom: 0.5rem;
+    }
+    .quick-action-btn span {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    /* Dashboard Cards */
+    .dashboard-card {
+      background-color: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      transition: box-shadow var(--transition-speed) ease;
+    }
+    .dashboard-card:hover {
+      box-shadow: var(--shadow);
+    }
+    .dashboard-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.1rem;
+      color: var(--color-accent);
+      margin: 0 0 1rem 0;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .dashboard-card h3 i {
+      color: var(--color-primary);
+    }
+    
+    /* Progress Ring */
+    .progress-ring-container {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .progress-ring {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    .progress-ring svg {
+      transform: rotate(-90deg);
+    }
+    .progress-ring-bg {
+      fill: none;
+      stroke: var(--color-border);
+      stroke-width: 8;
+    }
+    .progress-ring-fill {
+      fill: none;
+      stroke: var(--color-primary);
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+    .progress-ring-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    .progress-details h4 {
+      margin: 0 0 0.25rem 0;
+      color: var(--color-text);
+    }
+    .progress-details p {
+      margin: 0;
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+    }
+    
+    /* Streak Calendar */
+    .streak-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .streak-fire {
+      font-size: 2.5rem;
+    }
+    .streak-count {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    .streak-label {
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+    }
+    .streak-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .streak-day-header {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      padding: 4px;
+    }
+    .streak-day {
+      aspect-ratio: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--color-bg);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--color-text-light);
+    }
+    .streak-day.active {
+      background-color: var(--color-primary);
+      color: white;
+    }
+    .streak-day.today {
+      border: 2px solid var(--color-gold);
+    }
+    .streak-day.future {
+      opacity: 0.4;
+    }
+    
+    /* Upcoming Lessons */
+    .no-lessons {
+      text-align: center;
+      padding: 2rem;
+      color: var(--color-text-light);
+    }
+    .no-lessons i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+    }
+    
+    /* Resources List */
+    .resource-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      transition: background-color var(--transition-speed) ease;
+    }
+    .resource-item:hover {
+      background-color: var(--color-bg);
+    }
+    .resource-item i {
+      font-size: 1.25rem;
+      color: var(--color-primary);
+      width: 30px;
+      text-align: center;
+    }
+    .resource-item a {
+      flex: 1;
+      color: var(--color-text);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .resource-item a:hover {
+      color: var(--color-primary);
+    }
+    .resource-item .coming-soon {
+      color: var(--color-text-muted);
+      font-style: italic;
+      cursor: default;
+    }
+    .resource-item .coming-soon:hover {
+      color: var(--color-text-muted);
+    }
+    .resource-tag {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      background-color: var(--color-primary-light);
+      color: var(--color-primary-dark);
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .resource-tag.coming {
+      background-color: var(--color-bg);
+      color: var(--color-text-muted);
+    }
+    
+    /* Achievements */
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 1rem;
+    }
+    .achievement {
+      text-align: center;
+      padding: 0.75rem;
+    }
+    .achievement-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.5rem;
+      font-size: 1.25rem;
+    }
+    .achievement-icon.earned {
+      background-color: var(--color-gold);
+      color: white;
+    }
+    .achievement-icon.locked {
+      background-color: var(--color-bg);
+      color: var(--color-text-muted);
+      opacity: 0.5;
+    }
+    .achievement-name {
+      font-size: 0.75rem;
+      color: var(--color-text-light);
+    }
+    .achievement.locked .achievement-name {
+      opacity: 0.5;
+    }
+    
+    /* Account Card */
+    .plan-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background-color: var(--color-primary);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .plan-badge.pending {
+      background-color: var(--color-gold);
+    }
+    .plan-badge.has-addon {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-gold) 100%);
+    }
+    .addon-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      background-color: var(--color-gold);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+    .account-details {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .account-details li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+    }
+    .account-details li:last-child {
+      border-bottom: none;
+    }
+    .account-details strong {
+      color: var(--color-text-light);
+      font-weight: 500;
+    }
+    
+    /* Upgrade Card */
+    .upgrade-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-align: center;
+    }
+    .upgrade-card h3 {
+      color: white;
+      border-bottom-color: rgba(255,255,255,0.3);
+    }
+    .upgrade-card h3 i {
+      color: white;
+    }
+    .upgrade-card p {
+      margin-bottom: 1rem;
+      opacity: 0.95;
+    }
+    .upgrade-card .cta-button {
+      background: white;
+      color: #667eea;
+    }
+    .upgrade-card .cta-button:hover {
+      background: #f0f0f0;
+      transform: translateY(-2px);
+    }
+    
+    /* Tip of the Day */
+    .tip-box {
+      background-color: var(--color-primary-light);
+      border-left: 4px solid var(--color-primary);
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .tip-box p {
+      margin: 0;
+    }
+    .tip-box .tip-phrase {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-primary-dark);
+      display: block;
+      margin-top: 0.5rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .welcome-banner {
+        flex-direction: column;
+        text-align: center;
+      }
+      .welcome-stats {
+        justify-content: center;
+      }
+      .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    /* Dark mode fixes */
+    @media (prefers-color-scheme: dark) {
+      .tip-box {
+        background-color: var(--color-card-bg);
+      }
+      .resource-tag {
+        background-color: var(--color-primary-dark);
+        color: var(--color-primary-light);
+      }
+      .checkin-card {
+        background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+      }
+      .checkin-card.completed {
+        background: linear-gradient(135deg, #b8860b 0%, #8b6914 100%);
+      }
+    }
+  </style>
 </head>
 <body>
     <header class="site-header">
         <div class="container">
             <a href="index.html"><img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" /></a>
-            <button class="burger-menu" aria-label="メニューを開く" aria-expanded="false">
+            <button class="burger-menu" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
             </button>
             <nav class="main-nav">
                 <ul>
                     <li><a href="index.html">Home</a></li>
                     <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html" class="active">Contact</a></li>
-                    <li><a href="login.html">Log In</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="#" id="logout-button-nav" class="logout-button">Log Out</a></li>
                     <li>
                         <div class="nav-lang-toggle">
                             <button data-lang="ja" aria-label="日本語に切り替え">日本語</button>
@@ -44,118 +547,431 @@
         </div>
     </header>
 
-  <main>
-    <div class="container legal-page-container">
-      <button class="close-button" aria-label="Go back to previous page" onclick="history.back()">
-        <i class="fas fa-times"></i>
-      </button>
+    <main>
+        <!-- JAPANESE VERSION -->
+        <section id="ja-dashboard" class="lang-section" lang="ja">
+            <div class="container legal-page-container">
+                <!-- Loading State -->
+                <div id="ja-dashboard-loading" class="dashboard-loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>読み込み中...</p>
+                </div>
 
-      <div lang="en">
-        <h1 class="page-title">Contact Us</h1>
-        <p class="page-subtitle">Have questions about our services? Reach out to us and we'll get back to you soon.</p>
-      </div>
-      <div lang="ja">
-        <h1 class="page-title">お問い合わせ</h1>
-        <p class="page-subtitle">ご質問やご相談がありましたら、お気軽にご連絡ください。</p>
-      </div>
-      
-      <section id="en-contact" class="lang-section" lang="en">
-        <div class="process-grid">
-            <article class="process-card">
-                <i class="fas fa-envelope" aria-hidden="true"></i>
-                <h3 class="process-title">Email</h3>
-                <p class="process-description"><a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
-            </article>
-            <article class="process-card">
-                <i class="fab fa-line" aria-hidden="true"></i>
-                <h3 class="process-title">Contact us on LINE</h3>
-                <p class="process-description"><a href="https://page.line.me/845irjbc" target="_blank" rel="noopener noreferrer">@prokaiwa</a></p>
-            </article>
-            <article class="process-card">
-                <i class="fas fa-clock" aria-hidden="true"></i>
-                <h3 class="process-title">Business Hours</h3>
-                <p class="process-description">10:00 – 18:00 JST<br>(Closed weekends & holidays)</p>
-            </article>
-        </div>
-        <div class="contact-form">
-          <form action="https://formsubmit.co/prokaiwa.english@gmail.com" method="POST" aria-label="Contact form in English">
-            <p class="form-intro">Fill out the form below and we'll get back to you within 24 hours.</p>
-            <input type="hidden" name="_subject" value="New message from Prokaiwa Website">
-            <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="_next" value="https://prokaiwa.com/thank-you.html">
+                <!-- Dashboard Content -->
+                <div id="ja-dashboard-content" style="display: none;">
+                    
+                    <!-- Welcome Banner -->
+                    <div class="welcome-banner">
+                        <div>
+                            <h1 id="ja-welcome-name">おかえりなさい！</h1>
+                            <p>今日も英語学習、頑張りましょう！</p>
+                        </div>
+                        <div class="welcome-stats">
+                            <div class="welcome-stat">
+                                <span class="welcome-stat-value" id="ja-stat-streak">0</span>
+                                <span class="welcome-stat-label">日連続</span>
+                            </div>
+                            <div class="welcome-stat">
+                                <span class="welcome-stat-value" id="ja-stat-total">0</span>
+                                <span class="welcome-stat-label">練習回数</span>
+                            </div>
+                            <div class="welcome-stat">
+                                <span class="welcome-stat-value" id="ja-stat-month">0</span>
+                                <span class="welcome-stat-label">今月</span>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="name-en">Full Name</label>
-                <input type="text" id="name-en" name="name" required>
-              </div>
-              <div class="form-group">
-                <label for="email-en">Email Address</label>
-                <input type="email" id="email-en" name="email" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="subject-en">Subject</label>
-              <input type="text" id="subject-en" name="subject" required>
-            </div>
-            <div class="form-group">
-              <label for="message-en">Message</label>
-              <textarea id="message-en" name="message" required></textarea>
-            </div>
-            <button type="submit" class="cta-button form-submit-button">Send Message</button>
-          </form>
-        </div>
-      </section>
+                    <!-- Daily Check-in Card -->
+                    <div class="checkin-card" id="ja-checkin-card">
+                        <h2>📝 今日のLINE練習は完了しましたか？</h2>
+                        <p>LINEで練習したら、下のボタンを押して記録しましょう！</p>
+                        <button class="checkin-btn" id="ja-checkin-btn">
+                            <i class="fas fa-check"></i> 練習完了！
+                        </button>
+                    </div>
 
-      <section id="ja-contact" class="lang-section" lang="ja">
-        <div class="process-grid">
-            <article class="process-card">
-                <i class="fas fa-envelope" aria-hidden="true"></i>
-                <h3 class="process-title">Eメール</h3>
-                <p class="process-description"><a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
-            </article>
-            <article class="process-card">
-                <i class="fab fa-line" aria-hidden="true"></i>
-                <h3 class="process-title">LINEでお問い合わせ</h3>
-                <p class="process-description"><a href="https://page.line.me/845irjbc" target="_blank" rel="noopener noreferrer">@prokaiwa</a></p>
-            </article>
-            <article class="process-card">
-                <i class="fas fa-clock" aria-hidden="true"></i>
-                <h3 class="process-title">営業時間</h3>
-                <p class="process-description">10:00 – 18:00（日本時間）<br>※土日祝日休み</p>
-            </article>
-        </div>
-        <div class="contact-form">
-          <form action="https://formsubmit.co/prokaiwa.english@gmail.com" method="POST" aria-label="お問い合わせフォーム">
-            <p class="form-intro">下記のフォームにご記入ください。24時間以内にご返信いたします。</p>
-            <input type="hidden" name="_subject" value="【プロ会話HP】新規お問合わせ">
-            <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="_next" value="https://prokaiwa.com/thank-you.html">
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <a href="https://line.me/R/ti/p/@845irjbc" target="_blank" class="quick-action-btn">
+                            <i class="fab fa-line"></i>
+                            <span>LINEで練習</span>
+                        </a>
+                        <a href="https://calendly.com/prokaiwa-english/" target="_blank" class="quick-action-btn" id="ja-book-lesson-btn">
+                            <i class="fas fa-video"></i>
+                            <span>レッスン予約</span>
+                        </a>
+                        <a href="#ja-resources" class="quick-action-btn">
+                            <i class="fas fa-book"></i>
+                            <span>学習教材</span>
+                        </a>
+                        <a href="contact.html" class="quick-action-btn">
+                            <i class="fas fa-envelope"></i>
+                            <span>お問い合わせ</span>
+                        </a>
+                    </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="name-ja">氏名</label>
-                <input type="text" id="name-ja" name="name" required>
-              </div>
-              <div class="form-group">
-                <label for="email-ja">メールアドレス</label>
-                <input type="email" id="email-ja" name="email" required>
-              </div>
+                    <!-- Dashboard Grid -->
+                    <div class="dashboard-grid">
+                        
+                        <!-- Today's Tip -->
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-lightbulb"></i>今日のフレーズ</h3>
+                            <div class="tip-box">
+                                <p>今日はこのフレーズを使ってみましょう：</p>
+                                <span class="tip-phrase" id="ja-daily-phrase">"I'm looking forward to..."</span>
+                                <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--color-text-light);" id="ja-phrase-example">
+                                    例：I'm looking forward to our next lesson!<br>
+                                    （次のレッスンが楽しみです！）
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Progress -->
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-chart-line"></i>今月の進捗</h3>
+                            <div class="progress-ring-container">
+                                <div class="progress-ring">
+                                    <svg width="80" height="80">
+                                        <circle class="progress-ring-bg" cx="40" cy="40" r="32"></circle>
+                                        <circle class="progress-ring-fill" cx="40" cy="40" r="32" 
+                                                stroke-dasharray="201" 
+                                                id="ja-progress-ring"></circle>
+                                    </svg>
+                                    <span class="progress-ring-text" id="ja-progress-percent">0%</span>
+                                </div>
+                                <div class="progress-details">
+                                    <h4 id="ja-progress-message">頑張りましょう！</h4>
+                                    <p id="ja-progress-sub">今月の目標に向かって</p>
+                                </div>
+                            </div>
+                            <p style="font-size: 0.9rem; color: var(--color-text-light);">
+                                <i class="fas fa-check-circle" style="color: var(--color-primary);"></i>
+                                今月 <strong id="ja-sessions-completed">0</strong> / <span id="ja-sessions-total">20</span> 回完了
+                            </p>
+                        </div>
+
+                        <!-- Streak -->
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-fire"></i>練習継続記録</h3>
+                            <div class="streak-header">
+                                <span class="streak-fire" id="ja-streak-emoji">🔥</span>
+                                <div>
+                                    <span class="streak-count" id="ja-streak-count">0</span>
+                                    <span class="streak-label">日連続！</span>
+                                </div>
+                            </div>
+                            <div class="streak-calendar" id="ja-streak-calendar">
+                                <!-- Calendar will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Achievements -->
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-trophy"></i>達成バッジ</h3>
+                            <div class="achievements-grid" id="ja-achievements">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Lessons (for video plans) -->
+                        <div class="dashboard-card" id="ja-upcoming-lessons-card" style="display: none;">
+                            <h3><i class="fas fa-calendar-alt"></i>予約中のレッスン</h3>
+                            <div id="ja-upcoming-lessons">
+                                <div class="no-lessons">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    <p>予約中のレッスンはありません</p>
+                                    <a href="https://calendly.com/prokaiwa-english/" target="_blank" class="cta-button" style="margin-top: 1rem;">レッスンを予約する</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upgrade Card (for Plan A users without add-ons) -->
+                        <div class="dashboard-card upgrade-card" id="ja-upgrade-card" style="display: none;">
+                            <h3><i class="fas fa-star"></i>ビデオレッスンを追加</h3>
+                            <p>講師と直接話して、さらに上達しませんか？</p>
+                            <a href="https://buy.stripe.com/28E9AS4UrcIP8JK7wbes002" target="_blank" class="cta-button">
+                                カジュアルレッスン ¥3,000
+                            </a>
+                            <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.9;">
+                                <a href="https://buy.stripe.com/28E14mev16kr4tu5o3es003" target="_blank" style="color: white; text-decoration: underline;">
+                                    ビジネスレッスン ¥5,000
+                                </a>
+                            </p>
+                        </div>
+
+                        <!-- Learning Resources -->
+                        <div class="dashboard-card" id="ja-resources">
+                            <h3><i class="fas fa-folder-open"></i>学習教材</h3>
+                            <!-- 
+                                ================================================
+                                HOW TO ADD YOUR OWN RESOURCES:
+                                ================================================
+                                1. Create your PDF or document
+                                2. Upload to Google Drive
+                                3. Right-click → "Get link" → "Anyone with link can view"
+                                4. Replace the # in href="#" with your Google Drive link
+                                5. Remove the "coming-soon" class and "coming" class from tags
+                                
+                                Example with real link:
+                                <div class="resource-item">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <a href="https://drive.google.com/file/d/YOUR_FILE_ID/view" target="_blank">日常会話フレーズ集</a>
+                                    <span class="resource-tag">PDF</span>
+                                </div>
+                                ================================================
+                            -->
+                            <div class="resource-item">
+                                <i class="fas fa-file-pdf"></i>
+                                <a href="#" class="coming-soon">日常会話フレーズ集</a>
+                                <span class="resource-tag coming">準備中</span>
+                            </div>
+                            <div class="resource-item">
+                                <i class="fas fa-file-pdf"></i>
+                                <a href="#" class="coming-soon">ビジネス英語基礎</a>
+                                <span class="resource-tag coming">準備中</span>
+                            </div>
+                            <div class="resource-item">
+                                <i class="fas fa-link"></i>
+                                <a href="#" class="coming-soon">おすすめYouTubeチャンネル</a>
+                                <span class="resource-tag coming">準備中</span>
+                            </div>
+                            <div class="resource-item">
+                                <i class="fas fa-headphones"></i>
+                                <a href="#" class="coming-soon">リスニング練習音声</a>
+                                <span class="resource-tag coming">準備中</span>
+                            </div>
+                            <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--color-text-muted); text-align: center;">
+                                <i class="fas fa-info-circle"></i> 教材は順次追加予定です
+                            </p>
+                        </div>
+
+                        <!-- Account Info -->
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-user-circle"></i>アカウント情報</h3>
+                            <div id="ja-plan-badges">
+                                <span class="plan-badge" id="ja-plan-badge">プランA</span>
+                            </div>
+                            <ul class="account-details">
+                                <li><strong>氏名</strong><span id="ja-profile-name">-</span></li>
+                                <li><strong>メール</strong><span id="ja-profile-email">-</span></li>
+                                <li><strong>レベル</strong><span id="ja-profile-level">-</span></li>
+                                <li><strong>ステータス</strong><span id="ja-profile-status">-</span></li>
+                            </ul>
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <a href="contact.html?subject=plan-change" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">プラン変更</a>
+                                <button id="ja-logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">ログアウト</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-              <label for="subject-ja">件名</label>
-              <input type="text" id="subject-ja" name="subject" required>
+        </section>
+
+        <!-- ENGLISH VERSION -->
+        <section id="en-dashboard" class="lang-section" lang="en">
+            <div class="container legal-page-container">
+                <!-- Loading State -->
+                <div id="en-dashboard-loading" class="dashboard-loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading your dashboard...</p>
+                </div>
+
+                <!-- Dashboard Content -->
+                <div id="en-dashboard-content" style="display: none;">
+                    
+                    <!-- Welcome Banner -->
+                    <div class="welcome-banner">
+                        <div>
+                            <h1 id="en-welcome-name">Welcome back!</h1>
+                            <p>Let's continue your English learning journey!</p>
+                        </div>
+                        <div class="welcome-stats">
+                            <div class="welcome-stat">
+                                <span class="welcome-stat-value" id="en-stat-streak">0</span>
+                                <span class="welcome-stat-label">Day Streak</span>
+                            </div>
+                            <div class="welcome-stat">
+                                <span class="welcome-stat-value" id="en-stat-total">0</span>
+                                <span class="welcome-stat-label">Total Sessions</span>
+                            </div>
+                            <div class="welcome-stat">
+                                <span class="welcome-stat-value" id="en-stat-month">0</span>
+                                <span class="welcome-stat-label">This Month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Daily Check-in Card -->
+                    <div class="checkin-card" id="en-checkin-card">
+                        <h2>📝 Did you complete today's LINE practice?</h2>
+                        <p>After practicing on LINE, click the button below to log it!</p>
+                        <button class="checkin-btn" id="en-checkin-btn">
+                            <i class="fas fa-check"></i> Mark Complete!
+                        </button>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <a href="https://line.me/R/ti/p/@845irjbc" target="_blank" class="quick-action-btn">
+                            <i class="fab fa-line"></i>
+                            <span>Practice on LINE</span>
+                        </a>
+                        <a href="https://calendly.com/prokaiwa-english/" target="_blank" class="quick-action-btn" id="en-book-lesson-btn">
+                            <i class="fas fa-video"></i>
+                            <span>Book Lesson</span>
+                        </a>
+                        <a href="#en-resources" class="quick-action-btn">
+                            <i class="fas fa-book"></i>
+                            <span>Resources</span>
+                        </a>
+                        <a href="contact.html" class="quick-action-btn">
+                            <i class="fas fa-envelope"></i>
+                            <span>Contact Us</span>
+                        </a>
+                    </div>
+
+                    <!-- Dashboard Grid -->
+                    <div class="dashboard-grid">
+                        
+                        <!-- Today's Tip -->
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-lightbulb"></i>Phrase of the Day</h3>
+                            <div class="tip-box">
+                                <p>Try using this phrase today:</p>
+                                <span class="tip-phrase" id="en-daily-phrase">"I'm looking forward to..."</span>
+                                <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--color-text-light);" id="en-phrase-example">
+                                    Example: I'm looking forward to our next lesson!
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Progress -->
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-chart-line"></i>Monthly Progress</h3>
+                            <div class="progress-ring-container">
+                                <div class="progress-ring">
+                                    <svg width="80" height="80">
+                                        <circle class="progress-ring-bg" cx="40" cy="40" r="32"></circle>
+                                        <circle class="progress-ring-fill" cx="40" cy="40" r="32" 
+                                                stroke-dasharray="201" 
+                                                id="en-progress-ring"></circle>
+                                    </svg>
+                                    <span class="progress-ring-text" id="en-progress-percent">0%</span>
+                                </div>
+                                <div class="progress-details">
+                                    <h4 id="en-progress-message">Let's go!</h4>
+                                    <p id="en-progress-sub">Working toward your goal</p>
+                                </div>
+                            </div>
+                            <p style="font-size: 0.9rem; color: var(--color-text-light);">
+                                <i class="fas fa-check-circle" style="color: var(--color-primary);"></i>
+                                <strong id="en-sessions-completed">0</strong> / <span id="en-sessions-total">20</span> sessions this month
+                            </p>
+                        </div>
+
+                        <!-- Streak -->
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-fire"></i>Practice Streak</h3>
+                            <div class="streak-header">
+                                <span class="streak-fire" id="en-streak-emoji">🔥</span>
+                                <div>
+                                    <span class="streak-count" id="en-streak-count">0</span>
+                                    <span class="streak-label">day streak!</span>
+                                </div>
+                            </div>
+                            <div class="streak-calendar" id="en-streak-calendar">
+                                <!-- Calendar will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Achievements -->
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-trophy"></i>Achievements</h3>
+                            <div class="achievements-grid" id="en-achievements">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Lessons (for video plans) -->
+                        <div class="dashboard-card" id="en-upcoming-lessons-card" style="display: none;">
+                            <h3><i class="fas fa-calendar-alt"></i>Upcoming Lessons</h3>
+                            <div id="en-upcoming-lessons">
+                                <div class="no-lessons">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    <p>No upcoming lessons scheduled</p>
+                                    <a href="https://calendly.com/prokaiwa-english/" target="_blank" class="cta-button" style="margin-top: 1rem;">Book a Lesson</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upgrade Card (for Plan A users) -->
+                        <div class="dashboard-card upgrade-card" id="en-upgrade-card" style="display: none;">
+                            <h3><i class="fas fa-star"></i>Add Video Lessons</h3>
+                            <p>Want to practice speaking with a teacher directly?</p>
+                            <a href="https://buy.stripe.com/28E9AS4UrcIP8JK7wbes002" target="_blank" class="cta-button">
+                                Casual Lesson ¥3,000
+                            </a>
+                            <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.9;">
+                                <a href="https://buy.stripe.com/28E14mev16kr4tu5o3es003" target="_blank" style="color: white; text-decoration: underline;">
+                                    Business Lesson ¥5,000
+                                </a>
+                            </p>
+                        </div>
+
+                        <!-- Learning Resources -->
+                        <div class="dashboard-card" id="en-resources">
+                            <h3><i class="fas fa-folder-open"></i>Learning Resources</h3>
+                            <!-- See Japanese section for instructions on adding resources -->
+                            <div class="resource-item">
+                                <i class="fas fa-file-pdf"></i>
+                                <a href="#" class="coming-soon">Common Conversation Phrases</a>
+                                <span class="resource-tag coming">Coming Soon</span>
+                            </div>
+                            <div class="resource-item">
+                                <i class="fas fa-file-pdf"></i>
+                                <a href="#" class="coming-soon">Business English Basics</a>
+                                <span class="resource-tag coming">Coming Soon</span>
+                            </div>
+                            <div class="resource-item">
+                                <i class="fas fa-link"></i>
+                                <a href="#" class="coming-soon">Recommended YouTube Channels</a>
+                                <span class="resource-tag coming">Coming Soon</span>
+                            </div>
+                            <div class="resource-item">
+                                <i class="fas fa-headphones"></i>
+                                <a href="#" class="coming-soon">Listening Practice Audio</a>
+                                <span class="resource-tag coming">Coming Soon</span>
+                            </div>
+                            <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--color-text-muted); text-align: center;">
+                                <i class="fas fa-info-circle"></i> More resources coming soon!
+                            </p>
+                        </div>
+
+                        <!-- Account Info -->
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-user-circle"></i>Account Info</h3>
+                            <div id="en-plan-badges">
+                                <span class="plan-badge" id="en-plan-badge">Plan A</span>
+                            </div>
+                            <ul class="account-details">
+                                <li><strong>Name</strong><span id="en-profile-name">-</span></li>
+                                <li><strong>Email</strong><span id="en-profile-email">-</span></li>
+                                <li><strong>Level</strong><span id="en-profile-level">-</span></li>
+                                <li><strong>Status</strong><span id="en-profile-status">-</span></li>
+                            </ul>
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <a href="contact.html?subject=plan-change" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Change Plan</a>
+                                <button id="en-logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Log Out</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-              <label for="message-ja">メッセージ</label>
-              <textarea id="message-ja" name="message" required></textarea>
-            </div>
-            <button type="submit" class="cta-button form-submit-button">メッセージを送信</button>
-          </form>
-        </div>
-      </section>
-    </div>
-  </main>
+        </section>
+    </main>
 
     <footer class="site-footer">
         <div class="container">
@@ -178,9 +994,9 @@
                 <div class="footer-column">
                     <h3>Connect</h3>
                     <div class="footer-social-icons">
-                        <a href="https://page.line.me/845irjbc" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="LINE"><i class="fab fa-line"></i></a>
-                        <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
+                        <a href="https://page.line.me/845irjbc" class="social-icon" target="_blank" aria-label="LINE"><i class="fab fa-line"></i></a>
+                        <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
                     </div>
                     <a href="mailto:prokaiwa.english@gmail.com" class="footer-email">prokaiwa.english@gmail.com</a>
                 </div>
@@ -189,61 +1005,470 @@
         </div>
     </footer>
 
-    <script src="assets/js/script.js"></script>
-    
-    <!-- Pre-fill form based on URL parameters -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const subjectParam = urlParams.get('subject');
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // =============================================
+        // CONFIGURATION
+        // =============================================
+        const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Monthly goal (sessions per month)
+        const MONTHLY_GOAL = 20;
+
+        // Daily phrases (you can expand this list)
+        const dailyPhrases = [
+            { phrase: '"I\'m looking forward to..."', example_en: 'I\'m looking forward to our next lesson!', example_ja: '次のレッスンが楽しみです！' },
+            { phrase: '"Could you please..."', example_en: 'Could you please repeat that?', example_ja: 'もう一度言っていただけますか？' },
+            { phrase: '"I\'d like to..."', example_en: 'I\'d like to practice speaking more.', example_ja: 'もっとスピーキングを練習したいです。' },
+            { phrase: '"What do you think about..."', example_en: 'What do you think about this idea?', example_ja: 'このアイデアについてどう思いますか？' },
+            { phrase: '"It depends on..."', example_en: 'It depends on the situation.', example_ja: '状況によります。' },
+            { phrase: '"I\'m not sure, but..."', example_en: 'I\'m not sure, but I think so.', example_ja: '確かではないですが、そう思います。' },
+            { phrase: '"Let me think about it."', example_en: 'Let me think about it and get back to you.', example_ja: '考えて後で連絡しますね。' },
+        ];
+
+        // Achievement definitions
+        const achievements = [
+            { code: 'first_session', icon: 'fa-play', name_ja: '初回完了', name_en: 'First Session', condition: (stats) => stats.total >= 1 },
+            { code: 'streak_3', icon: 'fa-fire', name_ja: '3日連続', name_en: '3-Day Streak', condition: (stats) => stats.maxStreak >= 3 },
+            { code: 'streak_7', icon: 'fa-calendar-check', name_ja: '7日連続', name_en: '7-Day Streak', condition: (stats) => stats.maxStreak >= 7 },
+            { code: 'sessions_10', icon: 'fa-star', name_ja: '10回達成', name_en: '10 Sessions', condition: (stats) => stats.total >= 10 },
+            { code: 'streak_30', icon: 'fa-medal', name_ja: '30日連続', name_en: '30-Day Streak', condition: (stats) => stats.maxStreak >= 30 },
+            { code: 'sessions_100', icon: 'fa-crown', name_ja: '100回達成', name_en: '100 Sessions', condition: (stats) => stats.total >= 100 },
+        ];
+
+        // =============================================
+        // HELPER FUNCTIONS
+        // =============================================
+        
+        function getCurrentLang() {
+            return localStorage.getItem('prokaiwa-lang') || 'ja';
+        }
+
+        function getTodayString() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function getMonthStart() {
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        }
+
+        // Plan name mappings
+        const planNames = {
+            ja: { 'A': 'プランA', 'B45': 'プランB(45分)', 'B60': 'プランB(60分)', 'C1': 'プランC1', 'C2': 'プランC2' },
+            en: { 'A': 'Plan A', 'B45': 'Plan B (45min)', 'B60': 'Plan B (60min)', 'C1': 'Plan C1', 'C2': 'Plan C2' }
+        };
+
+        const statusNames = {
+            ja: { paid: '有効', pending: '支払い待ち' },
+            en: { paid: 'Active', pending: 'Payment Pending' }
+        };
+
+        const levelNames = {
+            ja: { 'Super Beginner': '超初級', 'Beginner': '初級', 'Intermediate': '中級', 'Advanced': '上級' },
+            en: { 'Super Beginner': 'Super Beginner', 'Beginner': 'Beginner', 'Intermediate': 'Intermediate', 'Advanced': 'Advanced' }
+        };
+
+        // =============================================
+        // STREAK CALCULATION
+        // =============================================
+        
+        function calculateStreak(practiceDates) {
+            if (!practiceDates || practiceDates.length === 0) return { current: 0, max: 0 };
             
-            // Pre-defined subjects for common requests
-            const subjects = {
-                'plan-change': {
-                    en: 'Plan Change Request',
-                    ja: 'プラン変更のご相談'
-                },
-                'cancel': {
-                    en: 'Cancellation Request',
-                    ja: '解約のご相談'
-                },
-                'question': {
-                    en: 'General Question',
-                    ja: 'ご質問'
-                },
-                'feedback': {
-                    en: 'Feedback',
-                    ja: 'ご意見・ご感想'
-                }
-            };
+            const sortedDates = [...practiceDates].sort((a, b) => new Date(b) - new Date(a));
+            const today = getTodayString();
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
             
-            if (subjectParam && subjects[subjectParam]) {
-                // Get current language
-                const currentLang = localStorage.getItem('prokaiwa-lang') || 'ja';
-                const subjectText = subjects[subjectParam][currentLang];
-                
-                // Pre-fill both language versions
-                const subjectEn = document.getElementById('subject-en');
-                const subjectJa = document.getElementById('subject-ja');
-                
-                if (subjectEn) subjectEn.value = subjects[subjectParam]['en'];
-                if (subjectJa) subjectJa.value = subjects[subjectParam]['ja'];
-                
-                // Also pre-fill message with a template for plan changes
-                if (subjectParam === 'plan-change') {
-                    const messageEn = document.getElementById('message-en');
-                    const messageJa = document.getElementById('message-ja');
-                    
-                    if (messageEn) {
-                        messageEn.value = 'Hello,\n\nI would like to discuss changing my plan.\n\nCurrent plan: \nDesired plan: \n\nThank you.';
-                    }
-                    if (messageJa) {
-                        messageJa.value = 'お世話になっております。\n\nプランの変更についてご相談させてください。\n\n現在のプラン：\n希望のプラン：\n\nよろしくお願いいたします。';
+            let currentStreak = 0;
+            let maxStreak = 0;
+            let tempStreak = 0;
+            let lastDate = null;
+            
+            const streakActive = sortedDates.includes(today) || sortedDates.includes(yesterday);
+            
+            if (streakActive) {
+                for (const dateStr of sortedDates) {
+                    const date = new Date(dateStr);
+                    if (lastDate === null) {
+                        currentStreak = 1;
+                        lastDate = date;
+                    } else {
+                        const diffDays = (lastDate - date) / (1000 * 60 * 60 * 24);
+                        if (diffDays === 1) {
+                            currentStreak++;
+                            lastDate = date;
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
-        });
+            
+            lastDate = null;
+            for (const dateStr of sortedDates) {
+                const date = new Date(dateStr);
+                if (lastDate === null) {
+                    tempStreak = 1;
+                    lastDate = date;
+                } else {
+                    const diffDays = (lastDate - date) / (1000 * 60 * 60 * 24);
+                    if (diffDays === 1) {
+                        tempStreak++;
+                        lastDate = date;
+                    } else {
+                        maxStreak = Math.max(maxStreak, tempStreak);
+                        tempStreak = 1;
+                        lastDate = date;
+                    }
+                }
+            }
+            maxStreak = Math.max(maxStreak, tempStreak);
+            
+            return { current: currentStreak, max: maxStreak };
+        }
+
+        // =============================================
+        // UI RENDERING
+        // =============================================
+        
+        function renderStreakCalendar(containerId, practiceDates, lang) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            const days = lang === 'ja' 
+                ? ['月', '火', '水', '木', '金', '土', '日']
+                : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+            
+            days.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'streak-day-header';
+                header.textContent = day;
+                container.appendChild(header);
+            });
+
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            const today = now.getDate();
+            
+            const startDay = (firstDay.getDay() + 6) % 7;
+            for (let i = 0; i < startDay; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'streak-day';
+                empty.style.visibility = 'hidden';
+                container.appendChild(empty);
+            }
+            
+            for (let d = 1; d <= lastDay.getDate(); d++) {
+                const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const day = document.createElement('div');
+                day.className = 'streak-day';
+                day.textContent = d;
+                
+                if (practiceDates.includes(dateStr)) {
+                    day.classList.add('active');
+                }
+                if (d === today) {
+                    day.classList.add('today');
+                }
+                if (d > today) {
+                    day.classList.add('future');
+                }
+                
+                container.appendChild(day);
+            }
+        }
+
+        function renderAchievements(containerId, stats, lang) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            achievements.forEach(achievement => {
+                const earned = achievement.condition(stats);
+                const div = document.createElement('div');
+                div.className = `achievement${earned ? '' : ' locked'}`;
+                div.innerHTML = `
+                    <div class="achievement-icon ${earned ? 'earned' : 'locked'}">
+                        <i class="fas ${achievement.icon}"></i>
+                    </div>
+                    <span class="achievement-name">${lang === 'ja' ? achievement.name_ja : achievement.name_en}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateProgressRing(lang, percentage) {
+            const ring = document.getElementById(`${lang}-progress-ring`);
+            const text = document.getElementById(`${lang}-progress-percent`);
+            const message = document.getElementById(`${lang}-progress-message`);
+            
+            const circumference = 201;
+            const offset = circumference - (percentage / 100) * circumference;
+            
+            ring.style.strokeDashoffset = offset;
+            text.textContent = `${Math.round(percentage)}%`;
+            
+            if (lang === 'ja') {
+                if (percentage >= 100) message.textContent = '目標達成！🎉';
+                else if (percentage >= 75) message.textContent = 'あと少し！';
+                else if (percentage >= 50) message.textContent = '順調です！';
+                else if (percentage >= 25) message.textContent = 'いい調子！';
+                else message.textContent = '頑張りましょう！';
+            } else {
+                if (percentage >= 100) message.textContent = 'Goal reached! 🎉';
+                else if (percentage >= 75) message.textContent = 'Almost there!';
+                else if (percentage >= 50) message.textContent = 'Great progress!';
+                else if (percentage >= 25) message.textContent = 'Good start!';
+                else message.textContent = "Let's go!";
+            }
+        }
+
+        function setDailyPhrase(lang) {
+            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+            const phrase = dailyPhrases[dayOfYear % dailyPhrases.length];
+            
+            document.getElementById(`${lang}-daily-phrase`).textContent = phrase.phrase;
+            document.getElementById(`${lang}-phrase-example`).innerHTML = lang === 'ja'
+                ? `例：${phrase.example_en}<br>（${phrase.example_ja}）`
+                : `Example: ${phrase.example_en}`;
+        }
+
+        // =============================================
+        // CHECK-IN FUNCTIONALITY
+        // =============================================
+        
+        async function handleCheckin(userId, lang) {
+            const btn = document.getElementById(`${lang}-checkin-btn`);
+            const card = document.getElementById(`${lang}-checkin-card`);
+            
+            btn.classList.add('loading');
+            btn.disabled = true;
+            
+            const today = getTodayString();
+            
+            try {
+                const { error } = await supabase
+                    .from('practice_log')
+                    .upsert({ 
+                        user_id: userId, 
+                        practice_date: today,
+                        created_at: new Date().toISOString()
+                    }, { 
+                        onConflict: 'user_id,practice_date' 
+                    });
+                
+                if (error) {
+                    console.error('Error logging practice:', error);
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    
+                    // More helpful error message
+                    const errorMsg = lang === 'ja' 
+                        ? 'エラーが発生しました。データベースのセットアップが必要かもしれません。' 
+                        : 'An error occurred. The database may need to be set up.';
+                    alert(errorMsg);
+                    return;
+                }
+                
+                // Update UI to show completion
+                card.classList.add('completed');
+                card.innerHTML = `
+                    <div class="checkin-success">
+                        <i class="fas fa-check-circle"></i>
+                        <span>${lang === 'ja' ? '今日の練習を記録しました！素晴らしい！🎉' : "Today's practice logged! Great job! 🎉"}</span>
+                    </div>
+                `;
+                
+                // Reload stats after a short delay
+                setTimeout(() => loadDashboard(), 1000);
+            } catch (err) {
+                console.error('Unexpected error:', err);
+                btn.classList.remove('loading');
+                btn.disabled = false;
+                alert(lang === 'ja' ? 'エラーが発生しました。' : 'An error occurred.');
+            }
+        }
+
+        // =============================================
+        // MAIN DASHBOARD LOADER
+        // =============================================
+        
+        async function loadDashboard() {
+            const lang = getCurrentLang();
+            const loadingDiv = document.getElementById(`${lang}-dashboard-loading`);
+            const contentDiv = document.getElementById(`${lang}-dashboard-content`);
+
+            // Check authentication
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Get user profile
+            const { data: profile, error: profileError } = await supabase
+                .from('questionnaire_responses')
+                .select('*')
+                .eq('user_id', user.id)
+                .single();
+            
+            if (profileError || !profile) {
+                window.location.href = 'questionnaire.html';
+                return;
+            }
+
+            // Get practice log (will be empty if table doesn't exist yet)
+            let practiceDates = [];
+            try {
+                const { data: practiceLog, error: practiceError } = await supabase
+                    .from('practice_log')
+                    .select('practice_date')
+                    .eq('user_id', user.id)
+                    .order('practice_date', { ascending: false });
+                
+                if (!practiceError && practiceLog) {
+                    practiceDates = practiceLog.map(p => p.practice_date);
+                }
+            } catch (e) {
+                console.log('Practice log table may not exist yet');
+            }
+            
+            const today = getTodayString();
+            const practicedToday = practiceDates.includes(today);
+            
+            // Calculate stats
+            const streakData = calculateStreak(practiceDates);
+            const monthStart = getMonthStart();
+            const thisMonthCount = practiceDates.filter(d => d >= monthStart).length;
+            const progressPercent = Math.min((thisMonthCount / MONTHLY_GOAL) * 100, 100);
+            
+            const stats = {
+                current: streakData.current,
+                maxStreak: streakData.max,
+                total: practiceDates.length,
+                thisMonth: thisMonthCount
+            };
+
+            // Check for video access
+            const hasVideoAddon = profile.addons?.includes('B45') || profile.addons?.includes('B60') || false;
+            const hasVideoAccess = profile.plan !== 'A' || hasVideoAddon;
+
+            // Update both language versions
+            ['ja', 'en'].forEach(l => {
+                // Welcome message
+                const welcomeText = l === 'ja' 
+                    ? `${profile.given_name_romaji}さん、おかえりなさい！`
+                    : `Welcome back, ${profile.given_name_romaji}!`;
+                document.getElementById(`${l}-welcome-name`).textContent = welcomeText;
+
+                // Stats
+                document.getElementById(`${l}-stat-streak`).textContent = stats.current;
+                document.getElementById(`${l}-stat-total`).textContent = stats.total;
+                document.getElementById(`${l}-stat-month`).textContent = stats.thisMonth;
+
+                // Profile info
+                document.getElementById(`${l}-profile-name`).textContent = profile.name;
+                document.getElementById(`${l}-profile-email`).textContent = profile.email;
+                document.getElementById(`${l}-profile-level`).textContent = levelNames[l][profile.level] || profile.level;
+                
+                const isPaid = profile.payment_status === 'paid';
+                document.getElementById(`${l}-profile-status`).textContent = isPaid 
+                    ? statusNames[l].paid 
+                    : statusNames[l].pending;
+
+                // Plan badge
+                const planBadge = document.getElementById(`${l}-plan-badge`);
+                planBadge.textContent = planNames[l][profile.plan] || profile.plan;
+                if (!isPaid) planBadge.classList.add('pending');
+                if (hasVideoAddon) planBadge.classList.add('has-addon');
+
+                // Add addon badge if applicable
+                if (hasVideoAddon) {
+                    const badgeContainer = document.getElementById(`${l}-plan-badges`);
+                    badgeContainer.innerHTML += `<span class="addon-badge">+ ${l === 'ja' ? 'ビデオ' : 'Video'}</span>`;
+                }
+
+                // Check-in card
+                if (practicedToday) {
+                    const card = document.getElementById(`${l}-checkin-card`);
+                    card.classList.add('completed');
+                    card.innerHTML = `
+                        <div class="checkin-success">
+                            <i class="fas fa-check-circle"></i>
+                            <span>${l === 'ja' ? '今日の練習を記録済み！素晴らしい！🎉' : "Today's practice logged! Great job! 🎉"}</span>
+                        </div>
+                    `;
+                }
+
+                // Show/hide elements based on plan
+                const bookLessonBtn = document.getElementById(`${l}-book-lesson-btn`);
+                const upcomingCard = document.getElementById(`${l}-upcoming-lessons-card`);
+                const upgradeCard = document.getElementById(`${l}-upgrade-card`);
+                
+                if (hasVideoAccess) {
+                    upcomingCard.style.display = 'block';
+                    upgradeCard.style.display = 'none';
+                } else {
+                    bookLessonBtn.style.display = 'none';
+                    upcomingCard.style.display = 'none';
+                    upgradeCard.style.display = 'block';
+                }
+
+                // Progress
+                document.getElementById(`${l}-sessions-completed`).textContent = stats.thisMonth;
+                document.getElementById(`${l}-sessions-total`).textContent = MONTHLY_GOAL;
+                updateProgressRing(l, progressPercent);
+
+                // Streak
+                document.getElementById(`${l}-streak-count`).textContent = stats.current;
+                document.getElementById(`${l}-streak-emoji`).textContent = stats.current >= 7 ? '🔥' : stats.current >= 3 ? '🔥' : '💪';
+                renderStreakCalendar(`${l}-streak-calendar`, practiceDates, l);
+
+                // Achievements
+                renderAchievements(`${l}-achievements`, stats, l);
+
+                // Daily phrase
+                setDailyPhrase(l);
+            });
+
+            // Hide loading, show content
+            loadingDiv.style.display = 'none';
+            contentDiv.style.display = 'block';
+
+            // Prepare other language version too
+            const otherLang = lang === 'ja' ? 'en' : 'ja';
+            document.getElementById(`${otherLang}-dashboard-loading`).style.display = 'none';
+            document.getElementById(`${otherLang}-dashboard-content`).style.display = 'block';
+
+            // Set up check-in button handlers
+            ['ja', 'en'].forEach(l => {
+                const btn = document.getElementById(`${l}-checkin-btn`);
+                if (btn && !practicedToday) {
+                    btn.addEventListener('click', () => handleCheckin(user.id, l));
+                }
+            });
+        }
+
+        // =============================================
+        // EVENT LISTENERS & INITIALIZATION
+        // =============================================
+        
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        document.getElementById('logout-button-nav').addEventListener('click', handleLogout);
+        document.getElementById('ja-logout-btn').addEventListener('click', handleLogout);
+        document.getElementById('en-logout-btn').addEventListener('click', handleLogout);
+
+        // Initialize
+        loadDashboard();
     </script>
+    <script src="assets/js/script.js"></script>
 </body>
 </html>
