@@ -13,9 +13,44 @@
   <meta charset="UTF-8">
   <title>Prokaiwa | Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Log in or sign up for Prokaiwa English lessons via LINE.">
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* Loading spinner styles */
+    .btn-loading {
+      position: relative;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    .btn-loading::after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 50%;
+      left: 50%;
+      margin-left: -8px;
+      margin-top: -8px;
+      border: 2px solid transparent;
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .btn-text { transition: opacity 0.2s; }
+    .btn-loading .btn-text { opacity: 0; }
+    
+    /* Password hint */
+    .password-hint {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-top: 0.25rem;
+    }
+  </style>
 </head>
 <body>
     <header class="site-header">
@@ -32,8 +67,8 @@
                     <li><a href="login.html" class="active">Log In</a></li>
                     <li>
                         <div class="nav-lang-toggle">
-                            <button data-lang="ja">日本語</button>
-                            <button data-lang="en">English</button>
+                            <button data-lang="ja" aria-label="日本語に切り替え">日本語</button>
+                            <button data-lang="en" aria-label="Switch to English">English</button>
                         </div>
                     </li>
                 </ul>
@@ -42,44 +77,97 @@
     </header>
 
     <main>
-        <div class="auth-container">
-            <div id="signup-prompt" class="message-box success" style="display: none;">
-                <span lang="en">To get started, please create an account below.</span>
-                <span lang="ja">始めるには、以下からアカウントを作成してください。</span>
+        <!-- JAPANESE VERSION -->
+        <section id="ja-auth" class="lang-section" lang="ja">
+            <div class="auth-container">
+                <div id="ja-signup-prompt" class="message-box success" style="display: none;">
+                    始めるには、以下からアカウントを作成してください。
+                </div>
+
+                <div class="auth-tabs">
+                    <button class="auth-tab-button active" data-tab="login" data-lang-section="ja">ログイン</button>
+                    <button class="auth-tab-button" data-tab="signup" data-lang-section="ja">新規登録</button>
+                </div>
+
+                <div id="ja-message-box" class="message-box"></div>
+
+                <form id="ja-login-form" class="auth-form active" data-lang="ja">
+                    <div class="form-group">
+                        <label for="ja-login-email">メールアドレス</label>
+                        <input type="email" id="ja-login-email" required autocomplete="email" placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="ja-login-password">パスワード</label>
+                        <input type="password" id="ja-login-password" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="cta-button" style="width:100%;">
+                        <span class="btn-text">ログイン</span>
+                    </button>
+                    <p><a href="#" class="forgot-password-link" data-lang="ja">パスワードを忘れた方はこちら</a></p>
+                </form>
+
+                <form id="ja-signup-form" class="auth-form" data-lang="ja">
+                    <div class="form-group">
+                        <label for="ja-signup-email">メールアドレス</label>
+                        <input type="email" id="ja-signup-email" required autocomplete="email" placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="ja-signup-password">パスワード</label>
+                        <input type="password" id="ja-signup-password" required autocomplete="new-password" minlength="6">
+                        <p class="password-hint">※6文字以上で設定してください</p>
+                    </div>
+                    <button type="submit" class="cta-button" style="width:100%;">
+                        <span class="btn-text">アカウントを作成</span>
+                    </button>
+                </form>
             </div>
+        </section>
 
-            <div class="auth-tabs">
-                <button class="auth-tab-button active" data-tab="login"><span lang="en">Log In</span><span lang="ja">ログイン</span></button>
-                <button class="auth-tab-button" data-tab="signup"><span lang="en">Sign Up</span><span lang="ja">アカウント作成</span></button>
+        <!-- ENGLISH VERSION -->
+        <section id="en-auth" class="lang-section" lang="en">
+            <div class="auth-container">
+                <div id="en-signup-prompt" class="message-box success" style="display: none;">
+                    To get started, please create an account below.
+                </div>
+
+                <div class="auth-tabs">
+                    <button class="auth-tab-button active" data-tab="login" data-lang-section="en">Log In</button>
+                    <button class="auth-tab-button" data-tab="signup" data-lang-section="en">Sign Up</button>
+                </div>
+
+                <div id="en-message-box" class="message-box"></div>
+
+                <form id="en-login-form" class="auth-form active" data-lang="en">
+                    <div class="form-group">
+                        <label for="en-login-email">Email</label>
+                        <input type="email" id="en-login-email" required autocomplete="email" placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="en-login-password">Password</label>
+                        <input type="password" id="en-login-password" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="cta-button" style="width:100%;">
+                        <span class="btn-text">Log In</span>
+                    </button>
+                    <p><a href="#" class="forgot-password-link" data-lang="en">Forgot Password?</a></p>
+                </form>
+
+                <form id="en-signup-form" class="auth-form" data-lang="en">
+                    <div class="form-group">
+                        <label for="en-signup-email">Email</label>
+                        <input type="email" id="en-signup-email" required autocomplete="email" placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="en-signup-password">Password</label>
+                        <input type="password" id="en-signup-password" required autocomplete="new-password" minlength="6">
+                        <p class="password-hint">Must be at least 6 characters</p>
+                    </div>
+                    <button type="submit" class="cta-button" style="width:100%;">
+                        <span class="btn-text">Create Account</span>
+                    </button>
+                </form>
             </div>
-
-            <div id="message-box" class="message-box"></div>
-
-            <form id="login-form" class="auth-form active">
-                <div class="form-group">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password"><span lang="en">Password</span><span lang="ja">パスワード</span></label>
-                    <input type="password" id="login-password" required>
-                </div>
-                <button type="submit" class="cta-button" style="width:100%;"><span lang="en">Log In</span><span lang="ja">ログイン</span></button>
-                <p><a href="#" class="forgot-password-link"><span lang="en">Forgot Password?</span><span lang="ja">パスワードをお忘れですか？</span></a></p>
-            </form>
-
-            <form id="signup-form" class="auth-form">
-                <div class="form-group">
-                    <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-password"><span lang="en">Password</span><span lang="ja">パスワード</span></label>
-                    <input type="password" id="signup-password" required>
-                </div>
-                <button type="submit" class="cta-button" style="width:100%;"><span lang="en">Create Account</span><span lang="ja">アカウントを作成</span></button>
-            </form>
-        </div>
+        </section>
     </main>
 
     <footer class="site-footer">
@@ -117,35 +205,55 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-        // --- Supabase and Page Setup ---
+        // --- Supabase Setup ---
         const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const loginForm = document.getElementById('login-form');
-        const signupForm = document.getElementById('signup-form');
-        const messageBox = document.getElementById('message-box');
-        const tabButtons = document.querySelectorAll('.auth-tab-button');
-        const authForms = document.querySelectorAll('.auth-form');
-        const forgotPasswordLink = document.querySelector('.forgot-password-link');
-        const signupPrompt = document.getElementById('signup-prompt');
+        // --- Language Detection ---
+        // Get current language from localStorage or default to 'ja'
+        function getCurrentLang() {
+            return localStorage.getItem('prokaiwa-lang') || 'ja';
+        }
 
+        // --- Helper Functions ---
         function showMessage(message, type = 'error') {
+            const lang = getCurrentLang();
+            const messageBox = document.getElementById(`${lang}-message-box`);
             messageBox.textContent = message;
             messageBox.className = `message-box ${type}`;
             messageBox.style.display = 'block';
         }
 
         function hideMessage() {
-            messageBox.style.display = 'none';
+            const lang = getCurrentLang();
+            const messageBox = document.getElementById(`${lang}-message-box`);
+            if (messageBox) {
+                messageBox.style.display = 'none';
+            }
+        }
+
+        function setButtonLoading(button, isLoading) {
+            if (isLoading) {
+                button.classList.add('btn-loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('btn-loading');
+                button.disabled = false;
+            }
         }
         
-        function switchTab(tabName) {
+        function switchTab(tabName, langSection) {
+            // Get elements for the specific language section
+            const container = document.getElementById(`${langSection}-auth`);
+            const tabButtons = container.querySelectorAll('.auth-tab-button');
+            const authForms = container.querySelectorAll('.auth-form');
+            
             tabButtons.forEach(btn => btn.classList.remove('active'));
             authForms.forEach(form => form.classList.remove('active'));
             
-            const newActiveTab = document.querySelector(`.auth-tab-button[data-tab="${tabName}"]`);
-            const newActiveForm = document.getElementById(`${tabName}-form`);
+            const newActiveTab = container.querySelector(`.auth-tab-button[data-tab="${tabName}"]`);
+            const newActiveForm = document.getElementById(`${langSection}-${tabName}-form`);
 
             if (newActiveTab) newActiveTab.classList.add('active');
             if (newActiveForm) newActiveForm.classList.add('active');
@@ -165,66 +273,144 @@
                 window.location.href = 'questionnaire.html';
             }
         }
+
+        // --- Error Messages (Localized) ---
+        const errorMessages = {
+            ja: {
+                invalidCredentials: 'メールアドレスまたはパスワードが正しくありません。',
+                emailInUse: 'このメールアドレスは既に登録されています。',
+                weakPassword: 'パスワードは6文字以上で設定してください。',
+                enterEmail: 'パスワードをリセットするには、メールアドレスを入力してください。',
+                resetSent: 'パスワードリセットのメールを送信しました。メールをご確認ください。',
+                genericError: 'エラーが発生しました。もう一度お試しください。'
+            },
+            en: {
+                invalidCredentials: 'Invalid email or password.',
+                emailInUse: 'This email is already registered.',
+                weakPassword: 'Password must be at least 6 characters.',
+                enterEmail: 'Please enter your email address to reset your password.',
+                resetSent: 'Password reset link sent! Please check your email.',
+                genericError: 'An error occurred. Please try again.'
+            }
+        };
+
+        function getLocalizedError(errorCode) {
+            const lang = getCurrentLang();
+            const messages = errorMessages[lang];
+            
+            // Map Supabase error messages to localized messages
+            if (errorCode.includes('Invalid login credentials')) {
+                return messages.invalidCredentials;
+            }
+            if (errorCode.includes('already registered') || errorCode.includes('already exists')) {
+                return messages.emailInUse;
+            }
+            if (errorCode.includes('Password')) {
+                return messages.weakPassword;
+            }
+            return messages.genericError;
+        }
         
-        tabButtons.forEach(button => {
+        // --- Event Listeners ---
+        // Tab switching for both language sections
+        document.querySelectorAll('.auth-tab-button').forEach(button => {
             button.addEventListener('click', () => {
-                signupPrompt.style.display = 'none'; // Hide prompt when user manually switches tabs
-                switchTab(button.dataset.tab);
+                const langSection = button.dataset.langSection;
+                const signupPrompt = document.getElementById(`${langSection}-signup-prompt`);
+                if (signupPrompt) signupPrompt.style.display = 'none';
+                switchTab(button.dataset.tab, langSection);
             });
         });
 
-        signupForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            hideMessage();
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-            const { data, error } = await supabase.auth.signUp({ email, password });
-            if (error) {
-                showMessage(error.message);
-            } else {
-                window.location.href = 'questionnaire.html';
-            }
+        // Signup forms
+        document.querySelectorAll('[id$="-signup-form"]').forEach(form => {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                hideMessage();
+                
+                const lang = form.dataset.lang;
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const email = document.getElementById(`${lang}-signup-email`).value;
+                const password = document.getElementById(`${lang}-signup-password`).value;
+                
+                setButtonLoading(submitBtn, true);
+                
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                
+                setButtonLoading(submitBtn, false);
+                
+                if (error) {
+                    showMessage(getLocalizedError(error.message));
+                } else {
+                    window.location.href = 'questionnaire.html';
+                }
+            });
         });
 
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            hideMessage();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) {
-                showMessage(error.message);
-            } else {
-                await handleRedirect(data.user);
-            }
-        });
-        
-        forgotPasswordLink.addEventListener('click', async (event) => {
-            event.preventDefault();
-            hideMessage();
-            const email = document.getElementById('login-email').value;
-            if (!email) {
-                showMessage('Please enter your email address in the email field to reset your password.');
-                return;
-            }
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.origin,
+        // Login forms
+        document.querySelectorAll('[id$="-login-form"]').forEach(form => {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                hideMessage();
+                
+                const lang = form.dataset.lang;
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const email = document.getElementById(`${lang}-login-email`).value;
+                const password = document.getElementById(`${lang}-login-password`).value;
+                
+                setButtonLoading(submitBtn, true);
+                
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                
+                setButtonLoading(submitBtn, false);
+                
+                if (error) {
+                    showMessage(getLocalizedError(error.message));
+                } else {
+                    await handleRedirect(data.user);
+                }
             });
-            if (error) {
-                showMessage(error.message);
-            } else {
-                showMessage('Password reset link sent! Please check your email.', 'success');
-            }
         });
         
+        // Forgot password links
+        document.querySelectorAll('.forgot-password-link').forEach(link => {
+            link.addEventListener('click', async (event) => {
+                event.preventDefault();
+                hideMessage();
+                
+                const lang = link.dataset.lang;
+                const messages = errorMessages[lang];
+                const email = document.getElementById(`${lang}-login-email`).value;
+                
+                if (!email) {
+                    showMessage(messages.enterEmail);
+                    return;
+                }
+                
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin,
+                });
+                
+                if (error) {
+                    showMessage(getLocalizedError(error.message));
+                } else {
+                    showMessage(messages.resetSent, 'success');
+                }
+            });
+        });
+        
+        // --- Initial Setup ---
         (async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
                 await handleRedirect(session.user);
             } else {
+                // Check for #signup hash
                 if (window.location.hash === '#signup') {
-                    switchTab('signup');
-                    signupPrompt.style.display = 'block';
+                    const lang = getCurrentLang();
+                    switchTab('signup', lang);
+                    const signupPrompt = document.getElementById(`${lang}-signup-prompt`);
+                    if (signupPrompt) signupPrompt.style.display = 'block';
                 }
             }
         })();
