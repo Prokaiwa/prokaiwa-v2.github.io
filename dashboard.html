@@ -619,9 +619,10 @@
                             <h3><i class="fas fa-lightbulb"></i>今日のフレーズ</h3>
                             <div class="tip-box">
                                 <p>今日はこのフレーズを使ってみましょう：</p>
-                                <span class="tip-phrase" id="ja-daily-phrase">読み込み中...</span>
+                                <span class="tip-phrase" id="ja-daily-phrase">"I'm looking forward to..."</span>
                                 <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--color-text-light);" id="ja-phrase-example">
-                                    読み込み中...
+                                    例：I'm looking forward to our next lesson!<br>
+                                    （次のレッスンが楽しみです！）
                                 </p>
                             </div>
                         </div>
@@ -702,6 +703,24 @@
                         <!-- Learning Resources -->
                         <div class="dashboard-card" id="ja-resources">
                             <h3><i class="fas fa-folder-open"></i>学習教材</h3>
+                            <!-- 
+                                ================================================
+                                HOW TO ADD YOUR OWN RESOURCES:
+                                ================================================
+                                1. Create your PDF or document
+                                2. Upload to Google Drive
+                                3. Right-click → "Get link" → "Anyone with link can view"
+                                4. Replace the # in href="#" with your Google Drive link
+                                5. Remove the "coming-soon" class and "coming" class from tags
+                                
+                                Example with real link:
+                                <div class="resource-item">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <a href="https://drive.google.com/file/d/YOUR_FILE_ID/view" target="_blank">日常会話フレーズ集</a>
+                                    <span class="resource-tag">PDF</span>
+                                </div>
+                                ================================================
+                            -->
                             <div class="resource-item">
                                 <i class="fas fa-file-pdf"></i>
                                 <a href="#" class="coming-soon">日常会話フレーズ集</a>
@@ -821,9 +840,9 @@
                             <h3><i class="fas fa-lightbulb"></i>Phrase of the Day</h3>
                             <div class="tip-box">
                                 <p>Try using this phrase today:</p>
-                                <span class="tip-phrase" id="en-daily-phrase">Loading...</span>
+                                <span class="tip-phrase" id="en-daily-phrase">"I'm looking forward to..."</span>
                                 <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--color-text-light);" id="en-phrase-example">
-                                    Loading...
+                                    Example: I'm looking forward to our next lesson!
                                 </p>
                             </div>
                         </div>
@@ -904,6 +923,7 @@
                         <!-- Learning Resources -->
                         <div class="dashboard-card" id="en-resources">
                             <h3><i class="fas fa-folder-open"></i>Learning Resources</h3>
+                            <!-- See Japanese section for instructions on adding resources -->
                             <div class="resource-item">
                                 <i class="fas fa-file-pdf"></i>
                                 <a href="#" class="coming-soon">Common Conversation Phrases</a>
@@ -978,14 +998,14 @@
                         <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
                     </div>
-                    <a href="/cdn-cgi/l/email-protection#9dedeff2f6fcf4eafcb3f8f3faf1f4eef5ddfaf0fcf4f1b3fef2f0" class="footer-email"><span class="__cf_email__" data-cfemail="0b7b7964606a627c6a256e656c676278634b6c666a626725686466">[email&#160;protected]</span></a>
+                    <a href="mailto:prokaiwa.english@gmail.com" class="footer-email">prokaiwa.english@gmail.com</a>
                 </div>
             </div>
             <p>© <span id="year"></span> Prokaiwa. All rights reserved.</p>
         </div>
     </footer>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+    <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
         // =============================================
@@ -998,195 +1018,16 @@
         // Monthly goal (sessions per month)
         const MONTHLY_GOAL = 20;
 
-        // =============================================
-        // PHRASE OF THE DAY - Daily Login Rotation
-        // =============================================
-        
-        /**
-         * Checks if current date is in holiday season (Nov 15 - Jan 7)
-         * @returns {boolean} True if in holiday season
-         */
-        function isHolidaySeason() {
-            const now = new Date();
-            const month = now.getMonth(); // 0-11 (0=Jan, 10=Nov, 11=Dec)
-            const day = now.getDate();
-            
-            // November 15 onwards (month 10, day >= 15)
-            if (month === 10 && day >= 15) return true;
-            
-            // All of December (month 11)
-            if (month === 11) return true;
-            
-            // January 1-7 (month 0, day <= 7)
-            if (month === 0 && day <= 7) return true;
-            
-            return false;
-        }
-
-        /**
-         * Shows fallback phrase when database is unavailable
-         */
-        function showFallbackPhrase() {
-            ['ja', 'en'].forEach(lang => {
-                document.getElementById(`${lang}-daily-phrase`).textContent = '"Practice makes perfect"';
-                const fallbackExample = lang === 'ja' 
-                    ? '例：Practice makes perfect!<br>（継続は力なり！）'
-                    : 'Example: Practice makes perfect!';
-                document.getElementById(`${lang}-phrase-example`).innerHTML = fallbackExample;
-            });
-        }
-
-        /**
-         * Loads phrase of the day based on user's login
-         * - Shows new phrase each day they log in
-         * - Automatically switches between daily and holiday phrases
-         * - Holiday phrases show between Nov 15 - Jan 7 (🎄 Easter egg!)
-         * - Non-blocking: Dashboard loads even if this fails
-         */
-        async function loadPhraseOfTheDay() {
-            try {
-                // Get current user
-                const { data: { user }, error: userError } = await supabase.auth.getUser();
-                if (userError || !user) {
-                    console.log('User not logged in for phrase loading');
-                    return;
-                }
-
-                // Determine which category to use (HOLIDAY EASTER EGG!)
-                const isHoliday = isHolidaySeason();
-                const category = isHoliday ? 'holiday' : 'daily';
-                const phraseIdField = isHoliday ? 'last_holiday_phrase_id' : 'last_phrase_id';
-
-                // Get user's phrase progress
-                const { data: profile, error: profileError } = await supabase
-                    .from('questionnaire_responses')
-                    .select(`last_phrase_id, last_phrase_date, last_holiday_phrase_id`)
-                    .eq('user_id', user.id)
-                    .single();
-
-                if (profileError) {
-                    console.error('Error fetching profile for phrases:', profileError);
-                    console.log('Columns may not exist yet. Please check Supabase setup.');
-                    // Show fallback and return
-                    showFallbackPhrase();
-                    return;
-                }
-
-                // If columns don't exist, profile will be missing these fields
-                if (profile.last_phrase_id === undefined) {
-                    console.log('Phrase tracking columns not found. Please run the SQL setup.');
-                    showFallbackPhrase();
-                    return;
-                }
-
-                // Get today's date (YYYY-MM-DD format)
-                const today = new Date().toISOString().split('T')[0];
-                
-                // Check if user needs a new phrase today
-                const needsNewPhrase = !profile.last_phrase_date || profile.last_phrase_date !== today;
-
-                let phraseToShow;
-
-                if (needsNewPhrase) {
-                    // ===== User needs a NEW phrase =====
-                    
-                    // Fetch all phrases in current category to know total count
-                    const { data: allPhrases, error: phrasesError } = await supabase
-                        .from('phrases')
-                        .select('id')
-                        .eq('category', category)
-                        .order('id');
-
-                    if (phrasesError) throw phrasesError;
-
-                    if (!allPhrases || allPhrases.length === 0) {
-                        console.error('No phrases found in database');
-                        return;
-                    }
-
-                    // Calculate next phrase ID (cycles back to first after reaching end)
-                    const totalPhrases = allPhrases.length;
-                    const currentPhraseId = profile[phraseIdField] || 0;
-                    
-                    // Find the next phrase ID in sequence
-                    const currentIndex = allPhrases.findIndex(p => p.id === currentPhraseId);
-                    const nextIndex = (currentIndex + 1) % totalPhrases;
-                    const nextPhraseId = allPhrases[nextIndex].id;
-
-                    // Fetch the next phrase with all details
-                    const { data: newPhrase, error: newPhraseError } = await supabase
-                        .from('phrases')
-                        .select('*')
-                        .eq('id', nextPhraseId)
-                        .single();
-
-                    if (newPhraseError) throw newPhraseError;
-
-                    phraseToShow = newPhrase;
-
-                    // Update user's progress in database
-                    const updateData = {
-                        last_phrase_date: today
-                    };
-                    updateData[phraseIdField] = nextPhraseId;
-
-                    const { error: updateError } = await supabase
-                        .from('questionnaire_responses')
-                        .update(updateData)
-                        .eq('user_id', user.id);
-
-                    if (updateError) {
-                        console.error('Error updating phrase progress:', updateError);
-                    }
-
-                } else {
-                    // ===== Show the SAME phrase (already saw it today) =====
-                    
-                    const currentPhraseId = profile[phraseIdField];
-                    
-                    if (!currentPhraseId) {
-                        // First time user, fetch first phrase
-                        const { data: firstPhrase, error: firstPhraseError } = await supabase
-                            .from('phrases')
-                            .select('*')
-                            .eq('category', category)
-                            .order('id')
-                            .limit(1)
-                            .single();
-                        
-                        if (firstPhraseError) throw firstPhraseError;
-                        phraseToShow = firstPhrase;
-                    } else {
-                        const { data: currentPhrase, error: currentPhraseError } = await supabase
-                            .from('phrases')
-                            .select('*')
-                            .eq('id', currentPhraseId)
-                            .single();
-
-                        if (currentPhraseError) throw currentPhraseError;
-                        phraseToShow = currentPhrase;
-                    }
-                }
-
-                // Display the phrase in both languages (with your exact styling!)
-                ['ja', 'en'].forEach(lang => {
-                    document.getElementById(`${lang}-daily-phrase`).textContent = `"${phraseToShow.phrase_en}"`;
-                    
-                    if (lang === 'ja') {
-                        document.getElementById(`${lang}-phrase-example`).innerHTML = 
-                            `例：${phraseToShow.example_en}<br>（${phraseToShow.example_ja}）`;
-                    } else {
-                        document.getElementById(`${lang}-phrase-example`).textContent = 
-                            `Example: ${phraseToShow.example_en}`;
-                    }
-                });
-
-            } catch (error) {
-                console.error('Error loading phrase:', error);
-                // Fallback phrase if something goes wrong
-                showFallbackPhrase();
-            }
-        }
+        // Daily phrases (you can expand this list)
+        const dailyPhrases = [
+            { phrase: '"I\'m looking forward to..."', example_en: 'I\'m looking forward to our next lesson!', example_ja: '次のレッスンが楽しみです！' },
+            { phrase: '"Could you please..."', example_en: 'Could you please repeat that?', example_ja: 'もう一度言っていただけますか？' },
+            { phrase: '"I\'d like to..."', example_en: 'I\'d like to practice speaking more.', example_ja: 'もっとスピーキングを練習したいです。' },
+            { phrase: '"What do you think about..."', example_en: 'What do you think about this idea?', example_ja: 'このアイデアについてどう思いますか？' },
+            { phrase: '"It depends on..."', example_en: 'It depends on the situation.', example_ja: '状況によります。' },
+            { phrase: '"I\'m not sure, but..."', example_en: 'I\'m not sure, but I think so.', example_ja: '確かではないですが、そう思います。' },
+            { phrase: '"Let me think about it."', example_en: 'Let me think about it and get back to you.', example_ja: '考えて後で連絡しますね。' },
+        ];
 
         // Achievement definitions
         const achievements = [
@@ -1386,6 +1227,16 @@
             }
         }
 
+        function setDailyPhrase(lang) {
+            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+            const phrase = dailyPhrases[dayOfYear % dailyPhrases.length];
+            
+            document.getElementById(`${lang}-daily-phrase`).textContent = phrase.phrase;
+            document.getElementById(`${lang}-phrase-example`).innerHTML = lang === 'ja'
+                ? `例：${phrase.example_en}<br>（${phrase.example_ja}）`
+                : `Example: ${phrase.example_en}`;
+        }
+
         // =============================================
         // CHECK-IN FUNCTIONALITY
         // =============================================
@@ -1415,6 +1266,7 @@
                     btn.classList.remove('loading');
                     btn.disabled = false;
                     
+                    // More helpful error message
                     const errorMsg = lang === 'ja' 
                         ? 'エラーが発生しました。データベースのセットアップが必要かもしれません。' 
                         : 'An error occurred. The database may need to be set up.';
@@ -1427,7 +1279,7 @@
                 card.innerHTML = `
                     <div class="checkin-success">
                         <i class="fas fa-check-circle"></i>
-                        <span>${lang === 'ja' ? '今日の練習を記録しました！素晴らしい！💪' : "Today's practice logged! Great job! 💪"}</span>
+                        <span>${lang === 'ja' ? '今日の練習を記録しました！素晴らしい！🎯' : "Today's practice logged! Great job! 🎯"}</span>
                     </div>
                 `;
                 
@@ -1469,7 +1321,7 @@
                 return;
             }
 
-            // Get practice log
+            // Get practice log (will be empty if table doesn't exist yet)
             let practiceDates = [];
             try {
                 const { data: practiceLog, error: practiceError } = await supabase
@@ -1547,7 +1399,7 @@
                     card.innerHTML = `
                         <div class="checkin-success">
                             <i class="fas fa-check-circle"></i>
-                            <span>${l === 'ja' ? '今日の練習を記録済み！素晴らしい！💪' : "Today's practice logged! Great job! 💪"}</span>
+                            <span>${l === 'ja' ? '今日の練習を記録済み！素晴らしい！🎯' : "Today's practice logged! Great job! 🎯"}</span>
                         </div>
                     `;
                 }
@@ -1578,9 +1430,12 @@
 
                 // Achievements
                 renderAchievements(`${l}-achievements`, stats, l);
+
+                // Daily phrase
+                setDailyPhrase(l);
             });
 
-            // Hide loading, show content FIRST (don't wait for phrases!)
+            // Hide loading, show content
             loadingDiv.style.display = 'none';
             contentDiv.style.display = 'block';
 
@@ -1588,11 +1443,6 @@
             const otherLang = lang === 'ja' ? 'en' : 'ja';
             document.getElementById(`${otherLang}-dashboard-loading`).style.display = 'none';
             document.getElementById(`${otherLang}-dashboard-content`).style.display = 'block';
-
-            // Load phrase of the day (non-blocking - runs in background)
-            loadPhraseOfTheDay().catch(err => {
-                console.error('Phrase loading failed, but dashboard still works:', err);
-            });
 
             // Set up check-in button handlers
             ['ja', 'en'].forEach(l => {
@@ -1613,4 +1463,12 @@
         }
 
         document.getElementById('logout-button-nav').addEventListener('click', handleLogout);
-        document.getElementById('ja-logout-btn').
+        document.getElementById('ja-logout-btn').addEventListener('click', handleLogout);
+        document.getElementById('en-logout-btn').addEventListener('click', handleLogout);
+
+        // Initialize
+        loadDashboard();
+    </script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
