@@ -1024,17 +1024,31 @@
         }
 
         /**
+         * Shows fallback phrase when database is unavailable
+         */
+        function showFallbackPhrase() {
+            ['ja', 'en'].forEach(lang => {
+                document.getElementById(`${lang}-daily-phrase`).textContent = '"Practice makes perfect"';
+                const fallbackExample = lang === 'ja' 
+                    ? '例：Practice makes perfect!<br>（継続は力なり！）'
+                    : 'Example: Practice makes perfect!';
+                document.getElementById(`${lang}-phrase-example`).innerHTML = fallbackExample;
+            });
+        }
+
+        /**
          * Loads phrase of the day based on user's login
          * - Shows new phrase each day they log in
          * - Automatically switches between daily and holiday phrases
          * - Holiday phrases show between Nov 15 - Jan 7 (🎄 Easter egg!)
+         * - Non-blocking: Dashboard loads even if this fails
          */
         async function loadPhraseOfTheDay() {
             try {
                 // Get current user
                 const { data: { user }, error: userError } = await supabase.auth.getUser();
                 if (userError || !user) {
-                    console.log('User not logged in');
+                    console.log('User not logged in for phrase loading');
                     return;
                 }
 
@@ -1051,15 +1065,17 @@
                     .single();
 
                 if (profileError) {
-                    console.error('Error fetching profile:', profileError);
+                    console.error('Error fetching profile for phrases:', profileError);
+                    console.log('Columns may not exist yet. Please check Supabase setup.');
                     // Show fallback and return
-                    ['ja', 'en'].forEach(lang => {
-                        document.getElementById(`${lang}-daily-phrase`).textContent = '"Practice makes perfect"';
-                        const fallbackExample = lang === 'ja' 
-                            ? '例：Practice makes perfect!<br>（継続は力なり！）'
-                            : 'Example: Practice makes perfect!';
-                        document.getElementById(`${lang}-phrase-example`).innerHTML = fallbackExample;
-                    });
+                    showFallbackPhrase();
+                    return;
+                }
+
+                // If columns don't exist, profile will be missing these fields
+                if (profile.last_phrase_id === undefined) {
+                    console.log('Phrase tracking columns not found. Please run the SQL setup.');
+                    showFallbackPhrase();
                     return;
                 }
 
@@ -1168,13 +1184,7 @@
             } catch (error) {
                 console.error('Error loading phrase:', error);
                 // Fallback phrase if something goes wrong
-                ['ja', 'en'].forEach(lang => {
-                    document.getElementById(`${lang}-daily-phrase`).textContent = '"Practice makes perfect"';
-                    const fallbackExample = lang === 'ja' 
-                        ? '例：Practice makes perfect!<br>（継続は力なり！）'
-                        : 'Example: Practice makes perfect!';
-                    document.getElementById(`${lang}-phrase-example`).innerHTML = fallbackExample;
-                });
+                showFallbackPhrase();
             }
         }
 
@@ -1570,10 +1580,7 @@
                 renderAchievements(`${l}-achievements`, stats, l);
             });
 
-            // Load phrase of the day (NEW!)
-            await loadPhraseOfTheDay();
-
-            // Hide loading, show content
+            // Hide loading, show content FIRST (don't wait for phrases!)
             loadingDiv.style.display = 'none';
             contentDiv.style.display = 'block';
 
@@ -1581,6 +1588,11 @@
             const otherLang = lang === 'ja' ? 'en' : 'ja';
             document.getElementById(`${otherLang}-dashboard-loading`).style.display = 'none';
             document.getElementById(`${otherLang}-dashboard-content`).style.display = 'block';
+
+            // Load phrase of the day (non-blocking - runs in background)
+            loadPhraseOfTheDay().catch(err => {
+                console.error('Phrase loading failed, but dashboard still works:', err);
+            });
 
             // Set up check-in button handlers
             ['ja', 'en'].forEach(l => {
