@@ -36,6 +36,25 @@
       to { transform: rotate(360deg); }
     }
     
+    /* Error State */
+    .dashboard-error {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--color-text);
+    }
+    .dashboard-error i {
+      font-size: 3rem;
+      color: #dc3545;
+      margin-bottom: 1rem;
+    }
+    .dashboard-error h2 {
+      margin-bottom: 1rem;
+    }
+    .dashboard-error p {
+      margin-bottom: 1.5rem;
+      color: var(--color-text-light);
+    }
+    
     /* Welcome Banner */
     .welcome-banner {
       background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
@@ -557,6 +576,15 @@
                     <p>読み込み中...</p>
                 </div>
 
+                <!-- Error State (hidden by default) -->
+                <div id="ja-dashboard-error" class="dashboard-error" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h2>エラーが発生しました</h2>
+                    <p id="ja-error-message">ページを読み込めませんでした。</p>
+                    <button onclick="location.reload()" class="cta-button">再読み込み</button>
+                    <a href="login.html" class="cta-button cta-secondary" style="margin-left: 1rem;">ログインページへ</a>
+                </div>
+
                 <!-- Dashboard Content -->
                 <div id="ja-dashboard-content" style="display: none;">
                     
@@ -703,24 +731,6 @@
                         <!-- Learning Resources -->
                         <div class="dashboard-card" id="ja-resources">
                             <h3><i class="fas fa-folder-open"></i>学習教材</h3>
-                            <!-- 
-                                ================================================
-                                HOW TO ADD YOUR OWN RESOURCES:
-                                ================================================
-                                1. Create your PDF or document
-                                2. Upload to Google Drive
-                                3. Right-click → "Get link" → "Anyone with link can view"
-                                4. Replace the # in href="#" with your Google Drive link
-                                5. Remove the "coming-soon" class and "coming" class from tags
-                                
-                                Example with real link:
-                                <div class="resource-item">
-                                    <i class="fas fa-file-pdf"></i>
-                                    <a href="https://drive.google.com/file/d/YOUR_FILE_ID/view" target="_blank">日常会話フレーズ集</a>
-                                    <span class="resource-tag">PDF</span>
-                                </div>
-                                ================================================
-                            -->
                             <div class="resource-item">
                                 <i class="fas fa-file-pdf"></i>
                                 <a href="#" class="coming-soon">日常会話フレーズ集</a>
@@ -776,6 +786,15 @@
                 <div id="en-dashboard-loading" class="dashboard-loading">
                     <i class="fas fa-spinner"></i>
                     <p>Loading your dashboard...</p>
+                </div>
+
+                <!-- Error State (hidden by default) -->
+                <div id="en-dashboard-error" class="dashboard-error" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h2>Something went wrong</h2>
+                    <p id="en-error-message">Could not load the page.</p>
+                    <button onclick="location.reload()" class="cta-button">Refresh</button>
+                    <a href="login.html" class="cta-button cta-secondary" style="margin-left: 1rem;">Go to Login</a>
                 </div>
 
                 <!-- Dashboard Content -->
@@ -923,7 +942,6 @@
                         <!-- Learning Resources -->
                         <div class="dashboard-card" id="en-resources">
                             <h3><i class="fas fa-folder-open"></i>Learning Resources</h3>
-                            <!-- See Japanese section for instructions on adding resources -->
                             <div class="resource-item">
                                 <i class="fas fa-file-pdf"></i>
                                 <a href="#" class="coming-soon">Common Conversation Phrases</a>
@@ -1009,16 +1027,26 @@
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
         // =============================================
-        // CONFIGURATION
+        // CONFIGURATION - MUST MATCH LOGIN PAGE
         // =============================================
         const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // FIX: Create client with SAME configuration as login page
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: true,
+                storageKey: 'prokaiwa-supabase-auth',  // MUST match login page
+                storage: window.localStorage,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
         
         // Monthly goal (sessions per month)
         const MONTHLY_GOAL = 20;
 
-        // Daily phrases (you can expand this list)
+        // Daily phrases
         const dailyPhrases = [
             { phrase: '"I\'m looking forward to..."', example_en: 'I\'m looking forward to our next lesson!', example_ja: '次のレッスンが楽しみです！' },
             { phrase: '"Could you please..."', example_en: 'Could you please repeat that?', example_ja: 'もう一度言っていただけますか？' },
@@ -1056,7 +1084,6 @@
             return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
         }
 
-        // Plan name mappings
         const planNames = {
             ja: { 'A': 'プランA', 'B45': 'プランB(45分)', 'B60': 'プランB(60分)', 'C1': 'プランC1', 'C2': 'プランC2' },
             en: { 'A': 'Plan A', 'B45': 'Plan B (45min)', 'B60': 'Plan B (60min)', 'C1': 'Plan C1', 'C2': 'Plan C2' }
@@ -1071,6 +1098,13 @@
             ja: { 'Super Beginner': '超初級', 'Beginner': '初級', 'Intermediate': '中級', 'Advanced': '上級' },
             en: { 'Super Beginner': 'Super Beginner', 'Beginner': 'Beginner', 'Intermediate': 'Intermediate', 'Advanced': 'Advanced' }
         };
+
+        function showError(lang, message) {
+            document.getElementById(`${lang}-dashboard-loading`).style.display = 'none';
+            document.getElementById(`${lang}-dashboard-content`).style.display = 'none';
+            document.getElementById(`${lang}-dashboard-error`).style.display = 'block';
+            document.getElementById(`${lang}-error-message`).textContent = message;
+        }
 
         // =============================================
         // STREAK CALCULATION
@@ -1266,15 +1300,13 @@
                     btn.classList.remove('loading');
                     btn.disabled = false;
                     
-                    // More helpful error message
                     const errorMsg = lang === 'ja' 
-                        ? 'エラーが発生しました。データベースのセットアップが必要かもしれません。' 
-                        : 'An error occurred. The database may need to be set up.';
+                        ? 'エラーが発生しました。' 
+                        : 'An error occurred.';
                     alert(errorMsg);
                     return;
                 }
                 
-                // Update UI to show completion
                 card.classList.add('completed');
                 card.innerHTML = `
                     <div class="checkin-success">
@@ -1283,7 +1315,6 @@
                     </div>
                 `;
                 
-                // Reload stats after a short delay
                 setTimeout(() => loadDashboard(), 1000);
             } catch (err) {
                 console.error('Unexpected error:', err);
@@ -1302,155 +1333,189 @@
             const loadingDiv = document.getElementById(`${lang}-dashboard-loading`);
             const contentDiv = document.getElementById(`${lang}-dashboard-content`);
 
-            // Check authentication
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
+            console.log('Loading dashboard...');
 
-            // Get user profile
-            const { data: profile, error: profileError } = await supabase
-                .from('questionnaire_responses')
-                .select('*')
-                .eq('user_id', user.id)
-                .single();
-            
-            if (profileError || !profile) {
-                window.location.href = 'questionnaire.html';
-                return;
-            }
-
-            // Get practice log (will be empty if table doesn't exist yet)
-            let practiceDates = [];
             try {
-                const { data: practiceLog, error: practiceError } = await supabase
-                    .from('practice_log')
-                    .select('practice_date')
+                // FIX: Use getSession() instead of getUser() - faster and more reliable
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError) {
+                    console.error('Session error:', sessionError);
+                }
+                
+                // If no session, redirect to login
+                if (!session) {
+                    console.log('No session found, redirecting to login');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const user = session.user;
+                console.log('User authenticated:', user.email);
+
+                // Get user profile
+                const { data: profile, error: profileError } = await supabase
+                    .from('questionnaire_responses')
+                    .select('*')
                     .eq('user_id', user.id)
-                    .order('practice_date', { ascending: false });
+                    .single();
                 
-                if (!practiceError && practiceLog) {
-                    practiceDates = practiceLog.map(p => p.practice_date);
+                if (profileError) {
+                    console.error('Profile error:', profileError);
+                    
+                    if (profileError.code === 'PGRST116') {
+                        // No profile found - redirect to questionnaire
+                        console.log('No profile found, redirecting to questionnaire');
+                        window.location.href = 'questionnaire.html';
+                        return;
+                    }
+                    
+                    // Other errors - show error state
+                    showError(lang, lang === 'ja' 
+                        ? 'プロフィールの読み込みに失敗しました。' 
+                        : 'Failed to load profile.');
+                    return;
                 }
-            } catch (e) {
-                console.log('Practice log table may not exist yet');
+
+                // Get practice log
+                let practiceDates = [];
+                try {
+                    const { data: practiceLog, error: practiceError } = await supabase
+                        .from('practice_log')
+                        .select('practice_date')
+                        .eq('user_id', user.id)
+                        .order('practice_date', { ascending: false });
+                    
+                    if (!practiceError && practiceLog) {
+                        practiceDates = practiceLog.map(p => p.practice_date);
+                    }
+                } catch (e) {
+                    console.log('Practice log table may not exist yet');
+                }
+                
+                const today = getTodayString();
+                const practicedToday = practiceDates.includes(today);
+                
+                // Calculate stats
+                const streakData = calculateStreak(practiceDates);
+                const monthStart = getMonthStart();
+                const thisMonthCount = practiceDates.filter(d => d >= monthStart).length;
+                const progressPercent = Math.min((thisMonthCount / MONTHLY_GOAL) * 100, 100);
+                
+                const stats = {
+                    current: streakData.current,
+                    maxStreak: streakData.max,
+                    total: practiceDates.length,
+                    thisMonth: thisMonthCount
+                };
+
+                // Check for video access
+                const hasVideoAddon = profile.addons?.includes('B45') || profile.addons?.includes('B60') || false;
+                const hasVideoAccess = profile.plan !== 'A' || hasVideoAddon;
+
+                // Update both language versions
+                ['ja', 'en'].forEach(l => {
+                    // Welcome message
+                    const welcomeText = l === 'ja' 
+                        ? `${profile.given_name_romaji || profile.name}さん、おかえりなさい！`
+                        : `Welcome back, ${profile.given_name_romaji || profile.name}!`;
+                    document.getElementById(`${l}-welcome-name`).textContent = welcomeText;
+
+                    // Stats
+                    document.getElementById(`${l}-stat-streak`).textContent = stats.current;
+                    document.getElementById(`${l}-stat-total`).textContent = stats.total;
+                    document.getElementById(`${l}-stat-month`).textContent = stats.thisMonth;
+
+                    // Profile info
+                    document.getElementById(`${l}-profile-name`).textContent = profile.name;
+                    document.getElementById(`${l}-profile-email`).textContent = profile.email;
+                    document.getElementById(`${l}-profile-level`).textContent = levelNames[l][profile.level] || profile.level;
+                    
+                    const isPaid = profile.payment_status === 'paid';
+                    document.getElementById(`${l}-profile-status`).textContent = isPaid 
+                        ? statusNames[l].paid 
+                        : statusNames[l].pending;
+
+                    // Plan badge
+                    const planBadge = document.getElementById(`${l}-plan-badge`);
+                    planBadge.textContent = planNames[l][profile.plan] || profile.plan;
+                    if (!isPaid) planBadge.classList.add('pending');
+                    if (hasVideoAddon) planBadge.classList.add('has-addon');
+
+                    // Add addon badge if applicable
+                    if (hasVideoAddon) {
+                        const badgeContainer = document.getElementById(`${l}-plan-badges`);
+                        badgeContainer.innerHTML += `<span class="addon-badge">+ ${l === 'ja' ? 'ビデオ' : 'Video'}</span>`;
+                    }
+
+                    // Check-in card
+                    if (practicedToday) {
+                        const card = document.getElementById(`${l}-checkin-card`);
+                        card.classList.add('completed');
+                        card.innerHTML = `
+                            <div class="checkin-success">
+                                <i class="fas fa-check-circle"></i>
+                                <span>${l === 'ja' ? '今日の練習を記録済み！素晴らしい！🎯' : "Today's practice logged! Great job! 🎯"}</span>
+                            </div>
+                        `;
+                    }
+
+                    // Show/hide elements based on plan
+                    const bookLessonBtn = document.getElementById(`${l}-book-lesson-btn`);
+                    const upcomingCard = document.getElementById(`${l}-upcoming-lessons-card`);
+                    const upgradeCard = document.getElementById(`${l}-upgrade-card`);
+                    
+                    if (hasVideoAccess) {
+                        upcomingCard.style.display = 'block';
+                        upgradeCard.style.display = 'none';
+                    } else {
+                        bookLessonBtn.style.display = 'none';
+                        upcomingCard.style.display = 'none';
+                        upgradeCard.style.display = 'block';
+                    }
+
+                    // Progress
+                    document.getElementById(`${l}-sessions-completed`).textContent = stats.thisMonth;
+                    document.getElementById(`${l}-sessions-total`).textContent = MONTHLY_GOAL;
+                    updateProgressRing(l, progressPercent);
+
+                    // Streak
+                    document.getElementById(`${l}-streak-count`).textContent = stats.current;
+                    document.getElementById(`${l}-streak-emoji`).textContent = stats.current >= 7 ? '🔥' : stats.current >= 3 ? '🔥' : '💪';
+                    renderStreakCalendar(`${l}-streak-calendar`, practiceDates, l);
+
+                    // Achievements
+                    renderAchievements(`${l}-achievements`, stats, l);
+
+                    // Daily phrase
+                    setDailyPhrase(l);
+                });
+
+                // Hide loading, show content
+                loadingDiv.style.display = 'none';
+                contentDiv.style.display = 'block';
+
+                // Prepare other language version too
+                const otherLang = lang === 'ja' ? 'en' : 'ja';
+                document.getElementById(`${otherLang}-dashboard-loading`).style.display = 'none';
+                document.getElementById(`${otherLang}-dashboard-content`).style.display = 'block';
+
+                // Set up check-in button handlers
+                ['ja', 'en'].forEach(l => {
+                    const btn = document.getElementById(`${l}-checkin-btn`);
+                    if (btn && !practicedToday) {
+                        btn.addEventListener('click', () => handleCheckin(user.id, l));
+                    }
+                });
+                
+                console.log('Dashboard loaded successfully');
+                
+            } catch (error) {
+                console.error('Dashboard load error:', error);
+                showError(lang, lang === 'ja' 
+                    ? '予期しないエラーが発生しました。' 
+                    : 'An unexpected error occurred.');
             }
-            
-            const today = getTodayString();
-            const practicedToday = practiceDates.includes(today);
-            
-            // Calculate stats
-            const streakData = calculateStreak(practiceDates);
-            const monthStart = getMonthStart();
-            const thisMonthCount = practiceDates.filter(d => d >= monthStart).length;
-            const progressPercent = Math.min((thisMonthCount / MONTHLY_GOAL) * 100, 100);
-            
-            const stats = {
-                current: streakData.current,
-                maxStreak: streakData.max,
-                total: practiceDates.length,
-                thisMonth: thisMonthCount
-            };
-
-            // Check for video access
-            const hasVideoAddon = profile.addons?.includes('B45') || profile.addons?.includes('B60') || false;
-            const hasVideoAccess = profile.plan !== 'A' || hasVideoAddon;
-
-            // Update both language versions
-            ['ja', 'en'].forEach(l => {
-                // Welcome message
-                const welcomeText = l === 'ja' 
-                    ? `${profile.given_name_romaji}さん、おかえりなさい！`
-                    : `Welcome back, ${profile.given_name_romaji}!`;
-                document.getElementById(`${l}-welcome-name`).textContent = welcomeText;
-
-                // Stats
-                document.getElementById(`${l}-stat-streak`).textContent = stats.current;
-                document.getElementById(`${l}-stat-total`).textContent = stats.total;
-                document.getElementById(`${l}-stat-month`).textContent = stats.thisMonth;
-
-                // Profile info
-                document.getElementById(`${l}-profile-name`).textContent = profile.name;
-                document.getElementById(`${l}-profile-email`).textContent = profile.email;
-                document.getElementById(`${l}-profile-level`).textContent = levelNames[l][profile.level] || profile.level;
-                
-                const isPaid = profile.payment_status === 'paid';
-                document.getElementById(`${l}-profile-status`).textContent = isPaid 
-                    ? statusNames[l].paid 
-                    : statusNames[l].pending;
-
-                // Plan badge
-                const planBadge = document.getElementById(`${l}-plan-badge`);
-                planBadge.textContent = planNames[l][profile.plan] || profile.plan;
-                if (!isPaid) planBadge.classList.add('pending');
-                if (hasVideoAddon) planBadge.classList.add('has-addon');
-
-                // Add addon badge if applicable
-                if (hasVideoAddon) {
-                    const badgeContainer = document.getElementById(`${l}-plan-badges`);
-                    badgeContainer.innerHTML += `<span class="addon-badge">+ ${l === 'ja' ? 'ビデオ' : 'Video'}</span>`;
-                }
-
-                // Check-in card
-                if (practicedToday) {
-                    const card = document.getElementById(`${l}-checkin-card`);
-                    card.classList.add('completed');
-                    card.innerHTML = `
-                        <div class="checkin-success">
-                            <i class="fas fa-check-circle"></i>
-                            <span>${l === 'ja' ? '今日の練習を記録済み！素晴らしい！🎯' : "Today's practice logged! Great job! 🎯"}</span>
-                        </div>
-                    `;
-                }
-
-                // Show/hide elements based on plan
-                const bookLessonBtn = document.getElementById(`${l}-book-lesson-btn`);
-                const upcomingCard = document.getElementById(`${l}-upcoming-lessons-card`);
-                const upgradeCard = document.getElementById(`${l}-upgrade-card`);
-                
-                if (hasVideoAccess) {
-                    upcomingCard.style.display = 'block';
-                    upgradeCard.style.display = 'none';
-                } else {
-                    bookLessonBtn.style.display = 'none';
-                    upcomingCard.style.display = 'none';
-                    upgradeCard.style.display = 'block';
-                }
-
-                // Progress
-                document.getElementById(`${l}-sessions-completed`).textContent = stats.thisMonth;
-                document.getElementById(`${l}-sessions-total`).textContent = MONTHLY_GOAL;
-                updateProgressRing(l, progressPercent);
-
-                // Streak
-                document.getElementById(`${l}-streak-count`).textContent = stats.current;
-                document.getElementById(`${l}-streak-emoji`).textContent = stats.current >= 7 ? '🔥' : stats.current >= 3 ? '🔥' : '💪';
-                renderStreakCalendar(`${l}-streak-calendar`, practiceDates, l);
-
-                // Achievements
-                renderAchievements(`${l}-achievements`, stats, l);
-
-                // Daily phrase
-                setDailyPhrase(l);
-            });
-
-            // Hide loading, show content
-            loadingDiv.style.display = 'none';
-            contentDiv.style.display = 'block';
-
-            // Prepare other language version too
-            const otherLang = lang === 'ja' ? 'en' : 'ja';
-            document.getElementById(`${otherLang}-dashboard-loading`).style.display = 'none';
-            document.getElementById(`${otherLang}-dashboard-content`).style.display = 'block';
-
-            // Set up check-in button handlers
-            ['ja', 'en'].forEach(l => {
-                const btn = document.getElementById(`${l}-checkin-btn`);
-                if (btn && !practicedToday) {
-                    btn.addEventListener('click', () => handleCheckin(user.id, l));
-                }
-            });
         }
 
         // =============================================
@@ -1458,15 +1523,30 @@
         // =============================================
         
         async function handleLogout() {
+            console.log('Logging out...');
             await supabase.auth.signOut();
             window.location.href = 'index.html';
         }
 
-        document.getElementById('logout-button-nav').addEventListener('click', handleLogout);
+        document.getElementById('logout-button-nav').addEventListener('click', (e) => {
+            e.preventDefault();
+            handleLogout();
+        });
         document.getElementById('ja-logout-btn').addEventListener('click', handleLogout);
         document.getElementById('en-logout-btn').addEventListener('click', handleLogout);
 
-        // Initialize
+        // FIX: Add auth state change listener
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth state changed:', event);
+            
+            if (event === 'SIGNED_OUT') {
+                window.location.href = 'login.html';
+            } else if (event === 'TOKEN_REFRESHED') {
+                console.log('Token refreshed successfully');
+            }
+        });
+
+        // Initialize dashboard
         loadDashboard();
     </script>
     <script src="assets/js/script.js"></script>
