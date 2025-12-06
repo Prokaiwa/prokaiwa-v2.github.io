@@ -81,9 +81,39 @@
       border-radius: 8px;
       border-left: 3px solid var(--color-primary);
     }
+    
+    /* Page loading overlay */
+    .page-loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--color-bg, #fff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .page-loading-overlay.hidden {
+      display: none;
+    }
+    .page-loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--color-border, #e0e0e0);
+      border-top-color: var(--color-primary, #007bff);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
   </style>
 </head>
 <body>
+    <!-- Page loading overlay - shown while checking auth -->
+    <div id="page-loading" class="page-loading-overlay">
+      <div class="page-loading-spinner"></div>
+    </div>
+
     <header class="site-header">
         <div class="container">
             <a href="index.html"><img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" /></a>
@@ -526,10 +556,20 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-        // --- Supabase Setup ---
+        // --- Supabase Setup - MUST MATCH login.html and dashboard.html ---
         const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // FIX: Create client with SAME configuration as login and dashboard pages
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: true,
+                storageKey: 'prokaiwa-supabase-auth',  // MUST match all other pages
+                storage: window.localStorage,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
 
         // --- Stripe Payment Links ---
         const baseStripeLinks = {
@@ -551,6 +591,13 @@
         // --- Language Detection ---
         function getCurrentLang() {
             return localStorage.getItem('prokaiwa-lang') || 'ja';
+        }
+        
+        function hidePageLoading() {
+            const overlay = document.getElementById('page-loading');
+            if (overlay) {
+                overlay.classList.add('hidden');
+            }
         }
 
         // --- Helper Functions ---
@@ -631,14 +678,19 @@
                 const localMessages = messages[lang];
                 const submitBtn = form.querySelector('button[type="submit"]');
                 
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) {
+                // FIX: Use getSession() instead of getUser()
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError || !session) {
+                    console.error('Session error:', sessionError);
                     showMessage(localMessages.notLoggedIn);
                     setTimeout(() => {
                         window.location.href = 'login.html';
                     }, 2000);
                     return;
                 }
+                
+                const user = session.user;
 
                 setButtonLoading(submitBtn, true);
 
@@ -692,42 +744,79 @@
                     updated_at: new Date().toISOString()
                 };
 
-                const { error } = await supabase
-                    .from('questionnaire_responses')
-                    .upsert(dataToSubmit, { onConflict: 'user_id' });
+                try {
+                    const { error } = await supabase
+                        .from('questionnaire_responses')
+                        .upsert(dataToSubmit, { onConflict: 'user_id' });
 
-                if (error) {
-                    setButtonLoading(submitBtn, false);
-                    showMessage(`${localMessages.saveError}${error.message}`);
-                } else {
-                    const baseUrl = baseStripeLinks[selectedPlan];
-                    
-                    if (!baseUrl) {
+                    if (error) {
                         setButtonLoading(submitBtn, false);
-                        showMessage(localMessages.paymentLinkError);
-                        return;
-                    }
+                        showMessage(`${localMessages.saveError}${error.message}`);
+                    } else {
+                        const baseUrl = baseStripeLinks[selectedPlan];
+                        
+                        if (!baseUrl) {
+                            setButtonLoading(submitBtn, false);
+                            showMessage(localMessages.paymentLinkError);
+                            return;
+                        }
 
-                    const stripeLink = `${baseUrl}?client_reference_id=${user.id}`;
-                    window.location.href = stripeLink;
+                        const stripeLink = `${baseUrl}?client_reference_id=${user.id}`;
+                        window.location.href = stripeLink;
+                    }
+                } catch (err) {
+                    console.error('Form submission error:', err);
+                    setButtonLoading(submitBtn, false);
+                    showMessage(localMessages.genericError);
                 }
             });
         });
 
         // --- Initial Setup ---
-        (async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                // Fill in user ID and email for both language forms
-                ['ja', 'en'].forEach(lang => {
-                    document.getElementById(`${lang}-user-id`).value = user.id;
-                    document.getElementById(`${lang}-email`).value = user.email;
-                });
-            } else {
-                // Redirect to login if not authenticated
+        async function initializePage() {
+            console.log('Initializing questionnaire page...');
+            
+            try {
+                // FIX: Use getSession() instead of getUser()
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    console.error('Session error:', error);
+                }
+                
+                if (session && session.user) {
+                    const user = session.user;
+                    console.log('User authenticated:', user.email);
+                    
+                    // Fill in user ID and email for both language forms
+                    ['ja', 'en'].forEach(lang => {
+                        document.getElementById(`${lang}-user-id`).value = user.id;
+                        document.getElementById(`${lang}-email`).value = user.email;
+                    });
+                    
+                    hidePageLoading();
+                } else {
+                    // Redirect to login if not authenticated
+                    console.log('No session found, redirecting to login');
+                    window.location.href = 'login.html';
+                }
+            } catch (err) {
+                console.error('Initialization error:', err);
                 window.location.href = 'login.html';
             }
-        })();
+        }
+        
+        // FIX: Listen for auth state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth state changed:', event);
+            
+            if (event === 'SIGNED_OUT') {
+                window.location.href = 'login.html';
+            }
+        });
+        
+        // Run initialization
+        initializePage();
     </script>
     <script src="assets/js/script.js"></script>
 </body>
