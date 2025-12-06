@@ -50,9 +50,39 @@
       color: var(--color-text-muted);
       margin-top: 0.25rem;
     }
+    
+    /* Page loading overlay */
+    .page-loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--color-bg, #fff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .page-loading-overlay.hidden {
+      display: none;
+    }
+    .page-loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--color-border, #e0e0e0);
+      border-top-color: var(--color-primary, #007bff);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
   </style>
 </head>
 <body>
+    <!-- Page loading overlay - shown while checking auth -->
+    <div id="page-loading" class="page-loading-overlay">
+      <div class="page-loading-spinner"></div>
+    </div>
+
     <header class="site-header">
         <div class="container">
             <a href="index.html"><img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" /></a>
@@ -205,13 +235,22 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-        // --- Supabase Setup ---
+        // --- Supabase Setup with EXPLICIT session configuration ---
         const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // FIX: Create client with explicit session persistence
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: true,
+                storageKey: 'prokaiwa-supabase-auth',  // Consistent key across all pages
+                storage: window.localStorage,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
 
         // --- Language Detection ---
-        // Get current language from localStorage or default to 'ja'
         function getCurrentLang() {
             return localStorage.getItem('prokaiwa-lang') || 'ja';
         }
@@ -243,8 +282,14 @@
             }
         }
         
+        function hidePageLoading() {
+            const overlay = document.getElementById('page-loading');
+            if (overlay) {
+                overlay.classList.add('hidden');
+            }
+        }
+        
         function switchTab(tabName, langSection) {
-            // Get elements for the specific language section
             const container = document.getElementById(`${langSection}-auth`);
             const tabButtons = container.querySelectorAll('.auth-tab-button');
             const authForms = container.querySelectorAll('.auth-form');
@@ -261,15 +306,34 @@
         }
 
         async function handleRedirect(user) {
-            const { data, error } = await supabase
-                .from('questionnaire_responses')
-                .select('user_id, payment_status')
-                .eq('user_id', user.id)
-                .single();
+            console.log('Handling redirect for user:', user.id);
+            
+            try {
+                const { data, error } = await supabase
+                    .from('questionnaire_responses')
+                    .select('user_id, payment_status')
+                    .eq('user_id', user.id)
+                    .single();
 
-            if (data && data.payment_status === 'paid') {
-                window.location.href = 'dashboard.html';
-            } else {
+                console.log('Questionnaire check result:', { data, error });
+
+                if (error) {
+                    // No questionnaire response found - new user
+                    console.log('No questionnaire found, redirecting to questionnaire');
+                    window.location.href = 'questionnaire.html';
+                    return;
+                }
+
+                if (data && data.payment_status === 'paid') {
+                    console.log('Paid user, redirecting to dashboard');
+                    window.location.href = 'dashboard.html';
+                } else {
+                    console.log('Unpaid user, redirecting to questionnaire');
+                    window.location.href = 'questionnaire.html';
+                }
+            } catch (err) {
+                console.error('Error in handleRedirect:', err);
+                // Default to questionnaire on error
                 window.location.href = 'questionnaire.html';
             }
         }
@@ -282,7 +346,8 @@
                 weakPassword: 'パスワードは6文字以上で設定してください。',
                 enterEmail: 'パスワードをリセットするには、メールアドレスを入力してください。',
                 resetSent: 'パスワードリセットのメールを送信しました。メールをご確認ください。',
-                genericError: 'エラーが発生しました。もう一度お試しください。'
+                genericError: 'エラーが発生しました。もう一度お試しください。',
+                networkError: 'ネットワークエラーが発生しました。インターネット接続を確認してください。'
             },
             en: {
                 invalidCredentials: 'Invalid email or password.',
@@ -290,7 +355,8 @@
                 weakPassword: 'Password must be at least 6 characters.',
                 enterEmail: 'Please enter your email address to reset your password.',
                 resetSent: 'Password reset link sent! Please check your email.',
-                genericError: 'An error occurred. Please try again.'
+                genericError: 'An error occurred. Please try again.',
+                networkError: 'Network error. Please check your internet connection.'
             }
         };
 
@@ -298,21 +364,27 @@
             const lang = getCurrentLang();
             const messages = errorMessages[lang];
             
-            // Map Supabase error messages to localized messages
-            if (errorCode.includes('Invalid login credentials')) {
+            if (!errorCode) return messages.genericError;
+            
+            const errorStr = String(errorCode).toLowerCase();
+            
+            if (errorStr.includes('invalid login credentials') || errorStr.includes('invalid_credentials')) {
                 return messages.invalidCredentials;
             }
-            if (errorCode.includes('already registered') || errorCode.includes('already exists')) {
+            if (errorStr.includes('already registered') || errorStr.includes('already exists') || errorStr.includes('user_already_exists')) {
                 return messages.emailInUse;
             }
-            if (errorCode.includes('Password')) {
+            if (errorStr.includes('password')) {
                 return messages.weakPassword;
+            }
+            if (errorStr.includes('network') || errorStr.includes('fetch')) {
+                return messages.networkError;
             }
             return messages.genericError;
         }
         
         // --- Event Listeners ---
-        // Tab switching for both language sections
+        // Tab switching
         document.querySelectorAll('.auth-tab-button').forEach(button => {
             button.addEventListener('click', () => {
                 const langSection = button.dataset.langSection;
@@ -330,19 +402,38 @@
                 
                 const lang = form.dataset.lang;
                 const submitBtn = form.querySelector('button[type="submit"]');
-                const email = document.getElementById(`${lang}-signup-email`).value;
+                const email = document.getElementById(`${lang}-signup-email`).value.trim();
                 const password = document.getElementById(`${lang}-signup-password`).value;
                 
                 setButtonLoading(submitBtn, true);
                 
-                const { data, error } = await supabase.auth.signUp({ email, password });
-                
-                setButtonLoading(submitBtn, false);
-                
-                if (error) {
-                    showMessage(getLocalizedError(error.message));
-                } else {
-                    window.location.href = 'questionnaire.html';
+                try {
+                    console.log('Attempting signup for:', email);
+                    
+                    const { data, error } = await supabase.auth.signUp({ 
+                        email, 
+                        password,
+                        options: {
+                            // Don't require email confirmation for immediate access
+                            emailRedirectTo: window.location.origin + '/questionnaire.html'
+                        }
+                    });
+                    
+                    setButtonLoading(submitBtn, false);
+                    
+                    if (error) {
+                        console.error('Signup error:', error);
+                        showMessage(getLocalizedError(error.message));
+                    } else if (data.user) {
+                        console.log('Signup successful, user:', data.user.id);
+                        // FIX: Wait a moment for session to be stored
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        window.location.href = 'questionnaire.html';
+                    }
+                } catch (err) {
+                    console.error('Signup exception:', err);
+                    setButtonLoading(submitBtn, false);
+                    showMessage(getLocalizedError('network'));
                 }
             });
         });
@@ -355,19 +446,40 @@
                 
                 const lang = form.dataset.lang;
                 const submitBtn = form.querySelector('button[type="submit"]');
-                const email = document.getElementById(`${lang}-login-email`).value;
+                const email = document.getElementById(`${lang}-login-email`).value.trim();
                 const password = document.getElementById(`${lang}-login-password`).value;
                 
                 setButtonLoading(submitBtn, true);
                 
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                
-                setButtonLoading(submitBtn, false);
-                
-                if (error) {
-                    showMessage(getLocalizedError(error.message));
-                } else {
-                    await handleRedirect(data.user);
+                try {
+                    console.log('Attempting login for:', email);
+                    
+                    const { data, error } = await supabase.auth.signInWithPassword({ 
+                        email, 
+                        password 
+                    });
+                    
+                    if (error) {
+                        console.error('Login error:', error);
+                        setButtonLoading(submitBtn, false);
+                        showMessage(getLocalizedError(error.message));
+                    } else if (data.session) {
+                        console.log('Login successful, session established');
+                        // FIX: Verify session was stored before redirecting
+                        const { data: verifySession } = await supabase.auth.getSession();
+                        if (verifySession.session) {
+                            console.log('Session verified, proceeding with redirect');
+                            await handleRedirect(data.user);
+                        } else {
+                            console.error('Session not stored properly');
+                            setButtonLoading(submitBtn, false);
+                            showMessage(getLocalizedError('generic'));
+                        }
+                    }
+                } catch (err) {
+                    console.error('Login exception:', err);
+                    setButtonLoading(submitBtn, false);
+                    showMessage(getLocalizedError('network'));
                 }
             });
         });
@@ -380,31 +492,50 @@
                 
                 const lang = link.dataset.lang;
                 const messages = errorMessages[lang];
-                const email = document.getElementById(`${lang}-login-email`).value;
+                const email = document.getElementById(`${lang}-login-email`).value.trim();
                 
                 if (!email) {
                     showMessage(messages.enterEmail);
                     return;
                 }
                 
-                const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin,
-                });
-                
-                if (error) {
-                    showMessage(getLocalizedError(error.message));
-                } else {
-                    showMessage(messages.resetSent, 'success');
+                try {
+                    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                        redirectTo: window.location.origin + '/login.html',
+                    });
+                    
+                    if (error) {
+                        showMessage(getLocalizedError(error.message));
+                    } else {
+                        showMessage(messages.resetSent, 'success');
+                    }
+                } catch (err) {
+                    console.error('Password reset error:', err);
+                    showMessage(getLocalizedError('network'));
                 }
             });
         });
         
         // --- Initial Setup ---
-        (async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                await handleRedirect(session.user);
-            } else {
+        async function initializePage() {
+            console.log('Initializing login page...');
+            
+            try {
+                // FIX: Use getSession() which is faster and more reliable
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    console.error('Session check error:', error);
+                }
+                
+                if (session) {
+                    console.log('Existing session found, redirecting...');
+                    await handleRedirect(session.user);
+                    return; // Don't hide loading if redirecting
+                }
+                
+                console.log('No existing session, showing login form');
+                
                 // Check for #signup hash
                 if (window.location.hash === '#signup') {
                     const lang = getCurrentLang();
@@ -412,8 +543,27 @@
                     const signupPrompt = document.getElementById(`${lang}-signup-prompt`);
                     if (signupPrompt) signupPrompt.style.display = 'block';
                 }
+                
+                hidePageLoading();
+                
+            } catch (err) {
+                console.error('Initialization error:', err);
+                hidePageLoading();
             }
-        })();
+        }
+        
+        // FIX: Listen for auth state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth state changed:', event);
+            
+            if (event === 'SIGNED_IN' && session) {
+                // User just signed in, redirect
+                handleRedirect(session.user);
+            }
+        });
+        
+        // Run initialization
+        initializePage();
     </script>
     <script src="assets/js/script.js"></script>
 </body>
