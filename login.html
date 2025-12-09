@@ -485,36 +485,78 @@
         });
         
         // Forgot password links
-        document.querySelectorAll('.forgot-password-link').forEach(link => {
-            link.addEventListener('click', async (event) => {
-                event.preventDefault();
-                hideMessage();
-                
-                const lang = link.dataset.lang;
-                const messages = errorMessages[lang];
-                const email = document.getElementById(`${lang}-login-email`).value.trim();
-                
-                if (!email) {
-                    showMessage(messages.enterEmail);
-                    return;
-                }
-                
-                try {
-                    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                        redirectTo: window.location.origin + '/login.html',
-                    });
-                    
-                    if (error) {
-                        showMessage(getLocalizedError(error.message));
-                    } else {
-                        showMessage(messages.resetSent, 'success');
-                    }
-                } catch (err) {
-                    console.error('Password reset error:', err);
-                    showMessage(getLocalizedError('network'));
-                }
+document.querySelectorAll('.forgot-password-link').forEach(link => {
+    link.addEventListener('click', async (event) => {
+        event.preventDefault();
+        hideMessage();
+        
+        const lang = link.dataset.lang;
+        const messages = errorMessages[lang];
+        
+        // Get email from input field
+        let email = document.getElementById(`${lang}-login-email`).value.trim();
+        
+        // If no email in field, prompt user to enter it
+        if (!email) {
+            const promptMessage = lang === 'ja' 
+                ? 'パスワードをリセットするメールアドレスを入力してください：' 
+                : 'Enter your email address to reset password:';
+            
+            email = prompt(promptMessage);
+            
+            if (!email || !email.trim()) {
+                showMessage(messages.enterEmail);
+                return;
+            }
+            
+            email = email.trim();
+        }
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            const invalidEmailMsg = lang === 'ja' 
+                ? '有効なメールアドレスを入力してください。' 
+                : 'Please enter a valid email address.';
+            showMessage(invalidEmailMsg);
+            return;
+        }
+        
+        // Show loading state
+        const originalText = link.textContent;
+        const loadingText = lang === 'ja' ? '送信中...' : 'Sending...';
+        link.textContent = loadingText;
+        link.style.pointerEvents = 'none';
+        link.style.opacity = '0.6';
+        
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/reset-password.html',
             });
-        });
+            
+            // Restore link
+            link.textContent = originalText;
+            link.style.pointerEvents = 'auto';
+            link.style.opacity = '1';
+            
+            if (error) {
+                console.error('Password reset error:', error);
+                showMessage(getLocalizedError(error.message));
+            } else {
+                showMessage(messages.resetSent, 'success');
+                // Fill the email field if it was empty
+                document.getElementById(`${lang}-login-email`).value = email;
+            }
+        } catch (err) {
+            console.error('Password reset exception:', err);
+            // Restore link
+            link.textContent = originalText;
+            link.style.pointerEvents = 'auto';
+            link.style.opacity = '1';
+            showMessage(getLocalizedError('network'));
+        }
+    });
+});
         
         // --- Initial Setup ---
         async function initializePage() {
