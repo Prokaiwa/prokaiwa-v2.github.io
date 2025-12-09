@@ -543,7 +543,16 @@ document.querySelectorAll('.forgot-password-link').forEach(link => {
                 console.error('Password reset error:', error);
                 showMessage(getLocalizedError(error.message));
             } else {
+                // SUCCESS! Show message prominently
                 showMessage(messages.resetSent, 'success');
+                
+                // ALSO show browser alert for extra visibility
+                const alertMessage = lang === 'ja'
+                    ? `パスワードリセットのメールを ${email} に送信しました。\n\nメールボックスをご確認ください。`
+                    : `Password reset email sent to ${email}!\n\nPlease check your inbox.`;
+                
+                alert(alertMessage);
+                
                 // Fill the email field if it was empty
                 document.getElementById(`${lang}-login-email`).value = email;
             }
