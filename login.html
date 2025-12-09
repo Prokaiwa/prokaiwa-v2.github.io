@@ -484,16 +484,11 @@
             });
         });
 
-        // === DEBUG: Check if we reach this code ===
-        console.log('🔍 About to attach forgot password listeners...');
-        console.log('🔍 Found links:', document.querySelectorAll('.forgot-password-link').length);
 
         // Forgot password links
         document.querySelectorAll('.forgot-password-link').forEach(link => {
-            console.log('🔗 Attaching listener to:', link);
             
             link.addEventListener('click', async (event) => {
-                console.log('✅ CLICKED!'); // This should fire when you click
                 event.preventDefault();
                 hideMessage();
                 
