@@ -698,12 +698,26 @@
                 const selectedPlan = form.querySelector(`input[name="${lang}-plan"]:checked`)?.value;
                 const selectedPurpose = form.querySelector(`input[name="${lang}-purpose"]:checked`)?.value;
                 
-                // Handle purpose with "Other" option
-                let purpose = selectedPurpose;
-                if (selectedPurpose === 'Other') {
-                    const otherText = document.getElementById(`${lang}-purpose-other-text`).value;
-                    purpose = otherText ? `Other: ${otherText}` : 'Other';
-                }
+                // Handle purpose - normalize to simple values
+let purpose = selectedPurpose;
+
+// Map friendly names to simple database values
+const purposeMap = {
+    'Fun / Hobby': 'Hobby',
+    'Business / Work': 'Work',
+    'Travel': 'Travel',
+    'Casual Conversation': 'Casual',
+    'Other': 'Hobby'  // Default "Other" to Hobby prompts
+};
+
+if (selectedPurpose === 'Other') {
+    const otherText = document.getElementById(`${lang}-purpose-other-text`).value;
+    // Store their custom purpose in goals for your review later
+    // But send them Hobby prompts for now so they get SOMETHING
+    purpose = 'Hobby';
+} else {
+    purpose = purposeMap[selectedPurpose] || 'Hobby';
+}
 
                 // Collect source checkboxes
                 const sourceCheckboxes = form.querySelectorAll(`input[name="${lang}-source"]:checked`);
