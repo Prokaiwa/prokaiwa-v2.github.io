@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Portal Login | Prokaiwa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .teacher-login-container {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 2rem;
+      background: var(--color-surface);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    .teacher-login-container .logo {
+      width: 150px;
+      display: block;
+      margin: 0 auto 2rem;
+    }
+    .teacher-login-container h1 {
+      text-align: center;
+      color: var(--color-primary);
+      margin-bottom: 0.5rem;
+    }
+    .teacher-login-container p {
+      text-align: center;
+      color: var(--color-text-light);
+      margin-bottom: 2rem;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+    .login-button {
+      width: 100%;
+      padding: 1rem;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .login-button:hover {
+      background: var(--color-primary-dark);
+    }
+    .login-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .error-message {
+      background: #fee;
+      color: #c33;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .error-message.show {
+      display: block;
+    }
+    .signup-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: var(--color-text-light);
+    }
+    .signup-link a {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="teacher-login-container">
+    <img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa" class="logo">
+    <h1>Teacher Portal</h1>
+    <p>Sign in to access your students and feedback queue</p>
+    
+    <div id="error-message" class="error-message"></div>
+    
+    <form id="teacher-login-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" required autocomplete="email">
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required autocomplete="current-password">
+      </div>
+      
+      <button type="submit" class="login-button" id="login-button">
+        Log In
+      </button>
+    </form>
+    
+    <div class="signup-link">
+      First time? <a href="#" id="signup-link">Create your account</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    
+    const supabase = createClient(
+      'https://sxjnbsnxdwlnfqvnkbmc.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4am5ic254ZHdsbmZxdm5rYm1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMyMDg5NDAsImV4cCI6MjA0ODc4NDk0MH0.hLrJdvhpEJrhbvnx_i9HyzcxcZqLp9FnBUz6s2f0hkw'
+    );
+
+    const form = document.getElementById('teacher-login-form');
+    const errorDiv = document.getElementById('error-message');
+    const loginButton = document.getElementById('login-button');
+    const signupLink = document.getElementById('signup-link');
+
+    // Show error message
+    function showError(message) {
+      errorDiv.textContent = message;
+      errorDiv.classList.add('show');
+      setTimeout(() => errorDiv.classList.remove('show'), 5000);
+    }
+
+    // Login form handler
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      loginButton.disabled = true;
+      loginButton.textContent = 'Signing in...';
+      
+      try {
+        // Sign in with Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (authError) {
+          showError('Invalid email or password');
+          loginButton.disabled = false;
+          loginButton.textContent = 'Log In';
+          return;
+        }
+        
+        // Check if user is a teacher
+        const { data: teacher, error: teacherError } = await supabase
+          .from('teachers')
+          .select('*')
+          .eq('auth_user_id', authData.user.id)
+          .single();
+        
+        if (teacherError || !teacher) {
+          await supabase.auth.signOut();
+          showError('Access denied. This account is not registered as a teacher.');
+          loginButton.disabled = false;
+          loginButton.textContent = 'Log In';
+          return;
+        }
+        
+        if (!teacher.is_active) {
+          await supabase.auth.signOut();
+          showError('Your teacher account has been deactivated. Please contact admin.');
+          loginButton.disabled = false;
+          loginButton.textContent = 'Log In';
+          return;
+        }
+        
+        // Success! Redirect to teacher portal
+        window.location.href = '/teacher-portal.html';
+        
+      } catch (err) {
+        console.error('Login error:', err);
+        showError('An error occurred. Please try again.');
+        loginButton.disabled = false;
+        loginButton.textContent = 'Log In';
+      }
+    });
+
+    // Signup link handler
+    signupLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      if (!email || !password) {
+        showError('Please enter both email and password');
+        return;
+      }
+      
+      if (password.length < 6) {
+        showError('Password must be at least 6 characters');
+        return;
+      }
+      
+      loginButton.disabled = true;
+      loginButton.textContent = 'Creating account...';
+      
+      try {
+        // Check if email exists in teachers table
+        const { data: existingTeacher } = await supabase
+          .from('teachers')
+          .select('*')
+          .eq('email', email)
+          .single();
+        
+        if (!existingTeacher) {
+          showError('Email not authorized. Please contact admin to be added as a teacher.');
+          loginButton.disabled = false;
+          loginButton.textContent = 'Log In';
+          return;
+        }
+        
+        if (existingTeacher.auth_user_id) {
+          showError('Account already exists. Please log in instead.');
+          loginButton.disabled = false;
+          loginButton.textContent = 'Log In';
+          return;
+        }
+        
+        // Create auth account
+        const { data: authData, error: signupError } = await supabase.auth.signUp({
+          email,
+          password
+        });
+        
+        if (signupError) {
+          showError(signupError.message);
+          loginButton.disabled = false;
+          loginButton.textContent = 'Log In';
+          return;
+        }
+        
+        // Link auth account to teacher record
+        const { error: updateError } = await supabase
+          .from('teachers')
+          .update({ auth_user_id: authData.user.id })
+          .eq('email', email);
+        
+        if (updateError) {
+          console.error('Failed to link teacher account:', updateError);
+        }
+        
+        // Success!
+        alert('Account created! Redirecting to teacher portal...');
+        window.location.href = '/teacher-portal.html';
+        
+      } catch (err) {
+        console.error('Signup error:', err);
+        showError('An error occurred. Please try again.');
+        loginButton.disabled = false;
+        loginButton.textContent = 'Log In';
+      }
+    });
+  </script>
+</body>
+</html>
