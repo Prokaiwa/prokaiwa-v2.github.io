@@ -1574,10 +1574,10 @@ main .container:not(.legal-page-container) {
 }
 
 .comparison-highlight {
-    border-color: var(--color-primary);
+    border-color: transparent; /* Remove original border */
+    outline: 3px solid var(--color-primary); /* Use outline instead */
+    outline-offset: -3px; /* Keep it inside the card */
     box-shadow: 0 8px 24px rgba(0, 128, 128, 0.15);
-    margin: -0.5rem;
-    padding: 2.5rem;
 }
 
 .comparison-title {
