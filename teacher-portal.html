@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Portal | Prokaiwa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    /* Teacher Portal Styles */
+    body {
+      background: #f5f5f5;
+    }
+    
+    .teacher-header {
+      background: var(--color-surface);
+      padding: 1rem 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    
+    .teacher-header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .teacher-header h1 {
+      font-size: 1.5rem;
+      color: var(--color-primary);
+      margin: 0;
+    }
+    
+    .teacher-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .logout-btn {
+      background: var(--color-accent);
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: var(--color-surface);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .stat-card h3 {
+      font-size: 2rem;
+      color: var(--color-primary);
+      margin: 0 0 0.5rem 0;
+    }
+    
+    .stat-card p {
+      color: var(--color-text-light);
+      margin: 0;
+    }
+    
+    .feedback-section {
+      background: var(--color-surface);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    
+    .feedback-section h2 {
+      color: var(--color-accent);
+      margin-top: 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--color-border);
+    }
+    
+    .student-card {
+      background: #fafafa;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+    
+    .student-card.expanded {
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .student-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .student-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    
+    .student-meta {
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+    
+    .expand-btn {
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .student-details {
+      display: none;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--color-border);
+    }
+    
+    .student-card.expanded .student-details {
+      display: block;
+    }
+    
+    .response-item {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .response-item h4 {
+      margin: 0 0 0.5rem 0;
+      color: var(--color-primary);
+    }
+    
+    .response-text {
+      color: var(--color-text);
+      margin: 0.5rem 0;
+    }
+    
+    .audio-player {
+      margin-top: 0.5rem;
+    }
+    
+    .feedback-box {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid var(--color-border);
+    }
+    
+    .template-selector {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .template-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--color-border);
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .template-btn.active {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+    
+    .feedback-textarea {
+      width: 100%;
+      min-height: 300px;
+      padding: 1rem;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.95rem;
+      resize: vertical;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .send-btn {
+      background: var(--color-primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    
+    .send-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .mark-done-btn {
+      background: #4caf50;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--color-text-light);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--color-text-light);
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--color-border);
+    }
+    
+    .priority-badge {
+      background: #ff9800;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="teacher-header">
+    <div class="container">
+      <h1>📚 Prokaiwa Teacher Portal</h1>
+      <div class="teacher-info">
+        <span id="teacher-name">Loading...</span>
+        <button class="logout-btn" id="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Stats Dashboard -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <h3 id="total-students">-</h3>
+        <p>Total Students</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="today-feedback">-</h3>
+        <p>Need Feedback Today</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="completed-today">-</h3>
+        <p>Completed Today</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="estimated-time">-</h3>
+        <p>Estimated Time</p>
+      </div>
+    </div>
+
+    <!-- Plan A Section -->
+    <div class="feedback-section" id="plan-a-section">
+      <h2>Plan A - Weekly Comprehensive</h2>
+      <div id="plan-a-students" class="loading">
+        <i class="fas fa-spinner fa-spin"></i> Loading students...
+      </div>
+    </div>
+
+    <!-- Plan C1 Section -->
+    <div class="feedback-section" id="plan-c1-section">
+      <h2>Plan C1 - Bi-Weekly</h2>
+      <div id="plan-c1-students" class="loading">
+        <i class="fas fa-spinner fa-spin"></i> Loading students...
+      </div>
+    </div>
+
+    <!-- Plan C2 Section -->
+    <div class="feedback-section" id="plan-c2-section">
+      <h2>Plan C2 - Daily Quick</h2>
+      <div id="plan-c2-students" class="loading">
+        <i class="fas fa-spinner fa-spin"></i> Loading students...
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    
+    const supabase = createClient(
+      'https://sxjnbsnxdwlnfqvnkbmc.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4am5ic254ZHdsbmZxdm5rYm1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMyMDg5NDAsImV4cCI6MjA0ODc4NDk0MH0.hLrJdvhpEJrhbvnx_i9HyzcxcZqLp9FnBUz6s2f0hkw'
+    );
+
+    let currentTeacher = null;
+    let feedbackQueue = { planA: [], planC1: [], planC2: [] };
+    let completedToday = new Set();
+
+    // Feedback Templates
+    const templates = {
+      weekly: `Week [X] Review 🌟
+
+📈 PROGRESS: Completed [X]/7 prompts
+
+🎯 WHAT YOU DID WELL:
+- [Natural phrases/pronunciation wins]
+- [Grammar improvements]
+
+📝 AREAS TO WORK ON:
+- [Common mistakes]
+- [Pronunciation practice needed]
+
+💡 THIS WEEK'S FOCUS: [Specific goal]
+
+Keep up the great work! 💪`,
+
+      biweekly: `Day [X] Check-in ✨
+
+Quick review of your last [X] responses:
+
+✅ GOING WELL:
+- [Highlight 1-2 wins]
+
+⚠️ WATCH FOR:
+- [1 pattern to improve]
+
+💡 PRACTICE TIP: [Quick actionable advice]`,
+
+      daily: `Great work today! 👏
+
+✅ [Specific thing they did well]
+
+💡 Quick tip: [One correction/suggestion]
+
+Tomorrow's focus: [Preview]`
+    };
+
+    // ============================================
+    // AUTHENTICATION & INITIALIZATION
+    // ============================================
+
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        window.location.href = '/teacher-login.html';
+        return;
+      }
+      
+      // Get teacher info
+      const { data: teacher, error } = await supabase
+        .from('teachers')
+        .select('*')
+        .eq('auth_user_id', session.user.id)
+        .single();
+      
+      if (error || !teacher || !teacher.is_active) {
+        await supabase.auth.signOut();
+        window.location.href = '/teacher-login.html';
+        return;
+      }
+      
+      currentTeacher = teacher;
+      document.getElementById('teacher-name').textContent = teacher.full_name;
+      
+      // Load feedback queue
+      await loadFeedbackQueue();
+    }
+
+    // ============================================
+    // LOAD FEEDBACK QUEUE
+    // ============================================
+
+    async function loadFeedbackQueue() {
+      try {
+        // Get all assigned students with their progress
+        const { data: assignments, error: assignError } = await supabase
+          .from('student_teacher_assignments')
+          .select(`
+            student_id,
+            questionnaire_responses (
+              id,
+              english_name,
+              japanese_name,
+              line_user_id,
+              plan
+            )
+          `)
+          .eq('teacher_id', currentTeacher.id);
+
+        if (assignError) throw assignError;
+
+        const students = assignments.map(a => a.questionnaire_responses).filter(Boolean);
+
+        // Get progress for all students
+        const studentIds = students.map(s => s.id);
+        const { data: progressData, error: progressError } = await supabase
+          .from('student_progress')
+          .select('*')
+          .in('student_id', studentIds);
+
+        if (progressError) throw progressError;
+
+        // Categorize by plan and feedback need
+        feedbackQueue = { planA: [], planC1: [], planC2: [] };
+
+        for (const student of students) {
+          const progress = progressData.find(p => p.student_id === student.id);
+          if (!progress) continue;
+
+          const studentData = {
+            ...student,
+            ...progress,
+            needsFeedback: checkIfNeedsFeedback(student.plan, progress)
+          };
+
+          if (studentData.needsFeedback) {
+            if (student.plan === 'A') feedbackQueue.planA.push(studentData);
+            else if (student.plan === 'C1') feedbackQueue.planC1.push(studentData);
+            else if (student.plan === 'C2') feedbackQueue.planC2.push(studentData);
+          }
+        }
+
+        // Render the queue
+        renderFeedbackQueue();
+        updateStats();
+
+      } catch (err) {
+        console.error('Error loading feedback queue:', err);
+        alert('Error loading students. Please refresh the page.');
+      }
+    }
+
+    // ============================================
+    // CHECK IF STUDENT NEEDS FEEDBACK
+    // ============================================
+
+    function checkIfNeedsFeedback(plan, progress) {
+      const { current_day, total_prompts_sent } = progress;
+
+      if (plan === 'A') {
+        // Weekly: Day 7, 14, 21, 28
+        return total_prompts_sent % 7 === 0 && current_day === 7;
+      } else if (plan === 'C1') {
+        // Bi-weekly: Days 3 and 7
+        return current_day === 3 || current_day === 7;
+      } else if (plan === 'C2') {
+        // Daily
+        return true;
+      }
+
+      return false;
+    }
+
+    // ============================================
+    // RENDER FEEDBACK QUEUE
+    // ============================================
+
+    function renderFeedbackQueue() {
+      renderPlanSection('plan-a-students', feedbackQueue.planA, 'weekly');
+      renderPlanSection('plan-c1-students', feedbackQueue.planC1, 'biweekly');
+      renderPlanSection('plan-c2-students', feedbackQueue.planC2, 'daily');
+    }
+
+    function renderPlanSection(containerId, students, templateType) {
+      const container = document.getElementById(containerId);
+      
+      if (students.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-check-circle"></i>
+            <p>No students need feedback today!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = students.map(student => createStudentCard(student, templateType)).join('');
+
+      // Add event listeners
+      students.forEach(student => {
+        const card = document.getElementById(`student-${student.id}`);
+        const expandBtn = card.querySelector('.expand-btn');
+        const sendBtn = card.querySelector('.send-btn');
+        const markDoneBtn = card.querySelector('.mark-done-btn');
+        const templateBtns = card.querySelectorAll('.template-btn');
+
+        expandBtn.addEventListener('click', () => toggleCard(student.id));
+        sendBtn.addEventListener('click', () => sendFeedback(student.id));
+        markDoneBtn.addEventListener('click', () => markComplete(student.id));
+        
+        templateBtns.forEach(btn => {
+          btn.addEventListener('click', () => loadTemplate(student.id, btn.dataset.template));
+        });
+      });
+    }
+
+    function createStudentCard(student, templateType) {
+      const isDone = completedToday.has(student.id);
+      const isPriority = student.current_day === 7 && student.current_week === 1;
+
+      return `
+        <div class="student-card" id="student-${student.id}">
+          <div class="student-header">
+            <div>
+              <div class="student-name">
+                ${student.english_name || student.japanese_name}
+                ${isPriority ? '<span class="priority-badge">⭐ NEW</span>' : ''}
+                ${isDone ? '<span class="priority-badge" style="background:#4caf50;">✓ DONE</span>' : ''}
+              </div>
+              <div class="student-meta">
+                Day ${student.current_day}/Week ${student.current_week} | 
+                Total prompts: ${student.total_prompts_sent}
+              </div>
+            </div>
+            <button class="expand-btn">
+              ${isDone ? 'View' : 'Send Feedback'} ▼
+            </button>
+          </div>
+          
+          <div class="student-details">
+            <h3>This Week's Responses</h3>
+            <div id="responses-${student.id}">
+              <p>Loading responses...</p>
+            </div>
+            
+            <div class="feedback-box">
+              <h3>Send Feedback</h3>
+              <div class="template-selector">
+                <button class="template-btn active" data-template="${templateType}">
+                  Load Template
+                </button>
+                <button class="template-btn" data-template="blank">
+                  Start Blank
+                </button>
+              </div>
+              
+              <textarea 
+                class="feedback-textarea" 
+                id="feedback-${student.id}"
+                placeholder="Write your feedback here..."
+              >${templates[templateType]}</textarea>
+              
+              <div class="action-buttons">
+                <button class="send-btn" ${isDone ? 'disabled' : ''}>
+                  <i class="fas fa-paper-plane"></i> Send to LINE
+                </button>
+                <button class="mark-done-btn" ${isDone ? 'disabled' : ''}>
+                  <i class="fas fa-check"></i> Mark Complete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ============================================
+    // CARD INTERACTIONS
+    // ============================================
+
+    async function toggleCard(studentId) {
+      const card = document.getElementById(`student-${studentId}`);
+      const isExpanded = card.classList.contains('expanded');
+
+      // Close all other cards
+      document.querySelectorAll('.student-card').forEach(c => c.classList.remove('expanded'));
+
+      if (!isExpanded) {
+        card.classList.add('expanded');
+        await loadStudentResponses(studentId);
+      }
+    }
+
+    async function loadStudentResponses(studentId) {
+      const container = document.getElementById(`responses-${studentId}`);
+      container.innerHTML = '<p>Loading...</p>';
+
+      try {
+        // Get messages for this student
+        const { data: messages, error } = await supabase
+          .from('message_log')
+          .select('*')
+          .eq('user_id', studentId)
+          .order('created_at', { ascending: false })
+          .limit(7);
+
+        if (error) throw error;
+
+        if (messages.length === 0) {
+          container.innerHTML = '<p>No responses yet.</p>';
+          return;
+        }
+
+        container.innerHTML = messages.map((msg, idx) => `
+          <div class="response-item">
+            <h4>Day ${7 - idx} Response</h4>
+            ${msg.message_text ? `<p class="response-text">"${msg.message_text}"</p>` : ''}
+            ${msg.media_type === 'audio' ? `
+              <div class="audio-player">
+                <audio controls src="/api/get-line-audio?messageId=${msg.message_id}">
+                  Your browser does not support audio.
+                </audio>
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+
+      } catch (err) {
+        console.error('Error loading responses:', err);
+        container.innerHTML = '<p>Error loading responses.</p>';
+      }
+    }
+
+    function loadTemplate(studentId, templateType) {
+      const textarea = document.getElementById(`feedback-${studentId}`);
+      const card = document.getElementById(`student-${studentId}`);
+      const templateBtns = card.querySelectorAll('.template-btn');
+
+      templateBtns.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (templateType === 'blank') {
+        textarea.value = '';
+      } else {
+        textarea.value = templates[templateType];
+      }
+    }
+
+    // ============================================
+    // SEND FEEDBACK
+    // ============================================
+
+    async function sendFeedback(studentId) {
+      const textarea = document.getElementById(`feedback-${studentId}`);
+      const feedbackText = textarea.value.trim();
+
+      if (!feedbackText) {
+        alert('Please write some feedback first!');
+        return;
+      }
+
+      if (!confirm('Send this feedback to the student via LINE?')) {
+        return;
+      }
+
+      const sendBtn = event.target;
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+      try {
+        // Call Edge Function to send to LINE
+        const response = await fetch('https://sxjnbsnxdwlnfqvnkbmc.supabase.co/functions/v1/send-teacher-feedback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
+          },
+          body: JSON.stringify({
+            studentId,
+            feedbackText,
+            teacherId: currentTeacher.id
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to send feedback');
+
+        alert('Feedback sent successfully!');
+        completedToday.add(studentId);
+        await loadFeedbackQueue();
+
+      } catch (err) {
+        console.error('Error sending feedback:', err);
+        alert('Error sending feedback. Please try again.');
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to LINE';
+      }
+    }
+
+    async function markComplete(studentId) {
+      completedToday.add(studentId);
+      await loadFeedbackQueue();
+      updateStats();
+    }
+
+    // ============================================
+    // UPDATE STATS
+    // ============================================
+
+    function updateStats() {
+      const totalStudents = feedbackQueue.planA.length + feedbackQueue.planC1.length + feedbackQueue.planC2.length;
+      const completed = completedToday.size;
+      
+      // Estimate time: 12 min for weekly, 5 min for biweekly, 3 min for daily
+      const estimatedMinutes = 
+        (feedbackQueue.planA.length * 12) +
+        (feedbackQueue.planC1.length * 5) +
+        (feedbackQueue.planC2.length * 3);
+      
+      const hours = Math.floor(estimatedMinutes / 60);
+      const minutes = estimatedMinutes % 60;
+
+      document.getElementById('total-students').textContent = totalStudents;
+      document.getElementById('today-feedback').textContent = totalStudents;
+      document.getElementById('completed-today').textContent = `${completed}/${totalStudents}`;
+      document.getElementById('estimated-time').textContent = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+    }
+
+    // ============================================
+    // LOGOUT
+    // ============================================
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      if (confirm('Are you sure you want to logout?')) {
+        await supabase.auth.signOut();
+        window.location.href = '/teacher-login.html';
+      }
+    });
+
+    // ============================================
+    // INITIALIZE
+    // ============================================
+
+    checkAuth();
+
+    // Auto-refresh every 5 minutes
+    setInterval(loadFeedbackQueue, 5 * 60 * 1000);
+  </script>
+</body>
+</html>
