@@ -414,29 +414,30 @@ Tomorrow's focus: [Preview]`
       try {
         // Get all assigned students with their progress
         const { data: assignments, error: assignError } = await supabase
-          .from('student_teacher_assignments')
-          .select(`
-            student_id,
-            questionnaire_responses (
-              id,
-              english_name,
-              japanese_name,
-              line_user_id,
-              plan
-            )
-          `)
-          .eq('teacher_id', currentTeacher.id);
+  .from('student_teacher_assignments')
+  .select(`
+    student_id,
+    questionnaire_responses (
+      id,
+      user_id,
+      english_name,
+      japanese_name,
+      line_user_id,
+      plan
+    )
+  `)
+  .eq('teacher_id', currentTeacher.id);
 
         if (assignError) throw assignError;
 
         const students = assignments.map(a => a.questionnaire_responses).filter(Boolean);
 
-        // Get progress for all students
-        const studentIds = students.map(s => s.id);
-        const { data: progressData, error: progressError } = await supabase
-          .from('student_progress')
-          .select('*')
-          .in('student_id', studentIds);
+        // Get progress for all students using user_id
+const userIds = students.map(s => s.user_id).filter(Boolean);
+const { data: progressData, error: progressError } = await supabase
+  .from('student_progress')
+  .select('*')
+  .in('user_id', userIds);
 
         if (progressError) throw progressError;
 
@@ -444,8 +445,8 @@ Tomorrow's focus: [Preview]`
         feedbackQueue = { planA: [], planC1: [], planC2: [] };
 
         for (const student of students) {
-          const progress = progressData.find(p => p.student_id === student.id);
-          if (!progress) continue;
+  const progress = progressData.find(p => p.user_id === student.user_id);
+  if (!progress) continue;
 
           const studentData = {
             ...student,
@@ -612,17 +613,26 @@ Tomorrow's focus: [Preview]`
     }
 
     async function loadStudentResponses(studentId) {
-      const container = document.getElementById(`responses-${studentId}`);
-      container.innerHTML = '<p>Loading...</p>';
+  const container = document.getElementById(`responses-${studentId}`);
+  container.innerHTML = '<p>Loading...</p>';
 
-      try {
-        // Get messages for this student
-        const { data: messages, error } = await supabase
-          .from('message_log')
-          .select('*')
-          .eq('user_id', studentId)
-          .order('created_at', { ascending: false })
-          .limit(7);
+  try {
+    // First get the student's user_id from questionnaire_responses
+    const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
+      .find(s => s.id === studentId);
+    
+    if (!student || !student.user_id) {
+      container.innerHTML = '<p>Error: Could not find student data.</p>';
+      return;
+    }
+
+    // Get messages for this student using user_id
+    const { data: messages, error } = await supabase
+      .from('message_log')
+      .select('*')
+      .eq('user_id', student.user_id)
+      .order('created_at', { ascending: false })
+      .limit(7);
 
         if (error) throw error;
 
