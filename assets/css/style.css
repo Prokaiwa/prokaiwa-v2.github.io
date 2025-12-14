@@ -1576,7 +1576,8 @@ main .container:not(.legal-page-container) {
 .comparison-highlight {
     border-color: var(--color-primary);
     box-shadow: 0 8px 24px rgba(0, 128, 128, 0.15);
-    transform: scale(1.02);
+    margin: -0.5rem;
+    padding: 2.5rem;
 }
 
 .comparison-title {
