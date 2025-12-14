@@ -148,14 +148,12 @@
     </div>
   </div>
 
-  <script type="module">
-  // Import Supabase with specific version
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/module/index.js';
-  
-  // Initialize Supabase
-  let supabase;
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Initialize Supabase using global supabase object
+  let supabaseClient;
   try {
-    supabase = createClient(
+    supabaseClient = supabase.createClient(
       'https://sxjnbsnxdwlnfqvnkbmc.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4am5ic254ZHdsbmZxdm5rYm1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMyMDg5NDAsImV4cCI6MjA0ODc4NDk0MH0.hLrJdvhpEJrhbvnx_i9HyzcxcZqLp9FnBUz6s2f0hkw'
     );
@@ -221,7 +219,7 @@
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    if (!supabase) {
+    if (!supabaseClient) {
       showError('Authentication not initialized. Please refresh the page.');
       return;
     }
@@ -234,7 +232,7 @@
     
     try {
       // Sign in with Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
         email,
         password
       });
@@ -247,14 +245,14 @@
       }
       
       // Check if user is a teacher
-      const { data: teacher, error: teacherError } = await supabase
+      const { data: teacher, error: teacherError } = await supabaseClient
         .from('teachers')
         .select('*')
         .eq('auth_user_id', authData.user.id)
         .single();
       
       if (teacherError || !teacher) {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         showError('Access denied. This account is not registered as a teacher.');
         loginButton.disabled = false;
         loginButton.innerHTML = 'Log In';
@@ -262,7 +260,7 @@
       }
       
       if (!teacher.is_active) {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         showError('Your teacher account has been deactivated. Please contact admin.');
         loginButton.disabled = false;
         loginButton.innerHTML = 'Log In';
@@ -287,7 +285,7 @@
   signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    if (!supabase) {
+    if (!supabaseClient) {
       showError('Authentication not initialized. Please refresh the page.');
       return;
     }
@@ -312,7 +310,7 @@
     
     try {
       // Check if email exists in teachers table
-      const { data: existingTeacher, error: lookupError } = await supabase
+      const { data: existingTeacher, error: lookupError } = await supabaseClient
         .from('teachers')
         .select('*')
         .eq('email', email)
@@ -337,7 +335,7 @@
       }
       
       // Create auth account
-      const { data: authData, error: signupError } = await supabase.auth.signUp({
+      const { data: authData, error: signupError } = await supabaseClient.auth.signUp({
         email,
         password
       });
@@ -350,7 +348,7 @@
       }
       
       // Link auth account to teacher record
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseClient
         .from('teachers')
         .update({ auth_user_id: authData.user.id })
         .eq('email', email);
