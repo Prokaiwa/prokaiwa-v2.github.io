@@ -1550,7 +1550,121 @@ main .container:not(.legal-page-container) {
         padding: 1.5rem;
     }
 }
+/* =============================================================================
+   COMPARISON SECTION (New)
+   ============================================================================= */
+.comparison-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
+}
 
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.comparison-card {
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    position: relative;
+}
+
+.comparison-highlight {
+    border-color: var(--color-primary);
+    box-shadow: 0 8px 24px rgba(0, 128, 128, 0.15);
+    transform: scale(1.02);
+}
+
+.comparison-title {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.comparison-list {
+    list-style: none;
+    padding: 0;
+}
+
+.comparison-list li {
+    padding: 0.75rem 0 0.75rem 2rem;
+    position: relative;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.comparison-list li:last-child {
+    border-bottom: none;
+}
+
+.comparison-negative::before {
+    content: "❌";
+    position: absolute;
+    left: 0;
+}
+
+.comparison-positive::before {
+    content: "✅";
+    position: absolute;
+    left: 0;
+}
+
+.value-highlight {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.value-stat {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.value-stat i {
+    margin-right: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.hero-subtext {
+    font-size: 1.1rem;
+    margin-top: 1rem;
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .comparison-highlight {
+        transform: scale(1);
+    }
+    
+    .comparison-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .comparison-section {
+        background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
+    }
+    
+    .comparison-card {
+        background-color: var(--color-card-bg);
+        border-color: var(--color-border);
+    }
+    
+    .comparison-highlight {
+        border-color: var(--color-primary);
+        box-shadow: 0 8px 24px rgba(0, 168, 168, 0.25);
+    }
+}
 /* =============================================================================
    23. PRINT STYLES
    ============================================================================= */
