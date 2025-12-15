@@ -418,13 +418,13 @@ Tomorrow's focus: [Preview]`
           .select(`
             student_id,
             questionnaire_responses (
-              id,
-              user_id,
-              english_name,
-              japanese_name,
-              line_user_id,
-              plan
-            )
+  id,
+  user_id,
+  given_name_romaji,
+  name,
+  line_id,
+  plan
+)
           `)
           .eq('teacher_id', currentTeacher.id);
 
@@ -544,7 +544,7 @@ Tomorrow's focus: [Preview]`
           <div class="student-header">
             <div>
               <div class="student-name">
-                ${student.english_name || student.japanese_name}
+                ${student.given_name_romaji || student.name}
                 ${isPriority ? '<span class="priority-badge">⭐ NEW</span>' : ''}
                 ${isDone ? '<span class="priority-badge" style="background:#4caf50;">✓ DONE</span>' : ''}
               </div>
