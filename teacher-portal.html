@@ -642,18 +642,39 @@ Tomorrow's focus: [Preview]`
         }
 
         container.innerHTML = messages.map((msg, idx) => `
-          <div class="response-item">
-            <h4>Day ${7 - idx} Response</h4>
-            ${msg.message_text ? `<p class="response-text">"${msg.message_text}"</p>` : ''}
-            ${msg.media_type === 'audio' ? `
-              <div class="audio-player">
-                <audio controls src="/api/get-line-audio?messageId=${msg.message_id}">
-                  Your browser does not support audio.
-                </audio>
-              </div>
-            ` : ''}
-          </div>
-        `).join('');
+  <div class="response-item">
+    <h4>Day ${7 - idx} Response</h4>
+    ${msg.message_text ? `<p class="response-text">"${msg.message_text}"</p>` : ''}
+    
+    ${msg.media_type === 'audio' ? `
+      <div class="audio-player">
+        <audio controls style="width: 100%; max-width: 400px;">
+          <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
+          Your browser does not support audio playback.
+        </audio>
+      </div>
+    ` : ''}
+    
+    ${msg.media_type === 'video' ? `
+      <div class="video-player">
+        <video controls style="width: 100%; max-width: 400px; border-radius: 8px;">
+          <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
+          Your browser does not support video playback.
+        </video>
+      </div>
+    ` : ''}
+    
+    ${msg.media_type === 'image' ? `
+      <div class="image-display">
+        <img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}" 
+             style="max-width: 100%; border-radius: 8px; cursor: pointer;"
+             onclick="window.open(this.src, '_blank')"
+             alt="Student response image">
+        <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">Click to view full size</p>
+      </div>
+    ` : ''}
+  </div>
+`).join('');
 
       } catch (err) {
         console.error('Error loading responses:', err);
