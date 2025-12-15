@@ -323,12 +323,12 @@
     </div>
   </main>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-    
-    const supabase = createClient(
-      'https://sxjnbsnxdwlnfqvnkbmc.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4am5ic254ZHdsbmZxdm5rYm1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMyMDg5NDAsImV4cCI6MjA0ODc4NDk0MH0.hLrJdvhpEJrhbvnx_i9HyzcxcZqLp9FnBUz6s2f0hkw'
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Initialize Supabase client
+    const supabaseClient = supabase.createClient(
+      'https://luyzyzefgintksydmwoh.supabase.co', 
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg'
     );
 
     let currentTeacher = null;
@@ -379,7 +379,7 @@ Tomorrow's focus: [Preview]`
     // ============================================
 
     async function checkAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseClient.auth.getSession();
       
       if (!session) {
         window.location.href = '/teacher-login.html';
@@ -387,14 +387,14 @@ Tomorrow's focus: [Preview]`
       }
       
       // Get teacher info
-      const { data: teacher, error } = await supabase
+      const { data: teacher, error } = await supabaseClient
         .from('teachers')
         .select('*')
         .eq('auth_user_id', session.user.id)
         .single();
       
       if (error || !teacher || !teacher.is_active) {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         window.location.href = '/teacher-login.html';
         return;
       }
@@ -413,31 +413,31 @@ Tomorrow's focus: [Preview]`
     async function loadFeedbackQueue() {
       try {
         // Get all assigned students with their progress
-        const { data: assignments, error: assignError } = await supabase
-  .from('student_teacher_assignments')
-  .select(`
-    student_id,
-    questionnaire_responses (
-      id,
-      user_id,
-      english_name,
-      japanese_name,
-      line_user_id,
-      plan
-    )
-  `)
-  .eq('teacher_id', currentTeacher.id);
+        const { data: assignments, error: assignError } = await supabaseClient
+          .from('student_teacher_assignments')
+          .select(`
+            student_id,
+            questionnaire_responses (
+              id,
+              user_id,
+              english_name,
+              japanese_name,
+              line_user_id,
+              plan
+            )
+          `)
+          .eq('teacher_id', currentTeacher.id);
 
         if (assignError) throw assignError;
 
         const students = assignments.map(a => a.questionnaire_responses).filter(Boolean);
 
         // Get progress for all students using user_id
-const userIds = students.map(s => s.user_id).filter(Boolean);
-const { data: progressData, error: progressError } = await supabase
-  .from('student_progress')
-  .select('*')
-  .in('user_id', userIds);
+        const userIds = students.map(s => s.user_id).filter(Boolean);
+        const { data: progressData, error: progressError } = await supabaseClient
+          .from('student_progress')
+          .select('*')
+          .in('user_id', userIds);
 
         if (progressError) throw progressError;
 
@@ -445,8 +445,8 @@ const { data: progressData, error: progressError } = await supabase
         feedbackQueue = { planA: [], planC1: [], planC2: [] };
 
         for (const student of students) {
-  const progress = progressData.find(p => p.user_id === student.user_id);
-  if (!progress) continue;
+          const progress = progressData.find(p => p.user_id === student.user_id);
+          if (!progress) continue;
 
           const studentData = {
             ...student,
@@ -613,26 +613,26 @@ const { data: progressData, error: progressError } = await supabase
     }
 
     async function loadStudentResponses(studentId) {
-  const container = document.getElementById(`responses-${studentId}`);
-  container.innerHTML = '<p>Loading...</p>';
+      const container = document.getElementById(`responses-${studentId}`);
+      container.innerHTML = '<p>Loading...</p>';
 
-  try {
-    // First get the student's user_id from questionnaire_responses
-    const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
-      .find(s => s.id === studentId);
-    
-    if (!student || !student.user_id) {
-      container.innerHTML = '<p>Error: Could not find student data.</p>';
-      return;
-    }
+      try {
+        // First get the student's user_id from questionnaire_responses
+        const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
+          .find(s => s.id === studentId);
+        
+        if (!student || !student.user_id) {
+          container.innerHTML = '<p>Error: Could not find student data.</p>';
+          return;
+        }
 
-    // Get messages for this student using user_id
-    const { data: messages, error } = await supabase
-      .from('message_log')
-      .select('*')
-      .eq('user_id', student.user_id)
-      .order('created_at', { ascending: false })
-      .limit(7);
+        // Get messages for this student using user_id
+        const { data: messages, error } = await supabaseClient
+          .from('message_log')
+          .select('*')
+          .eq('user_id', student.user_id)
+          .order('created_at', { ascending: false })
+          .limit(7);
 
         if (error) throw error;
 
@@ -699,11 +699,11 @@ const { data: progressData, error: progressError } = await supabase
 
       try {
         // Call Edge Function to send to LINE
-        const response = await fetch('https://sxjnbsnxdwlnfqvnkbmc.supabase.co/functions/v1/send-teacher-feedback', {
+        const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/send-teacher-feedback', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
+            'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
           },
           body: JSON.stringify({
             studentId,
@@ -761,7 +761,7 @@ const { data: progressData, error: progressError } = await supabase
 
     document.getElementById('logout-btn').addEventListener('click', async () => {
       if (confirm('Are you sure you want to logout?')) {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         window.location.href = '/teacher-login.html';
       }
     });
