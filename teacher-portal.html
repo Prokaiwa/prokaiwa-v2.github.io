@@ -419,10 +419,10 @@ Tomorrow's focus: [Preview]`
         todayStart.setHours(0, 0, 0, 0);
         
         const { data: todaysFeedback, error } = await supabaseClient
-          .from('feedback_log')
-          .select('student_id')
-          .eq('teacher_id', currentTeacher.id)
-          .gte('created_at', todayStart.toISOString());
+  .from('feedback_log')
+  .select('student_id')
+  .eq('teacher_id', currentTeacher.id)
+  .gte('sent_at', todayStart.toISOString());
         
         if (error) throw error;
         
@@ -666,19 +666,19 @@ Tomorrow's focus: [Preview]`
 
         // ALSO get teacher feedback for this student
         const { data: teacherFeedback, error: feedbackError } = await supabaseClient
-          .from('feedback_log')
-          .select('*')
-          .eq('student_id', studentId)
-          .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
-          .order('created_at', { ascending: true });
+  .from('feedback_log')
+  .select('*')
+  .eq('student_id', studentId)
+  .gte('sent_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+  .order('sent_at', { ascending: true });
 
         if (feedbackError) console.error('Error loading feedback:', feedbackError);
 
         // Combine messages and feedback into one timeline
         const allMessages = [
-          ...messages.map(m => ({ ...m, type: 'message' })),
-          ...(teacherFeedback || []).map(f => ({ ...f, type: 'feedback', created_at: f.created_at }))
-        ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  ...messages.map(m => ({ ...m, type: 'message', created_at: m.created_at })),
+  ...(teacherFeedback || []).map(f => ({ ...f, type: 'feedback', created_at: f.sent_at }))
+].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
         if (allMessages.length === 0) {
           container.innerHTML = '<p>No conversation history yet.</p>';
