@@ -628,11 +628,12 @@ Tomorrow's focus: [Preview]`
 
         // Get messages for this student using user_id
         const { data: messages, error } = await supabaseClient
-          .from('message_log')
-          .select('*')
-          .eq('user_id', student.user_id)
-          .order('created_at', { ascending: false })
-          .limit(7);
+  .from('message_log')
+  .select('*')
+  .eq('user_id', student.user_id)
+  .eq('message_type', 'student_response')  // ← ONLY show student responses!
+  .order('created_at', { ascending: false })
+  .limit(7);
 
         if (error) throw error;
 
@@ -698,84 +699,94 @@ Tomorrow's focus: [Preview]`
     }
 
     // ============================================
-    // SEND FEEDBACK
-    // ============================================
+// SEND FEEDBACK
+// ============================================
 
-    async function sendFeedback(studentId) {
-      const textarea = document.getElementById(`feedback-${studentId}`);
-      const feedbackText = textarea.value.trim();
+async function sendFeedback(studentId) {
+  const textarea = document.getElementById(`feedback-${studentId}`);
+  const feedbackText = textarea.value.trim();
 
-      if (!feedbackText) {
-        alert('Please write some feedback first!');
-        return;
-      }
+  if (!feedbackText) {
+    alert('Please write some feedback first!');
+    return;
+  }
 
-      if (!confirm('Send this feedback to the student via LINE?')) {
-        return;
-      }
+  if (!confirm('Send this feedback to the student via LINE?')) {
+    return;
+  }
 
-      const sendBtn = event.target;
-      sendBtn.disabled = true;
-      sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+  const sendBtn = event.target;
+  const originalHTML = sendBtn.innerHTML;
+  sendBtn.disabled = true;
+  sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
-      try {
-        // Call Edge Function to send to LINE
-        const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/send-teacher-feedback', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
-          },
-          body: JSON.stringify({
-            studentId,
-            feedbackText,
-            teacherId: currentTeacher.id
-          })
-        });
+  try {
+    // Call Edge Function to send to LINE
+    const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/send-teacher-feedback', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
+      },
+      body: JSON.stringify({
+        studentId,
+        feedbackText,
+        teacherId: currentTeacher.id
+      })
+    });
 
-        if (!response.ok) throw new Error('Failed to send feedback');
+    if (!response.ok) throw new Error('Failed to send feedback');
 
-        alert('Feedback sent successfully!');
-        completedToday.add(studentId);
-        await loadFeedbackQueue();
+    // Auto-mark as complete
+    completedToday.add(studentId);
+    
+    alert('Feedback sent successfully!');
+    
+    // Reload the queue to update UI
+    await loadFeedbackQueue();
 
-      } catch (err) {
-        console.error('Error sending feedback:', err);
-        alert('Error sending feedback. Please try again.');
-        sendBtn.disabled = false;
-        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to LINE';
-      }
-    }
+  } catch (err) {
+    console.error('Error sending feedback:', err);
+    alert('Error sending feedback. Please try again.');
+    sendBtn.disabled = false;
+    sendBtn.innerHTML = originalHTML;
+  }
+}
 
-    async function markComplete(studentId) {
-      completedToday.add(studentId);
-      await loadFeedbackQueue();
-      updateStats();
-    }
+async function markComplete(studentId) {
+  completedToday.add(studentId);
+  await loadFeedbackQueue();
+  updateStats();
+}
 
-    // ============================================
-    // UPDATE STATS
-    // ============================================
+// ============================================
+// UPDATE STATS
+// ============================================
 
-    function updateStats() {
-      const totalStudents = feedbackQueue.planA.length + feedbackQueue.planC1.length + feedbackQueue.planC2.length;
-      const completed = completedToday.size;
-      
-      // Estimate time: 12 min for weekly, 5 min for biweekly, 3 min for daily
-      const estimatedMinutes = 
-        (feedbackQueue.planA.length * 12) +
-        (feedbackQueue.planC1.length * 5) +
-        (feedbackQueue.planC2.length * 3);
-      
-      const hours = Math.floor(estimatedMinutes / 60);
-      const minutes = estimatedMinutes % 60;
+function updateStats() {
+  const totalStudents = feedbackQueue.planA.length + feedbackQueue.planC1.length + feedbackQueue.planC2.length;
+  const completed = completedToday.size;
+  
+  // Estimate time: 12 min for weekly, 5 min for biweekly, 3 min for daily
+  const remainingA = feedbackQueue.planA.filter(s => !completedToday.has(s.id)).length;
+  const remainingC1 = feedbackQueue.planC1.filter(s => !completedToday.has(s.id)).length;
+  const remainingC2 = feedbackQueue.planC2.filter(s => !completedToday.has(s.id)).length;
+  
+  const estimatedMinutes = 
+    (remainingA * 12) +
+    (remainingC1 * 5) +
+    (remainingC2 * 3);
+  
+  const hours = Math.floor(estimatedMinutes / 60);
+  const minutes = estimatedMinutes % 60;
 
-      document.getElementById('total-students').textContent = totalStudents;
-      document.getElementById('today-feedback').textContent = totalStudents;
-      document.getElementById('completed-today').textContent = `${completed}/${totalStudents}`;
-      document.getElementById('estimated-time').textContent = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-    }
-
+  document.getElementById('total-students').textContent = totalStudents;
+  document.getElementById('today-feedback').textContent = totalStudents;
+  document.getElementById('completed-today').textContent = `${completed}/${totalStudents}`;
+  document.getElementById('estimated-time').textContent = estimatedMinutes > 0 
+    ? (hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`)
+    : '0m';
+}
     // ============================================
     // LOGOUT
     // ============================================
