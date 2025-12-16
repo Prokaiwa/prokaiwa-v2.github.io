@@ -402,8 +402,36 @@ Tomorrow's focus: [Preview]`
       currentTeacher = teacher;
       document.getElementById('teacher-name').textContent = teacher.full_name;
       
+      // Load completed feedback from today
+      await loadCompletedToday();
+      
       // Load feedback queue
       await loadFeedbackQueue();
+    }
+
+    // ============================================
+    // LOAD COMPLETED FEEDBACK FROM TODAY
+    // ============================================
+
+    async function loadCompletedToday() {
+      try {
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        
+        const { data: todaysFeedback, error } = await supabaseClient
+          .from('feedback_log')
+          .select('student_id')
+          .eq('teacher_id', currentTeacher.id)
+          .gte('created_at', todayStart.toISOString());
+        
+        if (error) throw error;
+        
+        // Populate completedToday Set
+        completedToday = new Set(todaysFeedback.map(f => f.student_id));
+        
+      } catch (err) {
+        console.error('Error loading completed feedback:', err);
+      }
     }
 
     // ============================================
@@ -418,13 +446,13 @@ Tomorrow's focus: [Preview]`
           .select(`
             student_id,
             questionnaire_responses (
-  id,
-  user_id,
-  given_name_romaji,
-  name,
-  line_id,
-  plan
-)
+              id,
+              user_id,
+              given_name_romaji,
+              name,
+              line_id,
+              plan
+            )
           `)
           .eq('teacher_id', currentTeacher.id);
 
@@ -559,9 +587,9 @@ Tomorrow's focus: [Preview]`
           </div>
           
           <div class="student-details">
-            <h3>This Week's Responses</h3>
+            <h3>Conversation History</h3>
             <div id="responses-${student.id}">
-              <p>Loading responses...</p>
+              <p>Loading conversation...</p>
             </div>
             
             <div class="feedback-box">
@@ -613,125 +641,150 @@ Tomorrow's focus: [Preview]`
     }
 
     async function loadStudentResponses(studentId) {
-  const container = document.getElementById(`responses-${studentId}`);
-  container.innerHTML = '<p>Loading conversation...</p>';
+      const container = document.getElementById(`responses-${studentId}`);
+      container.innerHTML = '<p>Loading conversation...</p>';
 
-  try {
-    const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
-      .find(s => s.id === studentId);
-    
-    if (!student || !student.user_id) {
-      container.innerHTML = '<p>Error: Could not find student data.</p>';
-      return;
-    }
-
-    // Get ALL messages (prompts AND responses) for last 7 days
-    const { data: messages, error } = await supabaseClient
-      .from('message_log')
-      .select('*')
-      .eq('user_id', student.user_id)
-      .in('message_type', ['prompt', 'student_response'])
-      .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
-      .order('created_at', { ascending: true });
-
-    if (error) throw error;
-
-    if (messages.length === 0) {
-      container.innerHTML = '<p>No conversation history yet.</p>';
-      return;
-    }
-
-    // Group messages by date
-    const messagesByDate = {};
-    messages.forEach(msg => {
-      const date = new Date(msg.created_at).toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
-      if (!messagesByDate[date]) messagesByDate[date] = [];
-      messagesByDate[date].push(msg);
-    });
-
-    // Render as conversation
-    let html = '';
-    Object.entries(messagesByDate).reverse().forEach(([date, msgs]) => {
-      html += `<div style="margin-bottom: 2rem;">
-        <h4 style="color: #666; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem;">
-          📅 ${date}
-        </h4>`;
-      
-      msgs.forEach(msg => {
-        const time = new Date(msg.created_at).toLocaleTimeString('en-US', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        });
+      try {
+        const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
+          .find(s => s.id === studentId);
         
-        if (msg.message_type === 'prompt') {
-          // Prompt from bot
-          html += `
-            <div style="margin: 1rem 0; padding: 1rem; background: #f0f8ff; border-left: 3px solid #4A90E2; border-radius: 4px;">
-              <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
-                [${time}] 🤖 <strong>Prompt:</strong>
-              </div>
-              <p style="margin: 0; color: #333;">"${msg.message_text}"</p>
-            </div>`;
-        } else {
-          // Student response
-          html += `
-            <div style="margin: 1rem 0; padding: 1rem; background: #fff; border: 1px solid #e0e0e0; border-radius: 4px;">
-              <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
-                [${time}] 👤 <strong>${student.given_name_romaji || student.name}:</strong>
-              </div>`;
+        if (!student || !student.user_id) {
+          container.innerHTML = '<p>Error: Could not find student data.</p>';
+          return;
+        }
+
+        // Get ALL messages (prompts AND responses) for last 7 days
+        const { data: messages, error } = await supabaseClient
+          .from('message_log')
+          .select('*')
+          .eq('user_id', student.user_id)
+          .in('message_type', ['prompt', 'student_response'])
+          .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        // ALSO get teacher feedback for this student
+        const { data: teacherFeedback, error: feedbackError } = await supabaseClient
+          .from('feedback_log')
+          .select('*')
+          .eq('student_id', studentId)
+          .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+          .order('created_at', { ascending: true });
+
+        if (feedbackError) console.error('Error loading feedback:', feedbackError);
+
+        // Combine messages and feedback into one timeline
+        const allMessages = [
+          ...messages.map(m => ({ ...m, type: 'message' })),
+          ...(teacherFeedback || []).map(f => ({ ...f, type: 'feedback', created_at: f.created_at }))
+        ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+        if (allMessages.length === 0) {
+          container.innerHTML = '<p>No conversation history yet.</p>';
+          return;
+        }
+
+        // Group messages by date
+        const messagesByDate = {};
+        allMessages.forEach(msg => {
+          const date = new Date(msg.created_at).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          });
+          if (!messagesByDate[date]) messagesByDate[date] = [];
+          messagesByDate[date].push(msg);
+        });
+
+        // Render as conversation
+        let html = '';
+        Object.entries(messagesByDate).reverse().forEach(([date, msgs]) => {
+          html += `<div style="margin-bottom: 2rem;">
+            <h4 style="color: #666; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem;">
+              📅 ${date}
+            </h4>`;
           
-          if (msg.message_text) {
-            html += `<p style="margin: 0.5rem 0; color: #333;">"${msg.message_text}"</p>`;
-          }
-          
-          if (msg.media_type === 'audio') {
-            html += `
-              <div style="margin-top: 0.5rem;">
-                <audio controls style="width: 100%; max-width: 400px;">
-                  <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
-                  Your browser does not support audio playback.
-                </audio>
-              </div>`;
-          }
-          
-          if (msg.media_type === 'video') {
-            html += `
-              <div style="margin-top: 0.5rem;">
-                <video controls style="width: 100%; max-width: 400px; border-radius: 8px;">
-                  <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
-                  Your browser does not support video playback.
-                </video>
-              </div>`;
-          }
-          
-          if (msg.media_type === 'image') {
-            html += `
-              <div style="margin-top: 0.5rem;">
-                <img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}" 
-                     style="max-width: 100%; border-radius: 8px; cursor: pointer;"
-                     onclick="window.open(this.src, '_blank')"
-                     alt="Student response image">
-              </div>`;
-          }
+          msgs.forEach(msg => {
+            const time = new Date(msg.created_at).toLocaleTimeString('en-US', { 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            });
+            
+            if (msg.type === 'message' && msg.message_type === 'prompt') {
+              // Prompt from bot
+              html += `
+                <div style="margin: 1rem 0; padding: 1rem; background: #f0f8ff; border-left: 3px solid #4A90E2; border-radius: 4px;">
+                  <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
+                    [${time}] 🤖 <strong>Prompt:</strong>
+                  </div>
+                  <p style="margin: 0; color: #333;">"${msg.message_text}"</p>
+                </div>`;
+            } else if (msg.type === 'message' && msg.message_type === 'student_response') {
+              // Student response
+              html += `
+                <div style="margin: 1rem 0; padding: 1rem; background: #fff; border: 1px solid #e0e0e0; border-radius: 4px;">
+                  <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
+                    [${time}] 👤 <strong>${student.given_name_romaji || student.name}:</strong>
+                  </div>`;
+              
+              if (msg.message_text) {
+                html += `<p style="margin: 0.5rem 0; color: #333;">"${msg.message_text}"</p>`;
+              }
+              
+              if (msg.media_type === 'audio') {
+                html += `
+                  <div style="margin-top: 0.5rem;">
+                    <audio controls style="width: 100%; max-width: 400px;">
+                      <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
+                      Your browser does not support audio playback.
+                    </audio>
+                  </div>`;
+              }
+              
+              if (msg.media_type === 'video') {
+                html += `
+                  <div style="margin-top: 0.5rem;">
+                    <video controls style="width: 100%; max-width: 400px; border-radius: 8px;">
+                      <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
+                      Your browser does not support video playback.
+                    </video>
+                  </div>`;
+              }
+              
+              if (msg.media_type === 'image') {
+                html += `
+                  <div style="margin-top: 0.5rem;">
+                    <img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}" 
+                         style="max-width: 100%; border-radius: 8px; cursor: pointer;"
+                         onclick="window.open(this.src, '_blank')"
+                         alt="Student response image">
+                  </div>`;
+              }
+              
+              html += `</div>`;
+            } else if (msg.type === 'feedback') {
+              // Teacher feedback
+              html += `
+                <div style="margin: 1rem 0; padding: 1rem; background: #f0fff0; border-left: 3px solid #4caf50; border-radius: 4px;">
+                  <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
+                    [${time}] 👨‍🏫 <strong>Teacher Feedback:</strong>
+                  </div>
+                  <p style="margin: 0; color: #333; white-space: pre-wrap;">${msg.feedback_text}</p>
+                </div>`;
+            }
+          });
           
           html += `</div>`;
-        }
-      });
-      
-      html += `</div>`;
-    });
+        });
 
-    container.innerHTML = html;
+        container.innerHTML = html;
 
-  } catch (err) {
-    console.error('Error loading conversation:', err);
-    container.innerHTML = '<p>Error loading conversation history.</p>';
-  }
-}
+      } catch (err) {
+        console.error('Error loading conversation:', err);
+        container.innerHTML = '<p>Error loading conversation history.</p>';
+      }
+    }
 
     function loadTemplate(studentId, templateType) {
       const textarea = document.getElementById(`feedback-${studentId}`);
@@ -749,94 +802,95 @@ Tomorrow's focus: [Preview]`
     }
 
     // ============================================
-// SEND FEEDBACK
-// ============================================
+    // SEND FEEDBACK
+    // ============================================
 
-async function sendFeedback(studentId) {
-  const textarea = document.getElementById(`feedback-${studentId}`);
-  const feedbackText = textarea.value.trim();
+    async function sendFeedback(studentId) {
+      const textarea = document.getElementById(`feedback-${studentId}`);
+      const feedbackText = textarea.value.trim();
 
-  if (!feedbackText) {
-    alert('Please write some feedback first!');
-    return;
-  }
+      if (!feedbackText) {
+        alert('Please write some feedback first!');
+        return;
+      }
 
-  if (!confirm('Send this feedback to the student via LINE?')) {
-    return;
-  }
+      if (!confirm('Send this feedback to the student via LINE?')) {
+        return;
+      }
 
-  const sendBtn = event.target;
-  const originalHTML = sendBtn.innerHTML;
-  sendBtn.disabled = true;
-  sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+      const sendBtn = event.target;
+      const originalHTML = sendBtn.innerHTML;
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
-  try {
-    // Call Edge Function to send to LINE
-    const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/send-teacher-feedback', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
-      },
-      body: JSON.stringify({
-        studentId,
-        feedbackText,
-        teacherId: currentTeacher.id
-      })
-    });
+      try {
+        // Call Edge Function to send to LINE
+        const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/send-teacher-feedback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
+          },
+          body: JSON.stringify({
+            studentId,
+            feedbackText,
+            teacherId: currentTeacher.id
+          })
+        });
 
-    if (!response.ok) throw new Error('Failed to send feedback');
+        if (!response.ok) throw new Error('Failed to send feedback');
 
-    // Auto-mark as complete
-    completedToday.add(studentId);
-    
-    alert('Feedback sent successfully!');
-    
-    // Reload the queue to update UI
-    await loadFeedbackQueue();
+        // Auto-mark as complete
+        completedToday.add(studentId);
+        
+        alert('Feedback sent successfully!');
+        
+        // Reload the queue to update UI
+        await loadFeedbackQueue();
 
-  } catch (err) {
-    console.error('Error sending feedback:', err);
-    alert('Error sending feedback. Please try again.');
-    sendBtn.disabled = false;
-    sendBtn.innerHTML = originalHTML;
-  }
-}
+      } catch (err) {
+        console.error('Error sending feedback:', err);
+        alert('Error sending feedback. Please try again.');
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = originalHTML;
+      }
+    }
 
-async function markComplete(studentId) {
-  completedToday.add(studentId);
-  await loadFeedbackQueue();
-  updateStats();
-}
+    async function markComplete(studentId) {
+      completedToday.add(studentId);
+      await loadFeedbackQueue();
+      updateStats();
+    }
 
-// ============================================
-// UPDATE STATS
-// ============================================
+    // ============================================
+    // UPDATE STATS
+    // ============================================
 
-function updateStats() {
-  const totalStudents = feedbackQueue.planA.length + feedbackQueue.planC1.length + feedbackQueue.planC2.length;
-  const completed = completedToday.size;
-  
-  // Estimate time: 12 min for weekly, 5 min for biweekly, 3 min for daily
-  const remainingA = feedbackQueue.planA.filter(s => !completedToday.has(s.id)).length;
-  const remainingC1 = feedbackQueue.planC1.filter(s => !completedToday.has(s.id)).length;
-  const remainingC2 = feedbackQueue.planC2.filter(s => !completedToday.has(s.id)).length;
-  
-  const estimatedMinutes = 
-    (remainingA * 12) +
-    (remainingC1 * 5) +
-    (remainingC2 * 3);
-  
-  const hours = Math.floor(estimatedMinutes / 60);
-  const minutes = estimatedMinutes % 60;
+    function updateStats() {
+      const totalStudents = feedbackQueue.planA.length + feedbackQueue.planC1.length + feedbackQueue.planC2.length;
+      const completed = completedToday.size;
+      
+      // Estimate time: 12 min for weekly, 5 min for biweekly, 3 min for daily
+      const remainingA = feedbackQueue.planA.filter(s => !completedToday.has(s.id)).length;
+      const remainingC1 = feedbackQueue.planC1.filter(s => !completedToday.has(s.id)).length;
+      const remainingC2 = feedbackQueue.planC2.filter(s => !completedToday.has(s.id)).length;
+      
+      const estimatedMinutes = 
+        (remainingA * 12) +
+        (remainingC1 * 5) +
+        (remainingC2 * 3);
+      
+      const hours = Math.floor(estimatedMinutes / 60);
+      const minutes = estimatedMinutes % 60;
 
-  document.getElementById('total-students').textContent = totalStudents;
-  document.getElementById('today-feedback').textContent = totalStudents;
-  document.getElementById('completed-today').textContent = `${completed}/${totalStudents}`;
-  document.getElementById('estimated-time').textContent = estimatedMinutes > 0 
-    ? (hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`)
-    : '0m';
-}
+      document.getElementById('total-students').textContent = totalStudents;
+      document.getElementById('today-feedback').textContent = totalStudents;
+      document.getElementById('completed-today').textContent = `${completed}/${totalStudents}`;
+      document.getElementById('estimated-time').textContent = estimatedMinutes > 0 
+        ? (hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`)
+        : '0m';
+    }
+
     // ============================================
     // LOGOUT
     // ============================================
