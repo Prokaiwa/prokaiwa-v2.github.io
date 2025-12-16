@@ -613,75 +613,125 @@ Tomorrow's focus: [Preview]`
     }
 
     async function loadStudentResponses(studentId) {
-      const container = document.getElementById(`responses-${studentId}`);
-      container.innerHTML = '<p>Loading...</p>';
+  const container = document.getElementById(`responses-${studentId}`);
+  container.innerHTML = '<p>Loading conversation...</p>';
 
-      try {
-        // First get the student's user_id from questionnaire_responses
-        const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
-          .find(s => s.id === studentId);
-        
-        if (!student || !student.user_id) {
-          container.innerHTML = '<p>Error: Could not find student data.</p>';
-          return;
-        }
-
-        // Get messages for this student using user_id
-        const { data: messages, error } = await supabaseClient
-  .from('message_log')
-  .select('*')
-  .eq('user_id', student.user_id)
-  .eq('message_type', 'student_response')  // ← ONLY show student responses!
-  .order('created_at', { ascending: false })
-  .limit(7);
-
-        if (error) throw error;
-
-        if (messages.length === 0) {
-          container.innerHTML = '<p>No responses yet.</p>';
-          return;
-        }
-
-        container.innerHTML = messages.map((msg, idx) => `
-  <div class="response-item">
-    <h4>Day ${7 - idx} Response</h4>
-    ${msg.message_text ? `<p class="response-text">"${msg.message_text}"</p>` : ''}
+  try {
+    const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
+      .find(s => s.id === studentId);
     
-    ${msg.media_type === 'audio' ? `
-      <div class="audio-player">
-        <audio controls style="width: 100%; max-width: 400px;">
-          <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
-          Your browser does not support audio playback.
-        </audio>
-      </div>
-    ` : ''}
-    
-    ${msg.media_type === 'video' ? `
-      <div class="video-player">
-        <video controls style="width: 100%; max-width: 400px; border-radius: 8px;">
-          <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
-          Your browser does not support video playback.
-        </video>
-      </div>
-    ` : ''}
-    
-    ${msg.media_type === 'image' ? `
-      <div class="image-display">
-        <img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}" 
-             style="max-width: 100%; border-radius: 8px; cursor: pointer;"
-             onclick="window.open(this.src, '_blank')"
-             alt="Student response image">
-        <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">Click to view full size</p>
-      </div>
-    ` : ''}
-  </div>
-`).join('');
-
-      } catch (err) {
-        console.error('Error loading responses:', err);
-        container.innerHTML = '<p>Error loading responses.</p>';
-      }
+    if (!student || !student.user_id) {
+      container.innerHTML = '<p>Error: Could not find student data.</p>';
+      return;
     }
+
+    // Get ALL messages (prompts AND responses) for last 7 days
+    const { data: messages, error } = await supabaseClient
+      .from('message_log')
+      .select('*')
+      .eq('user_id', student.user_id)
+      .in('message_type', ['prompt', 'student_response'])
+      .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+
+    if (messages.length === 0) {
+      container.innerHTML = '<p>No conversation history yet.</p>';
+      return;
+    }
+
+    // Group messages by date
+    const messagesByDate = {};
+    messages.forEach(msg => {
+      const date = new Date(msg.created_at).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      if (!messagesByDate[date]) messagesByDate[date] = [];
+      messagesByDate[date].push(msg);
+    });
+
+    // Render as conversation
+    let html = '';
+    Object.entries(messagesByDate).reverse().forEach(([date, msgs]) => {
+      html += `<div style="margin-bottom: 2rem;">
+        <h4 style="color: #666; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem;">
+          📅 ${date}
+        </h4>`;
+      
+      msgs.forEach(msg => {
+        const time = new Date(msg.created_at).toLocaleTimeString('en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        
+        if (msg.message_type === 'prompt') {
+          // Prompt from bot
+          html += `
+            <div style="margin: 1rem 0; padding: 1rem; background: #f0f8ff; border-left: 3px solid #4A90E2; border-radius: 4px;">
+              <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
+                [${time}] 🤖 <strong>Prompt:</strong>
+              </div>
+              <p style="margin: 0; color: #333;">"${msg.message_text}"</p>
+            </div>`;
+        } else {
+          // Student response
+          html += `
+            <div style="margin: 1rem 0; padding: 1rem; background: #fff; border: 1px solid #e0e0e0; border-radius: 4px;">
+              <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
+                [${time}] 👤 <strong>${student.given_name_romaji || student.name}:</strong>
+              </div>`;
+          
+          if (msg.message_text) {
+            html += `<p style="margin: 0.5rem 0; color: #333;">"${msg.message_text}"</p>`;
+          }
+          
+          if (msg.media_type === 'audio') {
+            html += `
+              <div style="margin-top: 0.5rem;">
+                <audio controls style="width: 100%; max-width: 400px;">
+                  <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
+                  Your browser does not support audio playback.
+                </audio>
+              </div>`;
+          }
+          
+          if (msg.media_type === 'video') {
+            html += `
+              <div style="margin-top: 0.5rem;">
+                <video controls style="width: 100%; max-width: 400px; border-radius: 8px;">
+                  <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
+                  Your browser does not support video playback.
+                </video>
+              </div>`;
+          }
+          
+          if (msg.media_type === 'image') {
+            html += `
+              <div style="margin-top: 0.5rem;">
+                <img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}" 
+                     style="max-width: 100%; border-radius: 8px; cursor: pointer;"
+                     onclick="window.open(this.src, '_blank')"
+                     alt="Student response image">
+              </div>`;
+          }
+          
+          html += `</div>`;
+        }
+      });
+      
+      html += `</div>`;
+    });
+
+    container.innerHTML = html;
+
+  } catch (err) {
+    console.error('Error loading conversation:', err);
+    container.innerHTML = '<p>Error loading conversation history.</p>';
+  }
+}
 
     function loadTemplate(studentId, templateType) {
       const textarea = document.getElementById(`feedback-${studentId}`);
