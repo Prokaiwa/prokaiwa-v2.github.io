@@ -581,6 +581,8 @@ main .container:not(.legal-page-container) {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
     padding: 0 1rem;
+    max-width: 900px; /* Limits to 2 columns on desktop for balanced 2x2 layout */
+    margin: 0 auto; /* Centers the grid */
 }
 
 .plan-card {
