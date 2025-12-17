@@ -360,6 +360,15 @@ main .container:not(.legal-page-container) {
     line-height: 1.6;
 }
 
+.hero-subtext {
+    font-size: 1.1rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-accent);
+    font-weight: 600;
+    line-height: 1.6;
+}
+
 .hero-cta-buttons {
     display: flex;
     gap: 1rem;
@@ -373,6 +382,34 @@ main .container:not(.legal-page-container) {
     padding: 0.5rem;
     border-radius: var(--border-radius);
     margin-top: -0.6rem;
+}
+
+/* =============================================================================
+   9B. TRIAL BADGE (NEW)
+   ============================================================================= */
+.trial-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--color-gold) 0%, #f4c542 100%);
+    color: #1a1a1a;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+    box-shadow: 0 2px 8px rgba(212, 160, 23, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+    white-space: nowrap;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(212, 160, 23, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(212, 160, 23, 0.5);
+    }
 }
 
 /* =============================================================================
@@ -517,6 +554,26 @@ main .container:not(.legal-page-container) {
    ============================================================================= */
 .pricing-section {
     padding: 4rem 0;
+}
+
+/* NEW: Pricing Trial Notice */
+.pricing-trial-notice {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--color-text);
+    background: linear-gradient(135deg, var(--color-primary-light) 0%, #e8f4f4 100%);
+    padding: 1rem 2rem;
+    border-radius: var(--border-radius);
+    margin: 0 auto 2rem;
+    max-width: 600px;
+    font-weight: 600;
+    border: 2px solid var(--color-primary);
+}
+
+.pricing-trial-notice i {
+    color: var(--color-gold);
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
 }
 
 .plans-grid {
@@ -769,6 +826,7 @@ main .container:not(.legal-page-container) {
     margin-bottom: 1rem;
 }
 
+/* UPDATED: Social Icon with Explicit White Color on Hover */
 .social-icon {
     display: inline-flex;
     align-items: center;
@@ -783,12 +841,24 @@ main .container:not(.legal-page-container) {
     transition: all var(--transition-speed) ease;
 }
 
+/* Explicitly target the icon element */
+.social-icon i {
+    color: var(--color-primary-dark);
+    transition: color var(--transition-speed) ease;
+}
+
 .social-icon:hover,
 .social-icon:focus {
     background-color: var(--color-primary);
-    color: var(--color-surface);
+    color: #ffffff;
     transform: scale(1.15);
     box-shadow: var(--shadow);
+}
+
+/* Ensure the icon itself turns white on hover */
+.social-icon:hover i,
+.social-icon:focus i {
+    color: #ffffff;
 }
 
 .footer-email {
@@ -1218,7 +1288,90 @@ main .container:not(.legal-page-container) {
 }
 
 /* =============================================================================
-   20. DARK MODE
+   20. COMPARISON SECTION
+   ============================================================================= */
+.comparison-section {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.comparison-card {
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    position: relative;
+}
+
+.comparison-highlight {
+    border-color: transparent;
+    outline: 3px solid var(--color-primary);
+    outline-offset: -3px;
+    box-shadow: 0 8px 24px rgba(0, 128, 128, 0.15);
+}
+
+.comparison-title {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.comparison-list {
+    list-style: none;
+    padding: 0;
+}
+
+.comparison-list li {
+    padding: 0.75rem 0 0.75rem 2rem;
+    position: relative;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.comparison-list li:last-child {
+    border-bottom: none;
+}
+
+.comparison-negative::before {
+    content: "❌";
+    position: absolute;
+    left: 0;
+}
+
+.comparison-positive::before {
+    content: "✅";
+    position: absolute;
+    left: 0;
+}
+
+.value-highlight {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.value-stat {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.value-stat i {
+    margin-right: 0.5rem;
+    font-size: 1.5rem;
+}
+
+/* =============================================================================
+   21. DARK MODE
    Enhanced with better contrast ratios (WCAG AA compliant)
    ============================================================================= */
 @media (prefers-color-scheme: dark) {
@@ -1340,14 +1493,25 @@ main .container:not(.legal-page-container) {
         background-color: var(--color-bg);
     }
     
+    /* Social icons in dark mode */
     .social-icon {
         background-color: var(--color-card-bg);
         color: var(--color-text-light);
     }
     
-    .social-icon:hover {
+    .social-icon i {
+        color: var(--color-text-light);
+    }
+    
+    .social-icon:hover,
+    .social-icon:focus {
         background-color: var(--color-primary);
-        color: var(--color-surface);
+        color: #ffffff;
+    }
+    
+    .social-icon:hover i,
+    .social-icon:focus i {
+        color: #ffffff;
     }
     
     /* Language toggle */
@@ -1379,10 +1543,36 @@ main .container:not(.legal-page-container) {
     .hero-content {
         background-color: var(--color-surface);
     }
+    
+    /* Trial badge stays gold in dark mode */
+    .trial-badge {
+        color: #1a1a1a;
+    }
+    
+    /* Pricing trial notice dark mode */
+    .pricing-trial-notice {
+        background: linear-gradient(135deg, var(--color-primary-light) 0%, #2a3f3f 100%);
+        border-color: var(--color-primary);
+    }
+    
+    /* Comparison section dark mode */
+    .comparison-section {
+        background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
+    }
+    
+    .comparison-card {
+        background-color: var(--color-card-bg);
+        border-color: var(--color-border);
+    }
+    
+    .comparison-highlight {
+        border-color: var(--color-primary);
+        box-shadow: 0 8px 24px rgba(0, 168, 168, 0.25);
+    }
 }
 
 /* =============================================================================
-   21. RESPONSIVE DESIGN - MOBILE
+   22. RESPONSIVE DESIGN - MOBILE
    ============================================================================= */
 @media (max-width: 768px) {
     .site-header .container {
@@ -1453,10 +1643,18 @@ main .container:not(.legal-page-container) {
     .hero-image {
         order: 1;
         max-width: 100%;
-        max-height: 300px;      /* Limit height on mobile */
-        object-fit: cover;      /* Crop nicely if needed */
+        max-height: 300px;
+        object-fit: cover;
         margin-bottom: 1rem;
         margin-top: 0;
+    }
+    
+    /* Trial badge mobile */
+    .trial-badge {
+        display: block;
+        margin-left: 0;
+        margin-top: 0.5rem;
+        width: fit-content;
     }
 
     /* Grid adjustments */
@@ -1464,6 +1662,14 @@ main .container:not(.legal-page-container) {
     .plans-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
+    }
+    
+    .comparison-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .comparison-highlight {
+        transform: scale(1);
     }
 
     /* Section spacing */
@@ -1506,7 +1712,7 @@ main .container:not(.legal-page-container) {
 }
 
 /* =============================================================================
-   22. RESPONSIVE DESIGN - SMALL MOBILE
+   23. RESPONSIVE DESIGN - SMALL MOBILE
    ============================================================================= */
 @media (max-width: 480px) {
     .container {
@@ -1518,7 +1724,7 @@ main .container:not(.legal-page-container) {
     }
     
     .hero-image {
-        max-height: 250px;  /* Even smaller on tiny phones */
+        max-height: 250px;
     }
 
     .tagline {
@@ -1550,124 +1756,9 @@ main .container:not(.legal-page-container) {
         padding: 1.5rem;
     }
 }
+
 /* =============================================================================
-   COMPARISON SECTION (New)
-   ============================================================================= */
-.comparison-section {
-    padding: 4rem 0;
-    background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
-}
-
-.comparison-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin: 2rem 0;
-}
-
-.comparison-card {
-    background: var(--color-surface);
-    border: 2px solid var(--color-border);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    position: relative;
-}
-
-.comparison-highlight {
-    border-color: transparent; /* Remove original border */
-    outline: 3px solid var(--color-primary); /* Use outline instead */
-    outline-offset: -3px; /* Keep it inside the card */
-    box-shadow: 0 8px 24px rgba(0, 128, 128, 0.15);
-}
-
-.comparison-title {
-    font-size: 1.3rem;
-    margin-bottom: 1.5rem;
-    color: var(--color-text);
-    font-weight: 600;
-}
-
-.comparison-list {
-    list-style: none;
-    padding: 0;
-}
-
-.comparison-list li {
-    padding: 0.75rem 0 0.75rem 2rem;
-    position: relative;
-    border-bottom: 1px solid var(--color-border);
-}
-
-.comparison-list li:last-child {
-    border-bottom: none;
-}
-
-.comparison-negative::before {
-    content: "❌";
-    position: absolute;
-    left: 0;
-}
-
-.comparison-positive::before {
-    content: "✅";
-    position: absolute;
-    left: 0;
-}
-
-.value-highlight {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
-    color: white;
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    text-align: center;
-    margin-top: 2rem;
-}
-
-.value-stat {
-    font-size: 1.2rem;
-    margin: 0;
-}
-
-.value-stat i {
-    margin-right: 0.5rem;
-    font-size: 1.5rem;
-}
-
-.hero-subtext {
-    font-size: 1.1rem;
-    margin-top: 1rem;
-    color: var(--color-accent);
-    font-weight: 600;
-}
-
-@media (max-width: 768px) {
-    .comparison-highlight {
-        transform: scale(1);
-    }
-    
-    .comparison-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    .comparison-section {
-        background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
-    }
-    
-    .comparison-card {
-        background-color: var(--color-card-bg);
-        border-color: var(--color-border);
-    }
-    
-    .comparison-highlight {
-        border-color: var(--color-primary);
-        box-shadow: 0 8px 24px rgba(0, 168, 168, 0.25);
-    }
-}
-/* =============================================================================
-   23. PRINT STYLES
+   24. PRINT STYLES
    ============================================================================= */
 @media print {
     .site-header,
