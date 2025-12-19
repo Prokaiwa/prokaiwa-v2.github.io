@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KLVF2ZG1WX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KLVF2ZG1WX');
+</script>
+  <meta charset="UTF-8">
+  <title>Prokaiwa | Thank You (Video Lesson)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Thank you for purchasing a Prokaiwa 1-on-1 Video Lesson.">
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    .summary-card {
+      background-color: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .thank-you-container h2 {
+      font-size: 1.5rem;
+      color: var(--color-accent);
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    .thank-you-container ul {
+        list-style: none;
+        padding-left: 0;
+    }
+    .thank-you-container ul li {
+        position: relative;
+        padding-left: 1.75rem;
+        margin-bottom: 0.75rem;
+    }
+    .thank-you-container ul li::before {
+        content: "\f00c";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        top: 4px;
+        color: var(--color-primary);
+    }
+    .step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        background-color: var(--color-primary);
+        color: var(--color-surface);
+        border-radius: 50%;
+        margin-right: 0.75rem;
+        font-weight: 700;
+    }
+    .booking-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+    @media (max-width: 768px) {
+        .booking-buttons {
+            flex-direction: column;
+        }
+        .booking-buttons .cta-button {
+            width: 100%;
+        }
+    }
+  </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="index.html"><img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" /></a>
+            <button class="burger-menu" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="login.html">Log In</a></li>
+                    <li>
+                        <div class="nav-lang-toggle">
+                            <button data-lang="ja" aria-label="日本語に切り替え">日本語</button>
+                            <button data-lang="en" aria-label="Switch to English">English</button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- JAPANESE VERSION -->
+        <section id="ja-thank-you" class="lang-section" lang="ja">
+            <div class="container legal-page-container thank-you-container">
+                <h1 class="page-title">1対1ビデオレッスンのご購入、ありがとうございます！</h1>
+                <p class="page-subtitle">あなたに合わせた50分のレッスンで、楽しく英語を学びましょう。</p>
+
+                <h2>レッスン内容：</h2>
+                <div class="summary-card">
+                    <p><strong>ご購入いただいたレッスン：</strong></p>
+                    <ul>
+                        <li>50分のマンツーマンレッスン（¥4,000）</li>
+                        <li>日常会話、ビジネス英語、面接準備など自由に選択</li>
+                        <li>あなたのニーズに合わせた内容</li>
+                        <li>実践的な会話練習</li>
+                        <li>都合の良い時間に予約可能</li>
+                        <li>ネイティブ英語講師</li>
+                    </ul>
+                </div>
+
+                <h2>次のステップ：</h2>
+                <h3><span class="step-number">1</span>レッスンを予約</h3>
+                <p>下のボタンから予約してください。予約フォームで学習の目的（日常会話、ビジネス英語など）を選択できます。</p>
+                <div class="booking-buttons">
+                    <a href="https://calendly.com/prokaiwa-english/1-on-1-lesson" target="_blank" class="cta-button">レッスンを予約する</a>
+                </div>
+
+                <h3><span class="step-number">2</span>Zoomでレッスンに参加</h3>
+                <p>予約完了後、Zoomリンクがメールで届きます。レッスン時間になったら、そのリンクからご参加ください。</p>
+
+                <h3><span class="step-number">3</span>レッスンの準備</h3>
+                <p>予約時に学習目標を教えていただけると、より効果的なレッスンができます。日常会話、ビジネス英語、発音、面接準備など、あなたのニーズに合わせます。</p>
+                
+                <h3><span class="step-number">4</span>ダッシュボードを確認</h3>
+                <p>マイページでプラン詳細や購入履歴を確認できます。</p>
+                <div class="booking-buttons">
+                    <a href="dashboard.html" class="cta-button">マイページへ</a>
+                </div>
+
+                <h2>ご不明な点がありましたら</h2>
+                <p>ご質問やご相談は、お気軽にメールでお問い合わせください：<a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
+                <p><strong>予約でお困りの際も、お気軽にご連絡ください！</strong></p>
+            </div>
+        </section>
+
+        <!-- ENGLISH VERSION -->
+        <section id="en-thank-you" class="lang-section" lang="en">
+            <div class="container legal-page-container thank-you-container">
+                <h1 class="page-title">Thank you for purchasing your 1-on-1 Video Lesson!</h1>
+                <p class="page-subtitle">We're looking forward to your personalized 50-minute English learning session.</p>
+
+                <h2>Lesson Details:</h2>
+                <div class="summary-card">
+                    <p><strong>You've purchased:</strong></p>
+                    <ul>
+                        <li>50-minute one-on-one lesson (¥4,000)</li>
+                        <li>Casual conversation, business English, interview prep, etc.</li>
+                        <li>Content tailored to your needs</li>
+                        <li>Practical conversation practice</li>
+                        <li>Flexible scheduling</li>
+                        <li>Native English teacher</li>
+                    </ul>
+                </div>
+
+                <h2>Next Steps:</h2>
+                <h3><span class="step-number">1</span>Book your lesson</h3>
+                <p>Click the button below to schedule your lesson. You'll be able to specify your focus (casual conversation, business English, etc.) in the booking form.</p>
+                <div class="booking-buttons">
+                    <a href="https://calendly.com/prokaiwa-english/1-on-1-lesson" target="_blank" class="cta-button">Book Your Lesson</a>
+                </div>
+
+                <h3><span class="step-number">2</span>Join your lesson on Zoom</h3>
+                <p>After booking, you'll receive a Zoom link via email. Join at your scheduled time.</p>
+
+                <h3><span class="step-number">3</span>Prepare for your lesson</h3>
+                <p>Letting us know your goals when booking helps us make your lesson more effective. We can focus on casual conversation, business English, pronunciation, interview preparation, or whatever you need.</p>
+                
+                <h3><span class="step-number">4</span>Explore Your Dashboard</h3>
+                <p>Visit your dashboard to review your plan details and purchase history.</p>
+                <div class="booking-buttons">
+                    <a href="dashboard.html" class="cta-button">Go to My Dashboard</a>
+                </div>
+
+                <h2>Need Help?</h2>
+                <p>If you have any questions, feel free to email us at: <a href="mailto:prokaiwa.english@gmail.com">prokaiwa.english@gmail.com</a></p>
+                <p><strong>Let us know if you need help booking or have any special requests.</strong></p>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="commerce-disclosure.html">Commerce Disclosure</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-of-service.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Connect</h3>
+                    <div class="footer-social-icons">
+                        <a href="https://page.line.me/845irjbc" class="social-icon" target="_blank" aria-label="LINE"><i class="fab fa-line"></i></a>
+                        <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
+                    </div>
+                    <a href="mailto:prokaiwa.english@gmail.com" class="footer-email">prokaiwa.english@gmail.com</a>
+                </div>
+            </div>
+            <p>© <span id="year"></span> Prokaiwa. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
