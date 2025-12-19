@@ -715,7 +715,7 @@ Tomorrow's focus: [Preview]`
         filterBtns.forEach(btn => {
           btn.addEventListener('click', async (e) => {
             const filter = e.target.dataset.filter;
-            const sid = e.target.dataset.student;
+            const sid = parseInt(e.target.dataset.student); // ← FIX: Parse as integer
             
             // Update active state
             filterBtns.forEach(b => b.classList.remove('active'));
@@ -759,7 +759,7 @@ Tomorrow's focus: [Preview]`
         let startDate;
         
         if (daysFilter === 'recent') {
-          // Get last feedback date OR 3 days ago
+          // Get last feedback date
           const { data: lastFeedback } = await supabaseClient
             .from('feedback_log')
             .select('sent_at')
@@ -769,7 +769,10 @@ Tomorrow's focus: [Preview]`
             .single();
           
           if (lastFeedback) {
-            startDate = new Date(lastFeedback.sent_at);
+            // Show the entire day of the last feedback (start of that day)
+            const feedbackDate = new Date(lastFeedback.sent_at);
+            feedbackDate.setHours(0, 0, 0, 0);
+            startDate = feedbackDate;
           } else {
             // No feedback yet, show last 3 days
             startDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
