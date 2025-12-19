@@ -143,6 +143,48 @@
       display: block;
     }
     
+    /* Filter Bar Styles */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-label {
+      font-weight: 600;
+      color: var(--color-text);
+      margin-right: 0.5rem;
+    }
+    
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--color-border);
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    
+    .filter-btn:hover {
+      background: #f5f5f5;
+    }
+    
+    .filter-btn.active {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+    
+    .message-count {
+      margin-left: auto;
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+    
     .response-item {
       background: white;
       border: 1px solid #e0e0e0;
@@ -298,26 +340,26 @@
       </div>
     </div>
 
-    <!-- Plan A Section -->
-    <div class="feedback-section" id="plan-a-section">
-      <h2>Plan A - Weekly Comprehensive</h2>
-      <div id="plan-a-students" class="loading">
+    <!-- Power Pro Section (C2) -->
+    <div class="feedback-section" id="plan-c2-section">
+      <h2>⚡ Power Pro - Daily Quick</h2>
+      <div id="plan-c2-students" class="loading">
         <i class="fas fa-spinner fa-spin"></i> Loading students...
       </div>
     </div>
 
-    <!-- Plan C1 Section -->
+    <!-- Power Lite Section (C1) -->
     <div class="feedback-section" id="plan-c1-section">
-      <h2>Plan C1 - Bi-Weekly</h2>
+      <h2>💡 Power Lite - Bi-Weekly</h2>
       <div id="plan-c1-students" class="loading">
         <i class="fas fa-spinner fa-spin"></i> Loading students...
       </div>
     </div>
 
-    <!-- Plan C2 Section -->
-    <div class="feedback-section" id="plan-c2-section">
-      <h2>Plan C2 - Daily Quick</h2>
-      <div id="plan-c2-students" class="loading">
+    <!-- LINE Practice Section (A) -->
+    <div class="feedback-section" id="plan-a-section">
+      <h2>📱 LINE Practice - Weekly Comprehensive</h2>
+      <div id="plan-a-students" class="loading">
         <i class="fas fa-spinner fa-spin"></i> Loading students...
       </div>
     </div>
@@ -334,6 +376,7 @@
     let currentTeacher = null;
     let feedbackQueue = { planA: [], planC1: [], planC2: [] };
     let completedToday = new Set();
+    let currentFilters = {}; // Track filter per student
 
     // Feedback Templates
     const templates = {
@@ -419,10 +462,10 @@ Tomorrow's focus: [Preview]`
         todayStart.setHours(0, 0, 0, 0);
         
         const { data: todaysFeedback, error } = await supabaseClient
-  .from('feedback_log')
-  .select('student_id')
-  .eq('teacher_id', currentTeacher.id)
-  .gte('sent_at', todayStart.toISOString());
+          .from('feedback_log')
+          .select('student_id')
+          .eq('teacher_id', currentTeacher.id)
+          .gte('sent_at', todayStart.toISOString());
         
         if (error) throw error;
         
@@ -525,9 +568,9 @@ Tomorrow's focus: [Preview]`
     // ============================================
 
     function renderFeedbackQueue() {
-      renderPlanSection('plan-a-students', feedbackQueue.planA, 'weekly');
-      renderPlanSection('plan-c1-students', feedbackQueue.planC1, 'biweekly');
       renderPlanSection('plan-c2-students', feedbackQueue.planC2, 'daily');
+      renderPlanSection('plan-c1-students', feedbackQueue.planC1, 'biweekly');
+      renderPlanSection('plan-a-students', feedbackQueue.planA, 'weekly');
     }
 
     function renderPlanSection(containerId, students, templateType) {
@@ -587,7 +630,30 @@ Tomorrow's focus: [Preview]`
           </div>
           
           <div class="student-details">
-            <h3>Conversation History</h3>
+            <!-- Filter Bar -->
+            <div class="filter-bar" id="filter-bar-${student.id}">
+              <span class="filter-label">Show:</span>
+              <button class="filter-btn active" data-filter="recent" data-student="${student.id}">
+                Since Last Feedback
+              </button>
+              <button class="filter-btn" data-filter="3" data-student="${student.id}">
+                3 Days
+              </button>
+              <button class="filter-btn" data-filter="7" data-student="${student.id}">
+                7 Days
+              </button>
+              <button class="filter-btn" data-filter="14" data-student="${student.id}">
+                14 Days
+              </button>
+              <button class="filter-btn" data-filter="30" data-student="${student.id}">
+                30 Days
+              </button>
+              <button class="filter-btn" data-filter="all" data-student="${student.id}">
+                All
+              </button>
+              <span class="message-count" id="msg-count-${student.id}"></span>
+            </div>
+            
             <div id="responses-${student.id}">
               <p>Loading conversation...</p>
             </div>
@@ -636,13 +702,49 @@ Tomorrow's focus: [Preview]`
 
       if (!isExpanded) {
         card.classList.add('expanded');
-        await loadStudentResponses(studentId);
+        
+        // Initialize filter to 'recent' if not set
+        if (!currentFilters[studentId]) {
+          currentFilters[studentId] = 'recent';
+        }
+        
+        await loadStudentResponses(studentId, currentFilters[studentId]);
+        
+        // Add filter button listeners
+        const filterBtns = card.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const filter = e.target.dataset.filter;
+            const sid = e.target.dataset.student;
+            
+            // Update active state
+            filterBtns.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            // Update current filter and reload
+            currentFilters[sid] = filter;
+            await loadStudentResponses(sid, filter);
+          });
+        });
+        
+        // Auto-focus feedback textarea
+        setTimeout(() => {
+          const textarea = document.getElementById(`feedback-${studentId}`);
+          if (textarea && !completedToday.has(studentId)) {
+            textarea.focus();
+          }
+        }, 100);
       }
     }
 
-    async function loadStudentResponses(studentId) {
+    // ============================================
+    // LOAD STUDENT RESPONSES WITH FILTER
+    // ============================================
+
+    async function loadStudentResponses(studentId, daysFilter = 'recent') {
       const container = document.getElementById(`responses-${studentId}`);
-      container.innerHTML = '<p>Loading conversation...</p>';
+      const msgCountEl = document.getElementById(`msg-count-${studentId}`);
+      container.innerHTML = '<p style="text-align:center; padding:1rem; color:#999;"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
 
       try {
         const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
@@ -653,35 +755,67 @@ Tomorrow's focus: [Preview]`
           return;
         }
 
-        // Get ALL messages (prompts AND responses) for last 7 days
+        // Calculate date range based on filter
+        let startDate;
+        
+        if (daysFilter === 'recent') {
+          // Get last feedback date OR 3 days ago
+          const { data: lastFeedback } = await supabaseClient
+            .from('feedback_log')
+            .select('sent_at')
+            .eq('student_id', studentId)
+            .order('sent_at', { ascending: false })
+            .limit(1)
+            .single();
+          
+          if (lastFeedback) {
+            startDate = new Date(lastFeedback.sent_at);
+          } else {
+            // No feedback yet, show last 3 days
+            startDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+          }
+        } else if (daysFilter === 'all') {
+          startDate = new Date('2000-01-01'); // Very old date
+        } else {
+          // Specific number of days
+          const days = parseInt(daysFilter);
+          startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+        }
+
+        // Get messages
         const { data: messages, error } = await supabaseClient
           .from('message_log')
           .select('*')
           .eq('user_id', student.user_id)
           .in('message_type', ['prompt', 'student_response'])
-          .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+          .gte('created_at', startDate.toISOString())
           .order('created_at', { ascending: true });
 
         if (error) throw error;
 
-        // ALSO get teacher feedback for this student
+        // Get teacher feedback
         const { data: teacherFeedback, error: feedbackError } = await supabaseClient
-  .from('feedback_log')
-  .select('*')
-  .eq('student_id', studentId)
-  .gte('sent_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
-  .order('sent_at', { ascending: true });
+          .from('feedback_log')
+          .select('*')
+          .eq('student_id', studentId)
+          .gte('sent_at', startDate.toISOString())
+          .order('sent_at', { ascending: true });
 
         if (feedbackError) console.error('Error loading feedback:', feedbackError);
 
-        // Combine messages and feedback into one timeline
+        // Combine messages and feedback
         const allMessages = [
-  ...messages.map(m => ({ ...m, type: 'message', created_at: m.created_at })),
-  ...(teacherFeedback || []).map(f => ({ ...f, type: 'feedback', created_at: f.sent_at }))
-].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+          ...messages.map(m => ({ ...m, type: 'message', created_at: m.created_at })),
+          ...(teacherFeedback || []).map(f => ({ ...f, type: 'feedback', created_at: f.sent_at }))
+        ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+        // Update message count
+        if (msgCountEl) {
+          msgCountEl.textContent = `Showing ${allMessages.length} message${allMessages.length !== 1 ? 's' : ''}`;
+        }
 
         if (allMessages.length === 0) {
-          container.innerHTML = '<p>No conversation history yet.</p>';
+          container.innerHTML = '<p style="text-align:center; padding:2rem; color:#999;">No conversation history in this time range.</p>';
           return;
         }
 
@@ -782,7 +916,7 @@ Tomorrow's focus: [Preview]`
 
       } catch (err) {
         console.error('Error loading conversation:', err);
-        container.innerHTML = '<p>Error loading conversation history.</p>';
+        container.innerHTML = '<p style="color:red;">Error loading conversation history.</p>';
       }
     }
 
