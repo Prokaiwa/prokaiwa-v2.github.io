@@ -308,8 +308,14 @@
 /* ============================================ */
 
  /* Default - Desktop */
-.filter-text-desktop {
-  display: inline;
+.filter-buttons-desktop {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-select-mobile {
+  display: none;
 }
 
 .filter-text-mobile {
@@ -411,19 +417,21 @@
     margin-bottom: 0.25rem;
   }
   
-  .filter-btn {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.7rem;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .filter-text-desktop {
+  /* Hide desktop filter buttons on mobile */
+  .filter-buttons-desktop {
     display: none;
   }
   
-  .filter-text-mobile {
-    display: inline;
+  /* Show mobile dropdown */
+  .filter-select-mobile {
+    display: block;
+    width: 100%;
+    padding: 0.6rem;
+    font-size: 0.95rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
   }
   
   .message-count {
@@ -822,29 +830,43 @@ Tomorrow's focus: [Preview]`
           
           <div class="student-details">
             <!-- Filter Bar -->
-            <div class="filter-bar" id="filter-bar-${student.id}">
-              <span class="filter-label">Show:</span>
-              <button class="filter-btn active" data-filter="recent" data-student="${student.id}">
-  <span class="filter-text-desktop">Since Last Feedback</span>
-  <span class="filter-text-mobile">Recent</span>
-</button>
-              <button class="filter-btn" data-filter="3" data-student="${student.id}">
-                3 Days
-              </button>
-              <button class="filter-btn" data-filter="7" data-student="${student.id}">
-                7 Days
-              </button>
-              <button class="filter-btn" data-filter="14" data-student="${student.id}">
-                14 Days
-              </button>
-              <button class="filter-btn" data-filter="30" data-student="${student.id}">
-                30 Days
-              </button>
-              <button class="filter-btn" data-filter="all" data-student="${student.id}">
-                All
-              </button>
-              <span class="message-count" id="msg-count-${student.id}"></span>
-            </div>
+<div class="filter-bar" id="filter-bar-${student.id}">
+  <span class="filter-label">Show:</span>
+  
+  <!-- Desktop: Buttons -->
+  <div class="filter-buttons-desktop">
+    <button class="filter-btn active" data-filter="recent" data-student="${student.id}">
+      Since Last Feedback
+    </button>
+    <button class="filter-btn" data-filter="3" data-student="${student.id}">
+      3 Days
+    </button>
+    <button class="filter-btn" data-filter="7" data-student="${student.id}">
+      7 Days
+    </button>
+    <button class="filter-btn" data-filter="14" data-student="${student.id}">
+      14 Days
+    </button>
+    <button class="filter-btn" data-filter="30" data-student="${student.id}">
+      30 Days
+    </button>
+    <button class="filter-btn" data-filter="all" data-student="${student.id}">
+      All
+    </button>
+  </div>
+  
+  <!-- Mobile: Dropdown -->
+  <select class="filter-select-mobile" data-student="${student.id}">
+    <option value="recent" selected>Since Last Feedback</option>
+    <option value="3">Last 3 Days</option>
+    <option value="7">Last 7 Days</option>
+    <option value="14">Last 14 Days</option>
+    <option value="30">Last 30 Days</option>
+    <option value="all">All Messages</option>
+  </select>
+  
+  <span class="message-count" id="msg-count-${student.id}"></span>
+</div>
             
             <div id="responses-${student.id}">
               <p>Loading conversation...</p>
@@ -902,22 +924,35 @@ Tomorrow's focus: [Preview]`
         
         await loadStudentResponses(studentId, currentFilters[studentId]);
         
-        // Add filter button listeners
-        const filterBtns = card.querySelectorAll('.filter-btn');
-        filterBtns.forEach(btn => {
-          btn.addEventListener('click', async (e) => {
-            const filter = e.target.dataset.filter;
-            const sid = parseInt(e.target.dataset.student); // ← FIX: Parse as integer
-            
-            // Update active state
-            filterBtns.forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            
-            // Update current filter and reload
-            currentFilters[sid] = filter;
-            await loadStudentResponses(sid, filter);
-          });
-        });
+        // Add filter button listeners (desktop)
+const filterBtns = card.querySelectorAll('.filter-btn');
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    const filter = e.target.dataset.filter;
+    const sid = parseInt(e.target.dataset.student);
+    
+    // Update active state
+    filterBtns.forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    
+    // Update current filter and reload
+    currentFilters[sid] = filter;
+    await loadStudentResponses(sid, filter);
+  });
+});
+
+// Add dropdown listener (mobile)
+const filterSelect = card.querySelector('.filter-select-mobile');
+if (filterSelect) {
+  filterSelect.addEventListener('change', async (e) => {
+    const filter = e.target.value;
+    const sid = parseInt(e.target.dataset.student);
+    
+    // Update current filter and reload
+    currentFilters[sid] = filter;
+    await loadStudentResponses(sid, filter);
+  });
+}
         
         // Auto-focus feedback textarea
         setTimeout(() => {
