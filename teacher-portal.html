@@ -307,6 +307,14 @@
 /* MOBILE RESPONSIVE STYLES */
 /* ============================================ */
 
+ /* Default - Desktop */
+.filter-text-desktop {
+  display: inline;
+}
+
+.filter-text-mobile {
+  display: none;
+}   
 @media (max-width: 768px) {
   /* Header */
   .teacher-header h1 {
@@ -408,6 +416,14 @@
     padding: 0.4rem 0.7rem;
     flex: 1;
     min-width: 0;
+  }
+
+  .filter-text-desktop {
+    display: none;
+  }
+  
+  .filter-text-mobile {
+    display: inline;
   }
   
   .message-count {
@@ -684,10 +700,10 @@ Tomorrow's focus: [Preview]`
           if (!progress) continue;
 
           const studentData = {
-            ...student,
-            ...progress,
-            needsFeedback: checkIfNeedsFeedback(student.plan, progress)
-          };
+  ...student,
+  ...progress,
+  needsFeedback: await checkIfNeedsFeedback(student.plan, progress, student.user_id)
+};
 
           if (studentData.needsFeedback) {
             if (student.plan === 'A') feedbackQueue.planA.push(studentData);
@@ -710,22 +726,33 @@ Tomorrow's focus: [Preview]`
     // CHECK IF STUDENT NEEDS FEEDBACK
     // ============================================
 
-    function checkIfNeedsFeedback(plan, progress) {
-      const { current_day, total_prompts_sent } = progress;
+    async function checkIfNeedsFeedback(plan, progress, userId) {
+  const { current_day, total_prompts_sent } = progress;
 
-      if (plan === 'A') {
-        // Weekly: Day 7, 14, 21, 28
-        return total_prompts_sent % 7 === 0 && current_day === 7;
-      } else if (plan === 'C1') {
-        // Bi-weekly: Days 3 and 7
-        return current_day === 3 || current_day === 7;
-      } else if (plan === 'C2') {
-        // Daily
-        return true;
-      }
+  if (plan === 'A') {
+    // Weekly: Day 7, 14, 21, 28
+    return total_prompts_sent % 7 === 0 && current_day === 7;
+  } else if (plan === 'C1') {
+    // Bi-weekly: Days 3 and 7
+    return current_day === 3 || current_day === 7;
+  } else if (plan === 'C2') {
+    // Daily - but only if they responded today
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    
+    const { data: todayResponse } = await supabaseClient
+      .from('message_log')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('message_type', 'student_response')
+      .gte('created_at', todayStart.toISOString())
+      .single();
+    
+    return !!todayResponse; // True only if they responded today
+  }
 
-      return false;
-    }
+  return false;
+}
 
     // ============================================
     // RENDER FEEDBACK QUEUE
@@ -798,8 +825,9 @@ Tomorrow's focus: [Preview]`
             <div class="filter-bar" id="filter-bar-${student.id}">
               <span class="filter-label">Show:</span>
               <button class="filter-btn active" data-filter="recent" data-student="${student.id}">
-                Since Last Feedback
-              </button>
+  <span class="filter-text-desktop">Since Last Feedback</span>
+  <span class="filter-text-mobile">Recent</span>
+</button>
               <button class="filter-btn" data-filter="3" data-student="${student.id}">
                 3 Days
               </button>
