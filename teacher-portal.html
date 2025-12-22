@@ -818,9 +818,11 @@
 }
 
 .guide-close {
-  position: absolute;
+  position: sticky;
   top: 1rem;
   right: 1rem;
+  float: right;
+  margin-bottom: -2rem;
   background: none;
   border: none;
   font-size: 1.5rem;
@@ -1454,7 +1456,7 @@ if (responseError && responseError.code !== 'PGRST116') {
     📊 Assess Skills
   </button>
 </div>
-          
+         </div> 
           <div class="student-details">
             <!-- Filter Bar -->
 <div class="filter-bar" id="filter-bar-${student.id}">
