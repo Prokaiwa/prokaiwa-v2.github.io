@@ -748,13 +748,17 @@ Tomorrow's focus: [Preview]`
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     
-    const { data: todayResponse } = await supabaseClient
-      .from('message_log')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('message_type', 'student_response')
-      .gte('created_at', todayStart.toISOString())
-      .single();
+    const { data: todayResponse, error: responseError } = await supabaseClient
+  .from('message_log')
+  .select('id')
+  .eq('user_id', userId)
+  .eq('message_type', 'student_response')
+  .gte('created_at', todayStart.toISOString())
+  .maybeSingle();
+
+if (responseError && responseError.code !== 'PGRST116') {
+  console.error('Error checking student response:', responseError);
+}
     
     return !!todayResponse; // True only if they responded today
   }
