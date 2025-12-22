@@ -491,6 +491,397 @@
     padding: 0.35rem 0.5rem;
   }
 }
+    /* Assessment Modal */
+.assessment-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.assessment-modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.assessment-content {
+  background: var(--color-surface);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.assessment-header {
+  padding: 2rem 2rem 1rem;
+  border-bottom: 2px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  background: var(--color-surface);
+  z-index: 10;
+}
+
+.assessment-header h2 {
+  margin: 0 0 0.5rem 0;
+  color: var(--color-primary);
+}
+
+.assessment-header p {
+  margin: 0;
+  color: var(--color-text-light);
+}
+
+.assessment-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-text-light);
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.assessment-close:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.assessment-body {
+  padding: 2rem;
+}
+
+.skill-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.skill-section:last-child {
+  border-bottom: none;
+}
+
+.skill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.skill-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.skill-icon {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.skill-scores {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+}
+
+.skill-scores span {
+  background: var(--color-bg);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+}
+
+.show-guide-btn {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+
+.show-guide-btn:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+.slider-container {
+  position: relative;
+  margin: 1rem 0;
+}
+
+.skill-slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-border);
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.skill-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+}
+
+.skill-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(0, 128, 128, 0.4);
+}
+
+.skill-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.5rem;
+}
+
+.current-score {
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.band-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+  padding: 0 0.5rem;
+}
+
+.assessment-summary {
+  background: var(--color-primary-light);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.summary-item {
+  text-align: center;
+}
+
+.summary-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  display: block;
+}
+
+.summary-label {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+}
+
+.notes-section {
+  margin-bottom: 2rem;
+}
+
+.notes-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+}
+
+.notes-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.assessment-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  position: sticky;
+  bottom: 0;
+}
+
+.submit-assessment-btn {
+  flex: 1;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-assessment-btn:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+}
+
+.submit-assessment-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cancel-assessment-btn {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.guide-popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  overflow-y: auto;
+}
+
+.guide-popup.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.guide-content {
+  background: var(--color-surface);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  position: relative;
+}
+
+.guide-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-text-light);
+  cursor: pointer;
+}
+
+.guide-content h3 {
+  color: var(--color-primary);
+  margin-top: 0;
+}
+
+.guide-level {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--color-bg);
+  border-radius: 8px;
+}
+
+.guide-level h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--color-accent);
+}
+
+.guide-level p {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .assessment-modal.active {
+    padding: 0;
+  }
+  
+  .assessment-content {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  
+  .assessment-header,
+  .assessment-body,
+  .assessment-actions {
+    padding: 1.5rem;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .assessment-actions {
+    flex-direction: column;
+  }
+  
+  .skill-scores {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
   </style>
 </head>
 <body>
@@ -551,6 +942,234 @@
         <i class="fas fa-spinner fa-spin"></i> Loading students...
       </div>
     </div>
+    <!-- Assessment Modal -->
+  <div id="assessment-modal" class="assessment-modal">
+    <div class="assessment-content">
+      <div class="assessment-header">
+        <h2>Assess Student Skills</h2>
+        <p id="assessment-student-name">Loading...</p>
+        <button class="assessment-close" onclick="closeAssessmentModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="assessment-body">
+        <!-- Summary -->
+        <div class="assessment-summary">
+          <h3 style="margin: 0 0 0.5rem 0;">Overall Assessment</h3>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-value" id="total-score">0</span>
+              <span class="summary-label">Total Score</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-value" id="overall-band">-</span>
+              <span class="summary-label">Level Band</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-value" id="score-change">-</span>
+              <span class="summary-label">Change</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fluency -->
+        <div class="skill-section">
+          <div class="skill-header">
+            <div>
+              <span class="skill-icon">🌊</span>
+              <span class="skill-name">Fluency</span>
+            </div>
+            <div class="skill-scores">
+              <span>Previous: <strong id="fluency-prev">-</strong></span>
+              <span>Suggested: <strong id="fluency-suggested">-</strong></span>
+            </div>
+          </div>
+          <button class="show-guide-btn" onclick="showGuide('fluency')">
+            <i class="fas fa-book"></i> Show Guide
+          </button>
+          <div class="slider-container">
+            <input type="range" min="0" max="10" value="5" class="skill-slider" id="fluency-slider">
+            <div class="slider-labels">
+              <span>0</span>
+              <span>2</span>
+              <span>5</span>
+              <span>8</span>
+              <span>10</span>
+            </div>
+            <div class="band-labels">
+              <span>Super Beg</span>
+              <span>Beginner</span>
+              <span>Intermediate</span>
+              <span>Advanced</span>
+            </div>
+            <div class="current-score" id="fluency-score">5</div>
+          </div>
+        </div>
+
+        <!-- Grammar -->
+        <div class="skill-section">
+          <div class="skill-header">
+            <div>
+              <span class="skill-icon">📐</span>
+              <span class="skill-name">Grammar</span>
+            </div>
+            <div class="skill-scores">
+              <span>Previous: <strong id="grammar-prev">-</strong></span>
+              <span>Suggested: <strong id="grammar-suggested">-</strong></span>
+            </div>
+          </div>
+          <button class="show-guide-btn" onclick="showGuide('grammar')">
+            <i class="fas fa-book"></i> Show Guide
+          </button>
+          <div class="slider-container">
+            <input type="range" min="0" max="10" value="5" class="skill-slider" id="grammar-slider">
+            <div class="slider-labels">
+              <span>0</span>
+              <span>2</span>
+              <span>5</span>
+              <span>8</span>
+              <span>10</span>
+            </div>
+            <div class="band-labels">
+              <span>Super Beg</span>
+              <span>Beginner</span>
+              <span>Intermediate</span>
+              <span>Advanced</span>
+            </div>
+            <div class="current-score" id="grammar-score">5</div>
+          </div>
+        </div>
+
+        <!-- Comprehension -->
+        <div class="skill-section">
+          <div class="skill-header">
+            <div>
+              <span class="skill-icon">🧠</span>
+              <span class="skill-name">Comprehension</span>
+            </div>
+            <div class="skill-scores">
+              <span>Previous: <strong id="comprehension-prev">-</strong></span>
+              <span>Suggested: <strong id="comprehension-suggested">-</strong></span>
+            </div>
+          </div>
+          <button class="show-guide-btn" onclick="showGuide('comprehension')">
+            <i class="fas fa-book"></i> Show Guide
+          </button>
+          <div class="slider-container">
+            <input type="range" min="0" max="10" value="5" class="skill-slider" id="comprehension-slider">
+            <div class="slider-labels">
+              <span>0</span>
+              <span>2</span>
+              <span>5</span>
+              <span>8</span>
+              <span>10</span>
+            </div>
+            <div class="band-labels">
+              <span>Super Beg</span>
+              <span>Beginner</span>
+              <span>Intermediate</span>
+              <span>Advanced</span>
+            </div>
+            <div class="current-score" id="comprehension-score">5</div>
+          </div>
+        </div>
+
+        <!-- Vocabulary -->
+        <div class="skill-section">
+          <div class="skill-header">
+            <div>
+              <span class="skill-icon">💬</span>
+              <span class="skill-name">Vocabulary</span>
+            </div>
+            <div class="skill-scores">
+              <span>Previous: <strong id="vocabulary-prev">-</strong></span>
+              <span>Suggested: <strong id="vocabulary-suggested">-</strong></span>
+            </div>
+          </div>
+          <button class="show-guide-btn" onclick="showGuide('vocabulary')">
+            <i class="fas fa-book"></i> Show Guide
+          </button>
+          <div class="slider-container">
+            <input type="range" min="0" max="10" value="5" class="skill-slider" id="vocabulary-slider">
+            <div class="slider-labels">
+              <span>0</span>
+              <span>2</span>
+              <span>5</span>
+              <span>8</span>
+              <span>10</span>
+            </div>
+            <div class="band-labels">
+              <span>Super Beg</span>
+              <span>Beginner</span>
+              <span>Intermediate</span>
+              <span>Advanced</span>
+            </div>
+            <div class="current-score" id="vocabulary-score">5</div>
+          </div>
+        </div>
+
+        <!-- Pronunciation -->
+        <div class="skill-section">
+          <div class="skill-header">
+            <div>
+              <span class="skill-icon">🎤</span>
+              <span class="skill-name">Pronunciation</span>
+            </div>
+            <div class="skill-scores">
+              <span>Previous: <strong id="pronunciation-prev">-</strong></span>
+              <span>Suggested: <strong id="pronunciation-suggested">-</strong></span>
+            </div>
+          </div>
+          <button class="show-guide-btn" onclick="showGuide('pronunciation')">
+            <i class="fas fa-book"></i> Show Guide
+          </button>
+          <div class="slider-container">
+            <input type="range" min="0" max="10" value="5" class="skill-slider" id="pronunciation-slider">
+            <div class="slider-labels">
+              <span>0</span>
+              <span>2</span>
+              <span>5</span>
+              <span>8</span>
+              <span>10</span>
+            </div>
+            <div class="band-labels">
+              <span>Super Beg</span>
+              <span>Beginner</span>
+              <span>Intermediate</span>
+              <span>Advanced</span>
+            </div>
+            <div class="current-score" id="pronunciation-score">5</div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="notes-section">
+          <label for="assessment-notes">Teacher Notes (Optional)</label>
+          <textarea id="assessment-notes" class="notes-textarea" placeholder="Add any observations, strengths, or areas to focus on..."></textarea>
+        </div>
+      </div>
+
+      <div class="assessment-actions">
+        <button class="cancel-assessment-btn" onclick="closeAssessmentModal()">Cancel</button>
+        <button class="submit-assessment-btn" id="submit-assessment-btn" onclick="submitAssessment()">
+          <i class="fas fa-save"></i> Save Assessment
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide Popup -->
+  <div id="guide-popup" class="guide-popup">
+    <div class="guide-content">
+      <button class="guide-close" onclick="closeGuide()">
+        <i class="fas fa-times"></i>
+      </button>
+      <div id="guide-body">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -827,10 +1446,14 @@ if (responseError && responseError.code !== 'PGRST116') {
                 Total prompts: ${student.total_prompts_sent}
               </div>
             </div>
-            <button class="expand-btn">
-              ${isDone ? 'View' : 'Send Feedback'} ▼
-            </button>
-          </div>
+<div style="display: flex; gap: 0.5rem;">
+  <button class="expand-btn" onclick="toggleCard(${student.id})">
+    ${isDone ? 'View' : 'Send Feedback'} ▼
+  </button>
+  <button class="expand-btn" onclick="event.stopPropagation(); openAssessmentModal(${student.id})" style="background: var(--color-gold);">
+    📊 Assess Skills
+  </button>
+</div>
           
           <div class="student-details">
             <!-- Filter Bar -->
@@ -1278,6 +1901,262 @@ if (filterSelect) {
 
     // Auto-refresh every 5 minutes
     setInterval(loadFeedbackQueue, 5 * 60 * 1000);
+    // ============================================
+// ASSESSMENT MODAL FUNCTIONS
+// ============================================
+
+let currentAssessmentStudent = null;
+
+// Skill guides
+const skillGuides = {
+  fluency: {
+    title: '🌊 Fluency Scoring Guide',
+    levels: [
+      { score: '0-2', desc: 'Cannot make sentences / constant stopping' },
+      { score: '3-5', desc: 'Simple sentences with lots of pauses. Example: "I... uh... go to... restaurant"' },
+      { score: '6-8', desc: 'Smooth simple sentences, hesitates on complex ideas. Example: "Yesterday I went to a new restaurant downtown. The food was really good."' },
+      { score: '9-10', desc: 'Sounds natural, occasional pause for complex thoughts. Example: "I\'ve been meaning to try that place for ages! How was the ambiance?"' }
+    ]
+  },
+  grammar: {
+    title: '📐 Grammar Scoring Guide',
+    levels: [
+      { score: '0-2', desc: 'No grammar structure visible' },
+      { score: '3-5', desc: 'Basic errors in simple sentences. Example: "I go yesterday" / "She very happy"' },
+      { score: '6-8', desc: 'Simple sentences mostly correct, complex attempts have errors. Example: "I went yesterday" ✓ but "If I would have..." ✗' },
+      { score: '9-10', desc: 'Near-perfect, maybe misses a preposition occasionally' }
+    ]
+  },
+  comprehension: {
+    title: '🧠 Comprehension Scoring Guide',
+    levels: [
+      { score: '0-2', desc: 'Cannot understand basic prompts' },
+      { score: '3-5', desc: 'Understands "What did you eat?" but not "How did the meal make you feel?"' },
+      { score: '6-8', desc: 'Gets general meaning, misses some subtleties' },
+      { score: '9-10', desc: 'Catches everything, including implied meanings' }
+    ]
+  },
+  vocabulary: {
+    title: '💬 Vocabulary Scoring Guide',
+    levels: [
+      { score: '0-2', desc: 'Only knows a few words ("hello", "yes", "no")' },
+      { score: '3-5', desc: '"Good", "bad", "like", "not like" - very basic' },
+      { score: '6-8', desc: 'Can describe daily life but struggles with abstract concepts' },
+      { score: '9-10', desc: 'Uses "grab a bite", "catch up", "on the fence" naturally' }
+    ]
+  },
+  pronunciation: {
+    title: '🎤 Pronunciation Scoring Guide',
+    levels: [
+      { score: '0-2', desc: 'Incomprehensible' },
+      { score: '3-5', desc: 'Very heavy accent affecting understanding. Example: "My name is..." sounds like "Mai naim ee..."' },
+      { score: '6-8', desc: 'Accent present but understandable, misses word stress sometimes' },
+      { score: '9-10', desc: 'Could be mistaken for native speaker' }
+    ]
+  }
+};
+
+async function openAssessmentModal(studentId) {
+  currentAssessmentStudent = studentId;
+  
+  // Find student data
+  const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
+    .find(s => s.id === studentId);
+  
+  if (!student) {
+    alert('Error: Student not found');
+    return;
+  }
+  
+  // Update modal header
+  document.getElementById('assessment-student-name').textContent = 
+    `${student.given_name_romaji || student.name} - ${student.level || 'Not set'}`;
+  
+  // Load previous assessment
+  try {
+    const { data: prevAssessment, error } = await supabaseClient
+      .from('student_assessments')
+      .select('*')
+      .eq('student_id', studentId)
+      .order('assessed_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error loading previous assessment:', error);
+    }
+    
+    // Set previous scores or defaults
+    const skills = ['fluency', 'grammar', 'comprehension', 'vocabulary', 'pronunciation'];
+    skills.forEach(skill => {
+      const prevScore = prevAssessment ? prevAssessment[skill] : '-';
+      document.getElementById(`${skill}-prev`).textContent = prevScore;
+      
+      // Set suggested score (previous + 1 if exists, else based on level)
+      let suggested = 5; // default
+      if (prevAssessment) {
+        suggested = Math.min(prevAssessment[skill] + 1, 10);
+      } else {
+        // Initial assessment based on student level
+        const levelMap = {
+          'Super Beginner': 2,
+          'Beginner': 4,
+          'Intermediate': 7,
+          'Advanced': 9
+        };
+        suggested = levelMap[student.level] || 5;
+      }
+      
+      document.getElementById(`${skill}-suggested`).textContent = suggested;
+      document.getElementById(`${skill}-slider`).value = suggested;
+      document.getElementById(`${skill}-score`).textContent = suggested;
+    });
+    
+  } catch (err) {
+    console.error('Error loading assessment data:', err);
+  }
+  
+  // Set up slider listeners
+  const skills = ['fluency', 'grammar', 'comprehension', 'vocabulary', 'pronunciation'];
+  skills.forEach(skill => {
+    const slider = document.getElementById(`${skill}-slider`);
+    slider.oninput = () => {
+      document.getElementById(`${skill}-score`).textContent = slider.value;
+      updateAssessmentSummary();
+    };
+  });
+  
+  // Initial summary calculation
+  updateAssessmentSummary();
+  
+  // Show modal
+  document.getElementById('assessment-modal').classList.add('active');
+}
+
+function closeAssessmentModal() {
+  document.getElementById('assessment-modal').classList.remove('active');
+  currentAssessmentStudent = null;
+}
+
+function updateAssessmentSummary() {
+  const skills = ['fluency', 'grammar', 'comprehension', 'vocabulary', 'pronunciation'];
+  let total = 0;
+  
+  skills.forEach(skill => {
+    const value = parseInt(document.getElementById(`${skill}-slider`).value);
+    total += value;
+  });
+  
+  document.getElementById('total-score').textContent = `${total}/50`;
+  
+  // Determine band
+  let band = 'Super Beginner';
+  if (total >= 39) band = 'Advanced';
+  else if (total >= 26) band = 'Intermediate';
+  else if (total >= 13) band = 'Beginner';
+  
+  document.getElementById('overall-band').textContent = band;
+  
+  // Calculate change (if previous scores exist)
+  const prevTotal = skills.reduce((sum, skill) => {
+    const prev = document.getElementById(`${skill}-prev`).textContent;
+    return sum + (prev !== '-' ? parseInt(prev) : 0);
+  }, 0);
+  
+  if (prevTotal > 0) {
+    const change = total - prevTotal;
+    const changeEl = document.getElementById('score-change');
+    changeEl.textContent = change >= 0 ? `+${change}` : change;
+    changeEl.style.color = change >= 0 ? 'var(--color-success)' : 'var(--color-error)';
+  } else {
+    document.getElementById('score-change').textContent = 'Initial';
+  }
+}
+
+async function submitAssessment() {
+  if (!currentAssessmentStudent) {
+    alert('Error: No student selected');
+    return;
+  }
+  
+  const submitBtn = document.getElementById('submit-assessment-btn');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  
+  try {
+    // Get student data
+    const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
+      .find(s => s.id === currentAssessmentStudent);
+    
+    if (!student || !student.user_id) {
+      throw new Error('Student user_id not found');
+    }
+    
+    // Collect scores
+    const assessment = {
+      user_id: student.user_id,
+      student_id: currentAssessmentStudent,
+      assessed_by: currentTeacher.id,
+      fluency: parseInt(document.getElementById('fluency-slider').value),
+      grammar: parseInt(document.getElementById('grammar-slider').value),
+      comprehension: parseInt(document.getElementById('comprehension-slider').value),
+      vocabulary: parseInt(document.getElementById('vocabulary-slider').value),
+      pronunciation: parseInt(document.getElementById('pronunciation-slider').value),
+      teacher_notes: document.getElementById('assessment-notes').value.trim() || null,
+      assessment_type: 'monthly'
+    };
+    
+    // Save to database
+    const { data, error } = await supabaseClient
+      .from('student_assessments')
+      .insert([assessment])
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    alert('Assessment saved successfully! ✅');
+    closeAssessmentModal();
+    
+  } catch (err) {
+    console.error('Error saving assessment:', err);
+    alert('Error saving assessment. Please try again.');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Assessment';
+  }
+}
+
+function showGuide(skillName) {
+  const guide = skillGuides[skillName];
+  if (!guide) return;
+  
+  let html = `<h3>${guide.title}</h3>`;
+  guide.levels.forEach(level => {
+    html += `
+      <div class="guide-level">
+        <h4>Score ${level.score}</h4>
+        <p>${level.desc}</p>
+      </div>
+    `;
+  });
+  
+  document.getElementById('guide-body').innerHTML = html;
+  document.getElementById('guide-popup').classList.add('active');
+}
+
+function closeGuide() {
+  document.getElementById('guide-popup').classList.remove('active');
+}
+
+// Close modals on outside click
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('assessment-modal')) {
+    closeAssessmentModal();
+  }
+  if (e.target.classList.contains('guide-popup')) {
+    closeGuide();
+  }
+});
   </script>
 </body>
 </html>
