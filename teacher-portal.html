@@ -519,6 +519,8 @@
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .assessment-header {
@@ -543,7 +545,7 @@
 .assessment-close {
   position: absolute;
   top: 1rem;
-  right: 1rem;
+  right: 1.5rem;
   background: none;
   border: none;
   font-size: 1.5rem;
@@ -556,6 +558,7 @@
   justify-content: center;
   border-radius: 4px;
   transition: all 0.2s;
+  z-index: 20;
 }
 
 .assessment-close:hover {
@@ -815,6 +818,10 @@
   max-width: 600px;
   padding: 2rem;
   position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .guide-close {
@@ -822,12 +829,20 @@
   top: 1rem;
   right: 1rem;
   float: right;
-  margin-bottom: -2rem;
+  margin-bottom: -1rem;
   background: none;
   border: none;
   font-size: 1.5rem;
   color: var(--color-text-light);
   cursor: pointer;
+  z-index: 10;
+  padding: 0.5rem;
+}
+
+.guide-close:hover {
+  color: var(--color-text);
+  background: var(--color-border);
+  border-radius: 4px;
 }
 
 .guide-content h3 {
@@ -1189,21 +1204,57 @@
 
     // Feedback Templates
     const templates = {
-      weekly: `Week [X] Review 🌟
+      weekly: `Week [X] Review - Comprehensive Feedback 🌟
 
-📈 PROGRESS: Completed [X]/7 prompts
+📊 WEEKLY OVERVIEW:
+Completed [X]/7 prompts this week
+Overall improvement: [Brief summary of progress]
 
-🎯 WHAT YOU DID WELL:
-- [Natural phrases/pronunciation wins]
-- [Grammar improvements]
+🎯 MAJOR STRENGTHS THIS WEEK:
+1. [Specific example with day/prompt reference]
+2. [Another strength - be specific]
+3. [Another strength - be specific]
 
-📝 AREAS TO WORK ON:
-- [Common mistakes]
-- [Pronunciation practice needed]
+📝 PATTERNS TO IMPROVE:
+1. [Common error/pattern across multiple days]
+   → Example: [Specific instance from Day X]
+   → Practice tip: [How to fix it]
+   
+2. [Another pattern]
+   → Example: [Specific instance]
+   → Practice tip: [How to fix it]
 
-💡 THIS WEEK'S FOCUS: [Specific goal]
+🔍 SKILL BREAKDOWN:
 
-Keep up the great work! 💪`,
+💬 Fluency & Natural Speaking:
+[Observations about speaking flow, hesitation, conversation pace]
+
+📐 Grammar & Sentence Structure:
+[Common mistakes, improvements, patterns to watch]
+
+🎯 Vocabulary Range:
+[New words used well, vocabulary gaps, suggestions]
+
+🎤 Pronunciation & Clarity:
+[Specific sounds/words to practice, accent patterns]
+
+🧠 Comprehension & Responses:
+[How well you understood prompts, response appropriateness]
+
+💡 THIS WEEK'S FOCUS REVIEW:
+[What we worked on this week: _____ ]
+[Results: _____ ]
+
+🎯 ACTION ITEMS FOR NEXT WEEK:
+1. [Specific, actionable practice goal]
+2. [Specific, actionable practice goal]
+3. [Specific, actionable practice goal]
+
+🔮 NEXT WEEK'S THEME:
+Topic: [Preview of next week's conversation focus]
+Goal: [What we'll practice]
+
+Excellent work this week! Your consistency is paying off! 💪✨`,
 
       biweekly: `Day [X] Check-in ✨
 
@@ -1223,7 +1274,7 @@ Quick review of your last [X] responses:
 
 💡 Quick tip: [One correction/suggestion]
 
-Tomorrow's focus: [Preview]`
+Keep practicing! 🌟`
     };
 
     // ============================================
@@ -1581,14 +1632,6 @@ if (filterSelect) {
     await loadStudentResponses(sid, filter);
   });
 }
-        
-        // Auto-focus feedback textarea
-        setTimeout(() => {
-          const textarea = document.getElementById(`feedback-${studentId}`);
-          if (textarea && !completedToday.has(studentId)) {
-            textarea.focus();
-          }
-        }, 100);
       }
     }
 
