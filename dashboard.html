@@ -18,6 +18,582 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <!-- Chart.js for Pentagon Radar Chart -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* Dashboard-specific styles */
+    .dashboard-loading {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    .dashboard-loading i {
+      font-size: 2rem;
+      color: var(--color-primary);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .dashboard-error {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--color-text);
+    }
+    .dashboard-error i {
+      font-size: 3rem;
+      color: #dc3545;
+      margin-bottom: 1rem;
+    }
+    .dashboard-error h2 {
+      margin-bottom: 1rem;
+    }
+    .dashboard-error p {
+      margin-bottom: 1.5rem;
+      color: var(--color-text-light);
+    }
+    
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .welcome-banner h1 {
+      font-size: 1.75rem;
+      margin: 0 0 0.5rem 0;
+      color: white;
+    }
+    .welcome-banner p {
+      margin: 0;
+      opacity: 0.9;
+    }
+    .welcome-stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .welcome-stat {
+      text-align: center;
+    }
+    .welcome-stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      display: block;
+    }
+    .welcome-stat-label {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    
+    .practice-status-card {
+      background: linear-gradient(135deg, #28a745 0%, #20863d 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .practice-status-card.completed {
+      background: linear-gradient(135deg, var(--color-gold) 0%, #b8860b 100%);
+    }
+    .practice-status-card h2 {
+      color: white;
+      margin: 0 0 0.5rem 0;
+      font-size: 1.25rem;
+    }
+    .practice-status-card p {
+      margin: 0;
+      opacity: 0.95;
+    }
+    .practice-status-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .quick-action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem 1rem;
+      background-color: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      text-decoration: none;
+      color: var(--color-text);
+      transition: all var(--transition-speed) ease;
+      text-align: center;
+    }
+    .quick-action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--color-primary);
+    }
+    .quick-action-btn i {
+      font-size: 1.5rem;
+      color: var(--color-primary);
+      margin-bottom: 0.5rem;
+    }
+    .quick-action-btn span {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    /* Dashboard Grid - Custom layout for skills chart prominence */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    
+    /* First row: Phrase (left), Skills (center - span 1 but bigger), Progress (right) */
+    .dashboard-grid > .dashboard-card:nth-child(1) {
+      /* Skills Assessment - Make it bigger and stand out */
+      grid-column: 2 / 3;
+      grid-row: 1 / 3;
+      background: linear-gradient(135deg, rgba(0, 128, 128, 0.05) 0%, rgba(0, 128, 128, 0.02) 100%);
+      border: 2px solid var(--color-primary);
+      box-shadow: 0 8px 24px rgba(0, 128, 128, 0.15);
+    }
+    
+    .dashboard-grid > .dashboard-card:nth-child(2) {
+      /* Phrase of the Day - Left */
+      grid-column: 1 / 2;
+      grid-row: 1 / 2;
+    }
+    
+    .dashboard-grid > .dashboard-card:nth-child(3) {
+      /* Monthly Progress - Right */
+      grid-column: 3 / 4;
+      grid-row: 1 / 2;
+    }
+    
+    .dashboard-grid > .dashboard-card:nth-child(4) {
+      /* Streak - Left */
+      grid-column: 1 / 2;
+      grid-row: 2 / 3;
+    }
+    
+    .dashboard-grid > .dashboard-card:nth-child(5) {
+      /* Achievements - Right */
+      grid-column: 3 / 4;
+      grid-row: 2 / 3;
+    }
+    
+    /* Remaining cards flow normally */
+    .dashboard-grid > .dashboard-card:nth-child(n+6) {
+      grid-column: auto;
+    }
+    
+    .dashboard-card {
+      background-color: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      transition: box-shadow var(--transition-speed) ease;
+    }
+    .dashboard-card:hover {
+      box-shadow: var(--shadow);
+    }
+    .dashboard-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.1rem;
+      color: var(--color-accent);
+      margin: 0 0 1rem 0;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .dashboard-card h3 i {
+      color: var(--color-primary);
+    }
+    
+    /* Skills Chart - BIGGER! */
+    .skills-chart-container {
+      position: relative;
+      height: 400px;
+      margin: 1rem 0;
+    }
+    .no-assessment-message {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--color-text-light);
+    }
+    .no-assessment-message i {
+      font-size: 4rem;
+      color: var(--color-primary);
+      opacity: 0.5;
+      margin-bottom: 1rem;
+    }
+    .no-assessment-message p {
+      margin: 0.5rem 0;
+      line-height: 1.6;
+    }
+    .assessment-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border);
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+    }
+    .assessment-date {
+      font-style: italic;
+    }
+    .assessment-band {
+      font-weight: 700;
+      color: var(--color-primary);
+      font-size: 1.1rem;
+    }
+    
+    .progress-ring-container {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .progress-ring {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    .progress-ring svg {
+      transform: rotate(-90deg);
+    }
+    .progress-ring-bg {
+      fill: none;
+      stroke: var(--color-border);
+      stroke-width: 8;
+    }
+    .progress-ring-fill {
+      fill: none;
+      stroke: var(--color-primary);
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+    .progress-ring-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    .progress-details h4 {
+      margin: 0 0 0.25rem 0;
+      color: var(--color-text);
+    }
+    .progress-details p {
+      margin: 0;
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+    }
+    
+    .streak-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .streak-fire {
+      font-size: 2.5rem;
+    }
+    .streak-count {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    .streak-label {
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+    }
+    .streak-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .streak-day-header {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      padding: 4px;
+    }
+    .streak-day {
+      aspect-ratio: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--color-bg);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--color-text-light);
+    }
+    .streak-day.active {
+      background-color: var(--color-primary);
+      color: white;
+    }
+    .streak-day.today {
+      border: 2px solid var(--color-gold);
+    }
+    .streak-day.future {
+      opacity: 0.4;
+    }
+    
+    .no-lessons {
+      text-align: center;
+      padding: 2rem;
+      color: var(--color-text-light);
+    }
+    .no-lessons i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+    }
+    
+    .resource-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      transition: background-color var(--transition-speed) ease;
+    }
+    .resource-item:hover {
+      background-color: var(--color-bg);
+    }
+    .resource-item i {
+      font-size: 1.25rem;
+      color: var(--color-primary);
+      width: 30px;
+      text-align: center;
+    }
+    .resource-item a {
+      flex: 1;
+      color: var(--color-text);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .resource-item a:hover {
+      color: var(--color-primary);
+    }
+    .resource-item .coming-soon {
+      color: var(--color-text-muted);
+      font-style: italic;
+      cursor: default;
+    }
+    .resource-item .coming-soon:hover {
+      color: var(--color-text-muted);
+    }
+    .resource-tag {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      background-color: var(--color-primary-light);
+      color: var(--color-primary-dark);
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .resource-tag.coming {
+      background-color: var(--color-bg);
+      color: var(--color-text-muted);
+    }
+    
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 1rem;
+    }
+    .achievement {
+      text-align: center;
+      padding: 0.75rem;
+    }
+    .achievement-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.5rem;
+      font-size: 1.25rem;
+    }
+    .achievement-icon.earned {
+      background-color: var(--color-gold);
+      color: white;
+    }
+    .achievement-icon.locked {
+      background-color: var(--color-bg);
+      color: var(--color-text-muted);
+      opacity: 0.5;
+    }
+    .achievement-name {
+      font-size: 0.75rem;
+      color: var(--color-text-light);
+    }
+    .achievement.locked .achievement-name {
+      opacity: 0.5;
+    }
+    
+    .plan-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background-color: var(--color-primary);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .plan-badge.pending {
+      background-color: var(--color-gold);
+    }
+    .plan-badge.has-addon {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-gold) 100%);
+    }
+    .addon-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      background-color: var(--color-gold);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+    .account-details {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .account-details li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+    }
+    .account-details li:last-child {
+      border-bottom: none;
+    }
+    .account-details strong {
+      color: var(--color-text-light);
+      font-weight: 500;
+    }
+    
+    .upgrade-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-align: center;
+    }
+    .upgrade-card h3 {
+      color: white;
+      border-bottom-color: rgba(255,255,255,0.3);
+    }
+    .upgrade-card h3 i {
+      color: white;
+    }
+    .upgrade-card p {
+      margin-bottom: 1rem;
+      opacity: 0.95;
+    }
+    .upgrade-card .cta-button {
+      background: white;
+      color: #667eea;
+    }
+    .upgrade-card .cta-button:hover {
+      background: #f0f0f0;
+      transform: translateY(-2px);
+    }
+    
+    .tip-box {
+      background-color: var(--color-primary-light);
+      border-left: 4px solid var(--color-primary);
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .tip-box p {
+      margin: 0;
+    }
+    .tip-box .tip-phrase {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-primary-dark);
+      display: block;
+      margin-top: 0.5rem;
+    }
+    
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      
+      .dashboard-grid > .dashboard-card:nth-child(1) {
+        grid-column: 1 / 3;
+        grid-row: 1 / 2;
+      }
+      
+      .dashboard-grid > .dashboard-card:nth-child(2),
+      .dashboard-grid > .dashboard-card:nth-child(3),
+      .dashboard-grid > .dashboard-card:nth-child(4),
+      .dashboard-grid > .dashboard-card:nth-child(5) {
+        grid-column: auto;
+        grid-row: auto;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .welcome-banner {
+        flex-direction: column;
+        text-align: center;
+      }
+      .welcome-stats {
+        justify-content: center;
+      }
+      .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .dashboard-grid > .dashboard-card:nth-child(1) {
+        grid-column: 1;
+        grid-row: auto;
+      }
+      .skills-chart-container {
+        height: 300px;
+      }
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .tip-box {
+        background-color: var(--color-card-bg);
+      }
+      .resource-tag {
+        background-color: var(--color-primary-dark);
+        color: var(--color-primary-light);
+      }
+      .practice-status-card {
+        background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+      }
+      .practice-status-card.completed {
+        background: linear-gradient(135deg, #b8860b 0%, #8b6914 100%);
+      }
+    }
+  </style>
 </head>
 <body>
     <header class="site-header">
