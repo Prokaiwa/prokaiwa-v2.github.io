@@ -1412,15 +1412,14 @@ if (responseError && responseError.code !== 'PGRST116') {
 
       container.innerHTML = students.map(student => createStudentCard(student, templateType)).join('');
 
-      // Add event listeners
+      // Add event listeners ONLY for buttons that DON'T have inline onclick
       students.forEach(student => {
         const card = document.getElementById(`student-${student.id}`);
-        const expandBtn = card.querySelector('.expand-btn');
         const sendBtn = card.querySelector('.send-btn');
         const markDoneBtn = card.querySelector('.mark-done-btn');
         const templateBtns = card.querySelectorAll('.template-btn');
 
-        expandBtn.addEventListener('click', () => toggleCard(student.id));
+        // NOTE: expandBtn now uses inline onclick="toggleCard()", so we don't add a listener here
         sendBtn.addEventListener('click', () => sendFeedback(student.id));
         markDoneBtn.addEventListener('click', () => markComplete(student.id));
         
