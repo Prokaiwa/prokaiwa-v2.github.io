@@ -184,7 +184,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
-      align-items: start; /* CRITICAL: Prevents cards from stretching to match tallest in row! */
+      /* Cards will align to tallest in row - looks more organized */
     }
     
     /* Row 1 & 2: Phrase (left), Skills (center - span 2 rows), Progress (right) */
@@ -268,7 +268,7 @@
       position: relative;
       height: 420px;
       margin: 0;
-      padding: 0.5rem 0;
+      padding: 0.5rem 0 0.25rem 0; /* Reduced bottom padding */
     }
     .no-assessment-message {
       text-align: center;
@@ -294,7 +294,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 0.25rem;
+      margin-top: 0; /* Removed margin-top for tighter spacing */
       padding-top: 0.5rem;
       border-top: 1px solid var(--color-border);
       font-size: 0.85rem;
@@ -377,12 +377,47 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 2px;
+      transition: max-height 0.3s ease;
+      overflow: hidden;
+    }
+    .streak-calendar.compact {
+      max-height: 80px; /* Shows only header + 1 week */
+    }
+    .streak-calendar.expanded {
+      max-height: 500px; /* Shows full month */
+    }
+    .calendar-toggle {
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+    .calendar-toggle button {
+      background: none;
+      border: none;
+      color: var(--color-primary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+    .calendar-toggle button:hover {
+      background-color: var(--color-primary-light);
+    }
+    .calendar-toggle button i {
+      margin-left: 0.25rem;
+      font-size: 0.7rem;
+      transition: transform 0.3s ease;
+    }
+    .calendar-toggle button.expanded i {
+      transform: rotate(180deg);
     }
     .streak-day-header {
       text-align: center;
       font-size: 0.55rem;
       color: var(--color-text-muted);
       padding: 1px;
+      font-weight: 600;
     }
     .streak-day {
       aspect-ratio: 1;
@@ -1776,17 +1811,31 @@
         
         function renderStreakCalendar(containerId, practiceDates, lang) {
             const container = document.getElementById(containerId);
-            container.innerHTML = '';
+            const calendarId = `${containerId}-calendar-grid`;
+            const toggleId = `${containerId}-toggle`;
             
+            // Create structure with toggle button
+            container.innerHTML = `
+                <div id="${calendarId}" class="streak-calendar compact"></div>
+                <div class="calendar-toggle">
+                    <button id="${toggleId}" onclick="toggleCalendar('${containerId}', '${lang}')">
+                        ${lang === 'ja' ? '全て表示' : 'Show Full Month'} <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+            `;
+            
+            const calendarGrid = document.getElementById(calendarId);
+            
+            // Day headers - STARTS ON SUNDAY (Japan/US standard)
             const days = lang === 'ja' 
-                ? ['月', '火', '水', '木', '金', '土', '日']
-                : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+                ? ['日', '月', '火', '水', '木', '金', '土']  // Sunday first!
+                : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];      // Sunday first!
             
             days.forEach(day => {
                 const header = document.createElement('div');
                 header.className = 'streak-day-header';
                 header.textContent = day;
-                container.appendChild(header);
+                calendarGrid.appendChild(header);
             });
 
             const now = new Date();
@@ -1794,12 +1843,13 @@
             const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
             const today = now.getDate();
             
-            const startDay = (firstDay.getDay() + 6) % 7;
+            // Sunday = 0, so no adjustment needed! (was previously +6 to make Monday first)
+            const startDay = firstDay.getDay();
             for (let i = 0; i < startDay; i++) {
                 const empty = document.createElement('div');
                 empty.className = 'streak-day';
                 empty.style.visibility = 'hidden';
-                container.appendChild(empty);
+                calendarGrid.appendChild(empty);
             }
             
             for (let d = 1; d <= lastDay.getDate(); d++) {
@@ -1818,7 +1868,27 @@
                     day.classList.add('future');
                 }
                 
-                container.appendChild(day);
+                calendarGrid.appendChild(day);
+            }
+        }
+        
+        // Toggle calendar expansion
+        function toggleCalendar(containerId, lang) {
+            const calendarId = `${containerId}-calendar-grid`;
+            const toggleId = `${containerId}-toggle`;
+            const calendar = document.getElementById(calendarId);
+            const button = document.getElementById(toggleId);
+            
+            if (calendar.classList.contains('compact')) {
+                calendar.classList.remove('compact');
+                calendar.classList.add('expanded');
+                button.innerHTML = `${lang === 'ja' ? '今週のみ表示' : 'Show This Week'} <i class="fas fa-chevron-down"></i>`;
+                button.classList.add('expanded');
+            } else {
+                calendar.classList.add('compact');
+                calendar.classList.remove('expanded');
+                button.innerHTML = `${lang === 'ja' ? '全て表示' : 'Show Full Month'} <i class="fas fa-chevron-down"></i>`;
+                button.classList.remove('expanded');
             }
         }
 
