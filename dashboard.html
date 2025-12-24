@@ -373,13 +373,21 @@
       color: var(--color-text-light);
       font-size: 0.75rem;
     }
+    /* Outer container that holds the calendar grid */
+    .streak-calendar-container,
+    #ja-streak-calendar,
+    #en-streak-calendar {
+      width: 100%;
+      display: block;
+    }
     .streak-calendar {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(7, minmax(0, 1fr)); /* minmax(0, 1fr) allows columns to shrink below content size */
       gap: 2px;
       width: 100%; /* Make grid fill full width */
       transition: max-height 0.3s ease;
-      overflow: hidden;
+      overflow-y: hidden; /* Only hide vertical overflow for expand/collapse animation */
+      overflow-x: visible; /* Allow horizontal content to show */
     }
     .streak-calendar.compact {
       max-height: 80px; /* Shows only header + 1 week */
@@ -421,6 +429,7 @@
       color: var(--color-text-muted);
       padding: 1px;
       font-weight: 600;
+      min-width: 0; /* Allow shrinking below content width */
     }
     .streak-day {
       aspect-ratio: 1;
@@ -431,6 +440,8 @@
       border-radius: 3px;
       font-size: 0.6rem;
       color: var(--color-text-light);
+      min-width: 0; /* Allow shrinking below content width */
+      overflow: hidden; /* Prevent content from expanding cell */
     }
     .streak-day.active {
       background-color: var(--color-primary);
