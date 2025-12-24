@@ -151,7 +151,7 @@
       font-weight: 600;
     }
     
-    /* Dashboard Grid - Custom layout for skills chart prominence */
+    /* Dashboard Grid - Custom layout using classes for reliability */
     .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -159,8 +159,7 @@
     }
     
     /* Row 1 & 2: Phrase (left), Skills (center - span 2 rows), Progress (right) */
-    .dashboard-grid > .dashboard-card:nth-child(1) {
-      /* Skills Assessment - Make it bigger and stand out */
+    .card-skills {
       grid-column: 2 / 3;
       grid-row: 1 / 3;
       background: linear-gradient(135deg, rgba(0, 128, 128, 0.05) 0%, rgba(0, 128, 128, 0.02) 100%);
@@ -168,49 +167,46 @@
       box-shadow: 0 8px 24px rgba(0, 128, 128, 0.15);
     }
     
-    .dashboard-grid > .dashboard-card:nth-child(2) {
-      /* Phrase of the Day - Left top */
+    .card-phrase {
       grid-column: 1 / 2;
       grid-row: 1 / 2;
     }
     
-    .dashboard-grid > .dashboard-card:nth-child(3) {
-      /* Monthly Progress - Right top */
+    .card-progress {
       grid-column: 3 / 4;
       grid-row: 1 / 2;
     }
     
-    .dashboard-grid > .dashboard-card:nth-child(4) {
-      /* Streak - Left bottom */
+    .card-streak {
       grid-column: 1 / 2;
       grid-row: 2 / 3;
     }
     
-    .dashboard-grid > .dashboard-card:nth-child(5) {
-      /* Achievements - Right bottom */
+    .card-achievements {
       grid-column: 3 / 4;
       grid-row: 2 / 3;
     }
     
-    /* Row 3: Account Info, Upcoming Lessons, Resources */
-    .dashboard-grid > .dashboard-card:nth-child(6) {
-      /* This will be Account Info - Left */
+    /* Row 3: Account Info (left), Upcoming Lessons (middle), Resources (right) */
+    .card-account {
       grid-column: 1 / 2;
+      grid-row: 3 / 4;
     }
     
-    .dashboard-grid > .dashboard-card:nth-child(7) {
-      /* This will be Upcoming Lessons - Middle */
+    .card-lessons {
       grid-column: 2 / 3;
+      grid-row: 3 / 4;
     }
     
-    .dashboard-grid > .dashboard-card:nth-child(8) {
-      /* This will be Resources - Right */
+    .card-resources {
       grid-column: 3 / 4;
+      grid-row: 3 / 4;
     }
     
-    .dashboard-grid > .dashboard-card:nth-child(9) {
-      /* Upgrade card - spans all 3 columns */
+    /* Upgrade card spans all 3 columns */
+    .card-upgrade {
       grid-column: 1 / 4;
+      grid-row: 4 / 5;
     }
     
     .dashboard-card {
@@ -240,42 +236,47 @@
     /* Skills Chart - BIGGER and more compact! */
     .skills-chart-container {
       position: relative;
-      height: 450px;
-      margin: 0.5rem 0;
+      height: 380px;
+      margin: 0 0 0.5rem 0;
     }
     .no-assessment-message {
       text-align: center;
-      padding: 2rem 1.5rem;
+      padding: 2rem 1rem;
       color: var(--color-text-light);
     }
     .no-assessment-message i {
-      font-size: 3rem;
+      font-size: 2.5rem;
       color: var(--color-primary);
       opacity: 0.5;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
     }
     .no-assessment-message p {
       margin: 0.25rem 0;
-      line-height: 1.5;
-      font-size: 0.95rem;
+      line-height: 1.4;
+      font-size: 0.9rem;
+    }
+    .no-assessment-message p:first-of-type {
+      font-weight: 600;
+      font-size: 1rem;
     }
     .assessment-info {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-top: 0.5rem;
-      padding-top: 0.75rem;
+      padding-top: 0.5rem;
       border-top: 1px solid var(--color-border);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--color-text-light);
     }
     .assessment-date {
       font-style: italic;
+      font-size: 0.85rem;
     }
     .assessment-band {
       font-weight: 700;
       color: var(--color-primary);
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
     
     .progress-ring-container {
@@ -327,30 +328,30 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
     .streak-fire {
-      font-size: 2.5rem;
+      font-size: 2rem;
     }
     .streak-count {
-      font-size: 2rem;
+      font-size: 1.75rem;
       font-weight: 700;
       color: var(--color-text);
     }
     .streak-label {
       color: var(--color-text-light);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
     .streak-calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
+      gap: 3px;
     }
     .streak-day-header {
       text-align: center;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: var(--color-text-muted);
-      padding: 4px;
+      padding: 2px;
     }
     .streak-day {
       aspect-ratio: 1;
@@ -359,7 +360,7 @@
       align-items: center;
       background-color: var(--color-bg);
       border-radius: 4px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--color-text-light);
     }
     .streak-day.active {
@@ -433,22 +434,22 @@
     
     .achievements-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
     }
     .achievement {
       text-align: center;
-      padding: 0.75rem;
+      padding: 0.5rem;
     }
     .achievement-icon {
-      width: 50px;
-      height: 50px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 0.5rem;
-      font-size: 1.25rem;
+      margin: 0 auto 0.4rem;
+      font-size: 1.1rem;
     }
     .achievement-icon.earned {
       background-color: var(--color-gold);
@@ -559,17 +560,52 @@
         grid-template-columns: 1fr 1fr;
       }
       
-      .dashboard-grid > .dashboard-card:nth-child(1) {
+      /* Skills spans both columns at top */
+      .card-skills {
         grid-column: 1 / 3;
         grid-row: 1 / 2;
       }
       
-      .dashboard-grid > .dashboard-card:nth-child(2),
-      .dashboard-grid > .dashboard-card:nth-child(3),
-      .dashboard-grid > .dashboard-card:nth-child(4),
-      .dashboard-grid > .dashboard-card:nth-child(5) {
-        grid-column: auto;
-        grid-row: auto;
+      /* Phrase and Progress side by side */
+      .card-phrase {
+        grid-column: 1 / 2;
+        grid-row: 2 / 3;
+      }
+      
+      .card-progress {
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
+      }
+      
+      /* Streak and Achievements side by side */
+      .card-streak {
+        grid-column: 1 / 2;
+        grid-row: 3 / 4;
+      }
+      
+      .card-achievements {
+        grid-column: 2 / 3;
+        grid-row: 3 / 4;
+      }
+      
+      /* Bottom 3 stack */
+      .card-account {
+        grid-column: 1 / 3;
+        grid-row: 4 / 5;
+      }
+      
+      .card-lessons {
+        grid-column: 1 / 3;
+        grid-row: 5 / 6;
+      }
+      
+      .card-resources {
+        grid-column: 1 / 3;
+        grid-row: 6 / 7;
+      }
+      
+      .card-upgrade {
+        grid-column: 1 / 3;
       }
     }
     
@@ -587,10 +623,21 @@
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
-      .dashboard-grid > .dashboard-card:nth-child(1) {
+      
+      /* All cards stack in mobile */
+      .card-skills,
+      .card-phrase,
+      .card-progress,
+      .card-streak,
+      .card-achievements,
+      .card-account,
+      .card-lessons,
+      .card-resources,
+      .card-upgrade {
         grid-column: 1;
         grid-row: auto;
       }
+      
       .skills-chart-container {
         height: 300px;
       }
@@ -712,7 +759,7 @@
                     <div class="dashboard-grid">
                         
                         <!-- Skills Assessment Card (NEW!) -->
-                        <div class="dashboard-card">
+                        <div class="dashboard-card card-skills">
                             <h3><i class="fas fa-chart-radar"></i>スキル評価</h3>
                             <div id="ja-skills-assessment">
                                 <!-- Will be populated by JavaScript -->
@@ -720,7 +767,7 @@
                         </div>
 
                         <!-- Today's Tip -->
-                        <div class="dashboard-card">
+                        <div class="dashboard-card card-phrase">
                             <h3><i class="fas fa-lightbulb"></i>今日のフレーズ</h3>
                             <div class="tip-box">
                                 <p>今日はこのフレーズを使ってみましょう：</p>
@@ -733,7 +780,7 @@
                         </div>
 
                         <!-- Progress -->
-                        <div class="dashboard-card">
+                        <div class="dashboard-card card-progress">
                             <h3><i class="fas fa-chart-line"></i>今月の進捗</h3>
                             <div class="progress-ring-container">
                                 <div class="progress-ring">
@@ -757,7 +804,7 @@
                         </div>
 
                         <!-- Streak -->
-                        <div class="dashboard-card">
+                        <div class="dashboard-card card-streak">
                             <h3><i class="fas fa-fire"></i>練習継続記録</h3>
                             <div class="streak-header">
                                 <span class="streak-fire" id="ja-streak-emoji">🔥</span>
@@ -772,7 +819,7 @@
                         </div>
 
                         <!-- Achievements -->
-                        <div class="dashboard-card">
+                        <div class="dashboard-card card-achievements">
                             <h3><i class="fas fa-trophy"></i>達成バッジ</h3>
                             <div class="achievements-grid" id="ja-achievements">
                                 <!-- Will be populated by JavaScript -->
@@ -780,7 +827,7 @@
                         </div>
 
                         <!-- Account Info (6th - LEFT in row 3) -->
-                        <div class="dashboard-card">
+                        <div class="dashboard-card card-account">
                             <h3><i class="fas fa-user-circle"></i>アカウント情報</h3>
                             <div id="ja-plan-badges">
                                 <span class="plan-badge" id="ja-plan-badge">プランA</span>
@@ -798,7 +845,7 @@
                         </div>
 
                         <!-- Upcoming Lessons (7th - MIDDLE in row 3) -->
-                        <div class="dashboard-card" id="ja-upcoming-lessons-card" style="display: none;">
+                        <div class="dashboard-card card-lessons" id="ja-upcoming-lessons-card" style="display: none;">
                             <h3><i class="fas fa-calendar-alt"></i>予約中のレッスン</h3>
                             <div id="ja-upcoming-lessons">
                                 <div class="no-lessons">
@@ -810,7 +857,7 @@
                         </div>
 
                         <!-- Learning Resources (8th - RIGHT in row 3) -->
-                        <div class="dashboard-card" id="ja-resources">
+                        <div class="dashboard-card card-resources" id="ja-resources">
                             <h3><i class="fas fa-folder-open"></i>学習教材</h3>
                             <div class="resource-item">
                                 <i class="fas fa-file-pdf"></i>
@@ -838,7 +885,7 @@
                         </div>
 
                         <!-- Upgrade Card (9th - spans all 3 columns) -->
-                        <div class="dashboard-card upgrade-card" id="ja-upgrade-card" style="display: none;">
+                        <div class="dashboard-card upgrade-card card-upgrade" id="ja-upgrade-card" style="display: none;">
                             <h3><i class="fas fa-star"></i>ビデオレッスンを追加</h3>
                             <p>講師と直接話して、さらに上達しませんか？</p>
                             <a href="https://buy.stripe.com/28E9AS4UrcIP8JK7wbes002" target="_blank" class="cta-button">
@@ -976,7 +1023,7 @@
                     <div class="dashboard-grid">
                         
                         <!-- Skills Assessment Card (NEW!) -->
-                        <div class="dashboard-card">
+                        <div class="dashboard-card card-skills">
                             <h3><i class="fas fa-chart-radar"></i>Skills Assessment</h3>
                             <div id="en-skills-assessment">
                                 <!-- Will be populated by JavaScript -->
@@ -984,7 +1031,7 @@
                         </div>
 
                         <!-- Today's Tip -->
-                        <div class="dashboard-card">
+                        <div class="dashboard-card card-phrase">
                             <h3><i class="fas fa-lightbulb"></i>Phrase of the Day</h3>
                             <div class="tip-box">
                                 <p>Try using this phrase today:</p>
@@ -996,7 +1043,7 @@
                         </div>
 
                         <!-- Progress -->
-                        <div class="dashboard-card">
+                        <div class="dashboard-card card-progress">
                             <h3><i class="fas fa-chart-line"></i>Monthly Progress</h3>
                             <div class="progress-ring-container">
                                 <div class="progress-ring">
@@ -1020,7 +1067,7 @@
                         </div>
 
                         <!-- Streak -->
-                        <div class="dashboard-card">
+                        <div class="dashboard-card card-streak">
                             <h3><i class="fas fa-fire"></i>Practice Streak</h3>
                             <div class="streak-header">
                                 <span class="streak-fire" id="en-streak-emoji">🔥</span>
@@ -1035,15 +1082,33 @@
                         </div>
 
                         <!-- Achievements -->
-                        <div class="dashboard-card">
+                        <div class="dashboard-card card-achievements">
                             <h3><i class="fas fa-trophy"></i>Achievements</h3>
                             <div class="achievements-grid" id="en-achievements">
                                 <!-- Will be populated by JavaScript -->
                             </div>
                         </div>
 
-                        <!-- Upcoming Lessons -->
-                        <div class="dashboard-card" id="en-upcoming-lessons-card" style="display: none;">
+                        <!-- Account Info (6th - LEFT in row 3) -->
+                        <div class="dashboard-card card-account">
+                            <h3><i class="fas fa-user-circle"></i>Account Info</h3>
+                            <div id="en-plan-badges">
+                                <span class="plan-badge" id="en-plan-badge">Plan A</span>
+                            </div>
+                            <ul class="account-details">
+                                <li><strong>Name</strong><span id="en-profile-name">-</span></li>
+                                <li><strong>Email</strong><span id="en-profile-email">-</span></li>
+                                <li><strong>Level</strong><span id="en-profile-level">-</span></li>
+                                <li><strong>Status</strong><span id="en-profile-status">-</span></li>
+                            </ul>
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <a href="contact.html?subject=plan-change" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Change Plan</a>
+                                <button id="en-logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Log Out</button>
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Lessons (7th - MIDDLE in row 3) -->
+                        <div class="dashboard-card card-lessons" id="en-upcoming-lessons-card" style="display: none;">
                             <h3><i class="fas fa-calendar-alt"></i>Upcoming Lessons</h3>
                             <div id="en-upcoming-lessons">
                                 <div class="no-lessons">
@@ -1054,22 +1119,8 @@
                             </div>
                         </div>
 
-                        <!-- Upgrade Card -->
-                        <div class="dashboard-card upgrade-card" id="en-upgrade-card" style="display: none;">
-                            <h3><i class="fas fa-star"></i>Add Video Lessons</h3>
-                            <p>Want to practice speaking with a teacher directly?</p>
-                            <a href="https://buy.stripe.com/28E9AS4UrcIP8JK7wbes002" target="_blank" class="cta-button">
-                                Casual Lesson ¥3,000
-                            </a>
-                            <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.9;">
-                                <a href="https://buy.stripe.com/28E14mev16kr4tu5o3es003" target="_blank" style="color: white; text-decoration: underline;">
-                                    Business Lesson ¥5,000
-                                </a>
-                            </p>
-                        </div>
-
-                        <!-- Learning Resources -->
-                        <div class="dashboard-card" id="en-resources">
+                        <!-- Learning Resources (8th - RIGHT in row 3) -->
+                        <div class="dashboard-card card-resources" id="en-resources">
                             <h3><i class="fas fa-folder-open"></i>Learning Resources</h3>
                             <div class="resource-item">
                                 <i class="fas fa-file-pdf"></i>
@@ -1096,22 +1147,18 @@
                             </p>
                         </div>
 
-                        <!-- Account Info -->
-                        <div class="dashboard-card">
-                            <h3><i class="fas fa-user-circle"></i>Account Info</h3>
-                            <div id="en-plan-badges">
-                                <span class="plan-badge" id="en-plan-badge">Plan A</span>
-                            </div>
-                            <ul class="account-details">
-                                <li><strong>Name</strong><span id="en-profile-name">-</span></li>
-                                <li><strong>Email</strong><span id="en-profile-email">-</span></li>
-                                <li><strong>Level</strong><span id="en-profile-level">-</span></li>
-                                <li><strong>Status</strong><span id="en-profile-status">-</span></li>
-                            </ul>
-                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                <a href="contact.html?subject=plan-change" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Change Plan</a>
-                                <button id="en-logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Log Out</button>
-                            </div>
+                        <!-- Upgrade Card (9th - spans all 3 columns) -->
+                        <div class="dashboard-card upgrade-card card-upgrade" id="en-upgrade-card" style="display: none;">
+                            <h3><i class="fas fa-star"></i>Add Video Lessons</h3>
+                            <p>Want to practice speaking with a teacher directly?</p>
+                            <a href="https://buy.stripe.com/28E9AS4UrcIP8JK7wbes002" target="_blank" class="cta-button">
+                                Casual Lesson ¥3,000
+                            </a>
+                            <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.9;">
+                                <a href="https://buy.stripe.com/28E14mev16kr4tu5o3es003" target="_blank" style="color: white; text-decoration: underline;">
+                                    Business Lesson ¥5,000
+                                </a>
+                            </p>
                         </div>
 
                     </div>
@@ -1250,12 +1297,14 @@
         // =============================================
         
         function getSkillColor(score) {
-            // Color scheme: Blue→Purple→Orange→Green→Red, Teal at peak
-            if (score <= 2) return '#4A90E2'; // Blue (Super Beginner)
-            if (score <= 5) return '#9B59B6'; // Purple (Beginner)
-            if (score <= 8) return '#E67E22'; // Orange (Intermediate)
-            if (score < 10) return '#27AE60'; // Green (Advanced)
-            return '#E74C3C'; // Red (Near Perfect)
+            // Color scheme matching teacher portal: Blue→Purple→Orange→Green→Red, Teal at peak
+            if (score === 0) return '#CCCCCC'; // Gray for zero
+            if (score <= 2) return '#4A90E2'; // Blue (0-2: Super Beginner)
+            if (score <= 4) return '#9B59B6'; // Purple (3-4: Beginner)
+            if (score <= 6) return '#E67E22'; // Orange (5-6: Intermediate)  
+            if (score <= 8) return '#27AE60'; // Green (7-8: Advanced)
+            if (score < 10) return '#E74C3C'; // Red (9: Near Perfect)
+            return '#008080'; // Teal (10: Perfect!)
         }
 
         function renderSkillsChart(containerId, assessment, lang) {
@@ -1274,7 +1323,7 @@
                 return;
             }
             
-            // Check if all skills are at 10 (peak performance) = Teal
+            // Check if all skills are at 10 (peak performance) = All Teal
             const allPerfect = assessment.fluency === 10 && 
                                 assessment.grammar === 10 && 
                                 assessment.comprehension === 10 && 
@@ -1289,6 +1338,8 @@
                 pronunciation: assessment.pronunciation || 0
             };
             
+            console.log('Rendering skills chart:', skillsData);
+            
             const skillLabels = lang === 'ja'
                 ? ['流暢さ', '文法', '理解力', '語彙', '発音']
                 : ['Fluency', 'Grammar', 'Comprehension', 'Vocabulary', 'Pronunciation'];
@@ -1301,13 +1352,13 @@
                 skillsData.pronunciation
             ];
             
-            // Get colors for each point
-            const pointColors = allPerfect 
-                ? ['#008080', '#008080', '#008080', '#008080', '#008080'] // All Teal if perfect
-                : skillValues.map(score => getSkillColor(score));
+            // Get individual colors for each skill point
+            const pointColors = skillValues.map(score => getSkillColor(score));
+            console.log('Point colors:', pointColors);
             
+            // If all perfect, make everything teal
             const borderColor = allPerfect ? '#008080' : '#4A90E2';
-            const backgroundColor = allPerfect ? 'rgba(0, 128, 128, 0.2)' : 'rgba(74, 144, 226, 0.2)';
+            const backgroundColor = allPerfect ? 'rgba(0, 128, 128, 0.2)' : 'rgba(74, 144, 226, 0.15)';
             
             // Create canvas
             container.innerHTML = `
@@ -1337,8 +1388,9 @@
                         borderWidth: 2,
                         pointBackgroundColor: pointColors,
                         pointBorderColor: pointColors,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
+                        pointBorderWidth: 2,
+                        pointRadius: 7,
+                        pointHoverRadius: 9
                     }]
                 },
                 options: {
@@ -1362,7 +1414,7 @@
                                 font: { size: 11 }
                             },
                             pointLabels: {
-                                font: { size: 12, weight: 'bold' }
+                                font: { size: 13, weight: 'bold' }
                             },
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.1)'
@@ -1379,10 +1431,12 @@
                                     const skillName = context.label;
                                     const score = context.parsed.r;
                                     let level = '';
-                                    if (score <= 2) level = lang === 'ja' ? '超初級' : 'Super Beginner';
-                                    else if (score <= 5) level = lang === 'ja' ? '初級' : 'Beginner';
-                                    else if (score <= 8) level = lang === 'ja' ? '中級' : 'Intermediate';
-                                    else if (score < 10) level = lang === 'ja' ? '上級' : 'Advanced';
+                                    if (score === 0) level = lang === 'ja' ? '未評価' : 'Not Rated';
+                                    else if (score <= 2) level = lang === 'ja' ? '超初級' : 'Super Beginner';
+                                    else if (score <= 4) level = lang === 'ja' ? '初級' : 'Beginner';
+                                    else if (score <= 6) level = lang === 'ja' ? '中級' : 'Intermediate';
+                                    else if (score <= 8) level = lang === 'ja' ? '上級' : 'Advanced';
+                                    else if (score < 10) level = lang === 'ja' ? '上級+' : 'Advanced+';
                                     else level = lang === 'ja' ? '完璧！' : 'Perfect!';
                                     
                                     return `${skillName}: ${score}/10 (${level})`;
