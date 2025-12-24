@@ -93,7 +93,7 @@
     .practice-status-card {
       background: linear-gradient(135deg, #28a745 0%, #20863d 100%);
       color: white;
-      padding: 1.5rem;
+      padding: 1rem 1.5rem;
       border-radius: var(--border-radius);
       margin-bottom: 2rem;
       text-align: center;
@@ -103,16 +103,17 @@
     }
     .practice-status-card h2 {
       color: white;
-      margin: 0 0 0.5rem 0;
-      font-size: 1.25rem;
+      margin: 0 0 0.25rem 0;
+      font-size: 1.1rem;
     }
     .practice-status-card p {
       margin: 0;
       opacity: 0.95;
+      font-size: 0.9rem;
     }
     .practice-status-icon {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
+      font-size: 2rem;
+      margin-bottom: 0.25rem;
     }
     
     .quick-actions {
@@ -157,7 +158,7 @@
       gap: 1.5rem;
     }
     
-    /* First row: Phrase (left), Skills (center - span 1 but bigger), Progress (right) */
+    /* Row 1 & 2: Phrase (left), Skills (center - span 2 rows), Progress (right) */
     .dashboard-grid > .dashboard-card:nth-child(1) {
       /* Skills Assessment - Make it bigger and stand out */
       grid-column: 2 / 3;
@@ -168,32 +169,48 @@
     }
     
     .dashboard-grid > .dashboard-card:nth-child(2) {
-      /* Phrase of the Day - Left */
+      /* Phrase of the Day - Left top */
       grid-column: 1 / 2;
       grid-row: 1 / 2;
     }
     
     .dashboard-grid > .dashboard-card:nth-child(3) {
-      /* Monthly Progress - Right */
+      /* Monthly Progress - Right top */
       grid-column: 3 / 4;
       grid-row: 1 / 2;
     }
     
     .dashboard-grid > .dashboard-card:nth-child(4) {
-      /* Streak - Left */
+      /* Streak - Left bottom */
       grid-column: 1 / 2;
       grid-row: 2 / 3;
     }
     
     .dashboard-grid > .dashboard-card:nth-child(5) {
-      /* Achievements - Right */
+      /* Achievements - Right bottom */
       grid-column: 3 / 4;
       grid-row: 2 / 3;
     }
     
-    /* Remaining cards flow normally */
-    .dashboard-grid > .dashboard-card:nth-child(n+6) {
-      grid-column: auto;
+    /* Row 3: Account Info, Upcoming Lessons, Resources */
+    .dashboard-grid > .dashboard-card:nth-child(6) {
+      /* This will be Account Info - Left */
+      grid-column: 1 / 2;
+    }
+    
+    .dashboard-grid > .dashboard-card:nth-child(7) {
+      /* This will be Upcoming Lessons - Middle */
+      grid-column: 2 / 3;
+    }
+    
+    .dashboard-grid > .dashboard-card:nth-child(8) {
+      /* This will be Resources - Right */
+      grid-column: 3 / 4;
+    }
+    
+    .dashboard-grid > .dashboard-card:nth-child(9) {
+      /* Upgrade card - spans all 3 columns */
+      grid-column: 1 / 4;
     }
     
     .dashboard-card {
@@ -220,33 +237,34 @@
       color: var(--color-primary);
     }
     
-    /* Skills Chart - BIGGER! */
+    /* Skills Chart - BIGGER and more compact! */
     .skills-chart-container {
       position: relative;
-      height: 400px;
-      margin: 1rem 0;
+      height: 450px;
+      margin: 0.5rem 0;
     }
     .no-assessment-message {
       text-align: center;
-      padding: 3rem 2rem;
+      padding: 2rem 1.5rem;
       color: var(--color-text-light);
     }
     .no-assessment-message i {
-      font-size: 4rem;
+      font-size: 3rem;
       color: var(--color-primary);
       opacity: 0.5;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
     .no-assessment-message p {
-      margin: 0.5rem 0;
-      line-height: 1.6;
+      margin: 0.25rem 0;
+      line-height: 1.5;
+      font-size: 0.95rem;
     }
     .assessment-info {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 1rem;
-      padding-top: 1rem;
+      margin-top: 0.5rem;
+      padding-top: 0.75rem;
       border-top: 1px solid var(--color-border);
       font-size: 0.9rem;
       color: var(--color-text-light);
@@ -761,7 +779,25 @@
                             </div>
                         </div>
 
-                        <!-- Upcoming Lessons -->
+                        <!-- Account Info (6th - LEFT in row 3) -->
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-user-circle"></i>アカウント情報</h3>
+                            <div id="ja-plan-badges">
+                                <span class="plan-badge" id="ja-plan-badge">プランA</span>
+                            </div>
+                            <ul class="account-details">
+                                <li><strong>氏名</strong><span id="ja-profile-name">-</span></li>
+                                <li><strong>メール</strong><span id="ja-profile-email">-</span></li>
+                                <li><strong>レベル</strong><span id="ja-profile-level">-</span></li>
+                                <li><strong>ステータス</strong><span id="ja-profile-status">-</span></li>
+                            </ul>
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <a href="contact.html?subject=plan-change" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">プラン変更</a>
+                                <button id="ja-logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">ログアウト</button>
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Lessons (7th - MIDDLE in row 3) -->
                         <div class="dashboard-card" id="ja-upcoming-lessons-card" style="display: none;">
                             <h3><i class="fas fa-calendar-alt"></i>予約中のレッスン</h3>
                             <div id="ja-upcoming-lessons">
@@ -773,7 +809,35 @@
                             </div>
                         </div>
 
-                        <!-- Upgrade Card -->
+                        <!-- Learning Resources (8th - RIGHT in row 3) -->
+                        <div class="dashboard-card" id="ja-resources">
+                            <h3><i class="fas fa-folder-open"></i>学習教材</h3>
+                            <div class="resource-item">
+                                <i class="fas fa-file-pdf"></i>
+                                <a href="#" class="coming-soon">日常会話フレーズ集</a>
+                                <span class="resource-tag coming">準備中</span>
+                            </div>
+                            <div class="resource-item">
+                                <i class="fas fa-file-pdf"></i>
+                                <a href="#" class="coming-soon">ビジネス英語基礎</a>
+                                <span class="resource-tag coming">準備中</span>
+                            </div>
+                            <div class="resource-item">
+                                <i class="fas fa-link"></i>
+                                <a href="#" class="coming-soon">おすすめYouTubeチャンネル</a>
+                                <span class="resource-tag coming">準備中</span>
+                            </div>
+                            <div class="resource-item">
+                                <i class="fas fa-headphones"></i>
+                                <a href="#" class="coming-soon">リスニング練習音声</a>
+                                <span class="resource-tag coming">準備中</span>
+                            </div>
+                            <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--color-text-muted); text-align: center;">
+                                <i class="fas fa-info-circle"></i> 教材は順次追加予定です
+                            </p>
+                        </div>
+
+                        <!-- Upgrade Card (9th - spans all 3 columns) -->
                         <div class="dashboard-card upgrade-card" id="ja-upgrade-card" style="display: none;">
                             <h3><i class="fas fa-star"></i>ビデオレッスンを追加</h3>
                             <p>講師と直接話して、さらに上達しませんか？</p>
@@ -1339,6 +1403,9 @@
             const todayStart = new Date();
             todayStart.setHours(0, 0, 0, 0);
             
+            console.log(`[${lang}] Checking today's practice for user:`, userId);
+            console.log(`[${lang}] Today start:`, todayStart.toISOString());
+            
             try {
                 const { data: todayResponse, error } = await supabase
                     .from('message_log')
@@ -1349,14 +1416,17 @@
                     .limit(1)
                     .maybeSingle();
                 
+                console.log(`[${lang}] Today's response query result:`, { data: todayResponse, error });
+                
                 if (error && error.code !== 'PGRST116') {
                     console.error('Error checking today\'s practice:', error);
                     return false;
                 }
                 
                 const practicedToday = !!todayResponse;
+                console.log(`[${lang}] Practiced today:`, practicedToday);
                 
-                // Update status card
+                // Update status card with LINE logo
                 if (practicedToday) {
                     statusCard.classList.add('completed');
                     statusCard.innerHTML = `
@@ -1367,7 +1437,7 @@
                 } else {
                     statusCard.classList.remove('completed');
                     statusCard.innerHTML = `
-                        <div class="practice-status-icon">📝</div>
+                        <div class="practice-status-icon"><i class="fab fa-line" style="color: #00B900;"></i></div>
                         <h2>${lang === 'ja' ? 'まだ練習していません' : 'No Practice Yet Today'}</h2>
                         <p>${lang === 'ja' ? 'LINEで今日のプロンプトに答えましょう！' : 'Head to LINE to respond to today\'s prompt!'}</p>
                     `;
@@ -1386,19 +1456,27 @@
         // =============================================
 
         async function loadRealProgress(userId, lang) {
+            console.log('=== loadRealProgress START ===');
+            console.log('User ID:', userId);
+            
             try {
+                // Get student_progress data
+                console.log('Fetching student_progress...');
                 const { data: progress, error } = await supabase
                     .from('student_progress')
                     .select('*')
                     .eq('user_id', userId)
                     .single();
                 
+                console.log('student_progress result:', { data: progress, error });
+                
                 if (error) {
-                    console.error('Error loading progress:', error);
+                    console.error('❌ Error loading progress:', error);
                     return null;
                 }
                 
                 // Get dates when student actually responded
+                console.log('Fetching message_log...');
                 const { data: messages, error: msgError } = await supabase
                     .from('message_log')
                     .select('created_at')
@@ -1406,8 +1484,14 @@
                     .eq('message_type', 'student_response')
                     .order('created_at', { ascending: false });
                 
+                console.log('message_log result:', { 
+                    count: messages?.length || 0, 
+                    error: msgError,
+                    sample: messages?.slice(0, 3)
+                });
+                
                 if (msgError) {
-                    console.error('Error loading messages:', msgError);
+                    console.error('❌ Error loading messages:', msgError);
                 }
                 
                 // Extract unique dates
@@ -1415,15 +1499,23 @@
                     ? [...new Set(messages.map(m => m.created_at.split('T')[0]))]
                     : [];
                 
+                console.log('Practice dates extracted:', practiceDates.length, 'unique dates');
+                console.log('Sample dates:', practiceDates.slice(0, 5));
+                
                 // Calculate month-to-date
                 const monthStart = getMonthStart();
+                console.log('Month start:', monthStart);
+                
                 const thisMonthDates = practiceDates.filter(d => d >= monthStart);
                 const thisMonthCount = thisMonthDates.length;
                 
+                console.log('This month count:', thisMonthCount, 'days');
+                
                 // Calculate streak
                 const streakData = calculateStreak(practiceDates);
+                console.log('Streak calculated:', streakData);
                 
-                return {
+                const result = {
                     current_day: progress.current_day,
                     current_week: progress.current_week,
                     total_prompts_sent: progress.total_prompts_sent,
@@ -1433,8 +1525,13 @@
                     practiceDates: practiceDates
                 };
                 
+                console.log('✅ Final result:', result);
+                console.log('=== loadRealProgress END ===');
+                
+                return result;
+                
             } catch (err) {
-                console.error('Error in loadRealProgress:', err);
+                console.error('❌ ERROR in loadRealProgress:', err);
                 return null;
             }
         }
@@ -1444,6 +1541,9 @@
         // =============================================
 
         async function loadLatestAssessment(userId) {
+            console.log('=== loadLatestAssessment START ===');
+            console.log('User ID:', userId);
+            
             try {
                 const { data: assessment, error } = await supabase
                     .from('student_assessments')
@@ -1453,15 +1553,28 @@
                     .limit(1)
                     .maybeSingle();
                 
+                console.log('student_assessments result:', { data: assessment, error });
+                
                 if (error && error.code !== 'PGRST116') {
-                    console.error('Error loading assessment:', error);
+                    console.error('❌ Error loading assessment:', error);
                     return null;
                 }
                 
+                if (assessment) {
+                    console.log('✅ Assessment found:', {
+                        assessed_at: assessment.assessed_at,
+                        band_level: assessment.band_level,
+                        total_score: assessment.total_score
+                    });
+                } else {
+                    console.log('ℹ️ No assessment found yet');
+                }
+                
+                console.log('=== loadLatestAssessment END ===');
                 return assessment;
                 
             } catch (err) {
-                console.error('Error in loadLatestAssessment:', err);
+                console.error('❌ ERROR in loadLatestAssessment:', err);
                 return null;
             }
         }
