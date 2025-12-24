@@ -377,6 +377,7 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 2px;
+      width: 100%; /* Make grid fill full width */
       transition: max-height 0.3s ease;
       overflow: hidden;
     }
@@ -389,6 +390,7 @@
     .calendar-toggle {
       text-align: center;
       margin-top: 0.5rem;
+      width: 100%; /* Ensure full width */
     }
     .calendar-toggle button {
       background: none;
@@ -400,6 +402,7 @@
       padding: 0.25rem 0.5rem;
       border-radius: 4px;
       transition: all 0.2s ease;
+      display: inline-block;
     }
     .calendar-toggle button:hover {
       background-color: var(--color-primary-light);
@@ -1872,8 +1875,8 @@
             }
         }
         
-        // Toggle calendar expansion
-        function toggleCalendar(containerId, lang) {
+        // Toggle calendar expansion - GLOBAL function
+        window.toggleCalendar = function(containerId, lang) {
             const calendarId = `${containerId}-calendar-grid`;
             const toggleId = `${containerId}-toggle`;
             const calendar = document.getElementById(calendarId);
