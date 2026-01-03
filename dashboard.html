@@ -417,42 +417,8 @@
       gap: 2px;
       width: 100%; /* Make grid fill full width */
       transition: max-height 0.3s ease;
-      overflow-y: hidden; /* Only hide vertical overflow for expand/collapse animation */
+      overflow-y: hidden; /* Only hide vertical overflow */
       overflow-x: visible; /* Allow horizontal content to show */
-    }
-    .streak-calendar.compact {
-      max-height: 80px; /* Shows only header + 1 week */
-    }
-    .streak-calendar.expanded {
-      max-height: 500px; /* Shows full month */
-    }
-    .calendar-toggle {
-      text-align: center;
-      margin-top: 0.5rem;
-      width: 100%; /* Ensure full width */
-    }
-    .calendar-toggle button {
-      background: none;
-      border: none;
-      color: var(--color-primary);
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      transition: all 0.2s ease;
-      display: inline-block;
-    }
-    .calendar-toggle button:hover {
-      background-color: var(--color-primary-light);
-    }
-    .calendar-toggle button i {
-      margin-left: 0.25rem;
-      font-size: 0.7rem;
-      transition: transform 0.3s ease;
-    }
-    .calendar-toggle button.expanded i {
-      transform: rotate(180deg);
     }
     .streak-day-header {
       text-align: center;
@@ -579,6 +545,11 @@
     .achievement-name {
       font-size: 0.7rem;
       color: var(--color-text-light);
+      line-height: 1.1; /* Tighter line spacing for wrapped text */
+      min-height: 2em; /* Reserve space for 2 lines to prevent jumping */
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .achievement.locked .achievement-name {
       opacity: 0.5;
@@ -1297,7 +1268,7 @@
                         <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
                     </div>
-                    <a href="mailto:info@prokaiwa.com" class="footer-email">info@prokaiwa.com</a>
+                    <a href="mailto:prokaiwa.english@gmail.com" class="footer-email">prokaiwa.english@gmail.com</a>
                 </div>
             </div>
             <p>© <span id="year"></span> Prokaiwa. All rights reserved.</p>
@@ -1553,7 +1524,13 @@
         // =============================================
         
         function getCurrentLang() {
-            return localStorage.getItem('prokaiwa-lang') || 'ja';
+            // Check localStorage first
+            const stored = localStorage.getItem('prokaiwa-lang');
+            if (stored) return stored;
+            
+            // Auto-detect from browser language (like index.html)
+            const browserLang = navigator.language || navigator.userLanguage;
+            return browserLang.startsWith('ja') ? 'ja' : 'en';
         }
 
         function getTodayString() {
@@ -1843,7 +1820,7 @@
                 } else {
                     statusCard.classList.remove('completed');
                     statusCard.innerHTML = `
-                        <div class="practice-status-icon"><i class="fab fa-line" style="color: #00B900;"></i></div>
+                        <div class="practice-status-icon"><i class="fab fa-line" style="color: white;"></i></div>
                         <h2>${lang === 'ja' ? 'まだ練習していません' : 'No Practice Yet Today'}</h2>
                         <p>${lang === 'ja' ? 'LINEで今日のプロンプトに答えましょう！' : 'Head to LINE to respond to today\'s prompt!'}</p>
                     `;
@@ -2051,17 +2028,9 @@
         function renderStreakCalendar(containerId, practiceDates, lang) {
             const container = document.getElementById(containerId);
             const calendarId = `${containerId}-calendar-grid`;
-            const toggleId = `${containerId}-toggle`;
             
-            // Create structure with toggle button
-            container.innerHTML = `
-                <div id="${calendarId}" class="streak-calendar compact"></div>
-                <div class="calendar-toggle">
-                    <button id="${toggleId}" onclick="toggleCalendar('${containerId}', '${lang}')">
-                        ${lang === 'ja' ? '全て表示' : 'Show Full Month'} <i class="fas fa-chevron-down"></i>
-                    </button>
-                </div>
-            `;
+            // Create structure - FULL MONTH ALWAYS VISIBLE
+            container.innerHTML = `<div id="${calendarId}" class="streak-calendar"></div>`;
             
             const calendarGrid = document.getElementById(calendarId);
             
@@ -2111,25 +2080,6 @@
             }
         }
         
-        // Toggle calendar expansion - GLOBAL function
-        window.toggleCalendar = function(containerId, lang) {
-            const calendarId = `${containerId}-calendar-grid`;
-            const toggleId = `${containerId}-toggle`;
-            const calendar = document.getElementById(calendarId);
-            const button = document.getElementById(toggleId);
-            
-            if (calendar.classList.contains('compact')) {
-                calendar.classList.remove('compact');
-                calendar.classList.add('expanded');
-                button.innerHTML = `${lang === 'ja' ? '今週のみ表示' : 'Show This Week'} <i class="fas fa-chevron-down"></i>`;
-                button.classList.add('expanded');
-            } else {
-                calendar.classList.add('compact');
-                calendar.classList.remove('expanded');
-                button.innerHTML = `${lang === 'ja' ? '全て表示' : 'Show Full Month'} <i class="fas fa-chevron-down"></i>`;
-                button.classList.remove('expanded');
-            }
-        }
 
         function renderAchievements(containerId, stats, lang) {
             const container = document.getElementById(containerId);
