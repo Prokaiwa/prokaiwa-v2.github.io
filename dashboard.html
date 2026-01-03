@@ -444,6 +444,17 @@
       background-color: var(--color-primary);
       color: white;
     }
+    .streak-day.streak-hot {
+      background-color: #E67E22; /* Orange for 3-6 day streaks */
+      color: white;
+      font-weight: 600;
+    }
+    .streak-day.streak-fire {
+      background-color: #E74C3C; /* Fire red for 7+ day streaks */
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 0 8px rgba(231, 76, 60, 0.4);
+    }
     .streak-day.today {
       border: 2px solid var(--color-gold);
     }
@@ -2060,6 +2071,9 @@
                 calendarGrid.appendChild(empty);
             }
             
+            // Sort practice dates for streak calculation
+            const sortedDates = [...practiceDates].sort();
+            
             for (let d = 1; d <= lastDay.getDate(); d++) {
                 const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 const day = document.createElement('div');
@@ -2067,7 +2081,31 @@
                 day.textContent = d;
                 
                 if (practiceDates.includes(dateStr)) {
-                    day.classList.add('active');
+                    // Calculate streak length up to this day
+                    let streakLength = 1;
+                    const currentDate = new Date(dateStr);
+                    
+                    // Count backward to find streak length
+                    for (let i = 1; i <= 30; i++) {
+                        const prevDate = new Date(currentDate);
+                        prevDate.setDate(prevDate.getDate() - i);
+                        const prevDateStr = prevDate.toISOString().split('T')[0];
+                        
+                        if (sortedDates.includes(prevDateStr)) {
+                            streakLength++;
+                        } else {
+                            break; // Streak broken
+                        }
+                    }
+                    
+                    // Add class based on streak length
+                    if (streakLength >= 7) {
+                        day.classList.add('streak-fire'); // Red/fire for 7+ days
+                    } else if (streakLength >= 3) {
+                        day.classList.add('streak-hot'); // Orange for 3-6 days
+                    } else {
+                        day.classList.add('active'); // Teal for 1-2 days
+                    }
                 }
                 if (d === today) {
                     day.classList.add('today');
