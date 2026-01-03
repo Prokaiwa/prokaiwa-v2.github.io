@@ -310,6 +310,37 @@
       font-size: 0.95rem;
     }
     
+    /* Learning Archetype Display */
+    .learning-archetype {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(135deg, var(--color-primary-light) 0%, rgba(0, 128, 128, 0.05) 100%);
+      border-left: 4px solid var(--color-primary);
+      border-radius: 0 8px 8px 0;
+    }
+    .archetype-icon {
+      font-size: 2rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .archetype-content {
+      flex: 1;
+    }
+    .archetype-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.25rem;
+    }
+    .archetype-description {
+      font-size: 0.85rem;
+      color: var(--color-text);
+      line-height: 1.4;
+    }
+    
     .progress-ring-container {
       display: flex;
       align-items: center;
@@ -766,6 +797,16 @@
       }
       .practice-status-card.completed {
         background: linear-gradient(135deg, #b8860b 0%, #8b6914 100%);
+      }
+      .learning-archetype {
+        background: linear-gradient(135deg, var(--color-card-bg) 0%, rgba(0, 168, 168, 0.1) 100%);
+        border-left-color: var(--color-primary);
+      }
+      .archetype-name {
+        color: var(--color-primary);
+      }
+      .archetype-description {
+        color: var(--color-text-light);
       }
     }
   </style>
@@ -1302,14 +1343,14 @@
                         <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
                     </div>
-                    <a href="mailto:prokaiwa.english@gmail.com" class="footer-email">prokaiwa.english@gmail.com</a>
+                    <a href="/cdn-cgi/l/email-protection#067674696d676f7167286368616a6f756e46616b676f6a2865696b" class="footer-email"><span class="__cf_email__" data-cfemail="6414160b0f050d13054a010a03080d170c240309050d084a070b09">[email&#160;protected]</span></a>
                 </div>
             </div>
             <p>© <span id="year"></span> Prokaiwa. All rights reserved.</p>
         </div>
     </footer>
 
-    <script type="module">
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
 
         // =============================================
@@ -1341,14 +1382,210 @@
             { phrase: '"Let me think about it."', example_en: 'Let me think about it and get back to you.', example_ja: '考えて後で連絡しますね。' },
         ];
 
-        // Achievement definitions
+        // Learning Archetype definitions - personalizes based on skill pattern
+        const learningArchetypes = [
+            {
+                code: 'balanced_learner',
+                icon: '🎯',
+                name_ja: 'バランス型学習者',
+                name_en: 'Balanced Learner',
+                description_ja: 'すべてのスキルがバランスよく成長しています。この万能さは実践的なコミュニケーション力の証です！',
+                description_en: 'All your skills are developing evenly. This versatility shows strong practical communication ability!',
+                condition: (skills) => {
+                    // All skills within 2 points of each other
+                    const values = [skills.fluency, skills.grammar, skills.comprehension, skills.vocabulary, skills.pronunciation];
+                    const max = Math.max(...values);
+                    const min = Math.min(...values);
+                    return (max - min) <= 2;
+                }
+            },
+            {
+                code: 'natural_speaker',
+                icon: '🗣️',
+                name_ja: '天性のスピーカー',
+                name_en: 'Natural Speaker',
+                description_ja: '流暢さと発音が特に優れています。あなたは生まれながらのコミュニケーターですね！',
+                description_en: 'Your fluency and pronunciation stand out. You\'re a natural communicator!',
+                condition: (skills) => {
+                    const speakingAvg = (skills.fluency + skills.pronunciation) / 2;
+                    const otherAvg = (skills.grammar + skills.comprehension + skills.vocabulary) / 3;
+                    return speakingAvg >= 6 && speakingAvg > otherAvg + 1.5;
+                }
+            },
+            {
+                code: 'grammar_guru',
+                icon: '📚',
+                name_ja: '文法マスター',
+                name_en: 'Grammar Guru',
+                description_ja: '文法と語彙力が強みです。分析的な学習スタイルが英語の構造理解を深めています！',
+                description_en: 'Grammar and vocabulary are your strengths. Your analytical approach builds strong language foundations!',
+                condition: (skills) => {
+                    const structureAvg = (skills.grammar + skills.vocabulary) / 2;
+                    const otherAvg = (skills.fluency + skills.comprehension + skills.pronunciation) / 3;
+                    return structureAvg >= 6 && structureAvg > otherAvg + 1.5;
+                }
+            },
+            {
+                code: 'comprehension_champion',
+                icon: '👂',
+                name_en: 'Comprehension Champion',
+                name_ja: '理解力の達人',
+                description_ja: '理解力が抜群です。聞き取りと文脈把握の才能が際立っています！',
+                description_en: 'Your comprehension excels. You have a gift for understanding context and nuance!',
+                condition: (skills) => {
+                    return skills.comprehension >= 7 && skills.comprehension >= Math.max(skills.fluency, skills.grammar, skills.vocabulary, skills.pronunciation) + 1;
+                }
+            },
+            {
+                code: 'rising_star',
+                icon: '⭐',
+                name_ja: 'ライジングスター',
+                name_en: 'Rising Star',
+                description_ja: 'すべてのスキルが着実に成長中！この調子で頑張れば、必ず目標に到達できます！',
+                description_en: 'All your skills are steadily improving! Keep up this momentum and you\'ll reach your goals!',
+                condition: (skills) => {
+                    // All skills between 4-7 (solid intermediate progress)
+                    const values = [skills.fluency, skills.grammar, skills.comprehension, skills.vocabulary, skills.pronunciation];
+                    return values.every(v => v >= 4 && v <= 7);
+                }
+            },
+            {
+                code: 'foundation_builder',
+                icon: '🏗️',
+                name_ja: '基礎固め中',
+                name_en: 'Foundation Builder',
+                description_ja: '基礎をしっかり築いている段階です。この土台が将来の成長を支えます。着実に進みましょう！',
+                description_en: 'You\'re building a solid foundation. This groundwork will support all your future growth. Keep going!',
+                condition: (skills) => {
+                    // Most skills in beginner range (0-4)
+                    const values = [skills.fluency, skills.grammar, skills.comprehension, skills.vocabulary, skills.pronunciation];
+                    const beginnerCount = values.filter(v => v <= 4).length;
+                    return beginnerCount >= 3;
+                }
+            },
+            {
+                code: 'advanced_achiever',
+                icon: '🏆',
+                name_ja: '上級達成者',
+                name_en: 'Advanced Achiever',
+                description_ja: '高いレベルまで到達しています！この実力を維持しながら、さらなる高みを目指しましょう！',
+                description_en: 'You\'ve reached an advanced level! Maintain this excellence while aiming even higher!',
+                condition: (skills) => {
+                    // Most skills advanced (7+)
+                    const values = [skills.fluency, skills.grammar, skills.comprehension, skills.vocabulary, skills.pronunciation];
+                    const advancedCount = values.filter(v => v >= 7).length;
+                    return advancedCount >= 3;
+                }
+            },
+            {
+                code: 'perfect_master',
+                icon: '💎',
+                name_ja: 'パーフェクトマスター',
+                name_en: 'Perfect Master',
+                description_ja: '全スキル完璧！あなたは英語学習の頂点に立っています。素晴らしい努力の結晶です！',
+                description_en: 'Perfect across all skills! You\'ve reached the pinnacle of English mastery. Exceptional work!',
+                condition: (skills) => {
+                    // All skills at 10
+                    return skills.fluency === 10 && skills.grammar === 10 && skills.comprehension === 10 && 
+                           skills.vocabulary === 10 && skills.pronunciation === 10;
+                }
+            }
+        ];
+
+        // Achievement definitions - Optimized progression from beginner to master
         const achievements = [
-            { code: 'first_session', icon: 'fa-play', name_ja: '初回完了', name_en: 'First Session', condition: (stats) => stats.total >= 1 },
-            { code: 'streak_3', icon: 'fa-fire', name_ja: '3日連続', name_en: '3-Day Streak', condition: (stats) => stats.maxStreak >= 3 },
-            { code: 'streak_7', icon: 'fa-calendar-check', name_ja: '7日連続', name_en: '7-Day Streak', condition: (stats) => stats.maxStreak >= 7 },
-            { code: 'sessions_10', icon: 'fa-star', name_ja: '10回達成', name_en: '10 Sessions', condition: (stats) => stats.total >= 10 },
-            { code: 'streak_30', icon: 'fa-medal', name_ja: '30日連続', name_en: '30-Day Streak', condition: (stats) => stats.maxStreak >= 30 },
-            { code: 'sessions_100', icon: 'fa-crown', name_ja: '100回達成', name_en: '100 Sessions', condition: (stats) => stats.total >= 100 },
+            // ROW 1: BEGINNER ACHIEVEMENTS (Everyone can get these early!)
+            { 
+                code: 'first_session', 
+                icon: 'fa-play', 
+                name_ja: '初回完了', 
+                name_en: 'First Session', 
+                condition: (stats) => stats.total >= 1 
+            },
+            { 
+                code: 'streak_3', 
+                icon: 'fa-fire', 
+                name_ja: '3日連続', 
+                name_en: '3-Day Streak', 
+                condition: (stats) => stats.maxStreak >= 3 
+            },
+            { 
+                code: 'weekend_warrior', 
+                icon: 'fa-calendar-week', 
+                name_ja: '週末戦士', 
+                name_en: 'Weekend Warrior', 
+                condition: (stats) => {
+                    // Check if they practiced on both Saturday AND Sunday
+                    const dates = stats.practiceDates || [];
+                    let hasSaturday = false;
+                    let hasSunday = false;
+                    
+                    for (const dateStr of dates) {
+                        const day = new Date(dateStr).getDay();
+                        if (day === 6) hasSaturday = true;  // Saturday
+                        if (day === 0) hasSunday = true;    // Sunday
+                        if (hasSaturday && hasSunday) return true;
+                    }
+                    return false;
+                }
+            },
+            
+            // ROW 2: INTERMEDIATE ACHIEVEMENTS (Building consistency!)
+            { 
+                code: 'streak_7', 
+                icon: 'fa-calendar-check', 
+                name_ja: '7日連続', 
+                name_en: '7-Day Streak', 
+                condition: (stats) => stats.maxStreak >= 7 
+            },
+            { 
+                code: 'sessions_10', 
+                icon: 'fa-star', 
+                name_ja: '10回達成', 
+                name_en: '10 Sessions', 
+                condition: (stats) => stats.total >= 10 
+            },
+            { 
+                code: 'consistency_champion', 
+                icon: 'fa-trophy', 
+                name_ja: '継続王', 
+                name_en: 'Consistency Champion', 
+                condition: (stats) => {
+                    // Check if they ever had 20+ practice days in a single month
+                    const dates = stats.practiceDates || [];
+                    const monthCounts = {};
+                    
+                    for (const dateStr of dates) {
+                        const yearMonth = dateStr.substring(0, 7); // "2025-01"
+                        monthCounts[yearMonth] = (monthCounts[yearMonth] || 0) + 1;
+                    }
+                    
+                    return Object.values(monthCounts).some(count => count >= 20);
+                }
+            },
+            
+            // ROW 3: ADVANCED ACHIEVEMENTS (Master level!)
+            { 
+                code: 'streak_30', 
+                icon: 'fa-medal', 
+                name_ja: '30日連続', 
+                name_en: '30-Day Streak', 
+                condition: (stats) => stats.maxStreak >= 30 
+            },
+            { 
+                code: 'golden_milestone', 
+                icon: 'fa-award', 
+                name_ja: 'ゴールデン達成', 
+                name_en: 'Golden Milestone', 
+                condition: (stats) => stats.total >= 50 
+            },
+            { 
+                code: 'sessions_100', 
+                icon: 'fa-crown', 
+                name_ja: '100回達成', 
+                name_en: '100 Sessions', 
+                condition: (stats) => stats.total >= 100 
+            },
         ];
 
         // =============================================
@@ -1400,6 +1637,21 @@
             document.getElementById(`${lang}-dashboard-content`).style.display = 'none';
             document.getElementById(`${lang}-dashboard-error`).style.display = 'block';
             document.getElementById(`${lang}-error-message`).textContent = message;
+        }
+
+        // =============================================
+        // LEARNING ARCHETYPE DETERMINATION
+        // =============================================
+        
+        function getLearningArchetype(skillsData) {
+            // Check archetypes in priority order (most specific first)
+            for (const archetype of learningArchetypes) {
+                if (archetype.condition(skillsData)) {
+                    return archetype;
+                }
+            }
+            // Fallback to balanced learner if no match
+            return learningArchetypes[0];
         }
 
         // =============================================
@@ -1473,6 +1725,9 @@
             const borderColor = allPerfect ? '#008080' : 'rgba(74, 144, 226, 0.6)';
             const backgroundColor = allPerfect ? 'rgba(0, 128, 128, 0.3)' : 'rgba(74, 144, 226, 0.1)';
             
+            // Determine learning archetype
+            const archetype = getLearningArchetype(skillsData);
+            
             // Create canvas - NO LABELS to make chart bigger!
             container.innerHTML = `
                 <div class="skills-chart-container">
@@ -1484,6 +1739,13 @@
                         ${new Date(assessment.assessed_at).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US')}
                     </span>
                     <span class="assessment-band">${assessment.band_level || '-'}</span>
+                </div>
+                <div class="learning-archetype">
+                    <div class="archetype-icon">${archetype.icon}</div>
+                    <div class="archetype-content">
+                        <div class="archetype-name">${lang === 'ja' ? archetype.name_ja : archetype.name_en}</div>
+                        <div class="archetype-description">${lang === 'ja' ? archetype.description_ja : archetype.description_en}</div>
+                    </div>
                 </div>
             `;
             
@@ -2023,7 +2285,8 @@
                     current: 0,
                     maxStreak: 0,
                     total: 0,
-                    thisMonth: 0
+                    thisMonth: 0,
+                    practiceDates: []  // Added for achievement conditions
                 };
                 
                 let practiceDates = [];
@@ -2033,7 +2296,8 @@
                         current: realProgress.currentStreak,
                         maxStreak: realProgress.maxStreak,
                         total: realProgress.practiceDates.length,
-                        thisMonth: realProgress.thisMonthCount
+                        thisMonth: realProgress.thisMonthCount,
+                        practiceDates: realProgress.practiceDates  // Added for achievement conditions
                     };
                     practiceDates = realProgress.practiceDates;
                 }
@@ -2161,11 +2425,4 @@
         // Initialize dashboard
         loadDashboard();
         
-        console.log('🎉 Phase 1 Dashboard Ready!');
-        console.log('✅ Pentagon chart with color scheme');
-        console.log('✅ Auto-detect today\'s practice');
-        console.log('✅ Real progress from database');
-    </script>
-    <script src="assets/js/script.js"></script>
-</body>
-</html>
+        console.log('🎉 Phase 1 Dashboard Ready!
