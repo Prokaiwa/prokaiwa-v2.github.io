@@ -1049,52 +1049,6 @@
                             </p>
                         </div>
 
-                        <!-- Learning Resources -->
-                        <div class="dashboard-card" id="ja-resources">
-                            <h3><i class="fas fa-folder-open"></i>学習教材</h3>
-                            <div class="resource-item">
-                                <i class="fas fa-file-pdf"></i>
-                                <a href="#" class="coming-soon">日常会話フレーズ集</a>
-                                <span class="resource-tag coming">準備中</span>
-                            </div>
-                            <div class="resource-item">
-                                <i class="fas fa-file-pdf"></i>
-                                <a href="#" class="coming-soon">ビジネス英語基礎</a>
-                                <span class="resource-tag coming">準備中</span>
-                            </div>
-                            <div class="resource-item">
-                                <i class="fas fa-link"></i>
-                                <a href="#" class="coming-soon">おすすめYouTubeチャンネル</a>
-                                <span class="resource-tag coming">準備中</span>
-                            </div>
-                            <div class="resource-item">
-                                <i class="fas fa-headphones"></i>
-                                <a href="#" class="coming-soon">リスニング練習音声</a>
-                                <span class="resource-tag coming">準備中</span>
-                            </div>
-                            <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--color-text-muted); text-align: center;">
-                                <i class="fas fa-info-circle"></i> 教材は順次追加予定です
-                            </p>
-                        </div>
-
-                        <!-- Account Info -->
-                        <div class="dashboard-card">
-                            <h3><i class="fas fa-user-circle"></i>アカウント情報</h3>
-                            <div id="ja-plan-badges">
-                                <span class="plan-badge" id="ja-plan-badge">プランA</span>
-                            </div>
-                            <ul class="account-details">
-                                <li><strong>氏名</strong><span id="ja-profile-name">-</span></li>
-                                <li><strong>メール</strong><span id="ja-profile-email">-</span></li>
-                                <li><strong>レベル</strong><span id="ja-profile-level">-</span></li>
-                                <li><strong>ステータス</strong><span id="ja-profile-status">-</span></li>
-                            </ul>
-                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                <a href="contact.html?subject=plan-change" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">プラン変更</a>
-                                <button id="ja-logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">ログアウト</button>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </div>
@@ -1351,6 +1305,8 @@
     </footer>
 
     <script type="module">
+        console.log('🚀 DASHBOARD SCRIPT STARTING...');
+        
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
 
         // =============================================
@@ -1368,6 +1324,8 @@
                 detectSessionInUrl: true
             }
         });
+        
+        console.log('✅ Supabase client created successfully');
         
         const MONTHLY_GOAL = 20;
 
@@ -2430,4 +2388,7 @@
         // Initialize dashboard
         loadDashboard();
         
-        console.log('🎉 Phase 1 Dashboard Ready!
+        console.log('🎉 Phase 1 Dashboard Ready!');
+    </script>
+</body>
+</html>
