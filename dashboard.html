@@ -1913,14 +1913,14 @@
                         <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
                     </div>
-                    <a href="/cdn-cgi/l/email-protection#7a0a0815111b130d1b541f141d161309123a1d171b131654191517" class="footer-email"><span class="__cf_email__" data-cfemail="0171736e6a606876602f646f666d68726941666c60686d2f626e6c">[email&#160;protected]</span></a>
+                    <a href="mailto:prokaiwa.english@gmail.com" class="footer-email">prokaiwa.english@gmail.com</a>
                 </div>
             </div>
             <p>© <span id="year"></span> Prokaiwa. All rights reserved.</p>
         </div>
     </footer>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+    <script type="module">
         console.log('🚀 DASHBOARD SCRIPT STARTING...');
         
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
@@ -3623,7 +3623,15 @@
                     body: JSON.stringify({
                         action: 'cancel',
                         bookingData: {
-                     success) {
+                            bookingId: bookingId,
+                            reason: reason
+                        }
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) {
                     throw new Error(result.error || 'Cancellation failed');
                 }
                 
