@@ -791,6 +791,512 @@
         color: var(--color-text-light);
       }
     }
+    /* =============================================
+   BOOKING WIDGET STYLES
+   Add this to the <style> section of dashboard.html
+   ============================================= */
+
+/* Booking Widget Card */
+.booking-widget {
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 128, 128, 0.1);
+}
+
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.booking-header h2 {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 1.5rem;
+}
+
+.booking-credits {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.credit-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary-light);
+  border-radius: 20px;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.credit-badge i {
+  font-size: 1.1rem;
+}
+
+.credit-number {
+  font-size: 1.2rem;
+  color: var(--color-primary);
+}
+
+.consultation-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-gold);
+  border-radius: 20px;
+  font-weight: 600;
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Calendar Container */
+.calendar-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+/* Calendar (Left Side) */
+.calendar-picker {
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-month-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-month-nav h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.calendar-nav-btn {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.calendar-nav-btn:hover {
+  background: var(--color-primary-dark);
+  transform: scale(1.1);
+}
+
+.calendar-nav-btn:disabled {
+  background: var(--color-border);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 0.5rem 0;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.calendar-day:hover:not(.disabled):not(.other-month) {
+  background: var(--color-primary-light);
+  transform: scale(1.05);
+}
+
+.calendar-day.other-month {
+  color: var(--color-text-muted);
+  opacity: 0.3;
+}
+
+.calendar-day.today {
+  border-color: var(--color-gold);
+  font-weight: 700;
+}
+
+.calendar-day.selected {
+  background: var(--color-primary);
+  color: white;
+  font-weight: 700;
+}
+
+.calendar-day.disabled {
+  color: var(--color-text-muted);
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.calendar-day.has-booking {
+  background: var(--color-success);
+  color: white;
+  position: relative;
+}
+
+.calendar-day.has-booking::after {
+  content: '•';
+  position: absolute;
+  bottom: 2px;
+  font-size: 1.5rem;
+}
+
+/* Time Slots (Right Side) */
+.time-slots-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.selected-date-display {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: var(--color-bg);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.time-slots-loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-light);
+}
+
+.time-slots-loading i {
+  font-size: 2rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.time-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.time-period {
+  margin-bottom: 1rem;
+}
+
+.time-period h4 {
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.time-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+
+.time-slot {
+  padding: 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  font-weight: 500;
+}
+
+.time-slot:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+}
+
+.time-slot.selected {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.time-slot.booked {
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.no-slots-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-light);
+}
+
+.no-slots-message i {
+  font-size: 2rem;
+  color: var(--color-border);
+  margin-bottom: 0.5rem;
+}
+
+/* Booking Actions */
+.booking-actions {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lesson-type-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lesson-type-selector label {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.lesson-type-selector select {
+  padding: 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+}
+
+.booking-summary {
+  padding: 1rem;
+  background: var(--color-bg);
+  border-radius: 8px;
+  border-left: 4px solid var(--color-primary);
+}
+
+.booking-summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.booking-summary-item:last-child {
+  margin-bottom: 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.booking-summary-label {
+  color: var(--color-text-light);
+}
+
+.booking-summary-value {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.booking-summary-value.free {
+  color: var(--color-success);
+}
+
+.booking-summary-value.paid {
+  color: var(--color-primary);
+}
+
+.book-lesson-btn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.book-lesson-btn:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+}
+
+.book-lesson-btn:disabled {
+  background: var(--color-border);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.book-lesson-btn i {
+  margin-right: 0.5rem;
+}
+
+/* My Bookings Section */
+.my-bookings {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--color-border);
+}
+
+.my-bookings h3 {
+  margin: 0 0 1rem 0;
+  color: var(--color-accent);
+}
+
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.booking-item {
+  padding: 1rem;
+  background: var(--color-bg);
+  border-radius: 8px;
+  border-left: 4px solid var(--color-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.booking-info {
+  flex: 1;
+}
+
+.booking-date {
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.25rem;
+}
+
+.booking-time {
+  color: var(--color-text-light);
+  font-size: 0.9rem;
+}
+
+.booking-type {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.booking-actions-btns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.booking-action-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reschedule-btn {
+  background: var(--color-primary);
+  color: white;
+}
+
+.reschedule-btn:hover {
+  background: var(--color-primary-dark);
+}
+
+.cancel-btn {
+  background: var(--color-error);
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #c0392b;
+}
+
+.no-bookings {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-light);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .calendar-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .booking-credits {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .time-slots-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .time-slot {
+    background: var(--color-card-bg);
+  }
+  
+  .lesson-type-selector select {
+    background: var(--color-card-bg);
+    color: var(--color-text);
+  }
+}
   </style>
 </head>
 <body>
@@ -860,7 +1366,79 @@
                             </div>
                         </div>
                     </div>
-
+                  <!-- BOOKING WIDGET - JAPANESE -->
+<div class="booking-widget" id="ja-booking-widget">
+    <!-- Header with Credits -->
+    <div class="booking-header">
+        <h2><i class="fas fa-calendar-alt"></i> レッスン予約</h2>
+        <div class="booking-credits">
+            <div class="credit-badge">
+                <i class="fas fa-ticket-alt"></i>
+                <span>利用可能: <span class="credit-number" id="ja-credits-count">0</span></span>
+            </div>
+            <div class="consultation-badge" id="ja-consultation-badge" style="display: none;">
+                <i class="fas fa-gift"></i>
+                <span>無料相談</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Calendar and Time Slots -->
+    <div class="calendar-container">
+        <!-- Left: Calendar -->
+        <div class="calendar-picker">
+            <div class="calendar-month-nav">
+                <button class="calendar-nav-btn" id="ja-calendar-prev">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h3 id="ja-calendar-month">2026年 1月</h3>
+                <button class="calendar-nav-btn" id="ja-calendar-next">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="calendar-grid" id="ja-calendar-grid">
+                <!-- Calendar will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Right: Time Slots -->
+        <div class="time-slots-container">
+            <div class="selected-date-display" id="ja-selected-date">
+                日付を選択してください
+            </div>
+            <div id="ja-time-slots">
+                <!-- Time slots will be populated after date selection -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Booking Actions -->
+    <div class="booking-actions">
+        <div class="lesson-type-selector">
+            <label for="ja-lesson-type">レッスンタイプ:</label>
+            <select id="ja-lesson-type">
+                <option value="standard">50分 スタンダードレッスン</option>
+                <option value="consultation">20分 無料相談（初回のみ）</option>
+            </select>
+        </div>
+        
+        <div class="booking-summary" id="ja-booking-summary">
+            <!-- Summary will be populated after time selection -->
+        </div>
+        
+        <button class="book-lesson-btn" id="ja-book-btn" disabled>
+            <i class="fas fa-calendar-check"></i> レッスンを予約
+        </button>
+    </div>
+    
+    <!-- My Bookings -->
+    <div class="my-bookings">
+        <h3><i class="fas fa-list"></i> 予約済みレッスン</h3>
+        <div class="bookings-list" id="ja-bookings-list">
+            <!-- Bookings will be populated by JavaScript -->
+        </div>
+    </div>
+</div>
                     <!-- Practice Status Card (UPDATED - no manual button) -->
                     <div class="practice-status-card" id="ja-practice-status">
                         <div class="practice-status-icon">⏳</div>
@@ -1078,7 +1656,80 @@
                             </div>
                         </div>
                     </div>
-
+                  
+<!-- ENGLISH VERSION -->
+<div class="booking-widget" id="en-booking-widget">
+    <!-- Header with Credits -->
+    <div class="booking-header">
+        <h2><i class="fas fa-calendar-alt"></i> Book a Lesson</h2>
+        <div class="booking-credits">
+            <div class="credit-badge">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Available: <span class="credit-number" id="en-credits-count">0</span></span>
+            </div>
+            <div class="consultation-badge" id="en-consultation-badge" style="display: none;">
+                <i class="fas fa-gift"></i>
+                <span>Free Consultation</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Calendar and Time Slots -->
+    <div class="calendar-container">
+        <!-- Left: Calendar -->
+        <div class="calendar-picker">
+            <div class="calendar-month-nav">
+                <button class="calendar-nav-btn" id="en-calendar-prev">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h3 id="en-calendar-month">January 2026</h3>
+                <button class="calendar-nav-btn" id="en-calendar-next">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="calendar-grid" id="en-calendar-grid">
+                <!-- Calendar will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Right: Time Slots -->
+        <div class="time-slots-container">
+            <div class="selected-date-display" id="en-selected-date">
+                Select a date
+            </div>
+            <div id="en-time-slots">
+                <!-- Time slots will be populated after date selection -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Booking Actions -->
+    <div class="booking-actions">
+        <div class="lesson-type-selector">
+            <label for="en-lesson-type">Lesson Type:</label>
+            <select id="en-lesson-type">
+                <option value="standard">50-min Standard Lesson</option>
+                <option value="consultation">20-min Free Consultation (First-time)</option>
+            </select>
+        </div>
+        
+        <div class="booking-summary" id="en-booking-summary">
+            <!-- Summary will be populated after time selection -->
+        </div>
+        
+        <button class="book-lesson-btn" id="en-book-btn" disabled>
+            <i class="fas fa-calendar-check"></i> Book Lesson
+        </button>
+    </div>
+    
+    <!-- My Bookings -->
+    <div class="my-bookings">
+        <h3><i class="fas fa-list"></i> My Upcoming Lessons</h3>
+        <div class="bookings-list" id="en-bookings-list">
+            <!-- Bookings will be populated by JavaScript -->
+        </div>
+    </div>
+</div>
                     <!-- Practice Status Card (UPDATED - no manual button) -->
                     <div class="practice-status-card" id="en-practice-status">
                         <div class="practice-status-icon">⏳</div>
@@ -2334,7 +2985,16 @@
                 // Prepare other language version
                 const otherLang = lang === 'ja' ? 'en' : 'ja';
                 document.getElementById(`${otherLang}-dashboard-loading`).style.display = 'none';
+                document.getElementById(`${otherLang}-dashboard-content`).style.display = 'block';// Prepare other language version
+                const otherLang = lang === 'ja' ? 'en' : 'ja';
+                document.getElementById(`${otherLang}-dashboard-loading`).style.display = 'none';
                 document.getElementById(`${otherLang}-dashboard-content`).style.display = 'block';
+                
+                // INITIALIZE BOOKING WIDGET
+                await initializeBookingWidget(profile.id, user.id, 'ja');
+                await initializeBookingWidget(profile.id, user.id, 'en');
+                
+                console.log('✅ Dashboard loaded with Phase 1 features!');
                 
                 console.log('✅ Dashboard loaded with Phase 1 features!');
                 
@@ -2420,7 +3080,658 @@
                 mainNav.classList.toggle('open');
             });
         }
+        /* =============================================
+   BOOKING WIDGET JAVASCRIPT
+   Add this to the <script> section of dashboard.html
+   ============================================= */
+
+// =============================================
+// BOOKING WIDGET STATE
+// =============================================
+
+let bookingState = {
+    selectedDate: null,
+    selectedTime: null,
+    selectedLessonType: 'standard',
+    availableSlots: [],
+    userBookings: [],
+    availableCredits: 0,
+    eligibleForConsultation: false,
+    currentMonth: new Date(),
+    studentId: null,
+    userId: null
+};
+
+// =============================================
+// INITIALIZE BOOKING WIDGET
+// =============================================
+
+async function initializeBookingWidget(studentId, userId, lang) {
+    console.log('🎯 Initializing booking widget...', { studentId, userId, lang });
+    
+    bookingState.studentId = studentId;
+    bookingState.userId = userId;
+    
+    // Fetch user's eligibility and credits
+    await fetchBookingEligibility(studentId, lang);
+    
+    // Fetch user's existing bookings
+    await fetchUserBookings(userId, lang);
+    
+    // Render calendar for current month
+    renderCalendar(lang);
+    
+    // Set up event listeners
+    setupBookingEventListeners(lang);
+    
+    console.log('✅ Booking widget initialized');
+}
+
+// =============================================
+// FETCH BOOKING ELIGIBILITY
+// =============================================
+
+async function fetchBookingEligibility(studentId, lang) {
+    try {
+        const { data, error } = await supabase
+            .rpc('check_booking_eligibility', {
+                p_student_id: studentId,
+                p_lesson_type: 'standard'
+            });
         
+        if (error) throw error;
+        
+        bookingState.availableCredits = data.availableCredits || 0;
+        bookingState.eligibleForConsultation = data.eligibleForConsultation || false;
+        
+        // Update UI
+        document.getElementById(`${lang}-credits-count`).textContent = bookingState.availableCredits;
+        
+        const consultBadge = document.getElementById(`${lang}-consultation-badge`);
+        if (bookingState.eligibleForConsultation) {
+            consultBadge.style.display = 'flex';
+        } else {
+            consultBadge.style.display = 'none';
+        }
+        
+        console.log('Credits:', bookingState.availableCredits);
+        console.log('Consultation eligible:', bookingState.eligibleForConsultation);
+        
+    } catch (err) {
+        console.error('Error fetching eligibility:', err);
+    }
+}
+
+// =============================================
+// FETCH USER'S BOOKINGS
+// =============================================
+
+async function fetchUserBookings(userId, lang) {
+    try {
+        const { data: bookings, error } = await supabase
+            .from('lesson_bookings')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('status', 'scheduled')
+            .gte('scheduled_at', new Date().toISOString())
+            .order('scheduled_at', { ascending: true });
+        
+        if (error) throw error;
+        
+        bookingState.userBookings = bookings || [];
+        
+        // Render bookings list
+        renderUserBookings(lang);
+        
+        console.log('User bookings:', bookingState.userBookings.length);
+        
+    } catch (err) {
+        console.error('Error fetching bookings:', err);
+    }
+}
+
+// =============================================
+// RENDER CALENDAR
+// =============================================
+
+function renderCalendar(lang) {
+    const month = bookingState.currentMonth;
+    const year = month.getFullYear();
+    const monthIndex = month.getMonth();
+    
+    // Update month display
+    const monthNames = lang === 'ja' 
+        ? ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+        : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    document.getElementById(`${lang}-calendar-month`).textContent = 
+        lang === 'ja' ? `${year}年 ${monthNames[monthIndex]}` : `${monthNames[monthIndex]} ${year}`;
+    
+    // Get calendar grid
+    const calendarGrid = document.getElementById(`${lang}-calendar-grid`);
+    calendarGrid.innerHTML = '';
+    
+    // Add day headers
+    const dayHeaders = lang === 'ja' 
+        ? ['日', '月', '火', '水', '木', '金', '土']
+        : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    
+    dayHeaders.forEach(day => {
+        const header = document.createElement('div');
+        header.className = 'calendar-day-header';
+        header.textContent = day;
+        calendarGrid.appendChild(header);
+    });
+    
+    // Calculate first day of month and days in month
+    const firstDay = new Date(year, monthIndex, 1).getDay();
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, monthIndex, 0).getDate();
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Add previous month's trailing days
+    for (let i = firstDay - 1; i >= 0; i--) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day other-month';
+        day.textContent = daysInPrevMonth - i;
+        calendarGrid.appendChild(day);
+    }
+    
+    // Add current month's days
+    for (let date = 1; date <= daysInMonth; date++) {
+        const dayDate = new Date(year, monthIndex, date);
+        dayDate.setHours(0, 0, 0, 0);
+        
+        const day = document.createElement('div');
+        day.className = 'calendar-day';
+        day.textContent = date;
+        day.dataset.date = dayDate.toISOString().split('T')[0];
+        
+        // Check if today
+        if (dayDate.getTime() === today.getTime()) {
+            day.classList.add('today');
+        }
+        
+        // Check if selected
+        if (bookingState.selectedDate && dayDate.toISOString().split('T')[0] === bookingState.selectedDate) {
+            day.classList.add('selected');
+        }
+        
+        // Check if past
+        if (dayDate < today) {
+            day.classList.add('disabled');
+        }
+        
+        // Check if weekend (Saturday=6, Sunday=0)
+        const dayOfWeek = dayDate.getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+            // Not Saturday or Sunday = disabled
+            day.classList.add('disabled');
+        }
+        
+        // Check if has booking
+        const hasBooking = bookingState.userBookings.some(booking => {
+            const bookingDate = new Date(booking.scheduled_at);
+            return bookingDate.toISOString().split('T')[0] === dayDate.toISOString().split('T')[0];
+        });
+        
+        if (hasBooking) {
+            day.classList.add('has-booking');
+        }
+        
+        // Add click listener
+        if (!day.classList.contains('disabled')) {
+            day.addEventListener('click', () => selectDate(dayDate.toISOString().split('T')[0], lang));
+        }
+        
+        calendarGrid.appendChild(day);
+    }
+    
+    // Add next month's leading days
+    const totalCells = calendarGrid.children.length - 7; // Subtract headers
+    const remainingCells = 42 - totalCells; // 6 weeks * 7 days
+    for (let date = 1; date <= remainingCells; date++) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day other-month';
+        day.textContent = date;
+        calendarGrid.appendChild(day);
+    }
+    
+    // Enable/disable navigation buttons
+    const prevBtn = document.getElementById(`${lang}-calendar-prev`);
+    const today = new Date();
+    const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    if (month.getTime() <= currentMonth.getTime()) {
+        prevBtn.disabled = true;
+    } else {
+        prevBtn.disabled = false;
+    }
+}
+
+// =============================================
+// SELECT DATE
+// =============================================
+
+async function selectDate(dateStr, lang) {
+    console.log('📅 Selected date:', dateStr);
+    
+    bookingState.selectedDate = dateStr;
+    bookingState.selectedTime = null;
+    
+    // Re-render calendar to show selection
+    renderCalendar(lang);
+    
+    // Update selected date display
+    const date = new Date(dateStr + 'T00:00:00');
+    const dateDisplay = lang === 'ja'
+        ? `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 (${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]})`
+        : date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    
+    document.getElementById(`${lang}-selected-date`).textContent = dateDisplay;
+    
+    // Fetch available slots for this date
+    await fetchAvailableSlots(dateStr, lang);
+}
+
+// =============================================
+// FETCH AVAILABLE SLOTS
+// =============================================
+
+async function fetchAvailableSlots(dateStr, lang) {
+    const slotsContainer = document.getElementById(`${lang}-time-slots`);
+    slotsContainer.innerHTML = '<div class="time-slots-loading"><i class="fas fa-spinner fa-spin"></i><p>読み込み中...</p></div>';
+    
+    try {
+        const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
+            },
+            body: JSON.stringify({
+                action: 'getAvailableSlots',
+                bookingData: {
+                    date: dateStr
+                }
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to fetch slots');
+        }
+        
+        bookingState.availableSlots = result.slots || [];
+        
+        // Render time slots
+        renderTimeSlots(lang);
+        
+    } catch (err) {
+        console.error('Error fetching slots:', err);
+        slotsContainer.innerHTML = `
+            <div class="no-slots-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>${lang === 'ja' ? 'スロットの読み込みに失敗しました' : 'Failed to load time slots'}</p>
+            </div>
+        `;
+    }
+}
+
+// =============================================
+// RENDER TIME SLOTS
+// =============================================
+
+function renderTimeSlots(lang) {
+    const slotsContainer = document.getElementById(`${lang}-time-slots`);
+    
+    if (bookingState.availableSlots.length === 0) {
+        slotsContainer.innerHTML = `
+            <div class="no-slots-message">
+                <i class="fas fa-calendar-times"></i>
+                <p>${lang === 'ja' ? 'この日は空き時間がありません' : 'No available slots for this date'}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Group slots by period (morning, afternoon, evening)
+    const morning = bookingState.availableSlots.filter(s => {
+        const hour = parseInt(s.display.split(':')[0]);
+        return hour < 12;
+    });
+    
+    const afternoon = bookingState.availableSlots.filter(s => {
+        const hour = parseInt(s.display.split(':')[0]);
+        return hour >= 12 && hour < 18;
+    });
+    
+    const evening = bookingState.availableSlots.filter(s => {
+        const hour = parseInt(s.display.split(':')[0]);
+        return hour >= 18;
+    });
+    
+    let html = '<div class="time-slots">';
+    
+    if (morning.length > 0) {
+        html += `
+            <div class="time-period">
+                <h4>${lang === 'ja' ? '午前' : 'Morning'}</h4>
+                <div class="time-slots-grid">
+                    ${morning.map(slot => `
+                        <div class="time-slot" data-time="${slot.time}" onclick="selectTimeSlot('${slot.time}', '${lang}')">
+                            ${slot.display}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    if (afternoon.length > 0) {
+        html += `
+            <div class="time-period">
+                <h4>${lang === 'ja' ? '午後' : 'Afternoon'}</h4>
+                <div class="time-slots-grid">
+                    ${afternoon.map(slot => `
+                        <div class="time-slot" data-time="${slot.time}" onclick="selectTimeSlot('${slot.time}', '${lang}')">
+                            ${slot.display}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    if (evening.length > 0) {
+        html += `
+            <div class="time-period">
+                <h4>${lang === 'ja' ? '夜' : 'Evening'}</h4>
+                <div class="time-slots-grid">
+                    ${evening.map(slot => `
+                        <div class="time-slot" data-time="${slot.time}" onclick="selectTimeSlot('${slot.time}', '${lang}')">
+                            ${slot.display}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    slotsContainer.innerHTML = html;
+}
+
+// =============================================
+// SELECT TIME SLOT
+// =============================================
+
+function selectTimeSlot(timeStr, lang) {
+    console.log('⏰ Selected time:', timeStr);
+    
+    bookingState.selectedTime = timeStr;
+    
+    // Update UI
+    document.querySelectorAll(`#${lang}-time-slots .time-slot`).forEach(slot => {
+        slot.classList.remove('selected');
+    });
+    
+    document.querySelector(`#${lang}-time-slots .time-slot[data-time="${timeStr}"]`)?.classList.add('selected');
+    
+    // Update booking summary
+    updateBookingSummary(lang);
+    
+    // Enable book button
+    document.getElementById(`${lang}-book-btn`).disabled = false;
+}
+
+// =============================================
+// UPDATE BOOKING SUMMARY
+// =============================================
+
+function updateBookingSummary(lang) {
+    const lessonType = bookingState.selectedLessonType;
+    const summaryContainer = document.getElementById(`${lang}-booking-summary`);
+    
+    let duration, price, useCredit;
+    
+    if (lessonType === 'consultation') {
+        duration = 20;
+        price = 0;
+        useCredit = false;
+    } else {
+        duration = 50;
+        if (bookingState.availableCredits > 0) {
+            price = 0;
+            useCredit = true;
+        } else {
+            price = 4000;
+            useCredit = false;
+        }
+    }
+    
+    const dateTime = new Date(bookingState.selectedTime);
+    
+    const html = `
+        <div class="booking-summary-item">
+            <span class="booking-summary-label">${lang === 'ja' ? '日時' : 'Date & Time'}:</span>
+            <span class="booking-summary-value">${dateTime.toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US')}</span>
+        </div>
+        <div class="booking-summary-item">
+            <span class="booking-summary-label">${lang === 'ja' ? '時間' : 'Duration'}:</span>
+            <span class="booking-summary-value">${duration} ${lang === 'ja' ? '分' : 'minutes'}</span>
+        </div>
+        <div class="booking-summary-item">
+            <span class="booking-summary-label">${lang === 'ja' ? '料金' : 'Price'}:</span>
+            <span class="booking-summary-value ${price === 0 ? 'free' : 'paid'}">
+                ${price === 0 
+                    ? (lang === 'ja' ? '無料' : 'FREE') + (useCredit ? ` (${lang === 'ja' ? 'クレジット使用' : 'Using Credit'})` : '') 
+                    : `¥${price.toLocaleString()}`}
+            </span>
+        </div>
+    `;
+    
+    summaryContainer.innerHTML = html;
+}
+
+// =============================================
+// BOOK LESSON
+// =============================================
+
+async function bookLesson(lang) {
+    const btn = document.getElementById(`${lang}-book-btn`);
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (lang === 'ja' ? '予約中...' : 'Booking...');
+    
+    try {
+        const lessonType = bookingState.selectedLessonType === 'consultation' ? 'first_time_free' : 'standard';
+        
+        const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
+            },
+            body: JSON.stringify({
+                action: 'create',
+                bookingData: {
+                    studentId: bookingState.studentId,
+                    scheduledAt: bookingState.selectedTime,
+                    lessonType: lessonType,
+                    duration: bookingState.selectedLessonType === 'consultation' ? 20 : 50
+                }
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+            throw new Error(result.error || 'Booking failed');
+        }
+        
+        alert(lang === 'ja' ? '予約が完了しました！確認メールをご確認ください。' : 'Booking confirmed! Check your email for details.');
+        
+        // Reset state
+        bookingState.selectedDate = null;
+        bookingState.selectedTime = null;
+        
+        // Refresh everything
+        await fetchBookingEligibility(bookingState.studentId, lang);
+        await fetchUserBookings(bookingState.userId, lang);
+        renderCalendar(lang);
+        
+        document.getElementById(`${lang}-selected-date`).textContent = lang === 'ja' ? '日付を選択してください' : 'Select a date';
+        document.getElementById(`${lang}-time-slots`).innerHTML = '';
+        document.getElementById(`${lang}-booking-summary`).innerHTML = '';
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-calendar-check"></i> ' + (lang === 'ja' ? 'レッスンを予約' : 'Book Lesson');
+        
+    } catch (err) {
+        console.error('Booking error:', err);
+        alert(lang === 'ja' ? `予約エラー: ${err.message}` : `Booking error: ${err.message}`);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-calendar-check"></i> ' + (lang === 'ja' ? 'レッスンを予約' : 'Book Lesson');
+    }
+}
+
+// =============================================
+// RENDER USER BOOKINGS
+// =============================================
+
+function renderUserBookings(lang) {
+    const container = document.getElementById(`${lang}-bookings-list`);
+    
+    if (bookingState.userBookings.length === 0) {
+        container.innerHTML = `
+            <div class="no-bookings">
+                <i class="fas fa-calendar-alt"></i>
+                <p>${lang === 'ja' ? '予約がありません' : 'No upcoming bookings'}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const html = bookingState.userBookings.map(booking => {
+        const date = new Date(booking.scheduled_at);
+        const dateStr = date.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+        });
+        const timeStr = date.toLocaleTimeString(lang === 'ja' ? 'ja-JP' : 'en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const typeLabel = booking.lesson_type === 'first_time_free'
+            ? (lang === 'ja' ? '無料相談' : 'Free Consultation')
+            : (lang === 'ja' ? 'レッスン' : 'Lesson');
+        
+        return `
+            <div class="booking-item">
+                <div class="booking-info">
+                    <div class="booking-date">${dateStr}</div>
+                    <div class="booking-time">${timeStr} (${booking.duration_minutes} ${lang === 'ja' ? '分' : 'min'})</div>
+                    <span class="booking-type">${typeLabel}</span>
+                </div>
+                <div class="booking-actions-btns">
+                    <button class="booking-action-btn cancel-btn" onclick="cancelBooking('${booking.id}', '${lang}')">
+                        ${lang === 'ja' ? 'キャンセル' : 'Cancel'}
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = html;
+}
+
+// =============================================
+// CANCEL BOOKING
+// =============================================
+
+async function cancelBooking(bookingId, lang) {
+    const confirmMsg = lang === 'ja'
+        ? 'この予約をキャンセルしてもよろしいですか？'
+        : 'Are you sure you want to cancel this booking?';
+    
+    if (!confirm(confirmMsg)) return;
+    
+    const reasonMsg = lang === 'ja'
+        ? 'キャンセル理由を入力してください（任意）：'
+        : 'Cancellation reason (optional):';
+    
+    const reason = prompt(reasonMsg) || 'No reason provided';
+    
+    try {
+        const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
+            },
+            body: JSON.stringify({
+                action: 'cancel',
+                bookingData: {
+                    bookingId: bookingId,
+                    reason: reason
+                }
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+            throw new Error(result.error || 'Cancellation failed');
+        }
+        
+        alert(lang === 'ja' ? 'キャンセルしました。' + (result.refund || '') : 'Booking cancelled. ' + (result.refund || ''));
+        
+        // Refresh bookings
+        await fetchBookingEligibility(bookingState.studentId, lang);
+        await fetchUserBookings(bookingState.userId, lang);
+        renderCalendar(lang);
+        
+    } catch (err) {
+        console.error('Cancellation error:', err);
+        alert(lang === 'ja' ? `キャンセルエラー: ${err.message}` : `Cancellation error: ${err.message}`);
+    }
+}
+
+// =============================================
+// SETUP EVENT LISTENERS
+// =============================================
+
+function setupBookingEventListeners(lang) {
+    // Calendar navigation
+    document.getElementById(`${lang}-calendar-prev`).addEventListener('click', () => {
+        bookingState.currentMonth.setMonth(bookingState.currentMonth.getMonth() - 1);
+        renderCalendar(lang);
+    });
+    
+    document.getElementById(`${lang}-calendar-next`).addEventListener('click', () => {
+        bookingState.currentMonth.setMonth(bookingState.currentMonth.getMonth() + 1);
+        renderCalendar(lang);
+    });
+    
+    // Lesson type selector
+    document.getElementById(`${lang}-lesson-type`).addEventListener('change', (e) => {
+        bookingState.selectedLessonType = e.target.value;
+        if (bookingState.selectedTime) {
+            updateBookingSummary(lang);
+        }
+    });
+    
+    // Book button
+    document.getElementById(`${lang}-book-btn`).addEventListener('click', () => bookLesson(lang));
+}
+
+// Make functions globally accessible
+window.selectTimeSlot = selectTimeSlot;
+window.cancelBooking = cancelBooking;
         console.log('🎉 Phase 1 Dashboard Ready!');
     </script>
 </body>
