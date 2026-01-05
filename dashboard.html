@@ -163,6 +163,7 @@
       color: var(--color-text);
       transition: all var(--transition-speed) ease;
       text-align: center;
+      cursor: pointer;
     }
     .quick-action-btn:hover {
       transform: translateY(-3px);
@@ -791,19 +792,115 @@
         color: var(--color-text-light);
       }
     }
+    
     /* =============================================
-   BOOKING WIDGET STYLES
-   Add this to the <style> section of dashboard.html
+   BOOKING MODAL STYLES
    ============================================= */
 
-/* Booking Widget Card */
-.booking-widget {
+/* Modal Overlay */
+.booking-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9998;
+  animation: fadeIn 0.2s ease;
+}
+
+.booking-modal-overlay.show {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal Container */
+.booking-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
   background: var(--color-card-bg);
-  border: 2px solid var(--color-primary);
   border-radius: var(--border-radius);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+.booking-modal.show {
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Modal Header */
+.booking-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 128, 128, 0.1);
+  border-bottom: 2px solid var(--color-border);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+}
+
+.booking-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.booking-modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+.booking-modal-close:hover {
+  transform: scale(1.2);
+}
+
+/* Modal Body */
+.booking-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Booking Widget Styles (Compact for Modal) */
+.booking-widget {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
 }
 
 .booking-header {
@@ -818,13 +915,16 @@
 .booking-header h2 {
   margin: 0;
   color: var(--color-primary);
-  font-size: 1.5rem;
+  font-size: 1.2rem;
+  display: none; /* Hide since we have modal title */
 }
 
 .booking-credits {
   display: flex;
   gap: 1.5rem;
   align-items: center;
+  width: 100%;
+  justify-content: center;
 }
 
 .credit-badge {
@@ -869,7 +969,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 
 /* Calendar (Left Side) */
@@ -989,11 +1089,11 @@
 }
 
 .selected-date-display {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: 1rem;
-  padding: 1rem;
+  padding: 0.75rem;
   background: var(--color-bg);
   border-radius: 8px;
   text-align: center;
@@ -1014,15 +1114,15 @@
 .time-slots {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .time-period {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .time-period h4 {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-text-light);
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
@@ -1031,12 +1131,12 @@
 
 .time-slots-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   gap: 0.5rem;
 }
 
 .time-slot {
-  padding: 0.75rem;
+  padding: 0.6rem;
   border: 2px solid var(--color-border);
   border-radius: 8px;
   text-align: center;
@@ -1044,6 +1144,7 @@
   transition: all 0.2s;
   background: white;
   font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .time-slot:hover {
@@ -1080,7 +1181,7 @@
 
 /* Booking Actions */
 .booking-actions {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--color-border);
   display: flex;
@@ -1097,6 +1198,7 @@
 .lesson-type-selector label {
   font-weight: 600;
   color: var(--color-text);
+  font-size: 0.9rem;
 }
 
 .lesson-type-selector select {
@@ -1271,6 +1373,11 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .booking-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
   .calendar-container {
     grid-template-columns: 1fr;
   }
@@ -1288,6 +1395,10 @@
 
 /* Dark Mode */
 @media (prefers-color-scheme: dark) {
+  .booking-modal {
+    background: var(--color-card-bg);
+  }
+  
   .time-slot {
     background: var(--color-card-bg);
   }
@@ -1324,6 +1435,23 @@
     </header>
 
     <main>
+        <!-- BOOKING MODAL OVERLAY -->
+        <div class="booking-modal-overlay" id="booking-modal-overlay" onclick="closeBookingModal()"></div>
+        
+        <!-- BOOKING MODAL -->
+        <div class="booking-modal" id="booking-modal">
+            <div class="booking-modal-header">
+                <h2><i class="fas fa-calendar-alt"></i> <span id="modal-title">レッスン予約</span></h2>
+                <button class="booking-modal-close" onclick="closeBookingModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="booking-modal-body">
+                <!-- Booking widget content will be inserted here -->
+                <div id="modal-booking-content"></div>
+            </div>
+        </div>
+
         <!-- JAPANESE VERSION -->
         <section id="ja-dashboard" class="lang-section" lang="ja">
             <div class="container legal-page-container">
@@ -1366,80 +1494,8 @@
                             </div>
                         </div>
                     </div>
-                  <!-- BOOKING WIDGET - JAPANESE -->
-<div class="booking-widget" id="ja-booking-widget">
-    <!-- Header with Credits -->
-    <div class="booking-header">
-        <h2><i class="fas fa-calendar-alt"></i> レッスン予約</h2>
-        <div class="booking-credits">
-            <div class="credit-badge">
-                <i class="fas fa-ticket-alt"></i>
-                <span>利用可能: <span class="credit-number" id="ja-credits-count">0</span></span>
-            </div>
-            <div class="consultation-badge" id="ja-consultation-badge" style="display: none;">
-                <i class="fas fa-gift"></i>
-                <span>無料相談</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Calendar and Time Slots -->
-    <div class="calendar-container">
-        <!-- Left: Calendar -->
-        <div class="calendar-picker">
-            <div class="calendar-month-nav">
-                <button class="calendar-nav-btn" id="ja-calendar-prev">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <h3 id="ja-calendar-month">2026年 1月</h3>
-                <button class="calendar-nav-btn" id="ja-calendar-next">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-            <div class="calendar-grid" id="ja-calendar-grid">
-                <!-- Calendar will be populated by JavaScript -->
-            </div>
-        </div>
-        
-        <!-- Right: Time Slots -->
-        <div class="time-slots-container">
-            <div class="selected-date-display" id="ja-selected-date">
-                日付を選択してください
-            </div>
-            <div id="ja-time-slots">
-                <!-- Time slots will be populated after date selection -->
-            </div>
-        </div>
-    </div>
-    
-    <!-- Booking Actions -->
-    <div class="booking-actions">
-        <div class="lesson-type-selector">
-            <label for="ja-lesson-type">レッスンタイプ:</label>
-            <select id="ja-lesson-type">
-                <option value="standard">50分 スタンダードレッスン</option>
-                <option value="consultation">20分 無料相談（初回のみ）</option>
-            </select>
-        </div>
-        
-        <div class="booking-summary" id="ja-booking-summary">
-            <!-- Summary will be populated after time selection -->
-        </div>
-        
-        <button class="book-lesson-btn" id="ja-book-btn" disabled>
-            <i class="fas fa-calendar-check"></i> レッスンを予約
-        </button>
-    </div>
-    
-    <!-- My Bookings -->
-    <div class="my-bookings">
-        <h3><i class="fas fa-list"></i> 予約済みレッスン</h3>
-        <div class="bookings-list" id="ja-bookings-list">
-            <!-- Bookings will be populated by JavaScript -->
-        </div>
-    </div>
-</div>
-                    <!-- Practice Status Card (UPDATED - no manual button) -->
+
+                    <!-- Practice Status Card -->
                     <div class="practice-status-card" id="ja-practice-status">
                         <div class="practice-status-icon">⏳</div>
                         <h2>今日の練習状況を確認中...</h2>
@@ -1452,10 +1508,10 @@
                             <i class="fab fa-line"></i>
                             <span>LINEで練習</span>
                         </a>
-                        <a href="https://calendly.com/prokaiwa-english/" target="_blank" class="quick-action-btn" id="ja-book-lesson-btn">
+                        <button class="quick-action-btn" id="ja-book-lesson-btn" onclick="openBookingModal('ja')">
                             <i class="fas fa-video"></i>
                             <span>レッスン予約</span>
-                        </a>
+                        </button>
                         <a href="#ja-resources" class="quick-action-btn">
                             <i class="fas fa-book"></i>
                             <span>学習教材</span>
@@ -1469,7 +1525,7 @@
                     <!-- Dashboard Grid -->
                     <div class="dashboard-grid">
                         
-                        <!-- Skills Assessment Card (NEW!) -->
+                        <!-- Skills Assessment Card -->
                         <div class="dashboard-card card-skills">
                             <h3><i class="fas fa-chart-radar"></i>スキル評価</h3>
                             <div id="ja-skills-assessment">
@@ -1537,7 +1593,7 @@
                             </div>
                         </div>
 
-                        <!-- Account Info (6th - LEFT in row 3) -->
+                        <!-- Account Info -->
                         <div class="dashboard-card card-account">
                             <h3><i class="fas fa-user-circle"></i>アカウント情報</h3>
                             <div id="ja-plan-badges">
@@ -1555,19 +1611,19 @@
                             </div>
                         </div>
 
-                        <!-- Upcoming Lessons (7th - MIDDLE in row 3) -->
+                        <!-- Upcoming Lessons -->
                         <div class="dashboard-card card-lessons" id="ja-upcoming-lessons-card" style="display: none;">
                             <h3><i class="fas fa-calendar-alt"></i>予約中のレッスン</h3>
                             <div id="ja-upcoming-lessons">
                                 <div class="no-lessons">
                                     <i class="fas fa-calendar-plus"></i>
                                     <p>予約中のレッスンはありません</p>
-                                    <a href="https://calendly.com/prokaiwa-english/" target="_blank" class="cta-button" style="margin-top: 1rem;">レッスンを予約する</a>
+                                    <button onclick="openBookingModal('ja')" class="cta-button" style="margin-top: 1rem;">レッスンを予約する</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Learning Resources (8th - RIGHT in row 3) -->
+                        <!-- Learning Resources -->
                         <div class="dashboard-card card-resources" id="ja-resources">
                             <h3><i class="fas fa-folder-open"></i>学習教材</h3>
                             <div class="resource-item">
@@ -1595,7 +1651,7 @@
                             </p>
                         </div>
 
-                        <!-- Upgrade Card (9th - spans all 3 columns) -->
+                        <!-- Upgrade Card -->
                         <div class="dashboard-card upgrade-card card-upgrade" id="ja-upgrade-card" style="display: none;">
                             <h3><i class="fas fa-star"></i>ビデオレッスンを追加</h3>
                             <p>講師と直接話して、さらに上達しませんか？</p>
@@ -1656,81 +1712,8 @@
                             </div>
                         </div>
                     </div>
-                  
-<!-- ENGLISH VERSION -->
-<div class="booking-widget" id="en-booking-widget">
-    <!-- Header with Credits -->
-    <div class="booking-header">
-        <h2><i class="fas fa-calendar-alt"></i> Book a Lesson</h2>
-        <div class="booking-credits">
-            <div class="credit-badge">
-                <i class="fas fa-ticket-alt"></i>
-                <span>Available: <span class="credit-number" id="en-credits-count">0</span></span>
-            </div>
-            <div class="consultation-badge" id="en-consultation-badge" style="display: none;">
-                <i class="fas fa-gift"></i>
-                <span>Free Consultation</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Calendar and Time Slots -->
-    <div class="calendar-container">
-        <!-- Left: Calendar -->
-        <div class="calendar-picker">
-            <div class="calendar-month-nav">
-                <button class="calendar-nav-btn" id="en-calendar-prev">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <h3 id="en-calendar-month">January 2026</h3>
-                <button class="calendar-nav-btn" id="en-calendar-next">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-            <div class="calendar-grid" id="en-calendar-grid">
-                <!-- Calendar will be populated by JavaScript -->
-            </div>
-        </div>
-        
-        <!-- Right: Time Slots -->
-        <div class="time-slots-container">
-            <div class="selected-date-display" id="en-selected-date">
-                Select a date
-            </div>
-            <div id="en-time-slots">
-                <!-- Time slots will be populated after date selection -->
-            </div>
-        </div>
-    </div>
-    
-    <!-- Booking Actions -->
-    <div class="booking-actions">
-        <div class="lesson-type-selector">
-            <label for="en-lesson-type">Lesson Type:</label>
-            <select id="en-lesson-type">
-                <option value="standard">50-min Standard Lesson</option>
-                <option value="consultation">20-min Free Consultation (First-time)</option>
-            </select>
-        </div>
-        
-        <div class="booking-summary" id="en-booking-summary">
-            <!-- Summary will be populated after time selection -->
-        </div>
-        
-        <button class="book-lesson-btn" id="en-book-btn" disabled>
-            <i class="fas fa-calendar-check"></i> Book Lesson
-        </button>
-    </div>
-    
-    <!-- My Bookings -->
-    <div class="my-bookings">
-        <h3><i class="fas fa-list"></i> My Upcoming Lessons</h3>
-        <div class="bookings-list" id="en-bookings-list">
-            <!-- Bookings will be populated by JavaScript -->
-        </div>
-    </div>
-</div>
-                    <!-- Practice Status Card (UPDATED - no manual button) -->
+
+                    <!-- Practice Status Card -->
                     <div class="practice-status-card" id="en-practice-status">
                         <div class="practice-status-icon">⏳</div>
                         <h2>Checking today's practice...</h2>
@@ -1743,10 +1726,10 @@
                             <i class="fab fa-line"></i>
                             <span>Practice on LINE</span>
                         </a>
-                        <a href="https://calendly.com/prokaiwa-english/" target="_blank" class="quick-action-btn" id="en-book-lesson-btn">
+                        <button class="quick-action-btn" id="en-book-lesson-btn" onclick="openBookingModal('en')">
                             <i class="fas fa-video"></i>
                             <span>Book Lesson</span>
-                        </a>
+                        </button>
                         <a href="#en-resources" class="quick-action-btn">
                             <i class="fas fa-book"></i>
                             <span>Resources</span>
@@ -1760,7 +1743,7 @@
                     <!-- Dashboard Grid -->
                     <div class="dashboard-grid">
                         
-                        <!-- Skills Assessment Card (NEW!) -->
+                        <!-- Skills Assessment Card -->
                         <div class="dashboard-card card-skills">
                             <h3><i class="fas fa-chart-radar"></i>Skills Assessment</h3>
                             <div id="en-skills-assessment">
@@ -1827,7 +1810,7 @@
                             </div>
                         </div>
 
-                        <!-- Account Info (6th - LEFT in row 3) -->
+                        <!-- Account Info -->
                         <div class="dashboard-card card-account">
                             <h3><i class="fas fa-user-circle"></i>Account Info</h3>
                             <div id="en-plan-badges">
@@ -1845,19 +1828,19 @@
                             </div>
                         </div>
 
-                        <!-- Upcoming Lessons (7th - MIDDLE in row 3) -->
+                        <!-- Upcoming Lessons -->
                         <div class="dashboard-card card-lessons" id="en-upcoming-lessons-card" style="display: none;">
                             <h3><i class="fas fa-calendar-alt"></i>Upcoming Lessons</h3>
                             <div id="en-upcoming-lessons">
                                 <div class="no-lessons">
                                     <i class="fas fa-calendar-plus"></i>
                                     <p>No upcoming lessons scheduled</p>
-                                    <a href="https://calendly.com/prokaiwa-english/" target="_blank" class="cta-button" style="margin-top: 1rem;">Book a Lesson</a>
+                                    <button onclick="openBookingModal('en')" class="cta-button" style="margin-top: 1rem;">Book a Lesson</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Learning Resources (8th - RIGHT in row 3) -->
+                        <!-- Learning Resources -->
                         <div class="dashboard-card card-resources" id="en-resources">
                             <h3><i class="fas fa-folder-open"></i>Learning Resources</h3>
                             <div class="resource-item">
@@ -1885,7 +1868,7 @@
                             </p>
                         </div>
 
-                        <!-- Upgrade Card (9th - spans all 3 columns) -->
+                        <!-- Upgrade Card -->
                         <div class="dashboard-card upgrade-card card-upgrade" id="en-upgrade-card" style="display: none;">
                             <h3><i class="fas fa-star"></i>Add Video Lessons</h3>
                             <p>Want to practice speaking with a teacher directly?</p>
@@ -1973,10 +1956,8 @@
             { phrase: '"Let me think about it."', example_en: 'Let me think about it and get back to you.', example_ja: '考えて後で連絡しますね。' },
         ];
 
-        // Learning Archetype definitions - personalizes based on skill pattern
-        // Learning Archetype definitions - ORDERED BY SPECIFICITY (most specific first!)
+        // Learning Archetype definitions
         const learningArchetypes = [
-            // 1. MOST SPECIFIC: Perfect Master (all 10s)
             {
                 code: 'perfect_master',
                 icon: '💎',
@@ -1989,7 +1970,6 @@
                            skills.vocabulary === 10 && skills.pronunciation === 10;
                 }
             },
-            // 2. ADVANCED: 3+ skills at 7+
             {
                 code: 'advanced_achiever',
                 icon: '🏆',
@@ -2003,7 +1983,6 @@
                     return advancedCount >= 3;
                 }
             },
-            // 3-5. SPECIALIZED STYLES
             {
                 code: 'natural_speaker',
                 icon: '🗣️',
@@ -2041,7 +2020,6 @@
                     return skills.comprehension >= 7 && skills.comprehension >= Math.max(skills.fluency, skills.grammar, skills.vocabulary, skills.pronunciation) + 1;
                 }
             },
-            // 6. INTERMEDIATE: All skills 4-7
             {
                 code: 'rising_star',
                 icon: '⭐',
@@ -2054,7 +2032,6 @@
                     return values.every(v => v >= 4 && v <= 7);
                 }
             },
-            // 7. BEGINNER: 3+ skills at beginner level
             {
                 code: 'foundation_builder',
                 icon: '🏗️',
@@ -2068,7 +2045,6 @@
                     return beginnerCount >= 3;
                 }
             },
-            // 8. FALLBACK: Balanced (all within 2 points)
             {
                 code: 'balanced_learner',
                 icon: '🎯',
@@ -2085,9 +2061,8 @@
             }
         ];
 
-        // Achievement definitions - Optimized progression from beginner to master
+        // Achievement definitions
         const achievements = [
-            // ROW 1: BEGINNER ACHIEVEMENTS (Everyone can get these early!)
             { 
                 code: 'first_session', 
                 icon: 'fa-play', 
@@ -2108,22 +2083,19 @@
                 name_ja: '週末戦士', 
                 name_en: 'Weekend Warrior', 
                 condition: (stats) => {
-                    // Check if they practiced on both Saturday AND Sunday
                     const dates = stats.practiceDates || [];
                     let hasSaturday = false;
                     let hasSunday = false;
                     
                     for (const dateStr of dates) {
                         const day = new Date(dateStr).getDay();
-                        if (day === 6) hasSaturday = true;  // Saturday
-                        if (day === 0) hasSunday = true;    // Sunday
+                        if (day === 6) hasSaturday = true;
+                        if (day === 0) hasSunday = true;
                         if (hasSaturday && hasSunday) return true;
                     }
                     return false;
                 }
             },
-            
-            // ROW 2: INTERMEDIATE ACHIEVEMENTS (Building consistency!)
             { 
                 code: 'streak_7', 
                 icon: 'fa-calendar-check', 
@@ -2144,20 +2116,17 @@
                 name_ja: '継続王', 
                 name_en: 'Consistency Champion', 
                 condition: (stats) => {
-                    // Check if they ever had 20+ practice days in a single month
                     const dates = stats.practiceDates || [];
                     const monthCounts = {};
                     
                     for (const dateStr of dates) {
-                        const yearMonth = dateStr.substring(0, 7); // "2025-01"
+                        const yearMonth = dateStr.substring(0, 7);
                         monthCounts[yearMonth] = (monthCounts[yearMonth] || 0) + 1;
                     }
                     
                     return Object.values(monthCounts).some(count => count >= 20);
                 }
             },
-            
-            // ROW 3: ADVANCED ACHIEVEMENTS (Master level!)
             { 
                 code: 'streak_30', 
                 icon: 'fa-medal', 
@@ -2186,11 +2155,9 @@
         // =============================================
         
         function getCurrentLang() {
-            // Check localStorage first
             const stored = localStorage.getItem('prokaiwa-lang');
             if (stored) return stored;
             
-            // Auto-detect from browser language (like index.html)
             const browserLang = navigator.language || navigator.userLanguage;
             return browserLang.startsWith('ja') ? 'ja' : 'en';
         }
@@ -2244,20 +2211,18 @@
         
         function getLearningArchetype(skillsData) {
             console.log('🎯 Determining learning archetype for:', skillsData);
-            // Check archetypes in priority order (most specific first)
             for (const archetype of learningArchetypes) {
                 if (archetype.condition(skillsData)) {
                     console.log('✅ Matched archetype:', archetype.code);
                     return archetype;
                 }
             }
-            // Fallback to balanced learner (last in array) if no match
             console.log('⚠️ No match, using fallback: balanced_learner');
             return learningArchetypes[learningArchetypes.length - 1];
         }
 
         // =============================================
-        // PHASE 1: PENTAGON RADAR CHART
+        // PENTAGON RADAR CHART
         // =============================================
         
         function renderSkillsChart(containerId, assessment, lang) {
@@ -2276,7 +2241,6 @@
                 return;
             }
             
-            // Check if all skills are at 10 (peak performance) = Teal Glow
             const allPerfect = assessment.fluency === 10 && 
                                 assessment.grammar === 10 && 
                                 assessment.comprehension === 10 && 
@@ -2293,13 +2257,12 @@
             
             console.log('Rendering skills chart:', skillsData, 'All perfect:', allPerfect);
             
-            // FIXED COLORS PER SKILL (not based on score!)
             const skillColors = {
-                fluency: '#4A90E2',      // Blue - Flow like water
-                grammar: '#9B59B6',      // Purple - Structure and precision
-                comprehension: '#E67E22', // Orange - Understanding/light bulb moments
-                vocabulary: '#27AE60',   // Green - Growth and variety
-                pronunciation: '#E74C3C' // Red - Speaking/vocal power
+                fluency: '#4A90E2',
+                grammar: '#9B59B6',
+                comprehension: '#E67E22',
+                vocabulary: '#27AE60',
+                pronunciation: '#E74C3C'
             };
             
             const skillLabels = lang === 'ja'
@@ -2314,7 +2277,6 @@
                 skillsData.pronunciation
             ];
             
-            // Point colors - fixed per skill
             const pointColors = [
                 skillColors.fluency,
                 skillColors.grammar,
@@ -2323,14 +2285,11 @@
                 skillColors.pronunciation
             ];
             
-            // If all perfect, add teal glow effect
             const borderColor = allPerfect ? '#008080' : 'rgba(74, 144, 226, 0.6)';
             const backgroundColor = allPerfect ? 'rgba(0, 128, 128, 0.3)' : 'rgba(74, 144, 226, 0.1)';
             
-            // Determine learning archetype
             const archetype = getLearningArchetype(skillsData);
             
-            // Create canvas - NO LABELS to make chart bigger!
             container.innerHTML = `
                 <div class="skills-chart-container">
                     <canvas id="${containerId}-canvas"></canvas>
@@ -2397,7 +2356,7 @@
                                 color: '#666'
                             },
                             pointLabels: {
-                                display: false  // HIDE LABELS - makes pentagon MUCH bigger!
+                                display: false
                             },
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.1)',
@@ -2440,7 +2399,7 @@
         }
 
         // =============================================
-        // PHASE 1: AUTO-DETECT TODAY'S PRACTICE
+        // AUTO-DETECT TODAY'S PRACTICE
         // =============================================
 
         async function checkTodaysPractice(userId, lang) {
@@ -2471,7 +2430,6 @@
                 const practicedToday = !!todayResponse;
                 console.log(`[${lang}] Practiced today:`, practicedToday);
                 
-                // Update status card with LINE logo
                 if (practicedToday) {
                     statusCard.classList.add('completed');
                     statusCard.innerHTML = `
@@ -2497,7 +2455,7 @@
         }
 
         // =============================================
-        // PHASE 1: REAL PROGRESS FROM DATABASE
+        // REAL PROGRESS FROM DATABASE
         // =============================================
 
         async function loadRealProgress(userId, lang) {
@@ -2505,7 +2463,6 @@
             console.log('User ID:', userId);
             
             try {
-                // Get student_progress data
                 console.log('Fetching student_progress...');
                 const { data: progress, error } = await supabase
                     .from('student_progress')
@@ -2520,7 +2477,6 @@
                     return null;
                 }
                 
-                // Get dates when student actually responded
                 console.log('Fetching message_log...');
                 const { data: messages, error: msgError } = await supabase
                     .from('message_log')
@@ -2539,7 +2495,6 @@
                     console.error('❌ Error loading messages:', msgError);
                 }
                 
-                // Extract unique dates
                 const practiceDates = messages 
                     ? [...new Set(messages.map(m => m.created_at.split('T')[0]))]
                     : [];
@@ -2547,7 +2502,6 @@
                 console.log('Practice dates extracted:', practiceDates.length, 'unique dates');
                 console.log('Sample dates:', practiceDates.slice(0, 5));
                 
-                // Calculate month-to-date
                 const monthStart = getMonthStart();
                 console.log('Month start:', monthStart);
                 
@@ -2556,7 +2510,6 @@
                 
                 console.log('This month count:', thisMonthCount, 'days');
                 
-                // Calculate streak
                 const streakData = calculateStreak(practiceDates);
                 console.log('Streak calculated:', streakData);
                 
@@ -2582,7 +2535,7 @@
         }
 
         // =============================================
-        // PHASE 1: LOAD LATEST ASSESSMENT
+        // LOAD LATEST ASSESSMENT
         // =============================================
 
         async function loadLatestAssessment(userId) {
@@ -2625,7 +2578,7 @@
         }
 
         // =============================================
-        // STREAK CALCULATION FROM MESSAGE_LOG
+        // STREAK CALCULATION
         // =============================================
         
         function calculateStreak(practiceDates) {
@@ -2691,15 +2644,13 @@
             const container = document.getElementById(containerId);
             const calendarId = `${containerId}-calendar-grid`;
             
-            // Create structure - FULL MONTH ALWAYS VISIBLE
             container.innerHTML = `<div id="${calendarId}" class="streak-calendar"></div>`;
             
             const calendarGrid = document.getElementById(calendarId);
             
-            // Day headers - STARTS ON SUNDAY (Japan/US standard)
             const days = lang === 'ja' 
-                ? ['日', '月', '火', '水', '木', '金', '土']  // Sunday first!
-                : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];      // Sunday first!
+                ? ['日', '月', '火', '水', '木', '金', '土']
+                : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
             
             days.forEach(day => {
                 const header = document.createElement('div');
@@ -2713,7 +2664,6 @@
             const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
             const today = now.getDate();
             
-            // Sunday = 0, so no adjustment needed! (was previously +6 to make Monday first)
             const startDay = firstDay.getDay();
             for (let i = 0; i < startDay; i++) {
                 const empty = document.createElement('div');
@@ -2722,7 +2672,6 @@
                 calendarGrid.appendChild(empty);
             }
             
-            // Sort practice dates for streak calculation
             const sortedDates = [...practiceDates].sort();
             
             for (let d = 1; d <= lastDay.getDate(); d++) {
@@ -2732,11 +2681,9 @@
                 day.textContent = d;
                 
                 if (practiceDates.includes(dateStr)) {
-                    // Calculate streak length up to this day
                     let streakLength = 1;
                     const currentDate = new Date(dateStr);
                     
-                    // Count backward to find streak length
                     for (let i = 1; i <= 30; i++) {
                         const prevDate = new Date(currentDate);
                         prevDate.setDate(prevDate.getDate() - i);
@@ -2745,17 +2692,16 @@
                         if (sortedDates.includes(prevDateStr)) {
                             streakLength++;
                         } else {
-                            break; // Streak broken
+                            break;
                         }
                     }
                     
-                    // Add class based on streak length
                     if (streakLength >= 7) {
-                        day.classList.add('streak-fire'); // Red/fire for 7+ days
+                        day.classList.add('streak-fire');
                     } else if (streakLength >= 3) {
-                        day.classList.add('streak-hot'); // Orange for 3-6 days
+                        day.classList.add('streak-hot');
                     } else {
-                        day.classList.add('active'); // Teal for 1-2 days
+                        day.classList.add('active');
                     }
                 }
                 if (d === today) {
@@ -2768,7 +2714,6 @@
                 calendarGrid.appendChild(day);
             }
         }
-        
 
         function renderAchievements(containerId, stats, lang) {
             const container = document.getElementById(containerId);
@@ -2825,7 +2770,7 @@
         }
 
         // =============================================
-        // MAIN DASHBOARD LOADER WITH PHASE 1
+        // MAIN DASHBOARD LOADER
         // =============================================
         
         async function loadDashboard() {
@@ -2872,14 +2817,9 @@
                     return;
                 }
 
-                // =============================================
-                // PHASE 1: LOAD REAL PROGRESS & ASSESSMENT
-                // =============================================
-                
                 const realProgress = await loadRealProgress(user.id, lang);
                 const assessment = await loadLatestAssessment(user.id);
                 
-                // Check today's practice status
                 await checkTodaysPractice(user.id, 'ja');
                 await checkTodaysPractice(user.id, 'en');
                 
@@ -2888,7 +2828,7 @@
                     maxStreak: 0,
                     total: 0,
                     thisMonth: 0,
-                    practiceDates: []  // Added for achievement conditions
+                    practiceDates: []
                 };
                 
                 let practiceDates = [];
@@ -2899,31 +2839,26 @@
                         maxStreak: realProgress.maxStreak,
                         total: realProgress.practiceDates.length,
                         thisMonth: realProgress.thisMonthCount,
-                        practiceDates: realProgress.practiceDates  // Added for achievement conditions
+                        practiceDates: realProgress.practiceDates
                     };
                     practiceDates = realProgress.practiceDates;
                 }
                 
                 const progressPercent = Math.min((stats.thisMonth / MONTHLY_GOAL) * 100, 100);
 
-                // Check for video access
                 const hasVideoAddon = profile.addons?.includes('B45') || profile.addons?.includes('B60') || false;
                 const hasVideoAccess = profile.plan !== 'A' || hasVideoAddon;
 
-                // Update both language versions
                 ['ja', 'en'].forEach(l => {
-                    // Welcome message
                     const welcomeText = l === 'ja' 
                         ? `${profile.given_name_romaji || profile.name}さん、おかえりなさい！`
                         : `Welcome back, ${profile.given_name_romaji || profile.name}!`;
                     document.getElementById(`${l}-welcome-name`).textContent = welcomeText;
 
-                    // Stats with REAL data
                     document.getElementById(`${l}-stat-streak`).textContent = stats.current;
                     document.getElementById(`${l}-stat-total`).textContent = stats.total;
                     document.getElementById(`${l}-stat-month`).textContent = stats.thisMonth;
 
-                    // Profile info
                     document.getElementById(`${l}-profile-name`).textContent = profile.name;
                     document.getElementById(`${l}-profile-email`).textContent = profile.email;
                     document.getElementById(`${l}-profile-level`).textContent = levelNames[l][profile.level] || profile.level;
@@ -2933,7 +2868,6 @@
                         ? statusNames[l].paid 
                         : statusNames[l].pending;
 
-                    // Plan badge
                     const planBadge = document.getElementById(`${l}-plan-badge`);
                     planBadge.textContent = planNames[l][profile.plan] || profile.plan;
                     if (!isPaid) planBadge.classList.add('pending');
@@ -2944,7 +2878,6 @@
                         badgeContainer.innerHTML += `<span class="addon-badge">+ ${l === 'ja' ? 'ビデオ' : 'Video'}</span>`;
                     }
 
-                    // Show/hide elements based on plan
                     const bookLessonBtn = document.getElementById(`${l}-book-lesson-btn`);
                     const upcomingCard = document.getElementById(`${l}-upcoming-lessons-card`);
                     const upgradeCard = document.getElementById(`${l}-upgrade-card`);
@@ -2958,41 +2891,32 @@
                         upgradeCard.style.display = 'block';
                     }
 
-                    // Progress with REAL data
                     document.getElementById(`${l}-sessions-completed`).textContent = stats.thisMonth;
                     document.getElementById(`${l}-sessions-total`).textContent = MONTHLY_GOAL;
                     updateProgressRing(l, progressPercent);
 
-                    // Streak with REAL data
                     document.getElementById(`${l}-streak-count`).textContent = stats.current;
                     document.getElementById(`${l}-streak-emoji`).textContent = stats.current >= 7 ? '🔥' : stats.current >= 3 ? '🔥' : '💪';
                     renderStreakCalendar(`${l}-streak-calendar`, practiceDates, l);
 
-                    // Achievements
                     renderAchievements(`${l}-achievements`, stats, l);
 
-                    // Daily phrase
                     setDailyPhrase(l);
                     
-                    // PHASE 1: Render skills assessment
                     renderSkillsChart(`${l}-skills-assessment`, assessment, l);
                 });
 
-                // Hide loading, show content
                 loadingDiv.style.display = 'none';
                 contentDiv.style.display = 'block';
 
-                // Prepare other language version
                 const otherLang = lang === 'ja' ? 'en' : 'ja';
                 document.getElementById(`${otherLang}-dashboard-loading`).style.display = 'none';
                 document.getElementById(`${otherLang}-dashboard-content`).style.display = 'block';
                 
-                // INITIALIZE BOOKING WIDGET
-                await initializeBookingWidget(profile.id, user.id, 'ja');
-                await initializeBookingWidget(profile.id, user.id, 'en');
+                // Initialize booking widget
+                await initializeBookingWidget(profile.id, user.id);
                 
                 console.log('✅ Dashboard loaded with Phase 1 features!');
-                
                 
             } catch (error) {
                 console.error('Dashboard load error:', error);
@@ -3009,13 +2933,11 @@
         function setLanguage(lang) {
             localStorage.setItem('prokaiwa-lang', lang);
             
-            // Update sections
             document.querySelectorAll('.lang-section').forEach(section => {
                 section.classList.remove('show');
             });
             document.getElementById(`${lang}-dashboard`).classList.add('show');
             
-            // Update nav buttons
             document.querySelectorAll('.nav-lang-toggle button').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.dataset.lang === lang) {
@@ -3024,14 +2946,12 @@
             });
         }
         
-        // Set up language toggle buttons
         document.querySelectorAll('.nav-lang-toggle button').forEach(button => {
             button.addEventListener('click', () => {
                 setLanguage(button.dataset.lang);
             });
         });
         
-        // Initialize language on page load
         const initialLang = getCurrentLang();
         setLanguage(initialLang);
 
@@ -3062,13 +2982,10 @@
             }
         });
 
-        // Initialize dashboard
         loadDashboard();
         
-        // Set copyright year
         document.getElementById('year').textContent = new Date().getFullYear();
         
-        // Burger menu toggle
         const burgerMenu = document.querySelector('.burger-menu');
         const mainNav = document.querySelector('.main-nav');
         if (burgerMenu && mainNav) {
@@ -3076,657 +2993,688 @@
                 mainNav.classList.toggle('open');
             });
         }
-        /* =============================================
-   BOOKING WIDGET JAVASCRIPT
-   Add this to the <script> section of dashboard.html
-   ============================================= */
 
-// =============================================
-// BOOKING WIDGET STATE
-// =============================================
+        // =============================================
+        // BOOKING WIDGET - MODAL VERSION
+        // =============================================
 
-let bookingState = {
-    selectedDate: null,
-    selectedTime: null,
-    selectedLessonType: 'standard',
-    availableSlots: [],
-    userBookings: [],
-    availableCredits: 0,
-    eligibleForConsultation: false,
-    currentMonth: new Date(),
-    studentId: null,
-    userId: null
-};
+        let bookingState = {
+            selectedDate: null,
+            selectedTime: null,
+            selectedLessonType: 'standard',
+            availableSlots: [],
+            userBookings: [],
+            availableCredits: 0,
+            eligibleForConsultation: false,
+            currentMonth: new Date(),
+            studentId: null,
+            userId: null,
+            currentLang: 'ja'
+        };
 
-// =============================================
-// INITIALIZE BOOKING WIDGET
-// =============================================
+        // MODAL FUNCTIONS
+        window.openBookingModal = function(lang) {
+            console.log('📖 Opening booking modal for lang:', lang);
+            bookingState.currentLang = lang;
+            
+            // Update modal title
+            document.getElementById('modal-title').textContent = lang === 'ja' ? 'レッスン予約' : 'Book a Lesson';
+            
+            // Render booking widget content
+            const modalContent = document.getElementById('modal-booking-content');
+            modalContent.innerHTML = getBookingWidgetHTML(lang);
+            
+            // Show modal
+            document.getElementById('booking-modal-overlay').classList.add('show');
+            document.getElementById('booking-modal').classList.add('show');
+            
+            // Initialize widget
+            renderCalendar(lang);
+            setupBookingEventListeners(lang);
+        };
 
-async function initializeBookingWidget(studentId, userId, lang) {
-    console.log('🎯 Initializing booking widget...', { studentId, userId, lang });
-    
-    bookingState.studentId = studentId;
-    bookingState.userId = userId;
-    
-    // Fetch user's eligibility and credits
-    await fetchBookingEligibility(studentId, lang);
-    
-    // Fetch user's existing bookings
-    await fetchUserBookings(userId, lang);
-    
-    // Render calendar for current month
-    renderCalendar(lang);
-    
-    // Set up event listeners
-    setupBookingEventListeners(lang);
-    
-    console.log('✅ Booking widget initialized');
-}
+        window.closeBookingModal = function() {
+            console.log('📕 Closing booking modal');
+            document.getElementById('booking-modal-overlay').classList.remove('show');
+            document.getElementById('booking-modal').classList.remove('show');
+        };
 
-// =============================================
-// FETCH BOOKING ELIGIBILITY
-// =============================================
+        // Close modal on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeBookingModal();
+            }
+        });
 
-async function fetchBookingEligibility(studentId, lang) {
-    try {
-        const { data, error } = await supabase
-            .rpc('check_booking_eligibility', {
-                p_student_id: studentId,
-                p_lesson_type: 'standard'
+        function getBookingWidgetHTML(lang) {
+            return `
+                <div class="booking-widget">
+                    <div class="booking-header">
+                        <div class="booking-credits">
+                            <div class="credit-badge">
+                                <i class="fas fa-ticket-alt"></i>
+                                <span>${lang === 'ja' ? '利用可能' : 'Available'}: <span class="credit-number" id="${lang}-credits-count">0</span></span>
+                            </div>
+                            <div class="consultation-badge" id="${lang}-consultation-badge" style="display: none;">
+                                <i class="fas fa-gift"></i>
+                                <span>${lang === 'ja' ? '無料相談' : 'Free Consultation'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-container">
+                        <div class="calendar-picker">
+                            <div class="calendar-month-nav">
+                                <button class="calendar-nav-btn" id="${lang}-calendar-prev">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <h3 id="${lang}-calendar-month">2026年 1月</h3>
+                                <button class="calendar-nav-btn" id="${lang}-calendar-next">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div class="calendar-grid" id="${lang}-calendar-grid"></div>
+                        </div>
+                        
+                        <div class="time-slots-container">
+                            <div class="selected-date-display" id="${lang}-selected-date">
+                                ${lang === 'ja' ? '日付を選択してください' : 'Select a date'}
+                            </div>
+                            <div id="${lang}-time-slots"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="booking-actions">
+                        <div class="lesson-type-selector">
+                            <label for="${lang}-lesson-type">${lang === 'ja' ? 'レッスンタイプ:' : 'Lesson Type:'}</label>
+                            <select id="${lang}-lesson-type">
+                                <option value="standard">${lang === 'ja' ? '50分 スタンダードレッスン' : '50-min Standard Lesson'}</option>
+                                <option value="consultation">${lang === 'ja' ? '20分 無料相談（初回のみ）' : '20-min Free Consultation (First-time)'}</option>
+                            </select>
+                        </div>
+                        
+                        <div class="booking-summary" id="${lang}-booking-summary"></div>
+                        
+                        <button class="book-lesson-btn" id="${lang}-book-btn" disabled>
+                            <i class="fas fa-calendar-check"></i> ${lang === 'ja' ? 'レッスンを予約' : 'Book Lesson'}
+                        </button>
+                    </div>
+                    
+                    <div class="my-bookings">
+                        <h3><i class="fas fa-list"></i> ${lang === 'ja' ? '予約済みレッスン' : 'My Upcoming Lessons'}</h3>
+                        <div class="bookings-list" id="${lang}-bookings-list"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function initializeBookingWidget(studentId, userId) {
+            console.log('🎯 Initializing booking widget...', { studentId, userId });
+            
+            bookingState.studentId = studentId;
+            bookingState.userId = userId;
+            
+            await fetchBookingEligibility(studentId, 'ja');
+            await fetchBookingEligibility(studentId, 'en');
+            
+            await fetchUserBookings(userId, 'ja');
+            await fetchUserBookings(userId, 'en');
+            
+            console.log('✅ Booking widget initialized');
+        }
+
+        async function fetchBookingEligibility(studentId, lang) {
+            try {
+                const { data, error } = await supabase
+                    .rpc('check_booking_eligibility', {
+                        p_student_id: studentId,
+                        p_lesson_type: 'standard'
+                    });
+                
+                if (error) throw error;
+                
+                bookingState.availableCredits = data.availableCredits || 0;
+                bookingState.eligibleForConsultation = data.eligibleForConsultation || false;
+                
+                console.log('Credits:', bookingState.availableCredits);
+                console.log('Consultation eligible:', bookingState.eligibleForConsultation);
+                
+            } catch (err) {
+                console.error('Error fetching eligibility:', err);
+            }
+        }
+
+        async function fetchUserBookings(userId, lang) {
+            try {
+                const { data: bookings, error } = await supabase
+                    .from('lesson_bookings')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .eq('status', 'scheduled')
+                    .gte('scheduled_at', new Date().toISOString())
+                    .order('scheduled_at', { ascending: true });
+                
+                if (error) throw error;
+                
+                bookingState.userBookings = bookings || [];
+                
+                console.log('User bookings:', bookingState.userBookings.length);
+                
+            } catch (err) {
+                console.error('Error fetching bookings:', err);
+            }
+        }
+
+        function renderCalendar(lang) {
+            const month = bookingState.currentMonth;
+            const year = month.getFullYear();
+            const monthIndex = month.getMonth();
+            
+            const monthNames = lang === 'ja' 
+                ? ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+                : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            document.getElementById(`${lang}-calendar-month`).textContent = 
+                lang === 'ja' ? `${year}年 ${monthNames[monthIndex]}` : `${monthNames[monthIndex]} ${year}`;
+            
+            const calendarGrid = document.getElementById(`${lang}-calendar-grid`);
+            if (!calendarGrid) return;
+            
+            calendarGrid.innerHTML = '';
+            
+            const dayHeaders = lang === 'ja' 
+                ? ['日', '月', '火', '水', '木', '金', '土']
+                : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                calendarGrid.appendChild(header);
             });
-        
-        if (error) throw error;
-        
-        bookingState.availableCredits = data.availableCredits || 0;
-        bookingState.eligibleForConsultation = data.eligibleForConsultation || false;
-        
-        // Update UI
-        document.getElementById(`${lang}-credits-count`).textContent = bookingState.availableCredits;
-        
-        const consultBadge = document.getElementById(`${lang}-consultation-badge`);
-        if (bookingState.eligibleForConsultation) {
-            consultBadge.style.display = 'flex';
-        } else {
-            consultBadge.style.display = 'none';
-        }
-        
-        console.log('Credits:', bookingState.availableCredits);
-        console.log('Consultation eligible:', bookingState.eligibleForConsultation);
-        
-    } catch (err) {
-        console.error('Error fetching eligibility:', err);
-    }
-}
-
-// =============================================
-// FETCH USER'S BOOKINGS
-// =============================================
-
-async function fetchUserBookings(userId, lang) {
-    try {
-        const { data: bookings, error } = await supabase
-            .from('lesson_bookings')
-            .select('*')
-            .eq('user_id', userId)
-            .eq('status', 'scheduled')
-            .gte('scheduled_at', new Date().toISOString())
-            .order('scheduled_at', { ascending: true });
-        
-        if (error) throw error;
-        
-        bookingState.userBookings = bookings || [];
-        
-        // Render bookings list
-        renderUserBookings(lang);
-        
-        console.log('User bookings:', bookingState.userBookings.length);
-        
-    } catch (err) {
-        console.error('Error fetching bookings:', err);
-    }
-}
-
-// =============================================
-// RENDER CALENDAR
-// =============================================
-
-function renderCalendar(lang) {
-    const month = bookingState.currentMonth;
-    const year = month.getFullYear();
-    const monthIndex = month.getMonth();
-    
-    // Update month display
-    const monthNames = lang === 'ja' 
-        ? ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-        : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    
-    document.getElementById(`${lang}-calendar-month`).textContent = 
-        lang === 'ja' ? `${year}年 ${monthNames[monthIndex]}` : `${monthNames[monthIndex]} ${year}`;
-    
-    // Get calendar grid
-    const calendarGrid = document.getElementById(`${lang}-calendar-grid`);
-    calendarGrid.innerHTML = '';
-    
-    // Add day headers
-    const dayHeaders = lang === 'ja' 
-        ? ['日', '月', '火', '水', '木', '金', '土']
-        : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
-    dayHeaders.forEach(day => {
-        const header = document.createElement('div');
-        header.className = 'calendar-day-header';
-        header.textContent = day;
-        calendarGrid.appendChild(header);
-    });
-    
-    // Calculate first day of month and days in month
-    const firstDay = new Date(year, monthIndex, 1).getDay();
-    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-    const daysInPrevMonth = new Date(year, monthIndex, 0).getDate();
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    // Add previous month's trailing days
-    for (let i = firstDay - 1; i >= 0; i--) {
-        const day = document.createElement('div');
-        day.className = 'calendar-day other-month';
-        day.textContent = daysInPrevMonth - i;
-        calendarGrid.appendChild(day);
-    }
-    
-    // Add current month's days
-    for (let date = 1; date <= daysInMonth; date++) {
-        const dayDate = new Date(year, monthIndex, date);
-        dayDate.setHours(0, 0, 0, 0);
-        
-        const day = document.createElement('div');
-        day.className = 'calendar-day';
-        day.textContent = date;
-        day.dataset.date = dayDate.toISOString().split('T')[0];
-        
-        // Check if today
-        if (dayDate.getTime() === today.getTime()) {
-            day.classList.add('today');
-        }
-        
-        // Check if selected
-        if (bookingState.selectedDate && dayDate.toISOString().split('T')[0] === bookingState.selectedDate) {
-            day.classList.add('selected');
-        }
-        
-        // Check if past
-        if (dayDate < today) {
-            day.classList.add('disabled');
-        }
-        
-        // Check if weekend (Saturday=6, Sunday=0)
-        const dayOfWeek = dayDate.getDay();
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-            // Not Saturday or Sunday = disabled
-            day.classList.add('disabled');
-        }
-        
-        // Check if has booking
-        const hasBooking = bookingState.userBookings.some(booking => {
-            const bookingDate = new Date(booking.scheduled_at);
-            return bookingDate.toISOString().split('T')[0] === dayDate.toISOString().split('T')[0];
-        });
-        
-        if (hasBooking) {
-            day.classList.add('has-booking');
-        }
-        
-        // Add click listener
-        if (!day.classList.contains('disabled')) {
-            day.addEventListener('click', () => selectDate(dayDate.toISOString().split('T')[0], lang));
-        }
-        
-        calendarGrid.appendChild(day);
-    }
-    
-    // Add next month's leading days
-    const totalCells = calendarGrid.children.length - 7; // Subtract headers
-    const remainingCells = 42 - totalCells; // 6 weeks * 7 days
-    for (let date = 1; date <= remainingCells; date++) {
-        const day = document.createElement('div');
-        day.className = 'calendar-day other-month';
-        day.textContent = date;
-        calendarGrid.appendChild(day);
-    }
-    
-    // Enable/disable navigation buttons
-    const prevBtn = document.getElementById(`${lang}-calendar-prev`);
-    const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    
-    if (month.getTime() <= currentMonth.getTime()) {
-        prevBtn.disabled = true;
-    } else {
-        prevBtn.disabled = false;
-    }
-}
-
-// =============================================
-// SELECT DATE
-// =============================================
-
-async function selectDate(dateStr, lang) {
-    console.log('📅 Selected date:', dateStr);
-    
-    bookingState.selectedDate = dateStr;
-    bookingState.selectedTime = null;
-    
-    // Re-render calendar to show selection
-    renderCalendar(lang);
-    
-    // Update selected date display
-    const date = new Date(dateStr + 'T00:00:00');
-    const dateDisplay = lang === 'ja'
-        ? `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 (${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]})`
-        : date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    
-    document.getElementById(`${lang}-selected-date`).textContent = dateDisplay;
-    
-    // Fetch available slots for this date
-    await fetchAvailableSlots(dateStr, lang);
-}
-
-// =============================================
-// FETCH AVAILABLE SLOTS
-// =============================================
-
-async function fetchAvailableSlots(dateStr, lang) {
-    const slotsContainer = document.getElementById(`${lang}-time-slots`);
-    slotsContainer.innerHTML = '<div class="time-slots-loading"><i class="fas fa-spinner fa-spin"></i><p>読み込み中...</p></div>';
-    
-    try {
-        const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
-            },
-            body: JSON.stringify({
-                action: 'getAvailableSlots',
-                bookingData: {
-                    date: dateStr
+            
+            const firstDay = new Date(year, monthIndex, 1).getDay();
+            const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, monthIndex, 0).getDate();
+            
+            // TIMEZONE FIX: Get today in local timezone
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = daysInPrevMonth - i;
+                calendarGrid.appendChild(day);
+            }
+            
+            for (let date = 1; date <= daysInMonth; date++) {
+                const dayDate = new Date(year, monthIndex, date);
+                dayDate.setHours(0, 0, 0, 0);
+                
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = date;
+                
+                // TIMEZONE FIX: Store date as YYYY-MM-DD (no time component)
+                day.dataset.date = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                
+                if (dayDate.getTime() === today.getTime()) {
+                    day.classList.add('today');
                 }
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (!result.success) {
-            throw new Error(result.error || 'Failed to fetch slots');
+                
+                if (bookingState.selectedDate && day.dataset.date === bookingState.selectedDate) {
+                    day.classList.add('selected');
+                }
+                
+                if (dayDate < today) {
+                    day.classList.add('disabled');
+                }
+                
+                const dayOfWeek = dayDate.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    day.classList.add('disabled');
+                }
+                
+                const hasBooking = bookingState.userBookings.some(booking => {
+                    const bookingDate = new Date(booking.scheduled_at);
+                    return bookingDate.toISOString().split('T')[0] === day.dataset.date;
+                });
+                
+                if (hasBooking) {
+                    day.classList.add('has-booking');
+                }
+                
+                if (!day.classList.contains('disabled')) {
+                    day.addEventListener('click', () => selectDate(day.dataset.date, lang));
+                }
+                
+                calendarGrid.appendChild(day);
+            }
+            
+            const totalCells = calendarGrid.children.length - 7;
+            const remainingCells = 42 - totalCells;
+            for (let date = 1; date <= remainingCells; date++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = date;
+                calendarGrid.appendChild(day);
+            }
+            
+            const prevBtn = document.getElementById(`${lang}-calendar-prev`);
+            if (prevBtn) {
+                const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                prevBtn.disabled = month.getTime() <= currentMonth.getTime();
+            }
         }
-        
-        bookingState.availableSlots = result.slots || [];
-        
-        // Render time slots
-        renderTimeSlots(lang);
-        
-    } catch (err) {
-        console.error('Error fetching slots:', err);
-        slotsContainer.innerHTML = `
-            <div class="no-slots-message">
-                <i class="fas fa-exclamation-circle"></i>
-                <p>${lang === 'ja' ? 'スロットの読み込みに失敗しました' : 'Failed to load time slots'}</p>
-            </div>
-        `;
-    }
-}
 
-// =============================================
-// RENDER TIME SLOTS
-// =============================================
-
-function renderTimeSlots(lang) {
-    const slotsContainer = document.getElementById(`${lang}-time-slots`);
-    
-    if (bookingState.availableSlots.length === 0) {
-        slotsContainer.innerHTML = `
-            <div class="no-slots-message">
-                <i class="fas fa-calendar-times"></i>
-                <p>${lang === 'ja' ? 'この日は空き時間がありません' : 'No available slots for this date'}</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Group slots by period (morning, afternoon, evening)
-    const morning = bookingState.availableSlots.filter(s => {
-        const hour = parseInt(s.display.split(':')[0]);
-        return hour < 12;
-    });
-    
-    const afternoon = bookingState.availableSlots.filter(s => {
-        const hour = parseInt(s.display.split(':')[0]);
-        return hour >= 12 && hour < 18;
-    });
-    
-    const evening = bookingState.availableSlots.filter(s => {
-        const hour = parseInt(s.display.split(':')[0]);
-        return hour >= 18;
-    });
-    
-    let html = '<div class="time-slots">';
-    
-    if (morning.length > 0) {
-        html += `
-            <div class="time-period">
-                <h4>${lang === 'ja' ? '午前' : 'Morning'}</h4>
-                <div class="time-slots-grid">
-                    ${morning.map(slot => `
-                        <div class="time-slot" data-time="${slot.time}" onclick="selectTimeSlot('${slot.time}', '${lang}')">
-                            ${slot.display}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }
-    
-    if (afternoon.length > 0) {
-        html += `
-            <div class="time-period">
-                <h4>${lang === 'ja' ? '午後' : 'Afternoon'}</h4>
-                <div class="time-slots-grid">
-                    ${afternoon.map(slot => `
-                        <div class="time-slot" data-time="${slot.time}" onclick="selectTimeSlot('${slot.time}', '${lang}')">
-                            ${slot.display}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }
-    
-    if (evening.length > 0) {
-        html += `
-            <div class="time-period">
-                <h4>${lang === 'ja' ? '夜' : 'Evening'}</h4>
-                <div class="time-slots-grid">
-                    ${evening.map(slot => `
-                        <div class="time-slot" data-time="${slot.time}" onclick="selectTimeSlot('${slot.time}', '${lang}')">
-                            ${slot.display}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }
-    
-    html += '</div>';
-    slotsContainer.innerHTML = html;
-}
-
-// =============================================
-// SELECT TIME SLOT
-// =============================================
-
-function selectTimeSlot(timeStr, lang) {
-    console.log('⏰ Selected time:', timeStr);
-    
-    bookingState.selectedTime = timeStr;
-    
-    // Update UI
-    document.querySelectorAll(`#${lang}-time-slots .time-slot`).forEach(slot => {
-        slot.classList.remove('selected');
-    });
-    
-    document.querySelector(`#${lang}-time-slots .time-slot[data-time="${timeStr}"]`)?.classList.add('selected');
-    
-    // Update booking summary
-    updateBookingSummary(lang);
-    
-    // Enable book button
-    document.getElementById(`${lang}-book-btn`).disabled = false;
-}
-
-// =============================================
-// UPDATE BOOKING SUMMARY
-// =============================================
-
-function updateBookingSummary(lang) {
-    const lessonType = bookingState.selectedLessonType;
-    const summaryContainer = document.getElementById(`${lang}-booking-summary`);
-    
-    let duration, price, useCredit;
-    
-    if (lessonType === 'consultation') {
-        duration = 20;
-        price = 0;
-        useCredit = false;
-    } else {
-        duration = 50;
-        if (bookingState.availableCredits > 0) {
-            price = 0;
-            useCredit = true;
-        } else {
-            price = 4000;
-            useCredit = false;
+        async function selectDate(dateStr, lang) {
+            console.log('📅 Selected date:', dateStr);
+            
+            bookingState.selectedDate = dateStr;
+            bookingState.selectedTime = null;
+            
+            renderCalendar(lang);
+            
+            // TIMEZONE FIX: Parse date as local date
+            const [year, month, day] = dateStr.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+            
+            const dateDisplay = lang === 'ja'
+                ? `${year}年${month}月${day}日 (${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]})`
+                : date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            const displayElement = document.getElementById(`${lang}-selected-date`);
+            if (displayElement) {
+                displayElement.textContent = dateDisplay;
+            }
+            
+            await fetchAvailableSlots(dateStr, lang);
         }
-    }
-    
-    const dateTime = new Date(bookingState.selectedTime);
-    
-    const html = `
-        <div class="booking-summary-item">
-            <span class="booking-summary-label">${lang === 'ja' ? '日時' : 'Date & Time'}:</span>
-            <span class="booking-summary-value">${dateTime.toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US')}</span>
-        </div>
-        <div class="booking-summary-item">
-            <span class="booking-summary-label">${lang === 'ja' ? '時間' : 'Duration'}:</span>
-            <span class="booking-summary-value">${duration} ${lang === 'ja' ? '分' : 'minutes'}</span>
-        </div>
-        <div class="booking-summary-item">
-            <span class="booking-summary-label">${lang === 'ja' ? '料金' : 'Price'}:</span>
-            <span class="booking-summary-value ${price === 0 ? 'free' : 'paid'}">
-                ${price === 0 
-                    ? (lang === 'ja' ? '無料' : 'FREE') + (useCredit ? ` (${lang === 'ja' ? 'クレジット使用' : 'Using Credit'})` : '') 
-                    : `¥${price.toLocaleString()}`}
-            </span>
-        </div>
-    `;
-    
-    summaryContainer.innerHTML = html;
-}
 
-// =============================================
-// BOOK LESSON
-// =============================================
+        async function fetchAvailableSlots(dateStr, lang) {
+            const slotsContainer = document.getElementById(`${lang}-time-slots`);
+            if (!slotsContainer) return;
+            
+            slotsContainer.innerHTML = '<div class="time-slots-loading"><i class="fas fa-spinner fa-spin"></i><p>読み込み中...</p></div>';
+            
+            try {
+                console.log('🔍 Fetching available slots for:', dateStr);
+                
+                const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
+                    },
+                    body: JSON.stringify({
+                        action: 'getAvailableSlots',
+                        bookingData: {
+                            date: dateStr
+                        }
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('📥 Slots response:', result);
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to fetch slots');
+                }
+                
+                bookingState.availableSlots = result.slots || [];
+                
+                renderTimeSlots(lang);
+                
+            } catch (err) {
+                console.error('❌ Error fetching slots:', err);
+                slotsContainer.innerHTML = `
+                    <div class="no-slots-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>${lang === 'ja' ? 'スロットの読み込みに失敗しました' : 'Failed to load time slots'}</p>
+                        <p style="font-size: 0.85rem; color: var(--color-text-muted);">${err.message}</p>
+                    </div>
+                `;
+            }
+        }
 
-async function bookLesson(lang) {
-    const btn = document.getElementById(`${lang}-book-btn`);
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (lang === 'ja' ? '予約中...' : 'Booking...');
-    
-    try {
-        const lessonType = bookingState.selectedLessonType === 'consultation' ? 'first_time_free' : 'standard';
-        
-        const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
-            },
-            body: JSON.stringify({
-                action: 'create',
-                bookingData: {
+        function renderTimeSlots(lang) {
+            const slotsContainer = document.getElementById(`${lang}-time-slots`);
+            if (!slotsContainer) return;
+            
+            if (bookingState.availableSlots.length === 0) {
+                slotsContainer.innerHTML = `
+                    <div class="no-slots-message">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>${lang === 'ja' ? 'この日は空き時間がありません' : 'No available slots for this date'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const morning = bookingState.availableSlots.filter(s => {
+                const hour = parseInt(s.display.split(':')[0]);
+                return hour < 12;
+            });
+            
+            const afternoon = bookingState.availableSlots.filter(s => {
+                const hour = parseInt(s.display.split(':')[0]);
+                return hour >= 12 && hour < 18;
+            });
+            
+            const evening = bookingState.availableSlots.filter(s => {
+                const hour = parseInt(s.display.split(':')[0]);
+                return hour >= 18;
+            });
+            
+            let html = '<div class="time-slots">';
+            
+            if (morning.length > 0) {
+                html += `
+                    <div class="time-period">
+                        <h4>${lang === 'ja' ? '午前' : 'Morning'}</h4>
+                        <div class="time-slots-grid">
+                            ${morning.map(slot => `
+                                <div class="time-slot" data-time="${slot.time}" onclick="selectTimeSlot('${slot.time}', '${lang}')">
+                                    ${slot.display}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (afternoon.length > 0) {
+                html += `
+                    <div class="time-period">
+                        <h4>${lang === 'ja' ? '午後' : 'Afternoon'}</h4>
+                        <div class="time-slots-grid">
+                            ${afternoon.map(slot => `
+                                <div class="time-slot" data-time="${slot.time}" onclick="selectTimeSlot('${slot.time}', '${lang}')">
+                                    ${slot.display}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (evening.length > 0) {
+                html += `
+                    <div class="time-period">
+                        <h4>${lang === 'ja' ? '夜' : 'Evening'}</h4>
+                        <div class="time-slots-grid">
+                            ${evening.map(slot => `
+                                <div class="time-slot" data-time="${slot.time}" onclick="selectTimeSlot('${slot.time}', '${lang}')">
+                                    ${slot.display}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            slotsContainer.innerHTML = html;
+        }
+
+        window.selectTimeSlot = function(timeStr, lang) {
+            console.log('⏰ Selected time:', timeStr);
+            
+            bookingState.selectedTime = timeStr;
+            
+            document.querySelectorAll(`#${lang}-time-slots .time-slot`).forEach(slot => {
+                slot.classList.remove('selected');
+            });
+            
+            const selectedSlot = document.querySelector(`#${lang}-time-slots .time-slot[data-time="${timeStr}"]`);
+            if (selectedSlot) {
+                selectedSlot.classList.add('selected');
+            }
+            
+            updateBookingSummary(lang);
+            
+            const bookBtn = document.getElementById(`${lang}-book-btn`);
+            if (bookBtn) {
+                bookBtn.disabled = false;
+            }
+        };
+
+        function updateBookingSummary(lang) {
+            const lessonType = bookingState.selectedLessonType;
+            const summaryContainer = document.getElementById(`${lang}-booking-summary`);
+            if (!summaryContainer) return;
+            
+            let duration, price, useCredit;
+            
+            if (lessonType === 'consultation') {
+                duration = 20;
+                price = 0;
+                useCredit = false;
+            } else {
+                duration = 50;
+                if (bookingState.availableCredits > 0) {
+                    price = 0;
+                    useCredit = true;
+                } else {
+                    price = 4000;
+                    useCredit = false;
+                }
+            }
+            
+            const dateTime = new Date(bookingState.selectedTime);
+            
+            const html = `
+                <div class="booking-summary-item">
+                    <span class="booking-summary-label">${lang === 'ja' ? '日時' : 'Date & Time'}:</span>
+                    <span class="booking-summary-value">${dateTime.toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US')}</span>
+                </div>
+                <div class="booking-summary-item">
+                    <span class="booking-summary-label">${lang === 'ja' ? '時間' : 'Duration'}:</span>
+                    <span class="booking-summary-value">${duration} ${lang === 'ja' ? '分' : 'minutes'}</span>
+                </div>
+                <div class="booking-summary-item">
+                    <span class="booking-summary-label">${lang === 'ja' ? '料金' : 'Price'}:</span>
+                    <span class="booking-summary-value ${price === 0 ? 'free' : 'paid'}">
+                        ${price === 0 
+                            ? (lang === 'ja' ? '無料' : 'FREE') + (useCredit ? ` (${lang === 'ja' ? 'クレジット使用' : 'Using Credit'})` : '') 
+                            : `¥${price.toLocaleString()}`}
+                    </span>
+                </div>
+            `;
+            
+            summaryContainer.innerHTML = html;
+        }
+
+        async function bookLesson(lang) {
+            const btn = document.getElementById(`${lang}-book-btn`);
+            if (!btn) return;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (lang === 'ja' ? '予約中...' : 'Booking...');
+            
+            try {
+                const lessonType = bookingState.selectedLessonType === 'consultation' ? 'first_time_free' : 'standard';
+                
+                console.log('📤 Booking lesson:', {
                     studentId: bookingState.studentId,
                     scheduledAt: bookingState.selectedTime,
                     lessonType: lessonType,
                     duration: bookingState.selectedLessonType === 'consultation' ? 20 : 50
+                });
+                
+                const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
+                    },
+                    body: JSON.stringify({
+                        action: 'create',
+                        bookingData: {
+                            studentId: bookingState.studentId,
+                            scheduledAt: bookingState.selectedTime,
+                            lessonType: lessonType,
+                            duration: bookingState.selectedLessonType === 'consultation' ? 20 : 50
+                        }
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('📥 Booking response:', result);
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Booking failed');
                 }
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (!result.success) {
-            throw new Error(result.error || 'Booking failed');
+                
+                alert(lang === 'ja' ? '予約が完了しました！確認メールをご確認ください。' : 'Booking confirmed! Check your email for details.');
+                
+                bookingState.selectedDate = null;
+                bookingState.selectedTime = null;
+                
+                await fetchBookingEligibility(bookingState.studentId, lang);
+                await fetchUserBookings(bookingState.userId, lang);
+                
+                closeBookingModal();
+                
+            } catch (err) {
+                console.error('❌ Booking error:', err);
+                alert(lang === 'ja' ? `予約エラー: ${err.message}` : `Booking error: ${err.message}`);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-calendar-check"></i> ' + (lang === 'ja' ? 'レッスンを予約' : 'Book Lesson');
+            }
         }
-        
-        alert(lang === 'ja' ? '予約が完了しました！確認メールをご確認ください。' : 'Booking confirmed! Check your email for details.');
-        
-        // Reset state
-        bookingState.selectedDate = null;
-        bookingState.selectedTime = null;
-        
-        // Refresh everything
-        await fetchBookingEligibility(bookingState.studentId, lang);
-        await fetchUserBookings(bookingState.userId, lang);
-        renderCalendar(lang);
-        
-        document.getElementById(`${lang}-selected-date`).textContent = lang === 'ja' ? '日付を選択してください' : 'Select a date';
-        document.getElementById(`${lang}-time-slots`).innerHTML = '';
-        document.getElementById(`${lang}-booking-summary`).innerHTML = '';
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-calendar-check"></i> ' + (lang === 'ja' ? 'レッスンを予約' : 'Book Lesson');
-        
-    } catch (err) {
-        console.error('Booking error:', err);
-        alert(lang === 'ja' ? `予約エラー: ${err.message}` : `Booking error: ${err.message}`);
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-calendar-check"></i> ' + (lang === 'ja' ? 'レッスンを予約' : 'Book Lesson');
-    }
-}
 
-// =============================================
-// RENDER USER BOOKINGS
-// =============================================
+        function renderUserBookings(lang) {
+            const container = document.getElementById(`${lang}-bookings-list`);
+            if (!container) return;
+            
+            if (bookingState.userBookings.length === 0) {
+                container.innerHTML = `
+                    <div class="no-bookings">
+                        <i class="fas fa-calendar-alt"></i>
+                        <p>${lang === 'ja' ? '予約がありません' : 'No upcoming bookings'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = bookingState.userBookings.map(booking => {
+                const date = new Date(booking.scheduled_at);
+                const dateStr = date.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                const timeStr = date.toLocaleTimeString(lang === 'ja' ? 'ja-JP' : 'en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const typeLabel = booking.lesson_type === 'first_time_free'
+                    ? (lang === 'ja' ? '無料相談' : 'Free Consultation')
+                    : (lang === 'ja' ? 'レッスン' : 'Lesson');
+                
+                return `
+                    <div class="booking-item">
+                        <div class="booking-info">
+                            <div class="booking-date">${dateStr}</div>
+                            <div class="booking-time">${timeStr} (${booking.duration_minutes} ${lang === 'ja' ? '分' : 'min'})</div>
+                            <span class="booking-type">${typeLabel}</span>
+                        </div>
+                        <div class="booking-actions-btns">
+                            <button class="booking-action-btn cancel-btn" onclick="cancelBooking('${booking.id}', '${lang}')">
+                                ${lang === 'ja' ? 'キャンセル' : 'Cancel'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
 
-function renderUserBookings(lang) {
-    const container = document.getElementById(`${lang}-bookings-list`);
-    
-    if (bookingState.userBookings.length === 0) {
-        container.innerHTML = `
-            <div class="no-bookings">
-                <i class="fas fa-calendar-alt"></i>
-                <p>${lang === 'ja' ? '予約がありません' : 'No upcoming bookings'}</p>
-            </div>
-        `;
-        return;
-    }
-    
-    const html = bookingState.userBookings.map(booking => {
-        const date = new Date(booking.scheduled_at);
-        const dateStr = date.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric'
-        });
-        const timeStr = date.toLocaleTimeString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-        
-        const typeLabel = booking.lesson_type === 'first_time_free'
-            ? (lang === 'ja' ? '無料相談' : 'Free Consultation')
-            : (lang === 'ja' ? 'レッスン' : 'Lesson');
-        
-        return `
-            <div class="booking-item">
-                <div class="booking-info">
-                    <div class="booking-date">${dateStr}</div>
-                    <div class="booking-time">${timeStr} (${booking.duration_minutes} ${lang === 'ja' ? '分' : 'min'})</div>
-                    <span class="booking-type">${typeLabel}</span>
-                </div>
-                <div class="booking-actions-btns">
-                    <button class="booking-action-btn cancel-btn" onclick="cancelBooking('${booking.id}', '${lang}')">
-                        ${lang === 'ja' ? 'キャンセル' : 'Cancel'}
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    container.innerHTML = html;
-}
-
-// =============================================
-// CANCEL BOOKING
-// =============================================
-
-async function cancelBooking(bookingId, lang) {
-    const confirmMsg = lang === 'ja'
-        ? 'この予約をキャンセルしてもよろしいですか？'
-        : 'Are you sure you want to cancel this booking?';
-    
-    if (!confirm(confirmMsg)) return;
-    
-    const reasonMsg = lang === 'ja'
-        ? 'キャンセル理由を入力してください（任意）：'
-        : 'Cancellation reason (optional):';
-    
-    const reason = prompt(reasonMsg) || 'No reason provided';
-    
-    try {
-        const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
-            },
-            body: JSON.stringify({
-                action: 'cancel',
-                bookingData: {
-                    bookingId: bookingId,
-                    reason: reason
+        window.cancelBooking = async function(bookingId, lang) {
+            const confirmMsg = lang === 'ja'
+                ? 'この予約をキャンセルしてもよろしいですか？'
+                : 'Are you sure you want to cancel this booking?';
+            
+            if (!confirm(confirmMsg)) return;
+            
+            const reasonMsg = lang === 'ja'
+                ? 'キャンセル理由を入力してください（任意）：'
+                : 'Cancellation reason (optional):';
+            
+            const reason = prompt(reasonMsg) || 'No reason provided';
+            
+            try {
+                const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
+                    },
+                    body: JSON.stringify({
+                        action: 'cancel',
+                        bookingData: {
+                            bookingId: bookingId,
+                            reason: reason
+                        }
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Cancellation failed');
                 }
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (!result.success) {
-            throw new Error(result.error || 'Cancellation failed');
+                
+                alert(lang === 'ja' ? 'キャンセルしました。' + (result.refund || '') : 'Booking cancelled. ' + (result.refund || ''));
+                
+                await fetchBookingEligibility(bookingState.studentId, lang);
+                await fetchUserBookings(bookingState.userId, lang);
+                renderCalendar(lang);
+                
+            } catch (err) {
+                console.error('Cancellation error:', err);
+                alert(lang === 'ja' ? `キャンセルエラー: ${err.message}` : `Cancellation error: ${err.message}`);
+            }
+        };
+
+        function setupBookingEventListeners(lang) {
+            const prevBtn = document.getElementById(`${lang}-calendar-prev`);
+            const nextBtn = document.getElementById(`${lang}-calendar-next`);
+            const lessonTypeSelect = document.getElementById(`${lang}-lesson-type`);
+            const bookBtn = document.getElementById(`${lang}-book-btn`);
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    bookingState.currentMonth.setMonth(bookingState.currentMonth.getMonth() - 1);
+                    renderCalendar(lang);
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    bookingState.currentMonth.setMonth(bookingState.currentMonth.getMonth() + 1);
+                    renderCalendar(lang);
+                });
+            }
+            
+            if (lessonTypeSelect) {
+                lessonTypeSelect.addEventListener('change', (e) => {
+                    bookingState.selectedLessonType = e.target.value;
+                    if (bookingState.selectedTime) {
+                        updateBookingSummary(lang);
+                    }
+                });
+            }
+            
+            if (bookBtn) {
+                bookBtn.addEventListener('click', () => bookLesson(lang));
+            }
         }
-        
-        alert(lang === 'ja' ? 'キャンセルしました。' + (result.refund || '') : 'Booking cancelled. ' + (result.refund || ''));
-        
-        // Refresh bookings
-        await fetchBookingEligibility(bookingState.studentId, lang);
-        await fetchUserBookings(bookingState.userId, lang);
-        renderCalendar(lang);
-        
-    } catch (err) {
-        console.error('Cancellation error:', err);
-        alert(lang === 'ja' ? `キャンセルエラー: ${err.message}` : `Cancellation error: ${err.message}`);
-    }
-}
 
-// =============================================
-// SETUP EVENT LISTENERS
-// =============================================
-
-function setupBookingEventListeners(lang) {
-    // Calendar navigation
-    document.getElementById(`${lang}-calendar-prev`).addEventListener('click', () => {
-        bookingState.currentMonth.setMonth(bookingState.currentMonth.getMonth() - 1);
-        renderCalendar(lang);
-    });
-    
-    document.getElementById(`${lang}-calendar-next`).addEventListener('click', () => {
-        bookingState.currentMonth.setMonth(bookingState.currentMonth.getMonth() + 1);
-        renderCalendar(lang);
-    });
-    
-    // Lesson type selector
-    document.getElementById(`${lang}-lesson-type`).addEventListener('change', (e) => {
-        bookingState.selectedLessonType = e.target.value;
-        if (bookingState.selectedTime) {
-            updateBookingSummary(lang);
-        }
-    });
-    
-    // Book button
-    document.getElementById(`${lang}-book-btn`).addEventListener('click', () => bookLesson(lang));
-}
-
-// Make functions globally accessible
-window.selectTimeSlot = selectTimeSlot;
-window.cancelBooking = cancelBooking;
         console.log('🎉 Phase 1 Dashboard Ready!');
     </script>
 </body>
