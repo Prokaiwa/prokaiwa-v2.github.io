@@ -2985,9 +2985,6 @@
                 // Prepare other language version
                 const otherLang = lang === 'ja' ? 'en' : 'ja';
                 document.getElementById(`${otherLang}-dashboard-loading`).style.display = 'none';
-                document.getElementById(`${otherLang}-dashboard-content`).style.display = 'block';// Prepare other language version
-                const otherLang = lang === 'ja' ? 'en' : 'ja';
-                document.getElementById(`${otherLang}-dashboard-loading`).style.display = 'none';
                 document.getElementById(`${otherLang}-dashboard-content`).style.display = 'block';
                 
                 // INITIALIZE BOOKING WIDGET
@@ -2996,7 +2993,6 @@
                 
                 console.log('✅ Dashboard loaded with Phase 1 features!');
                 
-                console.log('✅ Dashboard loaded with Phase 1 features!');
                 
             } catch (error) {
                 console.error('Dashboard load error:', error);
