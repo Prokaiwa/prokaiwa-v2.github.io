@@ -3297,7 +3297,6 @@ function renderCalendar(lang) {
     
     // Enable/disable navigation buttons
     const prevBtn = document.getElementById(`${lang}-calendar-prev`);
-    const today = new Date();
     const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     
     if (month.getTime() <= currentMonth.getTime()) {
