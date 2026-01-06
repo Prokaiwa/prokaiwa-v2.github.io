@@ -3152,17 +3152,27 @@
                     }
 
                     const bookLessonBtn = document.getElementById(`${l}-book-lesson-btn`);
-                    const upcomingCard = document.getElementById(`${l}-upcoming-lessons-card`);
-                    const upgradeCard = document.getElementById(`${l}-upgrade-card`);
-                    
-                    if (hasVideoAccess) {
-                        upcomingCard.style.display = 'block';
-                        upgradeCard.style.display = 'none';
-                    } else {
-                        bookLessonBtn.style.display = 'none';
-                        upcomingCard.style.display = 'none';
-                        upgradeCard.style.display = 'block';
-                    }
+const upcomingCard = document.getElementById(`${l}-upcoming-lessons-card`);
+const upgradeCard = document.getElementById(`${l}-upgrade-card`);
+
+if (hasVideoAccess) {
+    if (upcomingCard) {
+        upcomingCard.style.display = 'block';
+    }
+    if (upgradeCard) {
+        upgradeCard.style.display = 'none';
+    }
+} else {
+    if (bookLessonBtn) {
+        bookLessonBtn.style.display = 'none';
+    }
+    if (upcomingCard) {
+        upcomingCard.style.display = 'none';
+    }
+    if (upgradeCard) {
+        upgradeCard.style.display = 'block';
+    }
+}
 
                     document.getElementById(`${l}-sessions-completed`).textContent = stats.thisMonth;
                     document.getElementById(`${l}-sessions-total`).textContent = MONTHLY_GOAL;
