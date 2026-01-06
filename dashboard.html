@@ -3476,8 +3476,17 @@ if (hasVideoAccess) {
                 ? ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
                 : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             
-            document.getElementById(`${lang}-calendar-month`).textContent = 
-                lang === 'ja' ? `${year}年 ${monthNames[monthIndex]}` : `${monthNames[monthIndex]} ${year}`;
+            const monthLabel = document.getElementById(`${lang}-calendar-month`);
+if (!monthLabel) {
+    console.warn(`Missing calendar month label: ${lang}-calendar-month`);
+    return;
+}
+
+monthLabel.textContent =
+    lang === 'ja'
+        ? `${year}年 ${monthNames[monthIndex]}`
+        : `${monthNames[monthIndex]} ${year}`;
+
             
             const calendarGrid = document.getElementById(`${lang}-calendar-grid`);
             if (!calendarGrid) return;
