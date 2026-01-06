@@ -3434,30 +3434,36 @@ if (hasVideoAccess) {
         }
 
         async function fetchUserBookings(userId, lang) {
-    try {
-        const { data: bookings, error } = await supabase
-            .from('lesson_bookings')
-            .select('*')
-            .eq('user_id', userId)
-            .eq('status', 'scheduled')
-            .gte('scheduled_at', new Date().toISOString())
-            .order('scheduled_at', { ascending: true });
-        
-        if (error) throw error;
-        
-        bookingState.userBookings = bookings || [];
-        
-        console.log('User bookings:', bookingState.userBookings.length);
-        
-        // ✅ ADD THESE 3 LINES:
-        if (lang === 'en') {
-            initializeEnhancedLessonsCard();
-        }
-        
-    } catch (err) {
-        console.error('Error fetching bookings:', err);
-    }
+  try {
+    const { data, error } = await supabase
+      .from('lesson_bookings')
+      .select(`
+        id,
+        scheduled_at,
+        duration_minutes,
+        lesson_type,
+        google_meet_link,
+        google_calendar_event_id,
+        status
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'scheduled')
+      .order('scheduled_at', { ascending: true });
+
+    if (error) throw error;
+
+    bookingState.userBookings = data || [];
+
+    console.log('User bookings:', bookingState.userBookings.length);
+
+    // Re-render UI AFTER data is loaded
+    initializeEnhancedLessonsCard();
+
+  } catch (err) {
+    console.error('Error fetching bookings:', err);
+  }
 }
+
 
         function renderCalendar(lang) {
             const month = bookingState.currentMonth;
@@ -3877,10 +3883,26 @@ if (hasVideoAccess) {
                             <span class="booking-type">${typeLabel}</span>
                         </div>
                         <div class="booking-actions-btns">
-                            <button class="booking-action-btn cancel-btn" onclick="cancelBooking('${booking.id}', '${lang}')">
-                                ${lang === 'ja' ? 'キャンセル' : 'Cancel'}
-                            </button>
-                        </div>
+
+  ${booking.google_meet_link ? `
+    <a 
+      href="${booking.google_meet_link}"
+      target="_blank"
+      class="booking-action-btn meet-btn"
+    >
+      ${lang === 'ja' ? 'Google Meet に参加' : 'Join Google Meet'}
+    </a>
+  ` : ''}
+
+  <button 
+    class="booking-action-btn cancel-btn" 
+    onclick="cancelBooking('${booking.id}', '${lang}')"
+  >
+    ${lang === 'ja' ? 'キャンセル' : 'Cancel'}
+  </button>
+
+</div>
+
                     </div>
                 `;
             }).join('');
