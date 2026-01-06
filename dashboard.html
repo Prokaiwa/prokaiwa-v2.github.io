@@ -1408,6 +1408,295 @@
     color: var(--color-text);
   }
 }
+    /* ================================
+   ENHANCED UPCOMING LESSONS CARD
+   ================================ */
+
+.lessons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.lesson-item {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.lesson-item.lesson-next {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.lesson-item.lesson-next .lesson-info {
+    color: white;
+}
+
+.lesson-item.lesson-next .lesson-datetime i,
+.lesson-item.lesson-next .lesson-countdown i {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.lesson-info {
+    margin-bottom: 1rem;
+}
+
+.lesson-datetime {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lesson-countdown {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lesson-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Google Meet Button */
+.google-meet-btn {
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #3c4043;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    width: 100%;
+}
+
+.google-meet-btn:hover {
+    background: #f8f9fa;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+.google-meet-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.google-meet-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Pulse animation for Join button when lesson is within 1 hour */
+.google-meet-btn.pulse {
+    animation: pulse 2s infinite;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    font-weight: 600;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 2px 6px rgba(76, 175, 80, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 16px rgba(76, 175, 80, 0.6);
+    }
+}
+
+.google-meet-btn.pulse svg {
+    filter: brightness(0) invert(1);
+}
+
+/* Secondary actions (Reschedule, Cancel) */
+.lesson-secondary-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.lesson-action-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 8px 16px;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    background: white;
+    color: #5f6368;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.lesson-action-btn:hover {
+    background: #f1f3f4;
+    border-color: #c4c7c9;
+}
+
+.reschedule-btn {
+    color: #1a73e8;
+    border-color: #1a73e8;
+}
+
+.reschedule-btn:hover {
+    background: #e8f0fe;
+    border-color: #1a73e8;
+}
+
+.cancel-btn {
+    color: #d93025;
+    border-color: #d93025;
+}
+
+.cancel-btn:hover {
+    background: #fce8e6;
+    border-color: #d93025;
+}
+
+/* Expanded lessons section */
+.lessons-more {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.lessons-more.expanded {
+    max-height: 2000px; /* Large enough for multiple lessons */
+}
+
+.lessons-more .lesson-item {
+    margin-top: 1rem;
+}
+
+/* Toggle button */
+.toggle-lessons-btn {
+    width: 100%;
+    padding: 10px;
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    color: #5f6368;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.toggle-lessons-btn:hover {
+    background: #f8f9fa;
+    border-color: #c4c7c9;
+}
+
+/* Divider before book another */
+.book-another-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #dadce0, transparent);
+    margin: 0.5rem 0;
+}
+
+/* Book another button */
+.book-another-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+}
+
+.book-another-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.book-another-btn:active {
+    transform: translateY(0);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .lesson-item {
+        padding: 1rem;
+    }
+    
+    .lesson-secondary-actions {
+        flex-direction: column;
+    }
+    
+    .lesson-action-btn {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    .google-meet-btn {
+        font-size: 14px;
+        padding: 10px 16px;
+    }
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+    .lesson-item {
+        background: #2d2d2d;
+        border-color: #404040;
+    }
+    
+    .lesson-item:not(.lesson-next) .lesson-datetime,
+    .lesson-item:not(.lesson-next) .lesson-countdown {
+        color: #e0e0e0;
+    }
+    
+    .google-meet-btn,
+    .lesson-action-btn,
+    .toggle-lessons-btn {
+        background: #2d2d2d;
+        border-color: #404040;
+        color: #e0e0e0;
+    }
+    
+    .google-meet-btn:hover,
+    .lesson-action-btn:hover,
+    .toggle-lessons-btn:hover {
+        background: #353535;
+    }
+}
   </style>
 </head>
 <body>
@@ -1608,18 +1897,6 @@
                             <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                                 <a href="contact.html?subject=plan-change" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">プラン変更</a>
                                 <button id="ja-logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">ログアウト</button>
-                            </div>
-                        </div>
-
-                        <!-- Upcoming Lessons -->
-                        <div class="dashboard-card card-lessons" id="ja-upcoming-lessons-card" style="display: none;">
-                            <h3><i class="fas fa-calendar-alt"></i>予約中のレッスン</h3>
-                            <div id="ja-upcoming-lessons">
-                                <div class="no-lessons">
-                                    <i class="fas fa-calendar-plus"></i>
-                                    <p>予約中のレッスンはありません</p>
-                                    <button onclick="openBookingModal('ja')" class="cta-button" style="margin-top: 1rem;">レッスンを予約する</button>
-                                </div>
                             </div>
                         </div>
 
@@ -1829,16 +2106,12 @@
                         </div>
 
                         <!-- Upcoming Lessons -->
-                        <div class="dashboard-card card-lessons" id="en-upcoming-lessons-card" style="display: none;">
-                            <h3><i class="fas fa-calendar-alt"></i>Upcoming Lessons</h3>
-                            <div id="en-upcoming-lessons">
-                                <div class="no-lessons">
-                                    <i class="fas fa-calendar-plus"></i>
-                                    <p>No upcoming lessons scheduled</p>
-                                    <button onclick="openBookingModal('en')" class="cta-button" style="margin-top: 1rem;">Book a Lesson</button>
-                                </div>
-                            </div>
-                        </div>
+<div class="dashboard-card card-lessons" id="en-upcoming-lessons-card" style="display: none;">
+    <h3><i class="fas fa-calendar-alt"></i>Upcoming Lessons</h3>
+    <div id="en-upcoming-lessons">
+        <!-- Will be populated by JavaScript -->
+    </div>
+</div>
 
                         <!-- Learning Resources -->
                         <div class="dashboard-card card-resources" id="en-resources">
@@ -3125,7 +3398,7 @@
             
             await fetchUserBookings(userId, 'ja');
             await fetchUserBookings(userId, 'en');
-            
+
             console.log('✅ Booking widget initialized');
         }
 
@@ -3151,25 +3424,30 @@
         }
 
         async function fetchUserBookings(userId, lang) {
-            try {
-                const { data: bookings, error } = await supabase
-                    .from('lesson_bookings')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .eq('status', 'scheduled')
-                    .gte('scheduled_at', new Date().toISOString())
-                    .order('scheduled_at', { ascending: true });
-                
-                if (error) throw error;
-                
-                bookingState.userBookings = bookings || [];
-                
-                console.log('User bookings:', bookingState.userBookings.length);
-                
-            } catch (err) {
-                console.error('Error fetching bookings:', err);
-            }
+    try {
+        const { data: bookings, error } = await supabase
+            .from('lesson_bookings')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('status', 'scheduled')
+            .gte('scheduled_at', new Date().toISOString())
+            .order('scheduled_at', { ascending: true });
+        
+        if (error) throw error;
+        
+        bookingState.userBookings = bookings || [];
+        
+        console.log('User bookings:', bookingState.userBookings.length);
+        
+        // ✅ ADD THESE 3 LINES:
+        if (lang === 'en') {
+            initializeEnhancedLessonsCard();
         }
+        
+    } catch (err) {
+        console.error('Error fetching bookings:', err);
+    }
+}
 
         function renderCalendar(lang) {
             const month = bookingState.currentMonth;
@@ -3682,6 +3960,268 @@
         }
 
         console.log('🎉 Phase 1 Dashboard Ready!');
+      // ================================
+// ENHANCED UPCOMING LESSONS CARD
+// Features: Google Meet button, countdown timer, expand/collapse, cancel/reschedule
+// ================================
+
+// State management
+const lessonsCardState = {
+    expanded: false,
+    updateInterval: null
+};
+
+// Format date/time
+function formatLessonDateTime(scheduledAt) {
+    const date = new Date(scheduledAt);
+    const options = { 
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    };
+    return date.toLocaleString('en-US', options);
+}
+
+// Calculate time until lesson
+function getTimeUntilLesson(scheduledAt) {
+    const now = new Date();
+    const lessonTime = new Date(scheduledAt);
+    const diff = lessonTime - now;
+    
+    if (diff < 0) return 'Past';
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const days = Math.floor(hours / 24);
+    
+    if (days > 1) return `In ${days} days`;
+    if (days === 1) return 'Tomorrow';
+    if (hours === 0) return `In ${minutes}m`;
+    return `In ${hours}h ${minutes}m`;
+}
+
+// Check if lesson is within 24 hours
+function isWithin24Hours(scheduledAt) {
+    const now = new Date();
+    const lessonTime = new Date(scheduledAt);
+    const diff = lessonTime - now;
+    const hours = diff / (1000 * 60 * 60);
+    return hours > 0 && hours <= 24;
+}
+
+// Check if lesson is within 1 hour
+function isWithin1Hour(scheduledAt) {
+    const now = new Date();
+    const lessonTime = new Date(scheduledAt);
+    const diff = lessonTime - now;
+    const hours = diff / (1000 * 60 * 60);
+    return hours > 0 && hours <= 1;
+}
+
+// Render a single lesson card
+function renderLessonCard(lesson, isFirst = false) {
+    const within24h = isWithin24Hours(lesson.scheduled_at);
+    const within1h = isWithin1Hour(lesson.scheduled_at);
+    const timeUntil = getTimeUntilLesson(lesson.scheduled_at);
+    const dateTime = formatLessonDateTime(lesson.scheduled_at);
+    
+    const showJoinButton = within24h && lesson.google_meet_link;
+    const showReschedule = !within1h; // Can't reschedule within 1 hour
+    
+    return `
+        <div class="lesson-item ${isFirst ? 'lesson-next' : ''}" data-lesson-id="${lesson.id}">
+            <div class="lesson-info">
+                <div class="lesson-datetime">
+                    <i class="fas fa-calendar-alt"></i> ${dateTime}
+                </div>
+                <div class="lesson-countdown">
+                    <i class="fas fa-clock"></i> ${timeUntil}
+                </div>
+            </div>
+            
+            <div class="lesson-actions">
+                ${showJoinButton ? `
+                    <button class="google-meet-btn ${within1h ? 'pulse' : ''}" 
+                            onclick="window.open('${lesson.google_meet_link}', '_blank')"
+                            title="Join Google Meet">
+                        <svg width="20" height="20" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#00832d" d="M96 0c53.019 0 96 42.981 96 96s-42.981 96-96 96S0 149.019 0 96 42.981 0 96 0z"/>
+                            <path fill="#0066da" d="M96 192c-53.019 0-96-42.981-96-96V96c0-8.837 7.163-16 16-16h32c8.837 0 16 7.163 16 16v64c0 8.837 7.163 16 16 16h80c0 8.837-7.163 16-16 16H96z"/>
+                            <path fill="#e94235" d="M96 0C42.981 0 0 42.981 0 96h48c0-8.837 7.163-16 16-16h64c8.837 0 16-7.163 16-16V16c0-8.837-7.163-16-16-16H96z"/>
+                            <path fill="#2684fc" d="M192 96c0-53.019-42.981-96-96-96v48c8.837 0 16 7.163 16 16v64c0 8.837 7.163 16 16 16h48c8.837 0 16-7.163 16-16V96z"/>
+                            <path fill="#00ac47" d="M128 80H64c-8.837 0-16 7.163-16 16v32c0 8.837 7.163 16 16 16h64c8.837 0 16-7.163 16-16V96c0-8.837-7.163-16-16-16z"/>
+                            <path fill="#fff" d="M112 96c0 8.837-7.163 16-16 16s-16-7.163-16-16 7.163-16 16-16 16 7.163 16 16z"/>
+                        </svg>
+                        Join with Google Meet
+                    </button>
+                ` : ''}
+                
+                <div class="lesson-secondary-actions">
+                    ${showReschedule ? `
+                        <button class="lesson-action-btn reschedule-btn" 
+                                onclick="rescheduleLesson('${lesson.id}')"
+                                title="Reschedule lesson">
+                            <i class="fas fa-calendar-edit"></i> Reschedule
+                        </button>
+                    ` : ''}
+                    
+                    <button class="lesson-action-btn cancel-btn" 
+                            onclick="cancelLesson('${lesson.id}')"
+                            title="Cancel lesson">
+                        <i class="fas fa-times-circle"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Render upcoming lessons card
+function renderUpcomingLessonsCard(lessons) {
+    const card = document.getElementById('en-upcoming-lessons-card');
+    if (!card) return;
+    
+    const container = document.getElementById('en-upcoming-lessons');
+    if (!container) return;
+    
+    if (!lessons || lessons.length === 0) {
+        card.style.display = 'none';
+        return;
+    }
+    
+    card.style.display = 'block';
+    
+    const nextLesson = lessons[0];
+    const hasMoreLessons = lessons.length > 1;
+    
+    container.innerHTML = `
+        <div class="lessons-container">
+            ${renderLessonCard(nextLesson, true)}
+            
+            ${hasMoreLessons ? `
+                <div class="lessons-more ${lessonsCardState.expanded ? 'expanded' : ''}">
+                    ${lessons.slice(1).map(lesson => renderLessonCard(lesson)).join('')}
+                </div>
+                
+                <button class="toggle-lessons-btn" onclick="toggleLessonsExpanded()">
+                    <i class="fas fa-chevron-${lessonsCardState.expanded ? 'up' : 'down'}"></i>
+                    ${lessonsCardState.expanded ? 'Show Less' : `View All Lessons (${lessons.length})`}
+                </button>
+            ` : ''}
+            
+            <div class="book-another-divider"></div>
+            
+            <button onclick="openBookingModal('en')" class="book-another-btn">
+                <i class="fas fa-plus-circle"></i> ${lessons.length > 0 ? 'Book Another Lesson' : 'Book Your First Lesson'}
+            </button>
+        </div>
+    `;
+}
+
+// Toggle expand/collapse
+function toggleLessonsExpanded() {
+    lessonsCardState.expanded = !lessonsCardState.expanded;
+    const moreSection = document.querySelector('.lessons-more');
+    const toggleBtn = document.querySelector('.toggle-lessons-btn');
+    
+    if (moreSection) {
+        moreSection.classList.toggle('expanded');
+    }
+    
+    if (toggleBtn) {
+        const totalLessons = bookingState.userBookings.length;
+        toggleBtn.innerHTML = lessonsCardState.expanded 
+            ? '<i class="fas fa-chevron-up"></i> Show Less'
+            : `<i class="fas fa-chevron-down"></i> View All Lessons (${totalLessons})`;
+    }
+}
+
+// Cancel lesson
+async function cancelLesson(lessonId) {
+    if (!confirm('Are you sure you want to cancel this lesson? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
+            },
+            body: JSON.stringify({
+                action: 'cancel',
+                bookingData: {
+                    bookingId: lessonId,
+                    reason: 'Cancelled from dashboard'
+                }
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+            throw new Error(result.error || 'Cancellation failed');
+        }
+        
+        alert('Lesson cancelled successfully' + (result.refundMessage ? '. ' + result.refundMessage : ''));
+        
+        // Refresh bookings
+        await fetchUserBookings(bookingState.userId, 'en');
+        
+    } catch (err) {
+        console.error('Error cancelling lesson:', err);
+        alert('Failed to cancel lesson: ' + err.message);
+    }
+}
+
+// Reschedule lesson
+async function rescheduleLesson(lessonId) {
+    // Open booking modal in reschedule mode
+    bookingState.reschedulingBookingId = lessonId;
+    openBookingModal('en');
+    
+    // TODO: Highlight that this is a reschedule in the modal
+    // You could add UI to show "Rescheduling lesson from [OLD DATE]"
+}
+
+// Start countdown update interval
+function startCountdownUpdates() {
+    if (lessonsCardState.updateInterval) {
+        clearInterval(lessonsCardState.updateInterval);
+    }
+    
+    lessonsCardState.updateInterval = setInterval(() => {
+        const countdowns = document.querySelectorAll('.lesson-countdown');
+        if (countdowns.length === 0) {
+            clearInterval(lessonsCardState.updateInterval);
+            lessonsCardState.updateInterval = null;
+            return;
+        }
+        
+        // Re-render to update countdowns
+        if (bookingState.userBookings && bookingState.userBookings.length > 0) {
+            renderUpcomingLessonsCard(bookingState.userBookings);
+        }
+    }, 60000); // Update every minute
+}
+
+// Initialize - call this after fetching bookings
+function initializeEnhancedLessonsCard() {
+    if (bookingState.userBookings && bookingState.userBookings.length > 0) {
+        renderUpcomingLessonsCard(bookingState.userBookings);
+        startCountdownUpdates();
+    }
+}
+
+// Make functions globally available
+window.toggleLessonsExpanded = toggleLessonsExpanded;
+window.cancelLesson = cancelLesson;
+window.rescheduleLesson = rescheduleLesson;
+window.initializeEnhancedLessonsCard = initializeEnhancedLessonsCard;
     </script>
 </body>
 </html>
