@@ -2740,7 +2740,7 @@
                 const { data: progress, error } = await supabase
                     .from('student_progress')
                     .select('*')
-                    .eq('user_id', userId)
+                    
                     .single();
                 
                 console.log('student_progress result:', { data: progress, error });
@@ -3434,35 +3434,37 @@ if (hasVideoAccess) {
         }
 
         async function fetchUserBookings(userId, lang) {
-  try {
-    const { data, error } = await supabase
-      .from('lesson_bookings')
-      .select(`
-        id,
-        scheduled_at,
-        duration_minutes,
-        lesson_type,
-        google_meet_link,
-        google_calendar_event_id,
-        status
-      `)
-      .eq('user_id', userId)
-      .eq('status', 'scheduled')
-      .order('scheduled_at', { ascending: true });
+    try {
+        const { data: bookings, error } = await supabase
+            .from('lesson_bookings')
+            .select(`
+                id,
+                scheduled_at,
+                duration_minutes,
+                lesson_type,
+                google_meet_link,
+                google_calendar_event_id,
+                status
+            `)
+            .eq('user_id', userId)
+            .eq('status', 'scheduled')
+            .order('scheduled_at', { ascending: true });
 
-    if (error) throw error;
+        if (error) throw error;
 
-    bookingState.userBookings = data || [];
+        bookingState.userBookings = bookings || [];
 
-    console.log('User bookings:', bookingState.userBookings.length);
+        console.log('User bookings:', bookingState.userBookings.length);
 
-    // Re-render UI AFTER data is loaded
-    initializeEnhancedLessonsCard();
+        // Re-render lesson card + calendar
+        renderUserBookings(lang);
+        renderCalendar(lang);
 
-  } catch (err) {
-    console.error('Error fetching bookings:', err);
-  }
+    } catch (err) {
+        console.error('Error fetching bookings:', err);
+    }
 }
+
 
 
         function renderCalendar(lang) {
@@ -3846,69 +3848,79 @@ if (hasVideoAccess) {
         }
 
         function renderUserBookings(lang) {
-            const container = document.getElementById(`${lang}-bookings-list`);
-            if (!container) return;
-            
-            if (bookingState.userBookings.length === 0) {
-                container.innerHTML = `
-                    <div class="no-bookings">
-                        <i class="fas fa-calendar-alt"></i>
-                        <p>${lang === 'ja' ? '予約がありません' : 'No upcoming bookings'}</p>
+    const container = document.getElementById(`${lang}-bookings-list`);
+    if (!container) return;
+
+    if (bookingState.userBookings.length === 0) {
+        container.innerHTML = `
+            <div class="no-bookings">
+                <i class="fas fa-calendar-alt"></i>
+                <p>${lang === 'ja' ? '予約がありません' : 'No upcoming bookings'}</p>
+            </div>
+        `;
+        return;
+    }
+
+    const html = bookingState.userBookings.map(booking => {
+        const date = new Date(booking.scheduled_at);
+
+        const dateStr = date.toLocaleDateString(
+            lang === 'ja' ? 'ja-JP' : 'en-US',
+            { weekday: 'short', month: 'short', day: 'numeric' }
+        );
+
+        const timeStr = date.toLocaleTimeString(
+            lang === 'ja' ? 'ja-JP' : 'en-US',
+            { hour: '2-digit', minute: '2-digit' }
+        );
+
+        const typeLabel =
+            booking.lesson_type === 'first_time_free'
+                ? (lang === 'ja' ? '無料相談' : 'Free Consultation')
+                : (lang === 'ja' ? 'レッスン' : 'Lesson');
+
+        return `
+            <div class="booking-item">
+                <div class="booking-info">
+                    <div class="booking-date">${dateStr}</div>
+                    <div class="booking-time">
+                        ${timeStr} (${booking.duration_minutes} ${lang === 'ja' ? '分' : 'min'})
                     </div>
-                `;
-                return;
-            }
+                    <span class="booking-type">${typeLabel}</span>
+                </div>
+
+                <div class="booking-actions-btns">
+                    ${
+                        booking.google_meet_link
+                            ? `
+                                <a
+                                    href="${booking.google_meet_link}"
+                                    target="_blank"
+                                    class="booking-action-btn meet-btn"
+                                >
+                                    ${lang === 'ja' ? 'Google Meet に参加' : 'Join Google Meet'}
+                                </a>
+                              `
+                            : ''
+                    }
+
+                    <button
+                        class="booking-action-btn cancel-btn"
+                        onclick="cancelBooking('${booking.id}', '${lang}')"
+                    >
+                        ${lang === 'ja' ? 'キャンセル' : 'Cancel'}
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
             
-            const html = bookingState.userBookings.map(booking => {
-                const date = new Date(booking.scheduled_at);
-                const dateStr = date.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
-                });
-                const timeStr = date.toLocaleTimeString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                
-                const typeLabel = booking.lesson_type === 'first_time_free'
-                    ? (lang === 'ja' ? '無料相談' : 'Free Consultation')
-                    : (lang === 'ja' ? 'レッスン' : 'Lesson');
-                
-                return `
-                    <div class="booking-item">
-                        <div class="booking-info">
-                            <div class="booking-date">${dateStr}</div>
-                            <div class="booking-time">${timeStr} (${booking.duration_minutes} ${lang === 'ja' ? '分' : 'min'})</div>
-                            <span class="booking-type">${typeLabel}</span>
-                        </div>
-                        <div class="booking-actions-btns">
-
-  ${booking.google_meet_link ? `
-    <a 
-      href="${booking.google_meet_link}"
-      target="_blank"
-      class="booking-action-btn meet-btn"
-    >
-      ${lang === 'ja' ? 'Google Meet に参加' : 'Join Google Meet'}
-    </a>
-  ` : ''}
-
-  <button 
-    class="booking-action-btn cancel-btn" 
-    onclick="cancelBooking('${booking.id}', '${lang}')"
-  >
-    ${lang === 'ja' ? 'キャンセル' : 'Cancel'}
-  </button>
-
-</div>
-
-                    </div>
-                `;
-            }).join('');
             
-            container.innerHTML = html;
-        }
+        
 
         window.cancelBooking = async function(bookingId, lang) {
             const confirmMsg = lang === 'ja'
