@@ -3296,31 +3296,34 @@ if (hasVideoAccess) {
         };
 
         // MODAL FUNCTIONS
-        window.openBookingModal = function(lang) {
-            console.log('📖 Opening booking modal for lang:', lang);
-            bookingState.currentLang = lang;
-            
-            // Update modal title
-            document.getElementById('modal-title').textContent = lang === 'ja' ? 'レッスン予約' : 'Book a Lesson';
-            
-            // Render booking widget content
-            const modalContent = document.getElementById('modal-booking-content');
-            modalContent.innerHTML = getBookingWidgetHTML(lang);
-            
-            // Show modal
-            document.getElementById('booking-modal-overlay').classList.add('show');
-            document.getElementById('booking-modal').classList.add('show');
-            
-            // Scroll modal body to top (fixes reopening at bottom issue)
-            const modalBody = document.querySelector('.booking-modal-body');
-            if (modalBody) {
-                modalBody.scrollTop = 0;
-            }
-            
-            // Initialize widget
-            renderCalendar(lang);
-            setupBookingEventListeners(lang);
-        };
+        window.openBookingModal = async function(lang) {
+    console.log('📖 Opening booking modal for lang:', lang);
+    bookingState.currentLang = lang;
+    
+    // Update modal title
+    document.getElementById('modal-title').textContent = lang === 'ja' ? 'レッスン予約' : 'Book a Lesson';
+    
+    // Render booking widget content
+    const modalContent = document.getElementById('modal-booking-content');
+    modalContent.innerHTML = getBookingWidgetHTML(lang);
+    
+    // Show modal
+    document.getElementById('booking-modal-overlay').classList.add('show');
+    document.getElementById('booking-modal').classList.add('show');
+    
+    // Scroll modal body to top
+    const modalBody = document.querySelector('.booking-modal-body');
+    if (modalBody) {
+        modalBody.scrollTop = 0;
+    }
+    
+    // 🆕 REFRESH CREDITS AFTER MODAL HTML EXISTS
+    await fetchBookingEligibility(bookingState.studentId, lang);
+    
+    // Initialize widget
+    renderCalendar(lang);
+    setupBookingEventListeners(lang);
+};
 
         window.closeBookingModal = function() {
             console.log('📕 Closing booking modal');
@@ -3855,9 +3858,12 @@ monthLabel.textContent =
                 bookingState.selectedTime = null;
                 
                 await fetchBookingEligibility(bookingState.studentId, lang);
-                await fetchUserBookings(bookingState.userId, lang);
-                
-                closeBookingModal();
+await fetchUserBookings(bookingState.userId, lang);
+
+// 🆕 UPDATE DASHBOARD CARD
+initializeEnhancedLessonsCard();
+
+closeBookingModal();
                 
             } catch (err) {
                 console.error('❌ Booking error:', err);
