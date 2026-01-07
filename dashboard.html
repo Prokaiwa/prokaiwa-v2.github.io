@@ -4239,8 +4239,10 @@ async function cancelLesson(lessonId) {
         
         alert('Lesson cancelled successfully' + (result.refundMessage ? '. ' + result.refundMessage : ''));
         
-        // Refresh bookings
+        // 🆕 REFRESH EVERYTHING
+        await fetchBookingEligibility(bookingState.studentId, 'en');
         await fetchUserBookings(bookingState.userId, 'en');
+        initializeEnhancedLessonsCard();
         
     } catch (err) {
         console.error('Error cancelling lesson:', err);
