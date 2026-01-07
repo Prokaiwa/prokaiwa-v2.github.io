@@ -3411,6 +3411,9 @@ if (hasVideoAccess) {
     
     await fetchUserBookings(userId, 'ja');
     await fetchUserBookings(userId, 'en');
+    
+    // 🆕 Initialize lessons card on dashboard load
+    initializeEnhancedLessonsCard();
 
     console.log('✅ Booking widget initialized');
 }
