@@ -3398,19 +3398,19 @@ if (hasVideoAccess) {
         }
 
         async function initializeBookingWidget(studentId, userId) {
-            console.log('🎯 Initializing booking widget...', { studentId, userId });
-            
-            bookingState.studentId = studentId;
-            bookingState.userId = userId;
-            
-            await fetchBookingEligibility(studentId, 'ja');
-            await fetchBookingEligibility(studentId, 'en');
-            
-            await fetchUserBookings(userId, 'ja');
-            await fetchUserBookings(userId, 'en');
+    console.log('🎯 Initializing booking widget...', { studentId, userId });
+    
+    bookingState.studentId = studentId;
+    bookingState.userId = userId;
+    
+    await fetchBookingEligibility(studentId, 'ja');
+    await fetchBookingEligibility(studentId, 'en');
+    
+    await fetchUserBookings(userId, 'ja');
+    await fetchUserBookings(userId, 'en');
 
-            console.log('✅ Booking widget initialized');
-        }
+    console.log('✅ Booking widget initialized');
+}
 
         async function fetchBookingEligibility(studentId, lang) {
             try {
@@ -3456,9 +3456,9 @@ if (hasVideoAccess) {
 
         console.log('User bookings:', bookingState.userBookings.length);
 
-        // Re-render lesson card + calendar
+        // Re-render lesson card only
         renderUserBookings(lang);
-        renderCalendar(lang);
+        // Calendar will be rendered when modal opens
 
     } catch (err) {
         console.error('Error fetching bookings:', err);
