@@ -3413,25 +3413,36 @@ if (hasVideoAccess) {
 }
 
         async function fetchBookingEligibility(studentId, lang) {
-            try {
-                const { data, error } = await supabase
-                    .rpc('check_booking_eligibility', {
-                        p_student_id: studentId,
-                        p_lesson_type: 'standard'
-                    });
-                
-                if (error) throw error;
-                
-                bookingState.availableCredits = data.availableCredits || 0;
-                bookingState.eligibleForConsultation = data.eligibleForConsultation || false;
-                
-                console.log('Credits:', bookingState.availableCredits);
-                console.log('Consultation eligible:', bookingState.eligibleForConsultation);
-                
-            } catch (err) {
-                console.error('Error fetching eligibility:', err);
-            }
+    try {
+        const { data, error } = await supabase
+            .rpc('check_booking_eligibility', {
+                p_student_id: studentId,
+                p_lesson_type: 'standard'
+            });
+        
+        if (error) throw error;
+        
+        bookingState.availableCredits = data.availableCredits || 0;
+        bookingState.eligibleForConsultation = data.eligibleForConsultation || false;
+        
+        console.log('Credits:', bookingState.availableCredits);
+        console.log('Consultation eligible:', bookingState.eligibleForConsultation);
+        
+        // 🆕 UPDATE UI ELEMENTS
+        const creditsElement = document.getElementById(`${lang}-credits-count`);
+        if (creditsElement) {
+            creditsElement.textContent = bookingState.availableCredits;
         }
+        
+        const consultBadge = document.getElementById(`${lang}-consultation-badge`);
+        if (consultBadge) {
+            consultBadge.style.display = bookingState.eligibleForConsultation ? 'flex' : 'none';
+        }
+        
+    } catch (err) {
+        console.error('Error fetching eligibility:', err);
+    }
+}
 
         async function fetchUserBookings(userId, lang) {
     try {
