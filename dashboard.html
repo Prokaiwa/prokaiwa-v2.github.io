@@ -23,12 +23,11 @@
     /* Dashboard-specific container padding */
     #ja-dashboard-content,
     #en-dashboard-content {
-      padding-bottom: 2rem; /* Ensures space at bottom of white container */
+      padding-bottom: 2rem;
     }
     
-    /* Reduce footer spacing for dashboard page */
     .site-footer {
-      margin-top: 2rem; /* Reduced from default 4rem */
+      margin-top: 2rem;
     }
     
     .dashboard-loading {
@@ -129,7 +128,7 @@
     
     @media (max-width: 768px) {
       .practice-status-card {
-        padding: 0.75rem 1.25rem; /* Even more compact on mobile */
+        padding: 0.75rem 1.25rem;
         margin-bottom: 1.5rem;
       }
       .practice-status-card h2 {
@@ -180,15 +179,13 @@
       font-weight: 600;
     }
     
-    /* Dashboard Grid - Custom layout using classes for reliability */
+    /* Dashboard Grid */
     .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
-      /* Cards will align to tallest in row - looks more organized */
     }
     
-    /* Row 1 & 2: Phrase (left), Skills (center - span 2 rows), Progress (right) */
     .card-skills {
       grid-column: 2 / 3;
       grid-row: 1 / 3;
@@ -217,7 +214,6 @@
       grid-row: 2 / 3;
     }
     
-    /* Row 3: Account Info (left), Upcoming Lessons (middle), Resources (right) */
     .card-account {
       grid-column: 1 / 2;
       grid-row: 3 / 4;
@@ -233,7 +229,6 @@
       grid-row: 3 / 4;
     }
     
-    /* Upgrade card spans all 3 columns */
     .card-upgrade {
       grid-column: 1 / 4;
       grid-row: 4 / 5;
@@ -264,12 +259,12 @@
       font-size: 1rem;
     }
     
-    /* Skills Chart - BIGGER pentagon without labels! */
+    /* Skills Chart */
     .skills-chart-container {
       position: relative;
       height: 420px;
       margin: 0;
-      padding: 0.5rem 0 0.25rem 0; /* Reduced bottom padding */
+      padding: 0.5rem 0 0.25rem 0;
     }
     .no-assessment-message {
       text-align: center;
@@ -295,7 +290,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 0; /* Removed margin-top for tighter spacing */
+      margin-top: 0;
       padding-top: 0.5rem;
       border-top: 1px solid var(--color-border);
       font-size: 0.85rem;
@@ -405,7 +400,6 @@
       color: var(--color-text-light);
       font-size: 0.75rem;
     }
-    /* Outer container that holds the calendar grid */
     .streak-calendar-container,
     #ja-streak-calendar,
     #en-streak-calendar {
@@ -414,12 +408,12 @@
     }
     .streak-calendar {
       display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr)); /* minmax(0, 1fr) allows columns to shrink below content size */
+      grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 2px;
-      width: 100%; /* Make grid fill full width */
+      width: 100%;
       transition: max-height 0.3s ease;
-      overflow-y: hidden; /* Only hide vertical overflow */
-      overflow-x: visible; /* Allow horizontal content to show */
+      overflow-y: hidden;
+      overflow-x: visible;
     }
     .streak-day-header {
       text-align: center;
@@ -427,7 +421,7 @@
       color: var(--color-text-muted);
       padding: 1px;
       font-weight: 600;
-      min-width: 0; /* Allow shrinking below content width */
+      min-width: 0;
     }
     .streak-day {
       aspect-ratio: 1;
@@ -438,20 +432,20 @@
       border-radius: 3px;
       font-size: 0.6rem;
       color: var(--color-text-light);
-      min-width: 0; /* Allow shrinking below content width */
-      overflow: hidden; /* Prevent content from expanding cell */
+      min-width: 0;
+      overflow: hidden;
     }
     .streak-day.active {
       background-color: var(--color-primary);
       color: white;
     }
     .streak-day.streak-hot {
-      background-color: #E67E22; /* Orange for 3-6 day streaks */
+      background-color: #E67E22;
       color: white;
       font-weight: 600;
     }
     .streak-day.streak-fire {
-      background-color: #E74C3C; /* Fire red for 7+ day streaks */
+      background-color: #E74C3C;
       color: white;
       font-weight: 700;
       box-shadow: 0 0 8px rgba(231, 76, 60, 0.4);
@@ -557,8 +551,8 @@
     .achievement-name {
       font-size: 0.7rem;
       color: var(--color-text-light);
-      line-height: 1.1; /* Tighter line spacing for wrapped text */
-      min-height: 2em; /* Reserve space for 2 lines to prevent jumping */
+      line-height: 1.1;
+      min-height: 2em;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -614,7 +608,7 @@
     }
     
     .upgrade-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
       color: white;
       text-align: center;
     }
@@ -631,7 +625,7 @@
     }
     .upgrade-card .cta-button {
       background: white;
-      color: #667eea;
+      color: var(--color-primary);
     }
     .upgrade-card .cta-button:hover {
       background: #f0f0f0;
@@ -661,13 +655,11 @@
         grid-template-columns: 1fr 1fr;
       }
       
-      /* Skills spans both columns at top */
       .card-skills {
         grid-column: 1 / 3;
         grid-row: 1 / 2;
       }
       
-      /* Phrase and Progress side by side */
       .card-phrase {
         grid-column: 1 / 2;
         grid-row: 2 / 3;
@@ -678,7 +670,6 @@
         grid-row: 2 / 3;
       }
       
-      /* Streak and Achievements side by side */
       .card-streak {
         grid-column: 1 / 2;
         grid-row: 3 / 4;
@@ -689,7 +680,6 @@
         grid-row: 3 / 4;
       }
       
-      /* Bottom 3 stack */
       .card-account {
         grid-column: 1 / 3;
         grid-row: 4 / 5;
@@ -714,35 +704,34 @@
       .welcome-banner {
         flex-direction: column;
         text-align: center;
-        padding: 1.25rem 1.5rem; /* Reduced from 2rem */
+        padding: 1.25rem 1.5rem;
       }
       .welcome-banner h1 {
-        font-size: 1.4rem; /* Slightly smaller */
+        font-size: 1.4rem;
         margin-bottom: 0.25rem;
       }
       .welcome-banner p {
-        font-size: 0.9rem; /* Slightly smaller */
+        font-size: 0.9rem;
         margin-bottom: 0.75rem;
       }
       .welcome-stats {
         justify-content: center;
-        gap: 1.5rem; /* Reduced gap */
+        gap: 1.5rem;
       }
       .welcome-stat-value {
-        font-size: 1.5rem; /* Reduced from 2rem */
+        font-size: 1.5rem;
       }
       .welcome-stat-label {
-        font-size: 0.75rem; /* Slightly smaller */
+        font-size: 0.75rem;
       }
       .quick-actions {
         grid-template-columns: repeat(2, 1fr);
       }
       .dashboard-grid {
         grid-template-columns: 1fr;
-        padding-bottom: 1.5rem; /* Add bottom padding on mobile */
+        padding-bottom: 1.5rem;
       }
       
-      /* All cards stack in mobile */
       .card-skills,
       .card-phrase,
       .card-progress,
@@ -760,7 +749,6 @@
         height: 300px;
       }
       
-      /* Ensure proper spacing for dashboard content on mobile */
       #ja-dashboard-content,
       #en-dashboard-content {
         padding-bottom: 1.5rem;
@@ -793,10 +781,7 @@
       }
     }
     
-    /* =============================================
-   BOOKING MODAL STYLES
-   ============================================= */
-
+    /* BOOKING MODAL STYLES */
 /* Modal Overlay */
 .booking-modal-overlay {
   display: none;
@@ -819,7 +804,6 @@
   to { opacity: 1; }
 }
 
-/* Modal Container */
 .booking-modal {
   display: none;
   position: fixed;
@@ -853,7 +837,6 @@
   }
 }
 
-/* Modal Header */
 .booking-modal-header {
   display: flex;
   justify-content: space-between;
@@ -887,14 +870,12 @@
   transform: scale(1.2);
 }
 
-/* Modal Body */
 .booking-modal-body {
   padding: 1.5rem;
   overflow-y: auto;
   flex: 1;
 }
 
-/* Booking Widget Styles (Compact for Modal) */
 .booking-widget {
   background: transparent;
   border: none;
@@ -916,7 +897,7 @@
   margin: 0;
   color: var(--color-primary);
   font-size: 1.2rem;
-  display: none; /* Hide since we have modal title */
+  display: none;
 }
 
 .booking-credits {
@@ -964,7 +945,6 @@
   50% { opacity: 0.8; }
 }
 
-/* Calendar Container */
 .calendar-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -972,7 +952,6 @@
   margin-top: 1rem;
 }
 
-/* Calendar (Left Side) */
 .calendar-picker {
   display: flex;
   flex-direction: column;
@@ -1082,7 +1061,6 @@
   font-size: 1.5rem;
 }
 
-/* Time Slots (Right Side) */
 .time-slots-container {
   display: flex;
   flex-direction: column;
@@ -1179,7 +1157,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* Booking Actions */
 .booking-actions {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
@@ -1278,7 +1255,6 @@
   margin-right: 0.5rem;
 }
 
-/* My Bookings Section */
 .my-bookings {
   margin-top: 2rem;
   padding-top: 2rem;
@@ -1371,7 +1347,6 @@
   color: var(--color-text-light);
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
   .booking-modal {
     width: 95%;
@@ -1393,7 +1368,6 @@
   }
 }
 
-/* Dark Mode */
 @media (prefers-color-scheme: dark) {
   .booking-modal {
     background: var(--color-card-bg);
@@ -1408,8 +1382,9 @@
     color: var(--color-text);
   }
 }
-    /* ================================
-   ENHANCED UPCOMING LESSONS CARD
+
+/* ================================
+   ENHANCED UPCOMING LESSONS CARD - TEAL STYLING
    ================================ */
 
 .lessons-container {
@@ -1426,11 +1401,12 @@
     transition: all 0.3s ease;
 }
 
+/* Next lesson uses TEAL gradient instead of purple */
 .lesson-item.lesson-next {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
     color: white;
     border: none;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
 }
 
 .lesson-item.lesson-next .lesson-info {
@@ -1467,6 +1443,23 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+}
+
+/* Meet link status indicator */
+.meet-link-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 12px 20px;
+    background: rgba(0, 128, 128, 0.1);
+    border: 1px solid rgba(0, 128, 128, 0.3);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--color-primary-dark);
+}
+
+.meet-link-status i {
+    animation: spin 1s linear infinite;
 }
 
 /* Google Meet Button */
@@ -1558,13 +1551,13 @@
 }
 
 .reschedule-btn {
-    color: #1a73e8;
-    border-color: #1a73e8;
+    color: var(--color-primary);
+    border-color: var(--color-primary);
 }
 
 .reschedule-btn:hover {
-    background: #e8f0fe;
-    border-color: #1a73e8;
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
 }
 
 .cancel-btn {
@@ -1585,7 +1578,7 @@
 }
 
 .lessons-more.expanded {
-    max-height: 2000px; /* Large enough for multiple lessons */
+    max-height: 2000px;
 }
 
 .lessons-more .lesson-item {
@@ -1622,11 +1615,11 @@
     margin: 0.5rem 0;
 }
 
-/* Book another button */
+/* Book another button - TEAL gradient instead of purple */
 .book-another-btn {
     width: 100%;
     padding: 12px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -1638,12 +1631,12 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 2px 6px rgba(0, 128, 128, 0.3);
 }
 
 .book-another-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 128, 128, 0.4);
 }
 
 .book-another-btn:active {
@@ -1671,7 +1664,7 @@
     }
 }
 
-/* Dark mode support (if needed) */
+/* Dark mode support */
 @media (prefers-color-scheme: dark) {
     .lesson-item {
         background: #2d2d2d;
@@ -1695,6 +1688,12 @@
     .lesson-action-btn:hover,
     .toggle-lessons-btn:hover {
         background: #353535;
+    }
+    
+    .meet-link-status {
+        background: rgba(0, 168, 168, 0.15);
+        border-color: rgba(0, 168, 168, 0.4);
+        color: var(--color-primary);
     }
 }
   </style>
@@ -3856,7 +3855,14 @@ monthLabel.textContent =
                 }
                 
                 alert(lang === 'ja' ? '予約が完了しました！確認メールをご確認ください。' : 'Booking confirmed! Check your email for details.');
-                
+                // Start auto-refresh for Meet link
+if (result.booking && result.booking.google_calendar_event_id) {
+    console.log('🔄 Starting auto-refresh for Meet link...');
+    meetLinkRefresh.start(
+        result.booking.id,
+        result.booking.google_calendar_event_id
+    );
+}
                 bookingState.selectedDate = null;
                 bookingState.selectedTime = null;
                 
@@ -4094,64 +4100,6 @@ function isWithin1Hour(scheduledAt) {
     return hours > 0 && hours <= 1;
 }
 
-// Render a single lesson card
-function renderLessonCard(lesson, isFirst = false) {
-    const within24h = isWithin24Hours(lesson.scheduled_at);
-    const within1h = isWithin1Hour(lesson.scheduled_at);
-    const timeUntil = getTimeUntilLesson(lesson.scheduled_at);
-    const dateTime = formatLessonDateTime(lesson.scheduled_at);
-    
-    const showJoinButton = within24h && lesson.google_meet_link;
-    const showReschedule = !within1h; // Can't reschedule within 1 hour
-    
-    return `
-        <div class="lesson-item ${isFirst ? 'lesson-next' : ''}" data-lesson-id="${lesson.id}">
-            <div class="lesson-info">
-                <div class="lesson-datetime">
-                    <i class="fas fa-calendar-alt"></i> ${dateTime}
-                </div>
-                <div class="lesson-countdown">
-                    <i class="fas fa-clock"></i> ${timeUntil}
-                </div>
-            </div>
-            
-            <div class="lesson-actions">
-                ${showJoinButton ? `
-                    <button class="google-meet-btn ${within1h ? 'pulse' : ''}" 
-                            onclick="window.open('${lesson.google_meet_link}', '_blank')"
-                            title="Join Google Meet">
-                        <svg width="20" height="20" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
-                            <path fill="#00832d" d="M96 0c53.019 0 96 42.981 96 96s-42.981 96-96 96S0 149.019 0 96 42.981 0 96 0z"/>
-                            <path fill="#0066da" d="M96 192c-53.019 0-96-42.981-96-96V96c0-8.837 7.163-16 16-16h32c8.837 0 16 7.163 16 16v64c0 8.837 7.163 16 16 16h80c0 8.837-7.163 16-16 16H96z"/>
-                            <path fill="#e94235" d="M96 0C42.981 0 0 42.981 0 96h48c0-8.837 7.163-16 16-16h64c8.837 0 16-7.163 16-16V16c0-8.837-7.163-16-16-16H96z"/>
-                            <path fill="#2684fc" d="M192 96c0-53.019-42.981-96-96-96v48c8.837 0 16 7.163 16 16v64c0 8.837 7.163 16 16 16h48c8.837 0 16-7.163 16-16V96z"/>
-                            <path fill="#00ac47" d="M128 80H64c-8.837 0-16 7.163-16 16v32c0 8.837 7.163 16 16 16h64c8.837 0 16-7.163 16-16V96c0-8.837-7.163-16-16-16z"/>
-                            <path fill="#fff" d="M112 96c0 8.837-7.163 16-16 16s-16-7.163-16-16 7.163-16 16-16 16 7.163 16 16z"/>
-                        </svg>
-                        Join with Google Meet
-                    </button>
-                ` : ''}
-                
-                <div class="lesson-secondary-actions">
-                    ${showReschedule ? `
-                        <button class="lesson-action-btn reschedule-btn" 
-                                onclick="rescheduleLesson('${lesson.id}')"
-                                title="Reschedule lesson">
-                            <i class="fas fa-calendar-edit"></i> Reschedule
-                        </button>
-                    ` : ''}
-                    
-                    <button class="lesson-action-btn cancel-btn" 
-                            onclick="cancelLesson('${lesson.id}')"
-                            title="Cancel lesson">
-                        <i class="fas fa-times-circle"></i> Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
 // Render upcoming lessons card
 function renderUpcomingLessonsCard(lessons) {
     const card = document.getElementById('en-upcoming-lessons-card');
@@ -4293,6 +4241,17 @@ function initializeEnhancedLessonsCard() {
     if (bookingState.userBookings && bookingState.userBookings.length > 0) {
         startCountdownUpdates();
     }
+
+    // 🆕 ADD THIS SECTION:
+    // Start auto-refresh for bookings without Meet links
+    if (bookingState.userBookings) {
+        bookingState.userBookings.forEach(booking => {
+            if (!booking.google_meet_link && booking.google_calendar_event_id) {
+                console.log(`🔄 Starting auto-refresh for existing booking ${booking.id}`);
+                meetLinkRefresh.start(booking.id, booking.google_calendar_event_id);
+            }
+        });
+    }
 }
 
 // Make functions globally available
@@ -4300,6 +4259,227 @@ window.toggleLessonsExpanded = toggleLessonsExpanded;
 window.cancelLesson = cancelLesson;
 window.rescheduleLesson = rescheduleLesson;
 window.initializeEnhancedLessonsCard = initializeEnhancedLessonsCard;
+      // ================================
+// AUTO-REFRESH MEET LINKS SYSTEM
+// Polls Google Calendar every 30 seconds to check for manually added Meet links
+// ================================
+
+const meetLinkRefresh = {
+    intervals: new Map(), // bookingId => intervalId
+    maxAttempts: 10, // Stop after 5 minutes (10 attempts * 30 seconds)
+    
+    // Start polling for a specific booking
+    start(bookingId, eventId) {
+        console.log(`🔄 Starting Meet link refresh for booking ${bookingId}`);
+        
+        // Don't start if already polling
+        if (this.intervals.has(bookingId)) {
+            console.log(`⚠️ Already polling for booking ${bookingId}`);
+            return;
+        }
+        
+        let attempts = 0;
+        
+        const intervalId = setInterval(async () => {
+            attempts++;
+            console.log(`🔍 Checking for Meet link (attempt ${attempts}/${this.maxAttempts})...`);
+            
+            try {
+                const hasLink = await this.checkForMeetLink(bookingId, eventId);
+                
+                if (hasLink) {
+                    console.log('✅ Meet link found! Stopping refresh.');
+                    this.stop(bookingId);
+                    
+                    // Refresh the lessons card
+                    await fetchUserBookings(bookingState.userId, 'en');
+                    initializeEnhancedLessonsCard();
+                } else if (attempts >= this.maxAttempts) {
+                    console.log('⏱️ Max attempts reached. Stopping refresh.');
+                    this.stop(bookingId);
+                }
+            } catch (err) {
+                console.error('❌ Error checking Meet link:', err);
+            }
+        }, 30000); // Check every 30 seconds
+        
+        this.intervals.set(bookingId, intervalId);
+        
+        // Also check immediately
+        this.checkForMeetLink(bookingId, eventId);
+    },
+    
+    // Stop polling for a booking
+    stop(bookingId) {
+        const intervalId = this.intervals.get(bookingId);
+        if (intervalId) {
+            clearInterval(intervalId);
+            this.intervals.delete(bookingId);
+            console.log(`🛑 Stopped polling for booking ${bookingId}`);
+        }
+    },
+    
+    // Stop all polling
+    stopAll() {
+        for (const [bookingId, intervalId] of this.intervals.entries()) {
+            clearInterval(intervalId);
+            console.log(`🛑 Stopped polling for booking ${bookingId}`);
+        }
+        this.intervals.clear();
+    },
+    
+    // Check if Meet link exists in Google Calendar
+    async checkForMeetLink(bookingId, eventId) {
+        try {
+            const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/google-calendar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`
+                },
+                body: JSON.stringify({
+                    action: 'getEvent',
+                    event_id: eventId,
+                    booking_id: bookingId
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success && result.meet_link) {
+                console.log('📍 Meet link found:', result.meet_link);
+                return true;
+            }
+            
+            return false;
+            
+        } catch (err) {
+            console.error('Error fetching event:', err);
+            return false;
+        }
+    }
+};
+
+// Update the bookLesson function to start auto-refresh
+// ADD THIS CODE INSIDE YOUR EXISTING bookLesson function, right after the booking succeeds:
+
+/*
+FIND THIS CODE IN bookLesson():
+        if (!result.success) {
+            throw new Error(result.error || 'Booking failed');
+        }
+        
+        alert(...);
+
+AND ADD THIS AFTER THE ALERT:
+
+        // Start auto-refresh for Meet link
+        if (result.booking && result.booking.google_calendar_event_id) {
+            console.log('🔄 Starting auto-refresh for Meet link...');
+            meetLinkRefresh.start(
+                result.booking.id,
+                result.booking.google_calendar_event_id
+            );
+        }
+
+*/
+
+// Update renderLessonCard to show "Meeting link loading" status
+
+function renderLessonCard(lesson, isFirst = false) {
+    const within24h = isWithin24Hours(lesson.scheduled_at);
+    const within1h = isWithin1Hour(lesson.scheduled_at);
+    const timeUntil = getTimeUntilLesson(lesson.scheduled_at);
+    const dateTime = formatLessonDateTime(lesson.scheduled_at);
+    
+    const showJoinButton = within24h && lesson.google_meet_link;
+    const showWaitingMessage = within24h && !lesson.google_meet_link && lesson.google_calendar_event_id;
+    const showReschedule = !within1h;
+    
+    return `
+        <div class="lesson-item ${isFirst ? 'lesson-next' : ''}" data-lesson-id="${lesson.id}">
+            <div class="lesson-info">
+                <div class="lesson-datetime">
+                    <i class="fas fa-calendar-alt"></i> ${dateTime}
+                </div>
+                <div class="lesson-countdown">
+                    <i class="fas fa-clock"></i> ${timeUntil}
+                </div>
+            </div>
+            
+            <div class="lesson-actions">
+                ${showJoinButton ? `
+                    <button class="google-meet-btn ${within1h ? 'pulse' : ''}" 
+                            onclick="window.open('${lesson.google_meet_link}', '_blank')"
+                            title="Join Google Meet">
+                        <svg width="20" height="20" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#00832d" d="M96 0c53.019 0 96 42.981 96 96s-42.981 96-96 96S0 149.019 0 96 42.981 0 96 0z"/>
+                            <path fill="#0066da" d="M96 192c-53.019 0-96-42.981-96-96V96c0-8.837 7.163-16 16-16h32c8.837 0 16 7.163 16 16v64c0 8.837 7.163 16 16 16h80c0 8.837-7.163 16-16 16H96z"/>
+                            <path fill="#e94235" d="M96 0C42.981 0 0 42.981 0 96h48c0-8.837 7.163-16 16-16h64c8.837 0 16-7.163 16-16V16c0-8.837-7.163-16-16-16H96z"/>
+                            <path fill="#2684fc" d="M192 96c0-53.019-42.981-96-96-96v48c8.837 0 16 7.163 16 16v64c0 8.837 7.163 16 16 16h48c8.837 0 16-7.163 16-16V96z"/>
+                            <path fill="#00ac47" d="M128 80H64c-8.837 0-16 7.163-16 16v32c0 8.837 7.163 16 16 16h64c8.837 0 16-7.163 16-16V96c0-8.837-7.163-16-16-16z"/>
+                            <path fill="#fff" d="M112 96c0 8.837-7.163 16-16 16s-16-7.163-16-16 7.163-16 16-16 16 7.163 16 16z"/>
+                        </svg>
+                        Join with Google Meet
+                    </button>
+                ` : showWaitingMessage ? `
+                    <div class="meet-link-status">
+                        <i class="fas fa-spinner"></i>
+                        Meet link will appear shortly (refreshing automatically)
+                    </div>
+                ` : ''}
+                
+                <div class="lesson-secondary-actions">
+                    ${showReschedule ? `
+                        <button class="lesson-action-btn reschedule-btn" 
+                                onclick="rescheduleLesson('${lesson.id}')"
+                                title="Reschedule lesson">
+                            <i class="fas fa-calendar-edit"></i> Reschedule
+                        </button>
+                    ` : ''}
+                    
+                    <button class="lesson-action-btn cancel-btn" 
+                            onclick="cancelLesson('${lesson.id}')"
+                            title="Cancel lesson">
+                        <i class="fas fa-times-circle"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Start auto-refresh for existing bookings on page load
+// ADD THIS TO initializeEnhancedLessonsCard():
+/*
+FIND THIS CODE:
+function initializeEnhancedLessonsCard() {
+    renderUpcomingLessonsCard(bookingState.userBookings || []);
+    
+    if (bookingState.userBookings && bookingState.userBookings.length > 0) {
+        startCountdownUpdates();
+    }
+}
+
+AND ADD THIS BEFORE THE CLOSING }:
+
+    // Start auto-refresh for bookings without Meet links
+    if (bookingState.userBookings) {
+        bookingState.userBookings.forEach(booking => {
+            if (!booking.google_meet_link && booking.google_calendar_event_id) {
+                console.log(`🔄 Starting auto-refresh for existing booking ${booking.id}`);
+                meetLinkRefresh.start(booking.id, booking.google_calendar_event_id);
+            }
+        });
+    }
+*/
+
+// Clean up intervals when user leaves page
+window.addEventListener('beforeunload', () => {
+    meetLinkRefresh.stopAll();
+});
+
+console.log('✅ Auto-refresh Meet link system loaded');
     </script>
 </body>
 </html>
