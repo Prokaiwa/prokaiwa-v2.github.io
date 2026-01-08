@@ -4286,8 +4286,11 @@ function startCountdownUpdates() {
 
 // Initialize - call this after fetching bookings
 function initializeEnhancedLessonsCard() {
+    // 🆕 ALWAYS call render, even with 0 bookings
+    renderUpcomingLessonsCard(bookingState.userBookings || []);
+    
+    // Only start countdown if there are bookings
     if (bookingState.userBookings && bookingState.userBookings.length > 0) {
-        renderUpcomingLessonsCard(bookingState.userBookings);
         startCountdownUpdates();
     }
 }
