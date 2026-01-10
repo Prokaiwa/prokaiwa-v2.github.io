@@ -899,6 +899,244 @@
     gap: 0.5rem;
   }
 }
+    /* Video Lessons Section */
+.video-lessons-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  margin-bottom: 2rem;
+}
+
+.video-lessons-section h2 {
+  color: white;
+  margin-top: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.pending-alert {
+  background: #ff9800;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pending-alert:hover {
+  background: #f57c00;
+  transform: translateY(-2px);
+}
+
+.pending-alert i {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
+.lesson-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.lesson-card.needs-link {
+  border-left: 4px solid #ff9800;
+  animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-left-color: #ff9800; }
+  50% { border-left-color: #ffc107; }
+}
+
+.lesson-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.lesson-student {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.lesson-datetime {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0;
+  color: var(--color-text-light);
+}
+
+.lesson-datetime i {
+  color: var(--color-primary);
+}
+
+.lesson-status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.lesson-status.has-link {
+  background: #4caf50;
+  color: white;
+}
+
+.lesson-status.no-link {
+  background: #ff9800;
+  color: white;
+}
+
+.lesson-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.add-link-btn {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.add-link-btn:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+}
+
+.join-meeting-btn {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.join-meeting-btn:hover {
+  background: #45a049;
+}
+
+/* Meet Link Modal */
+.meet-link-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 2000;
+  overflow-y: auto;
+}
+
+.meet-link-modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.meet-link-content {
+  background: var(--color-surface);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  padding: 2rem;
+  position: relative;
+}
+
+.meet-link-content h3 {
+  margin-top: 0;
+  color: var(--color-primary);
+}
+
+.meet-link-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  margin: 1rem 0;
+}
+
+.meet-link-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.meet-link-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.save-link-btn {
+  flex: 1;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancel-link-btn {
+  background: var(--color-border);
+  color: var(--color-text);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .lesson-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .lesson-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .add-link-btn,
+  .join-meeting-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
   </style>
 </head>
 <body>
@@ -933,6 +1171,46 @@
       <div class="stat-card">
         <h3 id="estimated-time">-</h3>
         <p>Estimated Time</p>
+      </div>
+    </div>
+    
+    <!-- Pending Bookings Alert -->
+    <div id="pending-alert" style="display: none;">
+      <!-- Will be populated if there are pending bookings -->
+    </div>
+
+    <!-- Video Lessons Section -->
+    <div class="video-lessons-section" id="video-lessons-section">
+      <h2>📹 Upcoming Video Lessons</h2>
+      <div id="video-lessons-list">
+        <p style="text-align: center; opacity: 0.8;">
+          <i class="fas fa-spinner fa-spin"></i> Loading lessons...
+        </p>
+      </div>
+    </div>
+
+    <!-- Meet Link Modal -->
+    <div id="meet-link-modal" class="meet-link-modal">
+      <div class="meet-link-content">
+        <h3>Add Google Meet Link</h3>
+        <p id="modal-booking-details" style="color: var(--color-text-light); margin-bottom: 1rem;">
+          <!-- Booking details will appear here -->
+        </p>
+        <input 
+          type="url" 
+          id="meet-link-input" 
+          class="meet-link-input" 
+          placeholder="https://meet.google.com/xxx-xxxx-xxx"
+        >
+        <p style="font-size: 0.85rem; color: var(--color-text-light); margin-top: 0.5rem;">
+          💡 Tip: Create a new Google Meet at <a href="https://meet.google.com" target="_blank">meet.google.com</a>
+        </p>
+        <div class="meet-link-actions">
+          <button class="cancel-link-btn" onclick="closeMeetLinkModal()">Cancel</button>
+          <button class="save-link-btn" onclick="saveMeetLink()">
+            <i class="fas fa-save"></i> Save Link
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1311,7 +1589,9 @@ Keep practicing! 🌟`
       // Load feedback queue
       await loadFeedbackQueue();
     }
-
+  // Load video lessons
+  await loadVideoLessons();
+}
     // ============================================
     // LOAD COMPLETED FEEDBACK FROM TODAY
     // ============================================
@@ -1944,7 +2224,10 @@ if (filterSelect) {
     checkAuth();
 
     // Auto-refresh every 5 minutes
-    setInterval(loadFeedbackQueue, 5 * 60 * 1000);
+    setInterval(() => {
+      loadFeedbackQueue();
+      loadVideoLessons();  // 🆕 ADD THIS LINE
+    }, 5 * 60 * 1000);
     // ============================================
 // ASSESSMENT MODAL FUNCTIONS
 // ============================================
@@ -2199,6 +2482,180 @@ document.addEventListener('click', (e) => {
   }
   if (e.target.classList.contains('guide-popup')) {
     closeGuide();
+  }
+});
+    // ============================================
+// VIDEO LESSONS FUNCTIONS
+// ============================================
+
+let currentBooking = null;
+
+async function loadVideoLessons() {
+  try {
+    const now = new Date().toISOString();
+    
+    // Get all upcoming lessons
+    const { data: bookings, error } = await supabaseClient
+      .from('lesson_bookings')
+      .select(`
+        *,
+        questionnaire_responses (
+          given_name_romaji,
+          name
+        )
+      `)
+      .eq('status', 'scheduled')
+      .gte('scheduled_at', now)
+      .order('scheduled_at', { ascending: true });
+    
+    if (error) throw error;
+    
+    const container = document.getElementById('video-lessons-list');
+    const alertContainer = document.getElementById('pending-alert');
+    
+    if (!bookings || bookings.length === 0) {
+      container.innerHTML = '<p style="text-align: center; opacity: 0.8;">No upcoming video lessons scheduled.</p>';
+      alertContainer.style.display = 'none';
+      return;
+    }
+    
+    // Count bookings without Meet links
+    const pendingCount = bookings.filter(b => !b.google_meet_link).length;
+    
+    // Show alert if there are pending bookings
+    if (pendingCount > 0) {
+      alertContainer.innerHTML = `
+        <div class="pending-alert" onclick="document.getElementById('video-lessons-section').scrollIntoView({ behavior: 'smooth' })">
+          <div style="display: flex; align-items: center;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+              <strong>${pendingCount} booking${pendingCount > 1 ? 's' : ''} need${pendingCount === 1 ? 's' : ''} a Google Meet link!</strong>
+              <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem;">
+                Click to view and add meeting links
+              </div>
+            </div>
+          </div>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      `;
+      alertContainer.style.display = 'block';
+    } else {
+      alertContainer.style.display = 'none';
+    }
+    
+    // Render lesson cards
+    const html = bookings.map(booking => {
+      const student = booking.questionnaire_responses;
+      const studentName = student?.given_name_romaji || student?.name || 'Unknown Student';
+      const date = new Date(booking.scheduled_at);
+      const hasLink = !!booking.google_meet_link;
+      const isToday = date.toDateString() === new Date().toDateString();
+      const isWithin24h = (date - new Date()) < 24 * 60 * 60 * 1000;
+      
+      return `
+        <div class="lesson-card ${!hasLink ? 'needs-link' : ''}">
+          <div class="lesson-header">
+            <div>
+              <div class="lesson-student">${studentName}</div>
+              <div class="lesson-datetime">
+                <div>
+                  <i class="fas fa-calendar"></i>
+                  ${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                </div>
+                <div>
+                  <i class="fas fa-clock"></i>
+                  ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                </div>
+                <div>
+                  <i class="fas fa-hourglass-half"></i>
+                  ${booking.duration_minutes} min
+                </div>
+              </div>
+              ${isToday ? '<div style="color: #ff9800; font-weight: 600; margin-top: 0.5rem;"><i class="fas fa-bell"></i> Today!</div>' : ''}
+              ${isWithin24h && !isToday ? '<div style="color: #2196f3; font-weight: 600; margin-top: 0.5rem;"><i class="fas fa-info-circle"></i> Within 24 hours</div>' : ''}
+            </div>
+            <span class="lesson-status ${hasLink ? 'has-link' : 'no-link'}">
+              ${hasLink ? '✓ Meet Link Added' : '⚠ No Meet Link'}
+            </span>
+          </div>
+          
+          <div class="lesson-actions">
+            <button class="add-link-btn" onclick="openMeetLinkModal('${booking.id}', '${studentName}', '${date.toLocaleString()}')">
+              <i class="fas fa-${hasLink ? 'edit' : 'plus'}"></i>
+              ${hasLink ? 'Update Link' : 'Add Meet Link'}
+            </button>
+            ${hasLink ? `
+              <a href="${booking.google_meet_link}" target="_blank" class="join-meeting-btn">
+                <i class="fas fa-video"></i>
+                Join Meeting
+              </a>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    container.innerHTML = html;
+    
+  } catch (err) {
+    console.error('Error loading video lessons:', err);
+    document.getElementById('video-lessons-list').innerHTML = 
+      '<p style="text-align: center; color: #f44336;">Error loading lessons. Please refresh the page.</p>';
+  }
+}
+
+function openMeetLinkModal(bookingId, studentName, datetime) {
+  currentBooking = bookingId;
+  document.getElementById('modal-booking-details').innerHTML = `
+    <strong>${studentName}</strong><br>
+    ${datetime}
+  `;
+  document.getElementById('meet-link-input').value = '';
+  document.getElementById('meet-link-modal').classList.add('active');
+}
+
+function closeMeetLinkModal() {
+  document.getElementById('meet-link-modal').classList.remove('active');
+  currentBooking = null;
+}
+
+async function saveMeetLink() {
+  if (!currentBooking) return;
+  
+  const meetLink = document.getElementById('meet-link-input').value.trim();
+  
+  if (!meetLink) {
+    alert('Please enter a Google Meet link');
+    return;
+  }
+  
+  if (!meetLink.includes('meet.google.com')) {
+    alert('Please enter a valid Google Meet link');
+    return;
+  }
+  
+  try {
+    const { error } = await supabaseClient
+      .from('lesson_bookings')
+      .update({ google_meet_link: meetLink })
+      .eq('id', currentBooking);
+    
+    if (error) throw error;
+    
+    alert('Google Meet link saved successfully! ✅');
+    closeMeetLinkModal();
+    loadVideoLessons();
+    
+  } catch (err) {
+    console.error('Error saving Meet link:', err);
+    alert('Error saving link. Please try again.');
+  }
+}
+
+// Close modal on outside click
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'meet-link-modal') {
+    closeMeetLinkModal();
   }
 });
   </script>
