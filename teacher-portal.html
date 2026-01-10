@@ -1567,7 +1567,7 @@ Keep practicing! 🌟`
         return;
       }
       
-      // Get teacher info
+// Get teacher info
       const { data: teacher, error } = await supabaseClient
         .from('teachers')
         .select('*')
@@ -1588,14 +1588,14 @@ Keep practicing! 🌟`
       
       // Load feedback queue
       await loadFeedbackQueue();
+      
+      // Load video lessons
+      await loadVideoLessons();
     }
-  // Load video lessons
-  await loadVideoLessons();
-}
+    
     // ============================================
     // LOAD COMPLETED FEEDBACK FROM TODAY
     // ============================================
-
     async function loadCompletedToday() {
       try {
         const todayStart = new Date();
