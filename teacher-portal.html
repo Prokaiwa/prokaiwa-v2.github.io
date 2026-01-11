@@ -2480,21 +2480,13 @@ async function loadVideoLessons() {
           </div>
           
           <div class="lesson-actions">
-  ${booking.google_calendar_event_id ? `
-    <a href="https://calendar.google.com/calendar/u/0/r/eventedit/${booking.google_calendar_event_id}" 
-       target="_blank" 
-       class="add-link-btn">
-      <i class="fas fa-calendar-plus"></i>
-      ${hasLink ? 'Edit in Calendar' : 'Add Meet Link in Calendar'}
-    </a>
-  ` : `
-    <a href="https://calendar.google.com/calendar/u/0/r/day/${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}" 
-       target="_blank" 
-       class="add-link-btn">
-      <i class="fas fa-calendar"></i>
-      Open Google Calendar
-    </a>
-  `}
+  <a href="https://calendar.google.com/calendar/r" 
+     target="_blank" 
+     class="add-link-btn"
+     title="Open in Google Calendar at ${date.toLocaleDateString()} ${date.toLocaleTimeString()}">
+    <i class="fas fa-calendar-plus"></i>
+    ${hasLink ? 'Edit Event in Calendar' : 'Open Calendar to Add Link'}
+  </a>
   ${hasLink ? `
     <a href="${booking.google_meet_link}" target="_blank" class="join-meeting-btn">
       <svg width="16" height="16" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
