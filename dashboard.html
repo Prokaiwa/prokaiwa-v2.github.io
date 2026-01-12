@@ -4275,8 +4275,8 @@ const lessonsCardState = {
     updateInterval: null
 };
 
-// Format date/time
-function formatLessonDateTime(scheduledAt) {
+// Format date/time (bilingual)
+function formatLessonDateTime(scheduledAt, lang = 'en') {
     const date = new Date(scheduledAt);
     const options = { 
         weekday: 'short', 
@@ -4284,27 +4284,34 @@ function formatLessonDateTime(scheduledAt) {
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-        hour12: true
+        hour12: lang === 'en'
     };
-    return date.toLocaleString('en-US', options);
+    return date.toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US', options);
 }
 
-// Calculate time until lesson
-function getTimeUntilLesson(scheduledAt) {
+// Calculate time until lesson (bilingual)
+function getTimeUntilLesson(scheduledAt, lang = 'en') {
     const now = new Date();
     const lessonTime = new Date(scheduledAt);
     const diff = lessonTime - now;
     
-    if (diff < 0) return 'Past';
+    if (diff < 0) return lang === 'ja' ? '過去' : 'Past';
     
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const days = Math.floor(hours / 24);
     
-    if (days > 1) return `In ${days} days`;
-    if (days === 1) return 'Tomorrow';
-    if (hours === 0) return `In ${minutes}m`;
-    return `In ${hours}h ${minutes}m`;
+    if (lang === 'ja') {
+        if (days > 1) return `${days}日後`;
+        if (days === 1) return '明日';
+        if (hours === 0) return `${minutes}分後`;
+        return `${hours}時間${minutes}分後`;
+    } else {
+        if (days > 1) return `In ${days} days`;
+        if (days === 1) return 'Tomorrow';
+        if (hours === 0) return `In ${minutes}m`;
+        return `In ${hours}h ${minutes}m`;
+    }
 }
 
 // Check if lesson is within 24 hours
@@ -4326,11 +4333,11 @@ function isWithin1Hour(scheduledAt) {
 }
 
 // Render upcoming lessons card
-function renderUpcomingLessonsCard(lessons) {
-    const card = document.getElementById('en-upcoming-lessons-card');
+function renderUpcomingLessonsCard(lessons, lang) {  // ← ADD lang parameter
+    const card = document.getElementById(`${lang}-upcoming-lessons-card`);  // ← Use lang
     if (!card) return;
     
-    const container = document.getElementById('en-upcoming-lessons');
+    const container = document.getElementById(`${lang}-upcoming-lessons`);  // ← Use lang
     if (!container) return;
     
     // 🆕 FILTER: Hide lessons that ended >60 min ago
@@ -4353,23 +4360,27 @@ function renderUpcomingLessonsCard(lessons) {
     
     container.innerHTML = `
         <div class="lessons-container">
-            ${renderLessonCard(nextLesson, true)}
+            ${renderLessonCard(nextLesson, true, lang)}
             
             ${hasMoreLessons ? `
                 <div class="lessons-more ${lessonsCardState.expanded ? 'expanded' : ''}">
-                    ${visibleLessons.slice(1).map(lesson => renderLessonCard(lesson)).join('')}
+                    ${visibleLessons.slice(1).map(lesson => renderLessonCard(lesson, false, lang)).join('')}
                 </div>
                 
                 <button class="toggle-lessons-btn" onclick="toggleLessonsExpanded()">
                     <i class="fas fa-chevron-${lessonsCardState.expanded ? 'up' : 'down'}"></i>
-                    ${lessonsCardState.expanded ? 'Show Less' : `View All Lessons (${visibleLessons.length})`}
+                    ${lessonsCardState.expanded 
+                        ? (lang === 'ja' ? '少なく表示' : 'Show Less')
+                        : (lang === 'ja' ? `すべて表示 (${visibleLessons.length})` : `View All Lessons (${visibleLessons.length})`)}
                 </button>
             ` : ''}
             
             <div class="book-another-divider"></div>
             
-            <button onclick="openBookingModal('en')" class="book-another-btn">
-                <i class="fas fa-plus-circle"></i> ${visibleLessons.length > 0 ? 'Book Another Lesson' : 'Book Your First Lesson'}
+            <button onclick="openBookingModal('${lang}')" class="book-another-btn">
+                <i class="fas fa-plus-circle"></i> ${visibleLessons.length > 0 
+                    ? (lang === 'ja' ? '別のレッスンを予約' : 'Book Another Lesson')
+                    : (lang === 'ja' ? '最初のレッスンを予約' : 'Book Your First Lesson')}
             </button>
         </div>
     `;
@@ -4394,7 +4405,7 @@ function toggleLessonsExpanded() {
 }
 
 // Cancel lesson
-async function cancelLesson(lessonId) {
+async function cancelLesson(lessonId, lang = 'en') {  // ← ADD lang parameter with default
     // Find the lesson
     const lesson = bookingState.userBookings.find(b => b.id === lessonId);
     if (!lesson) return;
@@ -4404,12 +4415,18 @@ async function cancelLesson(lessonId) {
     const hoursUntilStart = (lessonStart - now) / (1000 * 60 * 60);
     
     // Check if it's too late to cancel with refund
-    let confirmMsg = 'Are you sure you want to cancel this lesson?';
+    let confirmMsg = lang === 'ja' 
+        ? 'このレッスンをキャンセルしてもよろしいですか？' 
+        : 'Are you sure you want to cancel this lesson?';
     
     if (hoursUntilStart < 24) {
-        confirmMsg = `⚠️ Cancelling less than 24 hours before the lesson means NO REFUND.\n\nYour credit will NOT be restored. Are you sure you want to cancel?`;
+        confirmMsg = lang === 'ja'
+            ? '⚠️ 24時間前を切っているため、クレジットは返金されません。\n\nキャンセルしてもよろしいですか？'
+            : '⚠️ Cancelling less than 24 hours before the lesson means NO REFUND.\n\nYour credit will NOT be restored. Are you sure you want to cancel?';
     } else {
-        confirmMsg = `Cancel this lesson?\n\n✅ Your credit will be refunded (>24h notice).`;
+        confirmMsg = lang === 'ja'
+            ? 'このレッスンをキャンセルしますか？\n\n✅ クレジットは返金されます（24時間前まで）'
+            : 'Cancel this lesson?\n\n✅ Your credit will be refunded (>24h notice).';
     }
     
     if (!confirm(confirmMsg)) {
@@ -4427,7 +4444,7 @@ async function cancelLesson(lessonId) {
                 action: 'cancel',
                 bookingData: {
                     bookingId: lessonId,
-                    reason: 'Cancelled from dashboard'
+                    reason: lang === 'ja' ? 'ダッシュボードからキャンセル' : 'Cancelled from dashboard'
                 }
             })
         });
@@ -4435,31 +4452,37 @@ async function cancelLesson(lessonId) {
         const result = await response.json();
         
         if (!result.success) {
-            throw new Error(result.error || 'Cancellation failed');
+            throw new Error(result.error || (lang === 'ja' ? 'キャンセルに失敗しました' : 'Cancellation failed'));
         }
         
         // Show appropriate message based on refund status
         if (result.refundMessage) {
             alert('✅ ' + result.refundMessage);
         } else if (hoursUntilStart < 24) {
-            alert('Lesson cancelled. No refund issued (<24h notice).');
+            alert(lang === 'ja' 
+                ? 'レッスンをキャンセルしました。返金はありません（24時間前以降）。'
+                : 'Lesson cancelled. No refund issued (<24h notice).');
         } else {
-            alert('Lesson cancelled successfully. Your credit has been refunded.');
+            alert(lang === 'ja'
+                ? 'レッスンをキャンセルしました。クレジットは返金されました。'
+                : 'Lesson cancelled successfully. Your credit has been refunded.');
         }
         
         // Refresh everything
-        await fetchBookingEligibility(bookingState.studentId, 'en');
-        await fetchUserBookings(bookingState.userId, 'en');
+        await fetchBookingEligibility(bookingState.studentId, lang);
+        await fetchUserBookings(bookingState.userId, lang);
         initializeEnhancedLessonsCard();
         
     } catch (err) {
         console.error('Error cancelling lesson:', err);
-        alert('Failed to cancel lesson: ' + err.message);
+        alert(lang === 'ja' 
+            ? `キャンセルエラー: ${err.message}`
+            : `Failed to cancel lesson: ${err.message}`);
     }
 }
 
 // Reschedule lesson
-async function rescheduleLesson(lessonId) {
+async function rescheduleLesson(lessonId, lang = 'en') {  // ← ADD lang parameter with default
     // Find the lesson
     const lesson = bookingState.userBookings.find(b => b.id === lessonId);
     if (!lesson) return;
@@ -4468,12 +4491,16 @@ async function rescheduleLesson(lessonId) {
     const lessonStart = new Date(lesson.scheduled_at);
     const hoursUntilStart = (lessonStart - now) / (1000 * 60 * 60);
     
-    let confirmMsg = 'Reschedule this lesson?';
+    let confirmMsg = lang === 'ja' ? 'このレッスンを変更しますか？' : 'Reschedule this lesson?';
     
     if (hoursUntilStart < 24) {
-        confirmMsg = `⚠️ Rescheduling less than 24 hours before means NO CREDIT REFUND.\n\nYou'll lose this lesson credit. Are you sure?`;
+        confirmMsg = lang === 'ja'
+            ? '⚠️ 24時間前を切っているため、クレジットは返金されません。\n\nこのレッスンのクレジットは消費されます。よろしいですか？'
+            : '⚠️ Rescheduling less than 24 hours before means NO CREDIT REFUND.\n\nYou\'ll lose this lesson credit. Are you sure?';
     } else {
-        confirmMsg = `Reschedule this lesson?\n\n✅ Your credit will be restored and you can book a new time.`;
+        confirmMsg = lang === 'ja'
+            ? 'このレッスンを変更しますか？\n\n✅ クレジットは返金され、新しい時間を予約できます。'
+            : 'Reschedule this lesson?\n\n✅ Your credit will be restored and you can book a new time.';
     }
     
     if (!confirm(confirmMsg)) {
@@ -4491,7 +4518,7 @@ async function rescheduleLesson(lessonId) {
                 action: 'cancel',
                 bookingData: {
                     bookingId: lessonId,
-                    reason: 'Rescheduling lesson'
+                    reason: lang === 'ja' ? 'レッスン変更' : 'Rescheduling lesson'
                 }
             })
         });
@@ -4499,28 +4526,34 @@ async function rescheduleLesson(lessonId) {
         const result = await response.json();
         
         if (!result.success) {
-            throw new Error(result.error || 'Cancellation failed');
+            throw new Error(result.error || (lang === 'ja' ? '変更に失敗しました' : 'Cancellation failed'));
         }
         
         if (hoursUntilStart >= 24) {
-            alert('✅ Lesson cancelled. Your credit has been restored. Please select a new time.');
+            alert(lang === 'ja' 
+                ? '✅ レッスンをキャンセルしました。クレジットは返金されました。新しい時間を選択してください。'
+                : '✅ Lesson cancelled. Your credit has been restored. Please select a new time.');
         } else {
-            alert('⚠️ Lesson cancelled. No credit refund (<24h notice). Contact support if you need assistance.');
+            alert(lang === 'ja'
+                ? '⚠️ レッスンをキャンセルしました。クレジットは返金されません（24時間前以降）。必要に応じてサポートにお問い合わせください。'
+                : '⚠️ Lesson cancelled. No credit refund (<24h notice). Contact support if you need assistance.');
         }
         
         // Refresh data
-        await fetchBookingEligibility(bookingState.studentId, 'en');
-        await fetchUserBookings(bookingState.userId, 'en');
+        await fetchBookingEligibility(bookingState.studentId, lang);
+        await fetchUserBookings(bookingState.userId, lang);
         initializeEnhancedLessonsCard();
         
         // Open booking modal only if they got refund
         if (hoursUntilStart >= 24) {
-            openBookingModal('en');
+            openBookingModal(lang);
         }
         
     } catch (err) {
         console.error('Error rescheduling lesson:', err);
-        alert('Failed to reschedule lesson: ' + err.message);
+        alert(lang === 'ja'
+            ? `変更エラー: ${err.message}`
+            : `Failed to reschedule lesson: ${err.message}`);
     }
 }
 
@@ -4547,15 +4580,15 @@ function startCountdownUpdates() {
 
 // Initialize - call this after fetching bookings
 function initializeEnhancedLessonsCard() {
-    // 🆕 ALWAYS call render, even with 0 bookings
-    renderUpcomingLessonsCard(bookingState.userBookings || []);
+    // 🆕 Render for BOTH languages
+    renderUpcomingLessonsCard(bookingState.userBookings || [], 'ja');
+    renderUpcomingLessonsCard(bookingState.userBookings || [], 'en');
     
     // Only start countdown if there are bookings
     if (bookingState.userBookings && bookingState.userBookings.length > 0) {
         startCountdownUpdates();
     }
 
-    // 🆕 ADD THIS SECTION:
     // Start auto-refresh for bookings without Meet links
     if (bookingState.userBookings) {
         bookingState.userBookings.forEach(booking => {
@@ -4701,7 +4734,7 @@ AND ADD THIS AFTER THE ALERT:
 
 // Update renderLessonCard to show "Meeting link loading" status
 
-function renderLessonCard(lesson, isFirst = false) {
+function renderLessonCard(lesson, isFirst = false, lang = 'en') { 
     const now = new Date();
     const lessonStart = new Date(lesson.scheduled_at);
     const lessonEnd = new Date(lessonStart.getTime() + lesson.duration_minutes * 60000);
@@ -4719,18 +4752,24 @@ function renderLessonCard(lesson, isFirst = false) {
     
     const within1h = minutesUntilStart > 0 && minutesUntilStart <= 60;
     
-    // Status messages
+    // Status messages (bilingual)
     let statusBanner = '';
     if (minutesUntilStart < 0 && minutesSinceEnd < 0) {
-        statusBanner = '<div class="lesson-status-banner in-progress"><i class="fas fa-circle"></i> Lesson in progress</div>';
+        statusBanner = `<div class="lesson-status-banner in-progress"><i class="fas fa-circle"></i> ${
+            lang === 'ja' ? 'レッスン進行中' : 'Lesson in progress'
+        }</div>`;
     } else if (minutesSinceEnd > 0 && minutesSinceEnd <= 60) {
-        statusBanner = '<div class="lesson-status-banner recently-ended"><i class="fas fa-info-circle"></i> Lesson ended recently - Meet link still available</div>';
+        statusBanner = `<div class="lesson-status-banner recently-ended"><i class="fas fa-info-circle"></i> ${
+            lang === 'ja' ? 'レッスン終了 - Meetリンクはまだ利用可能' : 'Lesson ended recently - Meet link still available'
+        }</div>`;
     } else if (!showCancel && !showReschedule) {
-        statusBanner = '<div class="lesson-status-banner locked"><i class="fas fa-lock"></i> Too close to modify - contact support if needed</div>';
+        statusBanner = `<div class="lesson-status-banner locked"><i class="fas fa-lock"></i> ${
+            lang === 'ja' ? '変更不可 - サポートにお問い合わせください' : 'Too close to modify - contact support if needed'
+        }</div>`;
     }
     
-    const timeUntil = getTimeUntilLesson(lesson.scheduled_at);
-    const dateTime = formatLessonDateTime(lesson.scheduled_at);
+    const timeUntil = getTimeUntilLesson(lesson.scheduled_at, lang);
+    const dateTime = formatLessonDateTime(lesson.scheduled_at, lang);
     
     return `
         <div class="lesson-item ${isFirst ? 'lesson-next' : ''}" data-lesson-id="${lesson.id}">
@@ -4749,19 +4788,19 @@ function renderLessonCard(lesson, isFirst = false) {
                 ${showMeetLink ? `
                     <button class="google-meet-btn ${within1h ? 'pulse' : ''}" 
                             onclick="window.open('${lesson.google_meet_link}', '_blank')"
-                            title="Join Google Meet">
+                            title="${lang === 'ja' ? 'Google Meetに参加' : 'Join Google Meet'}">
                         <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                             <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
                             <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
                             <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
                             <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
                         </svg>
-                        Join with Google Meet
+                        ${lang === 'ja' ? 'Google Meetに参加' : 'Join with Google Meet'}
                     </button>
                 ` : showWaitingMessage ? `
                     <div class="meet-link-status">
                         <i class="fas fa-spinner fa-spin"></i>
-                        Meet link will appear shortly (refreshing automatically)
+                        ${lang === 'ja' ? 'Meetリンクは間もなく表示されます（自動更新中）' : 'Meet link will appear shortly (refreshing automatically)'}
                     </div>
                 ` : ''}
                 
@@ -4769,17 +4808,17 @@ function renderLessonCard(lesson, isFirst = false) {
                     <div class="lesson-secondary-actions">
                         ${showReschedule ? `
                             <button class="lesson-action-btn reschedule-btn" 
-                                    onclick="rescheduleLesson('${lesson.id}')"
-                                    title="Reschedule lesson (free if >24h before)">
-                                <i class="fas fa-calendar-edit"></i> Reschedule
+        onclick="rescheduleLesson('${lesson.id}', '${lang}')"
+                                    title="${lang === 'ja' ? 'レッスンを変更（24時間前まで無料）' : 'Reschedule lesson (free if >24h before)'}">
+                                <i class="fas fa-calendar-edit"></i> ${lang === 'ja' ? '変更' : 'Reschedule'}
                             </button>
                         ` : ''}
                         
                         ${showCancel ? `
                             <button class="lesson-action-btn cancel-btn" 
-                                    onclick="cancelLesson('${lesson.id}')"
-                                    title="Cancel lesson (refund if >24h before)">
-                                <i class="fas fa-times-circle"></i> Cancel
+        onclick="cancelLesson('${lesson.id}', '${lang}')"
+                                    title="${lang === 'ja' ? 'レッスンをキャンセル（24時間前まで返金）' : 'Cancel lesson (refund if >24h before)'}">
+                                <i class="fas fa-times-circle"></i> ${lang === 'ja' ? 'キャンセル' : 'Cancel'}
                             </button>
                         ` : ''}
                     </div>
