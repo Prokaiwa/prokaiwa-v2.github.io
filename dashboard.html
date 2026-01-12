@@ -1765,12 +1765,30 @@
 .booking-policy-notice {
     background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
     border-left: 4px solid #2196F3;
-    padding: 1rem;
+    padding: 0.75rem;  /* ← Reduced from 1rem */
     border-radius: 0 8px 8px 0;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;  /* ← Reduced from 1.5rem */
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;  /* ← Reduced from 1rem */
     align-items: flex-start;
+}
+
+.booking-policy-notice i {
+    color: #2196F3;
+    font-size: 1.2rem;  /* ← Reduced from 1.5rem */
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.booking-policy-notice ul {
+    margin: 0.25rem 0 0 0;  /* ← Reduced top margin */
+    padding-left: 1.25rem;
+    font-size: 0.85rem;  /* ← Slightly smaller */
+    line-height: 1.5;  /* ← Tighter line height */
+}
+
+.booking-policy-notice li {
+    margin-bottom: 0.15rem;  /* ← Reduced from 0.25rem */
 }
 
 .booking-policy-notice i {
