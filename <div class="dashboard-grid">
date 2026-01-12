@@ -224,6 +224,10 @@
       grid-row: 3 / 4;
     }
     
+    .card-booking-rules {
+    grid-column: 3 / 4;
+    grid-row: 3 / 4;
+}
     .card-resources {
       grid-column: 3 / 4;
       grid-row: 3 / 4;
@@ -654,7 +658,15 @@
       .dashboard-grid {
         grid-template-columns: 1fr 1fr;
       }
-      
+      .card-lessons {
+    grid-column: 1 / 3;
+    grid-row: 5 / 6;
+}
+
+.card-booking-rules {
+    grid-column: 1 / 3;
+    grid-row: 6 / 7;
+}
       .card-skills {
         grid-column: 1 / 3;
         grid-row: 1 / 2;
@@ -706,6 +718,10 @@
         text-align: center;
         padding: 1.25rem 1.5rem;
       }
+      .card-booking-rules {
+    grid-column: 1;
+    grid-row: auto;
+}
       .welcome-banner h1 {
         font-size: 1.4rem;
         margin-bottom: 0.25rem;
@@ -1699,6 +1715,124 @@
         color: var(--color-primary);
     }
 }
+    /* ================================
+   LESSON STATUS BANNERS - ADD THIS BEFORE
+   ================================ */
+.lesson-status-banner {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lesson-status-banner.in-progress {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+}
+
+.lesson-status-banner.in-progress i {
+    animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.lesson-status-banner.recently-ended {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+}
+
+.lesson-status-banner.locked {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+}
+
+@media (prefers-color-scheme: dark) {
+    .lesson-status-banner.locked {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Booking policy notice in modal */
+.booking-policy-notice {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-left: 4px solid #2196F3;
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.booking-policy-notice i {
+    color: #2196F3;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.booking-policy-notice strong {
+    color: #1976D2;
+}
+
+.booking-policy-notice ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.25rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.booking-policy-notice li {
+    margin-bottom: 0.25rem;
+}
+
+/* Rules card styles */
+.rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.rule-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: var(--color-bg);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.rule-item i {
+    font-size: 1.1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .booking-policy-notice {
+        background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(33, 150, 243, 0.08) 100%);
+        border-left-color: #42A5F5;
+    }
+    
+    .booking-policy-notice i {
+        color: #42A5F5;
+    }
+    
+    .booking-policy-notice strong {
+        color: #64B5F6;
+    }
+}
   </style>
 </head>
 <body>
@@ -1901,7 +2035,36 @@
                                 <button id="ja-logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">ログアウト</button>
                             </div>
                         </div>
+                        <!-- Upcoming Lessons -->
+<div class="dashboard-card card-lessons" id="ja-upcoming-lessons-card" style="display: none;">
+    <h3><i class="fas fa-calendar-alt"></i>予定レッスン</h3>
+    <div id="ja-upcoming-lessons">
+        <!-- Will be populated by JavaScript -->
+    </div>
+</div>
 
+<!-- 🆕 BOOKING RULES CARD -->
+<div class="dashboard-card card-booking-rules">
+    <h3><i class="fas fa-book-open"></i>予約ルール</h3>
+    <div class="rules-list">
+        <div class="rule-item">
+            <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+            <span><strong>無料で変更OK：</strong>レッスン24時間前までならキャンセル・変更無料</span>
+        </div>
+        <div class="rule-item">
+            <i class="fas fa-times-circle" style="color: #f44336;"></i>
+            <span><strong>返金なし：</strong>24時間前を切るとクレジット返金不可</span>
+        </div>
+        <div class="rule-item">
+            <i class="fas fa-user-slash" style="color: #ff9800;"></i>
+            <span><strong>無断欠席：</strong>連絡なしで欠席した場合もクレジット消費</span>
+        </div>
+        <div class="rule-item">
+            <i class="fas fa-video" style="color: #2196F3;"></i>
+            <span><strong>Meetリンク：</strong>レッスン24時間前から終了1時間後まで表示</span>
+        </div>
+    </div>
+</div>
                         <!-- Learning Resources -->
                         <div class="dashboard-card card-resources" id="ja-resources">
                             <h3><i class="fas fa-folder-open"></i>学習教材</h3>
@@ -2106,7 +2269,36 @@
                                 <button id="en-logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Log Out</button>
                             </div>
                         </div>
+                    <!-- Upcoming Lessons -->
+<div class="dashboard-card card-lessons" id="en-upcoming-lessons-card" style="display: none;">
+    <h3><i class="fas fa-calendar-alt"></i>Upcoming Lessons</h3>
+    <div id="en-upcoming-lessons">
+        <!-- Will be populated by JavaScript -->
+    </div>
+</div>
 
+<!-- 🆕 BOOKING RULES CARD -->
+<div class="dashboard-card card-booking-rules">
+    <h3><i class="fas fa-book-open"></i>Lesson Booking Rules</h3>
+    <div class="rules-list">
+        <div class="rule-item">
+            <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+            <span><strong>Free changes:</strong> Cancel or reschedule >24h before lesson</span>
+        </div>
+        <div class="rule-item">
+            <i class="fas fa-times-circle" style="color: #f44336;"></i>
+            <span><strong>No refund:</strong> Changes made <24h before lesson</span>
+        </div>
+        <div class="rule-item">
+            <i class="fas fa-user-slash" style="color: #ff9800;"></i>
+            <span><strong>No-shows:</strong> Credit is not refunded if you miss your lesson</span>
+        </div>
+        <div class="rule-item">
+            <i class="fas fa-video" style="color: #2196F3;"></i>
+            <span><strong>Meet link:</strong> Available 24h before until 1h after lesson</span>
+        </div>
+    </div>
+</div>
                         <!-- Upcoming Lessons -->
 <div class="dashboard-card card-lessons" id="en-upcoming-lessons-card" style="display: none;">
     <h3><i class="fas fa-calendar-alt"></i>Upcoming Lessons</h3>
@@ -3343,60 +3535,75 @@ if (hasVideoAccess) {
         });
 
         function getBookingWidgetHTML(lang) {
-            return `
-                <div class="booking-widget">
-                    <div class="booking-header">
-                        <div class="booking-credits">
-                            <div class="credit-badge">
-                                <i class="fas fa-ticket-alt"></i>
-                                <span>${lang === 'ja' ? '利用可能' : 'Available'}: <span class="credit-number" id="${lang}-credits-count">0</span></span>
-                            </div>
-                            <div class="consultation-badge" id="${lang}-consultation-badge" style="display: none;">
-                                <i class="fas fa-gift"></i>
-                                <span>${lang === 'ja' ? '無料相談' : 'Free Consultation'}</span>
-                            </div>
-                        </div>
+    return `
+        <div class="booking-widget">
+            <div class="booking-header">
+                <div class="booking-credits">
+                    <div class="credit-badge">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>${lang === 'ja' ? '利用可能' : 'Available'}: <span class="credit-number" id="${lang}-credits-count">0</span></span>
                     </div>
-                    
-                    <div class="calendar-container">
-                        <div class="calendar-picker">
-                            <div class="calendar-month-nav">
-                                <button class="calendar-nav-btn" id="${lang}-calendar-prev">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <h3 id="${lang}-calendar-month">2026年 1月</h3>
-                                <button class="calendar-nav-btn" id="${lang}-calendar-next">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                            <div class="calendar-grid" id="${lang}-calendar-grid"></div>
-                        </div>
-                        
-                        <div class="time-slots-container">
-                            <div class="selected-date-display" id="${lang}-selected-date">
-                                ${lang === 'ja' ? '日付を選択してください' : 'Select a date'}
-                            </div>
-                            <div id="${lang}-time-slots"></div>
-                        </div>
+                    <div class="consultation-badge" id="${lang}-consultation-badge" style="display: none;">
+                        <i class="fas fa-gift"></i>
+                        <span>${lang === 'ja' ? '無料相談' : 'Free Consultation'}</span>
                     </div>
-                    
-                    <div class="booking-actions">
-                        <div class="lesson-type-selector">
-                            <label for="${lang}-lesson-type">${lang === 'ja' ? 'レッスンタイプ:' : 'Lesson Type:'}</label>
-                            <select id="${lang}-lesson-type">
-                                <option value="standard">${lang === 'ja' ? '50分 スタンダードレッスン' : '50-min Standard Lesson'}</option>
-                                <option value="consultation">${lang === 'ja' ? '20分 無料相談（初回のみ）' : '20-min Free Consultation (First-time)'}</option>
-                            </select>
-                        </div>
-                        
-                        <div class="booking-summary" id="${lang}-booking-summary"></div>
-                        
-                        <button class="book-lesson-btn" id="${lang}-book-btn" disabled>
-                            <i class="fas fa-calendar-check"></i> ${lang === 'ja' ? 'レッスンを予約' : 'Book Lesson'}
+                </div>
+            </div>
+            
+            <!-- BOOKING POLICY NOTICE -->
+            <div class="booking-policy-notice">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>${lang === 'ja' ? '予約ポリシー：' : 'Booking Policy:'}</strong>
+                    <ul>
+                        <li>✅ <strong>${lang === 'ja' ? 'レッスンの24時間前まで' : '>24 hours before'}</strong>${lang === 'ja' ? 'なら無料でキャンセル・変更可能' : ': Free cancellation/reschedule'}</li>
+                        <li>❌ <strong>${lang === 'ja' ? '24時間前を切ると' : '<24 hours before'}</strong>${lang === 'ja' ? 'クレジットの返金なし' : ': No credit refund'}</li>
+                        <li>❌ <strong>${lang === 'ja' ? '無断欠席の場合' : 'No-shows'}</strong>${lang === 'ja' ? 'もクレジットは消費されます' : ': Credit is not refunded'}</li>
+                        <li>📱 <strong>${lang === 'ja' ? 'Meetリンク' : 'Meet link'}</strong>${lang === 'ja' ? 'はレッスン24時間前から終了1時間後まで利用可能' : ': Available 24h before - 1h after'}</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="calendar-container">
+                <div class="calendar-picker">
+                    <div class="calendar-month-nav">
+                        <button class="calendar-nav-btn" id="${lang}-calendar-prev">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h3 id="${lang}-calendar-month">2026年 1月</h3>
+                        <button class="calendar-nav-btn" id="${lang}-calendar-next">
+                            <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
-            `;
-        }
+                    <div class="calendar-grid" id="${lang}-calendar-grid"></div>
+                </div>
+                
+                <div class="time-slots-container">
+                    <div class="selected-date-display" id="${lang}-selected-date">
+                        ${lang === 'ja' ? '日付を選択してください' : 'Select a date'}
+                    </div>
+                    <div id="${lang}-time-slots"></div>
+                </div>
+            </div>
+            
+            <div class="booking-actions">
+                <div class="lesson-type-selector">
+                    <label for="${lang}-lesson-type">${lang === 'ja' ? 'レッスンタイプ:' : 'Lesson Type:'}</label>
+                    <select id="${lang}-lesson-type">
+                        <option value="standard">${lang === 'ja' ? '50分 スタンダードレッスン' : '50-min Standard Lesson'}</option>
+                        <option value="consultation">${lang === 'ja' ? '20分 無料相談（初回のみ）' : '20-min Free Consultation (First-time)'}</option>
+                    </select>
+                </div>
+                
+                <div class="booking-summary" id="${lang}-booking-summary"></div>
+                
+                <button class="book-lesson-btn" id="${lang}-book-btn" disabled>
+                    <i class="fas fa-calendar-check"></i> ${lang === 'ja' ? 'レッスンを予約' : 'Book Lesson'}
+                </button>
+            </div>
+        </div>
+    `;
+}
 
         async function initializeBookingWidget(studentId, userId) {
     console.log('🎯 Initializing booking widget...', { studentId, userId });
@@ -4126,15 +4333,23 @@ function renderUpcomingLessonsCard(lessons) {
     const container = document.getElementById('en-upcoming-lessons');
     if (!container) return;
     
-    if (!lessons || lessons.length === 0) {
+    // 🆕 FILTER: Hide lessons that ended >60 min ago
+    const now = new Date();
+    const visibleLessons = (lessons || []).filter(lesson => {
+        const lessonEnd = new Date(lesson.scheduled_at);
+        lessonEnd.setMinutes(lessonEnd.getMinutes() + lesson.duration_minutes + 60); // +60 min buffer
+        return lessonEnd > now;
+    });
+    
+    if (visibleLessons.length === 0) {
         card.style.display = 'none';
         return;
     }
     
     card.style.display = 'block';
     
-    const nextLesson = lessons[0];
-    const hasMoreLessons = lessons.length > 1;
+    const nextLesson = visibleLessons[0];
+    const hasMoreLessons = visibleLessons.length > 1;
     
     container.innerHTML = `
         <div class="lessons-container">
@@ -4142,19 +4357,19 @@ function renderUpcomingLessonsCard(lessons) {
             
             ${hasMoreLessons ? `
                 <div class="lessons-more ${lessonsCardState.expanded ? 'expanded' : ''}">
-                    ${lessons.slice(1).map(lesson => renderLessonCard(lesson)).join('')}
+                    ${visibleLessons.slice(1).map(lesson => renderLessonCard(lesson)).join('')}
                 </div>
                 
                 <button class="toggle-lessons-btn" onclick="toggleLessonsExpanded()">
                     <i class="fas fa-chevron-${lessonsCardState.expanded ? 'up' : 'down'}"></i>
-                    ${lessonsCardState.expanded ? 'Show Less' : `View All Lessons (${lessons.length})`}
+                    ${lessonsCardState.expanded ? 'Show Less' : `View All Lessons (${visibleLessons.length})`}
                 </button>
             ` : ''}
             
             <div class="book-another-divider"></div>
             
             <button onclick="openBookingModal('en')" class="book-another-btn">
-                <i class="fas fa-plus-circle"></i> ${lessons.length > 0 ? 'Book Another Lesson' : 'Book Your First Lesson'}
+                <i class="fas fa-plus-circle"></i> ${visibleLessons.length > 0 ? 'Book Another Lesson' : 'Book Your First Lesson'}
             </button>
         </div>
     `;
@@ -4180,7 +4395,24 @@ function toggleLessonsExpanded() {
 
 // Cancel lesson
 async function cancelLesson(lessonId) {
-    if (!confirm('Are you sure you want to cancel this lesson? This action cannot be undone.')) {
+    // Find the lesson
+    const lesson = bookingState.userBookings.find(b => b.id === lessonId);
+    if (!lesson) return;
+    
+    const now = new Date();
+    const lessonStart = new Date(lesson.scheduled_at);
+    const hoursUntilStart = (lessonStart - now) / (1000 * 60 * 60);
+    
+    // Check if it's too late to cancel with refund
+    let confirmMsg = 'Are you sure you want to cancel this lesson?';
+    
+    if (hoursUntilStart < 24) {
+        confirmMsg = `⚠️ Cancelling less than 24 hours before the lesson means NO REFUND.\n\nYour credit will NOT be restored. Are you sure you want to cancel?`;
+    } else {
+        confirmMsg = `Cancel this lesson?\n\n✅ Your credit will be refunded (>24h notice).`;
+    }
+    
+    if (!confirm(confirmMsg)) {
         return;
     }
     
@@ -4206,9 +4438,16 @@ async function cancelLesson(lessonId) {
             throw new Error(result.error || 'Cancellation failed');
         }
         
-        alert('Lesson cancelled successfully' + (result.refundMessage ? '. ' + result.refundMessage : ''));
+        // Show appropriate message based on refund status
+        if (result.refundMessage) {
+            alert('✅ ' + result.refundMessage);
+        } else if (hoursUntilStart < 24) {
+            alert('Lesson cancelled. No refund issued (<24h notice).');
+        } else {
+            alert('Lesson cancelled successfully. Your credit has been refunded.');
+        }
         
-        // 🆕 REFRESH EVERYTHING
+        // Refresh everything
         await fetchBookingEligibility(bookingState.studentId, 'en');
         await fetchUserBookings(bookingState.userId, 'en');
         initializeEnhancedLessonsCard();
@@ -4221,14 +4460,27 @@ async function cancelLesson(lessonId) {
 
 // Reschedule lesson
 async function rescheduleLesson(lessonId) {
-    const confirmMsg = 'Reschedule this lesson? Your credit will be restored and you can book a new time.';
+    // Find the lesson
+    const lesson = bookingState.userBookings.find(b => b.id === lessonId);
+    if (!lesson) return;
+    
+    const now = new Date();
+    const lessonStart = new Date(lesson.scheduled_at);
+    const hoursUntilStart = (lessonStart - now) / (1000 * 60 * 60);
+    
+    let confirmMsg = 'Reschedule this lesson?';
+    
+    if (hoursUntilStart < 24) {
+        confirmMsg = `⚠️ Rescheduling less than 24 hours before means NO CREDIT REFUND.\n\nYou'll lose this lesson credit. Are you sure?`;
+    } else {
+        confirmMsg = `Reschedule this lesson?\n\n✅ Your credit will be restored and you can book a new time.`;
+    }
     
     if (!confirm(confirmMsg)) {
         return;
     }
     
     try {
-        // Cancel the existing lesson
         const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
             method: 'POST',
             headers: {
@@ -4250,15 +4502,21 @@ async function rescheduleLesson(lessonId) {
             throw new Error(result.error || 'Cancellation failed');
         }
         
-        alert('Lesson cancelled. Your credit has been restored. Please select a new time.');
+        if (hoursUntilStart >= 24) {
+            alert('✅ Lesson cancelled. Your credit has been restored. Please select a new time.');
+        } else {
+            alert('⚠️ Lesson cancelled. No credit refund (<24h notice). Contact support if you need assistance.');
+        }
         
         // Refresh data
         await fetchBookingEligibility(bookingState.studentId, 'en');
         await fetchUserBookings(bookingState.userId, 'en');
         initializeEnhancedLessonsCard();
         
-        // Open booking modal automatically
-        openBookingModal('en');
+        // Open booking modal only if they got refund
+        if (hoursUntilStart >= 24) {
+            openBookingModal('en');
+        }
         
     } catch (err) {
         console.error('Error rescheduling lesson:', err);
@@ -4444,17 +4702,40 @@ AND ADD THIS AFTER THE ALERT:
 // Update renderLessonCard to show "Meeting link loading" status
 
 function renderLessonCard(lesson, isFirst = false) {
-    const within24h = isWithin24Hours(lesson.scheduled_at);
-    const within1h = isWithin1Hour(lesson.scheduled_at);
+    const now = new Date();
+    const lessonStart = new Date(lesson.scheduled_at);
+    const lessonEnd = new Date(lessonStart.getTime() + lesson.duration_minutes * 60000);
+    
+    // Calculate time differences in minutes
+    const minutesUntilStart = (lessonStart - now) / 60000;
+    const minutesSinceEnd = (now - lessonEnd) / 60000;
+    const hoursUntilStart = minutesUntilStart / 60;
+    
+    // Determine what to show
+    const showMeetLink = minutesUntilStart <= 1440 && minutesSinceEnd <= 60 && lesson.google_meet_link;
+    const showWaitingMessage = minutesUntilStart <= 1440 && !lesson.google_meet_link && lesson.google_calendar_event_id;
+    const showReschedule = hoursUntilStart > 24; // >24h before
+    const showCancel = minutesUntilStart > 60; // >1h before
+    
+    const within1h = minutesUntilStart > 0 && minutesUntilStart <= 60;
+    
+    // Status messages
+    let statusBanner = '';
+    if (minutesUntilStart < 0 && minutesSinceEnd < 0) {
+        statusBanner = '<div class="lesson-status-banner in-progress"><i class="fas fa-circle"></i> Lesson in progress</div>';
+    } else if (minutesSinceEnd > 0 && minutesSinceEnd <= 60) {
+        statusBanner = '<div class="lesson-status-banner recently-ended"><i class="fas fa-info-circle"></i> Lesson ended recently - Meet link still available</div>';
+    } else if (!showCancel && !showReschedule) {
+        statusBanner = '<div class="lesson-status-banner locked"><i class="fas fa-lock"></i> Too close to modify - contact support if needed</div>';
+    }
+    
     const timeUntil = getTimeUntilLesson(lesson.scheduled_at);
     const dateTime = formatLessonDateTime(lesson.scheduled_at);
     
-    const showJoinButton = within24h && lesson.google_meet_link;
-    const showWaitingMessage = within24h && !lesson.google_meet_link && lesson.google_calendar_event_id;
-    const showReschedule = !within1h;
-    
     return `
         <div class="lesson-item ${isFirst ? 'lesson-next' : ''}" data-lesson-id="${lesson.id}">
+            ${statusBanner}
+            
             <div class="lesson-info">
                 <div class="lesson-datetime">
                     <i class="fas fa-calendar-alt"></i> ${dateTime}
@@ -4465,40 +4746,44 @@ function renderLessonCard(lesson, isFirst = false) {
             </div>
             
             <div class="lesson-actions">
-                ${showJoinButton ? `
+                ${showMeetLink ? `
                     <button class="google-meet-btn ${within1h ? 'pulse' : ''}" 
                             onclick="window.open('${lesson.google_meet_link}', '_blank')"
                             title="Join Google Meet">
                         <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-    <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
-    <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
-    <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
-    <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
-</svg>
+                            <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+                            <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+                            <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
+                            <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+                        </svg>
                         Join with Google Meet
                     </button>
                 ` : showWaitingMessage ? `
                     <div class="meet-link-status">
-                        <i class="fas fa-spinner"></i>
+                        <i class="fas fa-spinner fa-spin"></i>
                         Meet link will appear shortly (refreshing automatically)
                     </div>
                 ` : ''}
                 
-                <div class="lesson-secondary-actions">
-                    ${showReschedule ? `
-                        <button class="lesson-action-btn reschedule-btn" 
-                                onclick="rescheduleLesson('${lesson.id}')"
-                                title="Reschedule lesson">
-                            <i class="fas fa-calendar-edit"></i> Reschedule
-                        </button>
-                    ` : ''}
-                    
-                    <button class="lesson-action-btn cancel-btn" 
-                            onclick="cancelLesson('${lesson.id}')"
-                            title="Cancel lesson">
-                        <i class="fas fa-times-circle"></i> Cancel
-                    </button>
-                </div>
+                ${(showReschedule || showCancel) ? `
+                    <div class="lesson-secondary-actions">
+                        ${showReschedule ? `
+                            <button class="lesson-action-btn reschedule-btn" 
+                                    onclick="rescheduleLesson('${lesson.id}')"
+                                    title="Reschedule lesson (free if >24h before)">
+                                <i class="fas fa-calendar-edit"></i> Reschedule
+                            </button>
+                        ` : ''}
+                        
+                        ${showCancel ? `
+                            <button class="lesson-action-btn cancel-btn" 
+                                    onclick="cancelLesson('${lesson.id}')"
+                                    title="Cancel lesson (refund if >24h before)">
+                                <i class="fas fa-times-circle"></i> Cancel
+                            </button>
+                        ` : ''}
+                    </div>
+                ` : ''}
             </div>
         </div>
     `;
