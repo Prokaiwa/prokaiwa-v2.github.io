@@ -3550,20 +3550,6 @@ if (hasVideoAccess) {
                 </div>
             </div>
             
-            <!-- BOOKING POLICY NOTICE -->
-            <div class="booking-policy-notice">
-                <i class="fas fa-info-circle"></i>
-                <div>
-                    <strong>${lang === 'ja' ? '予約ポリシー：' : 'Booking Policy:'}</strong>
-                    <ul>
-                        <li>✅ <strong>${lang === 'ja' ? 'レッスンの24時間前まで' : '>24 hours before'}</strong>${lang === 'ja' ? 'なら無料でキャンセル・変更可能' : ': Free cancellation/reschedule'}</li>
-                        <li>❌ <strong>${lang === 'ja' ? '24時間前を切ると' : '<24 hours before'}</strong>${lang === 'ja' ? 'クレジットの返金なし' : ': No credit refund'}</li>
-                        <li>❌ <strong>${lang === 'ja' ? '無断欠席の場合' : 'No-shows'}</strong>${lang === 'ja' ? 'もクレジットは消費されます' : ': Credit is not refunded'}</li>
-                        <li>📱 <strong>${lang === 'ja' ? 'Meetリンク' : 'Meet link'}</strong>${lang === 'ja' ? 'はレッスン24時間前から終了1時間後まで利用可能' : ': Available 24h before - 1h after'}</li>
-                    </ul>
-                </div>
-            </div>
-            
             <div class="calendar-container">
                 <div class="calendar-picker">
                     <div class="calendar-month-nav">
@@ -3596,6 +3582,20 @@ if (hasVideoAccess) {
                 </div>
                 
                 <div class="booking-summary" id="${lang}-booking-summary"></div>
+                
+                <!-- 🆕 MOVED POLICY NOTICE HERE -->
+                <div class="booking-policy-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>${lang === 'ja' ? '予約ポリシー：' : 'Booking Policy:'}</strong>
+                        <ul>
+                            <li>✅ <strong>${lang === 'ja' ? 'レッスンの24時間前まで' : '>24 hours before'}</strong>${lang === 'ja' ? 'なら無料でキャンセル・変更可能' : ': Free cancellation/reschedule'}</li>
+                            <li>❌ <strong>${lang === 'ja' ? '24時間前を切ると' : '<24 hours before'}</strong>${lang === 'ja' ? 'クレジットの返金なし' : ': No credit refund'}</li>
+                            <li>❌ <strong>${lang === 'ja' ? '無断欠席の場合' : 'No-shows'}</strong>${lang === 'ja' ? 'もクレジットは消費されます' : ': Credit is not refunded'}</li>
+                            <li>⏰ <strong>${lang === 'ja' ? '準備：' : 'Preparation:'}</strong>${lang === 'ja' ? 'レッスン5分前までに準備し、カメラ・マイクをテストしてください' : ' Please be ready 5 minutes early and test your camera/microphone'}</li>
+                        </ul>
+                    </div>
+                </div>
                 
                 <button class="book-lesson-btn" id="${lang}-book-btn" disabled>
                     <i class="fas fa-calendar-check"></i> ${lang === 'ja' ? 'レッスンを予約' : 'Book Lesson'}
