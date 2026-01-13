@@ -376,27 +376,7 @@
             background: rgba(23, 162, 184, 0.2);
         }
     }
-    /* CRITICAL FIX: Override main stylesheet for account settings */
-.lang-section {
-    display: block !important;
-    height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    position: relative !important;
-}
 
-.lang-section[style*="display: none"] {
-    display: none !important;
-}
-
-/* Ensure container is visible */
-.settings-container {
-    display: block !important;
-    height: auto !important;
-    min-height: 100px !important;
-}
 </style>
 </head>
 <body>
@@ -921,30 +901,30 @@
     }
 
     function setLanguage(lang) {
-        console.log('🔄 Setting language to:', lang);
-        
-        // Save to localStorage
-        localStorage.setItem('prokaiwa-lang', lang);
-        
-        // Hide all language sections
-        document.querySelectorAll('.lang-section').forEach(section => {
-            section.style.display = 'none';
-        });
-        
-        // Show selected language section
-        const selectedSection = document.getElementById(`${lang}-account-settings`);
-        if (selectedSection) {
-            selectedSection.style.display = 'block';
-        }
-        
-        // Update language toggle buttons
-        document.querySelectorAll('.nav-lang-toggle button').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.lang === lang) {
-                btn.classList.add('active');
-            }
-        });
+    console.log('🔄 Setting language to:', lang);
+    
+    // Save to localStorage
+    localStorage.setItem('prokaiwa-lang', lang);
+    
+    // Hide all language sections
+    document.querySelectorAll('.lang-section').forEach(section => {
+        section.classList.remove('show'); // Use the existing .show class system
+    });
+    
+    // Show selected language section
+    const selectedSection = document.getElementById(`${lang}-account-settings`);
+    if (selectedSection) {
+        selectedSection.classList.add('show'); // Add .show class instead of inline styles
     }
+    
+    // Update language toggle buttons
+    document.querySelectorAll('.nav-lang-toggle button').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.lang === lang) {
+            btn.classList.add('active');
+        }
+    });
+}
 
     async function loadAccountSettings() {
         console.log('📊 Loading account settings...');
