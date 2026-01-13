@@ -884,7 +884,7 @@
     // UNIFIED LANGUAGE DETECTION
     function getCurrentLang() {
         // 1. Check localStorage first (user preference)
-        const stored = localStorage.getItem('prokaiwa-lang');
+        const stored = localStorage.getItem('prokaiwaLang');
         if (stored) {
             console.log('📱 Language from localStorage:', stored);
             return stored;
@@ -904,7 +904,7 @@
     console.log('🔄 Setting language to:', lang);
     
     // Save to localStorage
-    localStorage.setItem('prokaiwa-lang', lang);
+    localStorage.setItem('prokaiwaLang', lang);
     
     // Hide all language sections
     document.querySelectorAll('.lang-section').forEach(section => {
