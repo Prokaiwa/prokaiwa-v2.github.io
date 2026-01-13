@@ -239,44 +239,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     
-  // ==========================================================================
-    // FAQ SCROLL FROM EXTERNAL PAGES
-    // ==========================================================================
+// ==========================================================================
+// FAQ SCROLL FROM EXTERNAL PAGES
+// ==========================================================================
+
+/**
+ * Handles scrolling to FAQ section when user clicks "View FAQ" 
+ * from account settings or other pages
+ */
+if (sessionStorage.getItem('scrollToFAQ') === 'true') {
+    sessionStorage.removeItem('scrollToFAQ');
     
-    /**
-     * Handles scrolling to FAQ section when user clicks "View FAQ" 
-     * from account settings or other pages
-     */
-    if (sessionStorage.getItem('scrollToFAQ') === 'true') {
-        // Clear the flag
-        sessionStorage.removeItem('scrollToFAQ');
+    // Wait for language section to be visible before scrolling
+    const waitForFAQ = setInterval(() => {
+        // Get current language from localStorage
+        const currentLang = localStorage.getItem('prokaiwaLang') || 
+                          (navigator.language || navigator.userLanguage).split('-')[0];
+        const lang = currentLang === 'ja' ? 'ja' : 'en';
         
-        // Wait for language section to be visible
-        setTimeout(() => {
-            // Try to find FAQ section (different IDs for different languages)
-            const faqSection = document.getElementById('faq') || 
-                              document.getElementById('ja-faq') || 
-                              document.getElementById('en-faq');
+        // Try to find the FAQ section for current language
+        const faqSection = document.getElementById(`${lang}-faq`);
+        
+        // Check if section exists AND is actually visible (has height)
+        if (faqSection && faqSection.offsetHeight > 0) {
+            clearInterval(waitForFAQ); // Stop checking
             
-            if (faqSection) {
-                // Smooth scroll to FAQ section
-                faqSection.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-                
-                // Optional: Add a subtle highlight effect
-                faqSection.style.transition = 'background-color 0.3s ease';
-                const originalBg = window.getComputedStyle(faqSection).backgroundColor;
-                faqSection.style.backgroundColor = 'rgba(0, 128, 128, 0.1)';
-                
-                // Remove highlight after 2 seconds
-                setTimeout(() => {
-                    faqSection.style.backgroundColor = originalBg;
-                }, 2000);
-            }
-        }, 800); // Wait 800ms for language section to show
-    }
+            console.log('✅ FAQ section found and visible, scrolling...');
+            
+            // Scroll to FAQ
+            faqSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+            
+            // Add subtle highlight effect
+            faqSection.style.transition = 'background-color 0.3s ease';
+            const originalBg = window.getComputedStyle(faqSection).backgroundColor;
+            faqSection.style.backgroundColor = 'rgba(0, 128, 128, 0.1)';
+            
+            setTimeout(() => {
+                faqSection.style.backgroundColor = originalBg;
+            }, 2000);
+        }
+    }, 100); // Check every 100ms
+    
+    // Safety: Stop checking after 5 seconds
+    setTimeout(() => {
+        clearInterval(waitForFAQ);
+        console.warn('⏱️ FAQ scroll timeout - section not found or not visible');
+    }, 5000);
+}
     
     
     // ==========================================================================
