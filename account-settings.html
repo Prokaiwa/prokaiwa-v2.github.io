@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KLVF2ZG1WX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-KLVF2ZG1WX');
+    </script>
+    
+    <meta charset="UTF-8">
+    <title>Prokaiwa | Account Settings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Manage your Prokaiwa account settings, subscription, and preferences.">
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        /* Account Settings Specific Styles */
+        .settings-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .settings-header {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .back-button {
+            background: var(--color-card-bg);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .back-button:hover {
+            background: var(--color-bg);
+            transform: translateX(-3px);
+        }
+        
+        .settings-header h1 {
+            margin: 0;
+            color: var(--color-accent);
+        }
+        
+        .settings-section {
+            background: var(--color-card-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .settings-section h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            color: var(--color-accent);
+            margin: 0 0 1.25rem 0;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--color-border);
+        }
+        
+        .settings-section h2 i {
+            color: var(--color-primary);
+            font-size: 1.25rem;
+        }
+        
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .settings-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .settings-row:first-child {
+            padding-top: 0;
+        }
+        
+        .settings-label {
+            font-weight: 500;
+            color: var(--color-text-light);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .settings-label-main {
+            color: var(--color-text);
+            font-size: 0.95rem;
+        }
+        
+        .settings-label-sub {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            font-weight: 400;
+        }
+        
+        .settings-value {
+            color: var(--color-text);
+            font-weight: 600;
+            text-align: right;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-badge.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-badge.connected {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .settings-button {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+            background: white;
+            color: var(--color-text);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .settings-button:hover {
+            background: var(--color-bg);
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+        
+        .settings-button.primary {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+        
+        .settings-button.primary:hover {
+            background: var(--color-primary-dark);
+            border-color: var(--color-primary-dark);
+            color: white;
+        }
+        
+        .settings-button.danger {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .settings-button.danger:hover {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        
+        .settings-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .credit-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .credit-display i {
+            color: var(--color-gold);
+            font-size: 1.1rem;
+        }
+        
+        .credit-expiry {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            font-weight: 400;
+        }
+        
+        .subscription-details {
+            background: var(--color-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .subscription-details-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+        
+        .subscription-details-row:not(:last-child) {
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .warning-box i {
+            color: #856404;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .warning-box-content {
+            flex: 1;
+        }
+        
+        .warning-box-content strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        .warning-box-content p {
+            margin: 0;
+            color: #856404;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .info-box i {
+            color: #0c5460;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .info-box-content {
+            flex: 1;
+        }
+        
+        .info-box-content p {
+            margin: 0;
+            color: #0c5460;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        /* Loading State */
+        .settings-loading {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .settings-loading i {
+            font-size: 2rem;
+            color: var(--color-primary);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .settings-container {
+                padding: 1rem 0.5rem;
+            }
+            
+            .settings-section {
+                padding: 1rem;
+            }
+            
+            .settings-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .settings-value {
+                text-align: left;
+            }
+            
+            .settings-actions {
+                width: 100%;
+            }
+            
+            .settings-button {
+                flex: 1;
+                text-align: center;
+            }
+        }
+        
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            .status-badge.active {
+                background: #155724;
+                color: #d4edda;
+            }
+            
+            .status-badge.pending {
+                background: #856404;
+                color: #fff3cd;
+            }
+            
+            .status-badge.cancelled {
+                background: #721c24;
+                color: #f8d7da;
+            }
+            
+            .status-badge.connected {
+                background: #0c5460;
+                color: #d1ecf1;
+            }
+            
+            .settings-button {
+                background: var(--color-card-bg);
+                border-color: var(--color-border);
+            }
+            
+            .warning-box {
+                background: rgba(255, 193, 7, 0.2);
+            }
+            
+            .info-box {
+                background: rgba(23, 162, 184, 0.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="index.html"><img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" /></a>
+            <button class="burger-menu" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="#" id="logout-button-nav" class="logout-button">Log Out</a></li>
+                    <li>
+                        <div class="nav-lang-toggle">
+                            <button data-lang="ja" aria-label="日本語に切り替え">日本語</button>
+                            <button data-lang="en" aria-label="Switch to English">English</button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- LOADING STATE -->
+        <div id="settings-loading" class="settings-loading">
+            <i class="fas fa-spinner"></i>
+            <p><span lang="ja">読み込み中...</span><span lang="en">Loading...</span></p>
+        </div>
+
+        <!-- JAPANESE VERSION -->
+        <section id="ja-account-settings" class="lang-section" lang="ja" style="display: none;">
+            <div class="container settings-container">
+                <div class="settings-header">
+                    <a href="dashboard.html" class="back-button">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>ダッシュボードに戻る</span>
+                    </a>
+                    <h1>アカウント設定</h1>
+                </div>
+
+                <!-- PROFILE SECTION -->
+                <div class="settings-section">
+                    <h2><i class="fas fa-user-circle"></i>プロフィール</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">氏名</span>
+                        </span>
+                        <span class="settings-value" id="ja-profile-name">-</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">メールアドレス</span>
+                        </span>
+                        <span class="settings-value" id="ja-profile-email">-</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">英語レベル</span>
+                        </span>
+                        <span class="settings-value" id="ja-profile-level">-</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">登録日</span>
+                        </span>
+                        <span class="settings-value" id="ja-profile-created">-</span>
+                    </div>
+                </div>
+
+                <!-- LINE CONNECTION SECTION -->
+                <div class="settings-section">
+                    <h2><i class="fab fa-line"></i>LINE連携</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">ステータス</span>
+                            <span class="settings-label-sub">毎日のプロンプト配信用</span>
+                        </span>
+                        <span class="status-badge connected" id="ja-line-status">接続済み</span>
+                    </div>
+                    <div class="info-box" id="ja-line-info" style="display: none;">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="info-box-content">
+                            <p>LINEアカウントが接続されていません。毎日のプロンプトを受け取るには、LINE公式アカウント（@845irjbc）を友だち追加してください。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBSCRIPTION SECTION -->
+                <div class="settings-section">
+                    <h2><i class="fas fa-credit-card"></i>サブスクリプション</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">現在のプラン</span>
+                        </span>
+                        <span class="settings-value" id="ja-sub-plan">-</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">ステータス</span>
+                        </span>
+                        <span class="status-badge active" id="ja-sub-status">有効</span>
+                    </div>
+                    
+                    <div class="subscription-details" id="ja-sub-details">
+                        <div class="subscription-details-row">
+                            <span class="settings-label-main">次回請求日</span>
+                            <span class="settings-value" id="ja-sub-next-billing">-</span>
+                        </div>
+                        <div class="subscription-details-row">
+                            <span class="settings-label-main">請求金額</span>
+                            <span class="settings-value" id="ja-sub-amount">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-actions" style="margin-top: 1.5rem;">
+                        <a href="contact.html?subject=plan-change" class="settings-button">
+                            <i class="fas fa-exchange-alt"></i> プラン変更
+                        </a>
+                        <button class="settings-button danger" id="ja-cancel-subscription-btn" onclick="location.href='cancel-subscription.html'">
+                            <i class="fas fa-times-circle"></i> サブスクリプションをキャンセル
+                        </button>
+                    </div>
+                    
+                    <div class="warning-box" id="ja-cancelled-warning" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="warning-box-content">
+                            <strong>サブスクリプションがキャンセルされました</strong>
+                            <p><span id="ja-access-until"></span>まで引き続きサービスをご利用いただけます。再開したい場合は、いつでもお問い合わせください。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LESSON CREDITS SECTION -->
+                <div class="settings-section" id="ja-credits-section">
+                    <h2><i class="fas fa-ticket-alt"></i>レッスンクレジット</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">利用可能クレジット</span>
+                            <span class="settings-label-sub">ビデオレッスンの予約に使用</span>
+                        </span>
+                        <div class="credit-display">
+                            <i class="fas fa-ticket-alt"></i>
+                            <span id="ja-credits-count">0</span>
+                            <span>クレジット</span>
+                        </div>
+                    </div>
+                    <div class="settings-row" id="ja-credits-expiry-row" style="display: none;">
+                        <span class="settings-label">
+                            <span class="settings-label-main">有効期限</span>
+                        </span>
+                        <span class="settings-value credit-expiry" id="ja-credits-expiry">-</span>
+                    </div>
+                    <div class="settings-actions" style="margin-top: 1rem;">
+                        <button class="settings-button primary" onclick="alert('クレジット購入機能は近日公開予定です')">
+                            <i class="fas fa-shopping-cart"></i> クレジットを購入
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PRIVACY & DATA SECTION -->
+                <div class="settings-section">
+                    <h2><i class="fas fa-shield-alt"></i>プライバシー・データ</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">データの取り扱い</span>
+                            <span class="settings-label-sub">収集する情報について</span>
+                        </span>
+                        <a href="privacy-policy.html" class="settings-button">
+                            <i class="fas fa-file-alt"></i> プライバシーポリシー
+                        </a>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">データのダウンロード</span>
+                            <span class="settings-label-sub">あなたのデータのコピーを取得</span>
+                        </span>
+                        <button class="settings-button" onclick="alert('この機能は近日公開予定です')">
+                            <i class="fas fa-download"></i> データをダウンロード
+                        </button>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">アカウントの削除</span>
+                            <span class="settings-label-sub">すべてのデータを完全に削除</span>
+                        </span>
+                        <button class="settings-button danger" onclick="alert('アカウント削除をご希望の場合は、サポート（prokaiwa.english@gmail.com）までご連絡ください。')">
+                            <i class="fas fa-trash-alt"></i> アカウントを削除
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUPPORT SECTION -->
+                <div class="settings-section">
+                    <h2><i class="fas fa-life-ring"></i>サポート</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">お問い合わせ</span>
+                            <span class="settings-label-sub">ご質問やご不明点がございましたら</span>
+                        </span>
+                        <a href="contact.html" class="settings-button">
+                            <i class="fas fa-envelope"></i> お問い合わせ
+                        </a>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">よくある質問</span>
+                            <span class="settings-label-sub">一般的な質問と回答</span>
+                        </span>
+                        <a href="index.html#faq" class="settings-button">
+                            <i class="fas fa-question-circle"></i> FAQを見る
+                        </a>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">問題を報告</span>
+                            <span class="settings-label-sub">技術的な問題やバグ</span>
+                        </span>
+                        <a href="contact.html?subject=issue" class="settings-button">
+                            <i class="fas fa-bug"></i> 問題を報告
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ENGLISH VERSION -->
+        <section id="en-account-settings" class="lang-section" lang="en" style="display: none;">
+            <div class="container settings-container">
+                <div class="settings-header">
+                    <a href="dashboard.html" class="back-button">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Back to Dashboard</span>
+                    </a>
+                    <h1>Account Settings</h1>
+                </div>
+
+                <!-- PROFILE SECTION -->
+                <div class="settings-section">
+                    <h2><i class="fas fa-user-circle"></i>Profile</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Name</span>
+                        </span>
+                        <span class="settings-value" id="en-profile-name">-</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Email</span>
+                        </span>
+                        <span class="settings-value" id="en-profile-email">-</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">English Level</span>
+                        </span>
+                        <span class="settings-value" id="en-profile-level">-</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Member Since</span>
+                        </span>
+                        <span class="settings-value" id="en-profile-created">-</span>
+                    </div>
+                </div>
+
+                <!-- LINE CONNECTION SECTION -->
+                <div class="settings-section">
+                    <h2><i class="fab fa-line"></i>LINE Connection</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Status</span>
+                            <span class="settings-label-sub">For daily prompt delivery</span>
+                        </span>
+                        <span class="status-badge connected" id="en-line-status">Connected</span>
+                    </div>
+                    <div class="info-box" id="en-line-info" style="display: none;">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="info-box-content">
+                            <p>Your LINE account is not connected. To receive daily prompts, please add our official LINE account (@845irjbc) as a friend.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBSCRIPTION SECTION -->
+                <div class="settings-section">
+                    <h2><i class="fas fa-credit-card"></i>Subscription</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Current Plan</span>
+                        </span>
+                        <span class="settings-value" id="en-sub-plan">-</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Status</span>
+                        </span>
+                        <span class="status-badge active" id="en-sub-status">Active</span>
+                    </div>
+                    
+                    <div class="subscription-details" id="en-sub-details">
+                        <div class="subscription-details-row">
+                            <span class="settings-label-main">Next Billing Date</span>
+                            <span class="settings-value" id="en-sub-next-billing">-</span>
+                        </div>
+                        <div class="subscription-details-row">
+                            <span class="settings-label-main">Amount</span>
+                            <span class="settings-value" id="en-sub-amount">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-actions" style="margin-top: 1.5rem;">
+                        <a href="contact.html?subject=plan-change" class="settings-button">
+                            <i class="fas fa-exchange-alt"></i> Change Plan
+                        </a>
+                        <button class="settings-button danger" id="en-cancel-subscription-btn" onclick="location.href='cancel-subscription.html'">
+                            <i class="fas fa-times-circle"></i> Cancel Subscription
+                        </button>
+                    </div>
+                    
+                    <div class="warning-box" id="en-cancelled-warning" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="warning-box-content">
+                            <strong>Subscription Cancelled</strong>
+                            <p>You'll continue to have access until <span id="en-access-until"></span>. Contact us anytime if you'd like to resume your subscription.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LESSON CREDITS SECTION -->
+                <div class="settings-section" id="en-credits-section">
+                    <h2><i class="fas fa-ticket-alt"></i>Lesson Credits</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Available Credits</span>
+                            <span class="settings-label-sub">Use to book video lessons</span>
+                        </span>
+                        <div class="credit-display">
+                            <i class="fas fa-ticket-alt"></i>
+                            <span id="en-credits-count">0</span>
+                            <span>credits</span>
+                        </div>
+                    </div>
+                    <div class="settings-row" id="en-credits-expiry-row" style="display: none;">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Expiry Date</span>
+                        </span>
+                        <span class="settings-value credit-expiry" id="en-credits-expiry">-</span>
+                    </div>
+                    <div class="settings-actions" style="margin-top: 1rem;">
+                        <button class="settings-button primary" onclick="alert('Credit purchase feature coming soon!')">
+                            <i class="fas fa-shopping-cart"></i> Purchase Credits
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PRIVACY & DATA SECTION -->
+                <div class="settings-section">
+                    <h2><i class="fas fa-shield-alt"></i>Privacy & Data</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Data Usage</span>
+                            <span class="settings-label-sub">What information we collect</span>
+                        </span>
+                        <a href="privacy-policy.html" class="settings-button">
+                            <i class="fas fa-file-alt"></i> Privacy Policy
+                        </a>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Download Data</span>
+                            <span class="settings-label-sub">Get a copy of your information</span>
+                        </span>
+                        <button class="settings-button" onclick="alert('This feature is coming soon!')">
+                            <i class="fas fa-download"></i> Download Data
+                        </button>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Delete Account</span>
+                            <span class="settings-label-sub">Permanently remove all data</span>
+                        </span>
+                        <button class="settings-button danger" onclick="alert('To delete your account, please contact support at prokaiwa.english@gmail.com')">
+                            <i class="fas fa-trash-alt"></i> Delete Account
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUPPORT SECTION -->
+                <div class="settings-section">
+                    <h2><i class="fas fa-life-ring"></i>Support</h2>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Contact Us</span>
+                            <span class="settings-label-sub">Questions or concerns?</span>
+                        </span>
+                        <a href="contact.html" class="settings-button">
+                            <i class="fas fa-envelope"></i> Contact
+                        </a>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">FAQ</span>
+                            <span class="settings-label-sub">Common questions and answers</span>
+                        </span>
+                        <a href="index.html#faq" class="settings-button">
+                            <i class="fas fa-question-circle"></i> View FAQ
+                        </a>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">
+                            <span class="settings-label-main">Report Issue</span>
+                            <span class="settings-label-sub">Technical problems or bugs</span>
+                        </span>
+                        <a href="contact.html?subject=issue" class="settings-button">
+                            <i class="fas fa-bug"></i> Report Issue
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="commerce-disclosure.html">Commerce Disclosure</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-of-service.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Connect</h3>
+                    <div class="footer-social-icons">
+                        <a href="https://page.line.me/845irjbc" class="social-icon" target="_blank" aria-label="LINE"><i class="fab fa-line"></i></a>
+                        <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
+                    </div>
+                    <a href="mailto:prokaiwa.english@gmail.com" class="footer-email">prokaiwa.english@gmail.com</a>
+                </div>
+            </div>
+            <p>© <span id="year"></span> Prokaiwa. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
+
+        const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: true,
+                storageKey: 'prokaiwa-supabase-auth',
+                storage: window.localStorage,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
+
+        const planNames = {
+            ja: { 
+                'A': 'LINEプラクティスプラン', 
+                'B45': 'ビデオレッスン（45分）',
+                'B60': 'ビデオレッスン（60分）',
+                'C1': 'パワーパック・ライト', 
+                'C2': 'パワーパック・プロ' 
+            },
+            en: { 
+                'A': 'LINE Practice Plan', 
+                'B45': 'Video Lesson (45min)',
+                'B60': 'Video Lesson (60min)',
+                'C1': 'Power Pack Lite', 
+                'C2': 'Power Pack Pro' 
+            }
+        };
+
+        const statusNames = {
+            ja: { paid: '有効', pending: '支払い待ち', cancelled: 'キャンセル済み' },
+            en: { paid: 'Active', pending: 'Payment Pending', cancelled: 'Cancelled' }
+        };
+
+        const levelNames = {
+            ja: { 'Super Beginner': '超初級', 'Beginner': '初級', 'Intermediate': '中級', 'Advanced': '上級' },
+            en: { 'Super Beginner': 'Super Beginner', 'Beginner': 'Beginner', 'Intermediate': 'Intermediate', 'Advanced': 'Advanced' }
+        };
+
+        function getCurrentLang() {
+            const stored = localStorage.getItem('prokaiwa-lang');
+            if (stored) return stored;
+            
+            const browserLang = navigator.language || navigator.userLanguage;
+            return browserLang.startsWith('ja') ? 'ja' : 'en';
+        }
+
+        function setLanguage(lang) {
+            localStorage.setItem('prokaiwa-lang', lang);
+            
+            document.querySelectorAll('.lang-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(`${lang}-account-settings`).style.display = 'block';
+            
+            document.querySelectorAll('.nav-lang-toggle button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.lang === lang) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Hide/show inline lang spans
+            document.querySelectorAll('[lang]').forEach(el => {
+                if (el.getAttribute('lang') === lang) {
+                    el.style.display = '';
+                } else if (el.tagName !== 'SECTION') {
+                    el.style.display = 'none';
+                }
+            });
+        }
+
+        async function loadAccountSettings() {
+            const loading = document.getElementById('settings-loading');
+            
+            try {
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const { data: profile, error: profileError } = await supabase
+                    .from('questionnaire_responses')
+                    .select('*')
+                    .eq('user_id', session.user.id)
+                    .single();
+
+                if (profileError) {
+                    console.error('Error loading profile:', profileError);
+                    alert('Failed to load account settings. Please try again.');
+                    return;
+                }
+
+                // Populate profile information for both languages
+                ['ja', 'en'].forEach(lang => {
+                    document.getElementById(`${lang}-profile-name`).textContent = profile.name;
+                    document.getElementById(`${lang}-profile-email`).textContent = profile.email;
+                    document.getElementById(`${lang}-profile-level`).textContent = levelNames[lang][profile.level] || profile.level;
+                    
+                    const createdDate = new Date(profile.created_at);
+                    document.getElementById(`${lang}-profile-created`).textContent = createdDate.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US');
+
+                    // Subscription info
+                    const planName = planNames[lang][profile.plan] || profile.plan;
+                    document.getElementById(`${lang}-sub-plan`).textContent = planName;
+                    
+                    const statusBadge = document.getElementById(`${lang}-sub-status`);
+                    const statusText = statusNames[lang][profile.payment_status] || profile.payment_status;
+                    statusBadge.textContent = statusText;
+                    statusBadge.className = `status-badge ${profile.payment_status}`;
+
+                    // Show/hide cancelled warning
+                    if (profile.payment_status === 'cancelled') {
+                        document.getElementById(`${lang}-cancelled-warning`).style.display = 'flex';
+                        // You'll need to add billing end date logic here
+                        document.getElementById(`${lang}-access-until`).textContent = 'January 31, 2026'; // Placeholder
+                    }
+
+                    // Credits (placeholder - you'll implement this when you add credits system)
+                    document.getElementById(`${lang}-credits-count`).textContent = '0';
+                });
+
+                loading.style.display = 'none';
+                const lang = getCurrentLang();
+                document.getElementById(`${lang}-account-settings`).style.display = 'block';
+
+            } catch (error) {
+                console.error('Account settings error:', error);
+                alert('Failed to load account settings.');
+            }
+        }
+
+        // Language toggle
+        document.querySelectorAll('.nav-lang-toggle button').forEach(button => {
+            button.addEventListener('click', () => {
+                setLanguage(button.dataset.lang);
+            });
+        });
+
+        // Logout
+        document.getElementById('logout-button-nav').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        });
+
+        // Burger menu
+        const burgerMenu = document.querySelector('.burger-menu');
+        const mainNav = document.querySelector('.main-nav');
+        if (burgerMenu && mainNav) {
+            burgerMenu.addEventListener('click', () => {
+                mainNav.classList.toggle('open');
+            });
+        }
+
+        // Footer year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Initialize
+        const initialLang = getCurrentLang();
+        setLanguage(initialLang);
+        loadAccountSettings();
+    </script>
+</body>
+</html>
