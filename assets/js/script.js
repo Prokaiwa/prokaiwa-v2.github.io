@@ -242,15 +242,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================================================
 // FAQ SCROLL FROM EXTERNAL PAGES
 // ==========================================================================
-console.log('🔍 FAQ Scroll Debug:');
-console.log('- sessionStorage flag:', sessionStorage.getItem('scrollToFAQ'));
-console.log('- Current lang:', localStorage.getItem('prokaiwaLang'));
+
 /**
  * Handles scrolling to FAQ section when user clicks "View FAQ" 
  * from account settings or other pages
  */
 if (sessionStorage.getItem('scrollToFAQ') === 'true') {
     sessionStorage.removeItem('scrollToFAQ');
+    
+    let timeoutId = null;
     
     // Wait for language section to be visible before scrolling
     const waitForFAQ = setInterval(() => {
@@ -265,6 +265,7 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
         // Check if section exists AND is actually visible (has height)
         if (faqSection && faqSection.offsetHeight > 0) {
             clearInterval(waitForFAQ); // Stop checking
+            clearTimeout(timeoutId); // Cancel the timeout warning
             
             console.log('✅ FAQ section found and visible, scrolling...');
             
@@ -286,7 +287,7 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
     }, 100); // Check every 100ms
     
     // Safety: Stop checking after 5 seconds
-    setTimeout(() => {
+    timeoutId = setTimeout(() => {
         clearInterval(waitForFAQ);
         console.warn('⏱️ FAQ scroll timeout - section not found or not visible');
     }, 5000);
