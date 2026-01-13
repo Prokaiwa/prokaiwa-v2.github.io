@@ -964,34 +964,76 @@
             console.log('✅ Profile loaded:', profile);
 
             // Populate profile information for both languages
-            ['ja', 'en'].forEach(lang => {
-                console.log(`📝 Populating ${lang} fields...`);
-                
-                document.getElementById(`${lang}-profile-name`).textContent = profile.name;
-                document.getElementById(`${lang}-profile-email`).textContent = profile.email;
-                document.getElementById(`${lang}-profile-level`).textContent = levelNames[lang][profile.level] || profile.level;
-                
-                const createdDate = new Date(profile.created_at);
-                document.getElementById(`${lang}-profile-created`).textContent = createdDate.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US');
+['ja', 'en'].forEach(lang => {
+    console.log(`📝 Populating ${lang} fields...`);
+    
+    document.getElementById(`${lang}-profile-name`).textContent = profile.name;
+    document.getElementById(`${lang}-profile-email`).textContent = profile.email;
+    document.getElementById(`${lang}-profile-level`).textContent = levelNames[lang][profile.level] || profile.level;
+    
+    const createdDate = new Date(profile.created_at);
+    document.getElementById(`${lang}-profile-created`).textContent = createdDate.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US');
 
-                // Subscription info
-                const planName = planNames[lang][profile.plan] || profile.plan;
-                document.getElementById(`${lang}-sub-plan`).textContent = planName;
-                
-                const statusBadge = document.getElementById(`${lang}-sub-status`);
-                const statusText = statusNames[lang][profile.payment_status] || profile.payment_status;
-                statusBadge.textContent = statusText;
-                statusBadge.className = `status-badge ${profile.payment_status}`;
+    // Subscription info
+    const planName = planNames[lang][profile.plan] || profile.plan;
+    document.getElementById(`${lang}-sub-plan`).textContent = planName;
+    
+    const statusBadge = document.getElementById(`${lang}-sub-status`);
+    const statusText = statusNames[lang][profile.payment_status] || profile.payment_status;
+    statusBadge.textContent = statusText;
+    statusBadge.className = `status-badge ${profile.payment_status}`;
 
-                // Show/hide cancelled warning
-                if (profile.payment_status === 'cancelled') {
-                    document.getElementById(`${lang}-cancelled-warning`).style.display = 'flex';
-                    document.getElementById(`${lang}-access-until`).textContent = 'January 31, 2026'; // Placeholder
-                }
+    // Show/hide cancelled warning
+    if (profile.payment_status === 'cancelled') {
+        document.getElementById(`${lang}-cancelled-warning`).style.display = 'flex';
+        document.getElementById(`${lang}-access-until`).textContent = 'January 31, 2026'; // Placeholder
+    }
+});
 
-                // Credits (placeholder)
-                document.getElementById(`${lang}-credits-count`).textContent = '0';
-            });
+// Load lesson credits from lesson_credits table (after profile loop)
+console.log('💳 Loading lesson credits...');
+const { data: creditsData, error: creditsError } = await supabase
+    .from('lesson_credits')
+    .select('*')
+    .eq('user_id', session.user.id)
+    .gte('expires_at', new Date().toISOString().split('T')[0]) // Only non-expired credits
+    .order('expires_at', { ascending: true });
+
+if (creditsError) {
+    console.error('❌ Credits error:', creditsError);
+} else {
+    console.log('✅ Credits loaded:', creditsData);
+    
+    // Calculate total available credits
+    let totalAvailable = 0;
+    let earliestExpiry = null;
+    
+    if (creditsData && creditsData.length > 0) {
+        creditsData.forEach(record => {
+            const available = record.total_credits - record.used_credits;
+            totalAvailable += available;
+            
+            // Track earliest expiry
+            if (!earliestExpiry || record.expires_at < earliestExpiry) {
+                earliestExpiry = record.expires_at;
+            }
+        });
+    }
+    
+    // Update UI for both languages
+    ['ja', 'en'].forEach(lang => {
+        document.getElementById(`${lang}-credits-count`).textContent = totalAvailable.toString();
+        
+        // Show expiry if credits exist
+        if (totalAvailable > 0 && earliestExpiry) {
+            const expiryDate = new Date(earliestExpiry);
+            const formattedExpiry = expiryDate.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US');
+            
+            document.getElementById(`${lang}-credits-expiry-row`).style.display = 'flex';
+            document.getElementById(`${lang}-credits-expiry`).textContent = formattedExpiry;
+        }
+    });
+}
 
             // Hide loading, show content
             console.log('✅ Hiding loading, showing content');
