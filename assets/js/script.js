@@ -290,44 +290,45 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
     // Console message for debugging (can be removed in production)
     console.log('✅ Prokaiwa script loaded successfully');
     
-   // ==========================================================================
+  // ==========================================================================
     // DYNAMIC NAV: Show Dashboard if logged in, Login if not
     // ==========================================================================
     
-    /**
-     * Updates navigation to show "Dashboard" for logged-in users
-     * or "Log In" for guests
-     */
     async function updateNavForAuthState() {
         console.log('🔍 Checking auth state for nav...');
         
         try {
-            // Check if user is logged in
             const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm');
             console.log('✅ Supabase imported');
             
             const supabase = createClient(
                 'https://luyzyzefgintksydmwoh.supabase.co',
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg'
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg',
+                {
+                    auth: {
+                        persistSession: true,
+                        storageKey: 'prokaiwa-supabase-auth', // ← CRITICAL: Must match login.html
+                        storage: window.localStorage,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: true
+                    }
+                }
             );
-            console.log('✅ Supabase client created');
+            console.log('✅ Supabase client created with correct storage key');
             
             const { data: { session } } = await supabase.auth.getSession();
             console.log('📊 Session:', session ? '✅ Logged in' : '❌ Not logged in');
             
-            // Find the login link in nav
             const loginLink = document.querySelector('.main-nav a[href="login.html"]');
             console.log('🔗 Login link found:', loginLink ? 'Yes' : 'No');
             
             if (loginLink) {
                 if (session) {
-                    // User is logged in → Show Dashboard
                     console.log('🔄 Changing to Dashboard');
                     loginLink.href = 'dashboard.html';
                     loginLink.textContent = 'Dashboard';
                     console.log('✅ Nav updated to Dashboard');
                 } else {
-                    // User is not logged in → Show Log In
                     console.log('ℹ️ Keeping as Log In');
                     loginLink.href = 'login.html';
                     loginLink.textContent = 'Log In';
@@ -341,8 +342,7 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
         }
     }
     
-    // Run on page load
     console.log('🚀 Starting auth check...');
     updateNavForAuthState();
-    
+
 });
