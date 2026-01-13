@@ -242,7 +242,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================================================
 // FAQ SCROLL FROM EXTERNAL PAGES
 // ==========================================================================
-
+console.log('🔍 FAQ Scroll Debug:');
+console.log('- sessionStorage flag:', sessionStorage.getItem('scrollToFAQ'));
+console.log('- Current lang:', localStorage.getItem('prokaiwaLang'));
 /**
  * Handles scrolling to FAQ section when user clicks "View FAQ" 
  * from account settings or other pages
