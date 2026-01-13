@@ -4396,18 +4396,30 @@ function renderUpcomingLessonsCard(lessons, lang) {  // ← ADD lang parameter
 // Toggle expand/collapse
 function toggleLessonsExpanded() {
     lessonsCardState.expanded = !lessonsCardState.expanded;
-    const moreSection = document.querySelector('.lessons-more');
+    
+    // Get current language
+    const lang = getCurrentLang();
+    
+    // Toggle both language versions
+    ['ja', 'en'].forEach(l => {
+        const moreSection = document.querySelector(`#${l}-upcoming-lessons .lessons-more`);
+        if (moreSection) {
+            if (lessonsCardState.expanded) {
+                moreSection.classList.add('expanded');
+            } else {
+                moreSection.classList.remove('expanded');
+            }
+        }
+    });
+    
+    // Update button text
     const toggleBtn = document.querySelector('.toggle-lessons-btn');
-    
-    if (moreSection) {
-        moreSection.classList.toggle('expanded');
-    }
-    
     if (toggleBtn) {
         const totalLessons = bookingState.userBookings.length;
+        const lang = getCurrentLang();
         toggleBtn.innerHTML = lessonsCardState.expanded 
-            ? '<i class="fas fa-chevron-up"></i> Show Less'
-            : `<i class="fas fa-chevron-down"></i> View All Lessons (${totalLessons})`;
+            ? `<i class="fas fa-chevron-up"></i> ${lang === 'ja' ? '少なく表示' : 'Show Less'}`
+            : `<i class="fas fa-chevron-down"></i> ${lang === 'ja' ? `すべて表示 (${totalLessons})` : `View All Lessons (${totalLessons})`}`;
     }
 }
 
