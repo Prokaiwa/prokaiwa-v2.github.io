@@ -290,16 +290,13 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
     // Console message for debugging (can be removed in production)
     console.log('✅ Prokaiwa script loaded successfully');
     
-  // ==========================================================================
+    // ==========================================================================
     // DYNAMIC NAV: Show Dashboard if logged in, Login if not
     // ==========================================================================
     
     async function updateNavForAuthState() {
-        console.log('🔍 Checking auth state for nav...');
-        
         try {
             const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm');
-            console.log('✅ Supabase imported');
             
             const supabase = createClient(
                 'https://luyzyzefgintksydmwoh.supabase.co',
@@ -307,42 +304,42 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
                 {
                     auth: {
                         persistSession: true,
-                        storageKey: 'prokaiwa-supabase-auth', // ← CRITICAL: Must match login.html
+                        storageKey: 'prokaiwa-supabase-auth',
                         storage: window.localStorage,
                         autoRefreshToken: true,
                         detectSessionInUrl: true
                     }
                 }
             );
-            console.log('✅ Supabase client created with correct storage key');
             
             const { data: { session } } = await supabase.auth.getSession();
-            console.log('📊 Session:', session ? '✅ Logged in' : '❌ Not logged in');
-            
-            const loginLink = document.querySelector('.main-nav a[href="login.html"]');
-            console.log('🔗 Login link found:', loginLink ? 'Yes' : 'No');
+            const loginLink = document.querySelector('#auth-nav-link');
             
             if (loginLink) {
                 if (session) {
-                    console.log('🔄 Changing to Dashboard');
+                    // User is logged in
                     loginLink.href = 'dashboard.html';
                     loginLink.textContent = 'Dashboard';
-                    console.log('✅ Nav updated to Dashboard');
                 } else {
-                    console.log('ℹ️ Keeping as Log In');
+                    // User is not logged in
                     loginLink.href = 'login.html';
                     loginLink.textContent = 'Log In';
                 }
-            } else {
-                console.warn('⚠️ Could not find login link in nav');
+                // Reveal the link after decision is made
+                loginLink.style.visibility = 'visible';
             }
             
         } catch (error) {
-            console.error('❌ Error checking auth state:', error);
+            // On error, default to Log In and show it
+            const loginLink = document.querySelector('#auth-nav-link');
+            if (loginLink) {
+                loginLink.href = 'login.html';
+                loginLink.textContent = 'Log In';
+                loginLink.style.visibility = 'visible';
+            }
         }
     }
     
-    console.log('🚀 Starting auth check...');
     updateNavForAuthState();
 
 });
