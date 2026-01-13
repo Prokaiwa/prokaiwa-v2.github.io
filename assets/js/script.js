@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     faqSection.style.backgroundColor = originalBg;
                 }, 2000);
             }
-        }, 500); // Wait 500ms for language section to show
+        }, 800); // Wait 800ms for language section to show
     }
     
     
