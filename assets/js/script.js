@@ -283,11 +283,54 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
 }
 
     
-    // ==========================================================================
+  // ==========================================================================
     // DEVELOPMENT LOG
     // ==========================================================================
     
     // Console message for debugging (can be removed in production)
     console.log('✅ Prokaiwa script loaded successfully');
+    
+    // ==========================================================================
+    // DYNAMIC NAV: Show Dashboard if logged in, Login if not
+    // ==========================================================================
+    
+    /**
+     * Updates navigation to show "Dashboard" for logged-in users
+     * or "Log In" for guests
+     */
+    async function updateNavForAuthState() {
+        try {
+            // Check if user is logged in
+            const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm');
+            const supabase = createClient(
+                'https://luyzyzefgintksydmwoh.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg'
+            );
+            
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            // Find the login link in nav
+            const loginLink = document.querySelector('.main-nav a[href="login.html"]');
+            
+            if (loginLink) {
+                if (session) {
+                    // User is logged in → Show Dashboard
+                    loginLink.href = 'dashboard.html';
+                    loginLink.textContent = 'Dashboard';
+                } else {
+                    // User is not logged in → Show Log In
+                    loginLink.href = 'login.html';
+                    loginLink.textContent = 'Log In';
+                }
+            }
+            
+        } catch (error) {
+            console.log('Could not check auth state:', error);
+            // Silently fail - keep default "Log In" button
+        }
+    }
+    
+    // Run on page load
+    updateNavForAuthState();
     
 });
