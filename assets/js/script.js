@@ -250,8 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
 if (sessionStorage.getItem('scrollToFAQ') === 'true') {
     sessionStorage.removeItem('scrollToFAQ');
     
-    let timeoutId = null;
-    
     // Wait for language section to be visible before scrolling
     const waitForFAQ = setInterval(() => {
         // Get current language from localStorage
@@ -265,9 +263,6 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
         // Check if section exists AND is actually visible (has height)
         if (faqSection && faqSection.offsetHeight > 0) {
             clearInterval(waitForFAQ); // Stop checking
-            clearTimeout(timeoutId); // Cancel the timeout warning
-            
-            console.log('✅ FAQ section found and visible, scrolling...');
             
             // Scroll to FAQ
             faqSection.scrollIntoView({ 
@@ -285,14 +280,8 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
             }, 2000);
         }
     }, 100); // Check every 100ms
-    
-    // Safety: Stop checking after 5 seconds
-    timeoutId = setTimeout(() => {
-        clearInterval(waitForFAQ);
-        console.warn('⏱️ FAQ scroll timeout - section not found or not visible');
-    }, 5000);
 }
-    
+
     
     // ==========================================================================
     // DEVELOPMENT LOG
