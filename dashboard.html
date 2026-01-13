@@ -4445,7 +4445,7 @@ async function cancelLesson(lessonId, lang = 'en') {  // ← ADD lang parameter 
     } else {
         confirmMsg = lang === 'ja'
             ? 'このレッスンをキャンセルしますか？\n\n✅ クレジットは返金されます（24時間前まで）'
-            : 'Cancel this lesson?\n\n✅ Your credit will be refunded (>24h notice).';
+            : 'Cancel this lesson?\n\n✅ Your credit will be refunded.';
     }
     
     if (!confirm(confirmMsg)) {
