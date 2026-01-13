@@ -239,6 +239,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     
+  // ==========================================================================
+    // FAQ SCROLL FROM EXTERNAL PAGES
+    // ==========================================================================
+    
+    /**
+     * Handles scrolling to FAQ section when user clicks "View FAQ" 
+     * from account settings or other pages
+     */
+    if (sessionStorage.getItem('scrollToFAQ') === 'true') {
+        // Clear the flag
+        sessionStorage.removeItem('scrollToFAQ');
+        
+        // Wait for language section to be visible
+        setTimeout(() => {
+            // Try to find FAQ section (different IDs for different languages)
+            const faqSection = document.getElementById('faq') || 
+                              document.getElementById('ja-faq') || 
+                              document.getElementById('en-faq');
+            
+            if (faqSection) {
+                // Smooth scroll to FAQ section
+                faqSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+                
+                // Optional: Add a subtle highlight effect
+                faqSection.style.transition = 'background-color 0.3s ease';
+                const originalBg = window.getComputedStyle(faqSection).backgroundColor;
+                faqSection.style.backgroundColor = 'rgba(0, 128, 128, 0.1)';
+                
+                // Remove highlight after 2 seconds
+                setTimeout(() => {
+                    faqSection.style.backgroundColor = originalBg;
+                }, 2000);
+            }
+        }, 500); // Wait 500ms for language section to show
+    }
+    
+    
     // ==========================================================================
     // DEVELOPMENT LOG
     // ==========================================================================
