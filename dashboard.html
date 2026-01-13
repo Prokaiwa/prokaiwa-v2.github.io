@@ -2629,12 +2629,12 @@
         // =============================================
         
         function getCurrentLang() {
-            const stored = localStorage.getItem('prokaiwa-lang');
-            if (stored) return stored;
-            
-            const browserLang = navigator.language || navigator.userLanguage;
-            return browserLang.startsWith('ja') ? 'ja' : 'en';
-        }
+    const stored = localStorage.getItem('prokaiwaLang');
+    if (stored) return stored;
+    
+    const browserLang = navigator.language || navigator.userLanguage;
+    return browserLang.startsWith('ja') ? 'ja' : 'en';
+}
 
         function getTodayString() {
             return new Date().toISOString().split('T')[0];
@@ -3417,7 +3417,7 @@ if (hasVideoAccess) {
         // =============================================
         
         function setLanguage(lang) {
-            localStorage.setItem('prokaiwa-lang', lang);
+            localStorage.setItem('prokaiwaLang', lang);
             
             document.querySelectorAll('.lang-section').forEach(section => {
                 section.classList.remove('show');
