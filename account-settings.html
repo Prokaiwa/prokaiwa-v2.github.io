@@ -376,6 +376,27 @@
             background: rgba(23, 162, 184, 0.2);
         }
     }
+    /* CRITICAL FIX: Override main stylesheet for account settings */
+.lang-section {
+    display: block !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative !important;
+}
+
+.lang-section[style*="display: none"] {
+    display: none !important;
+}
+
+/* Ensure container is visible */
+.settings-container {
+    display: block !important;
+    height: auto !important;
+    min-height: 100px !important;
+}
 </style>
 </head>
 <body>
