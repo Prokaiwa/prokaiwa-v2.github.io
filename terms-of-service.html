@@ -527,68 +527,6 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Element Selectors ---
-            const burgerMenu = document.querySelector('.burger-menu');
-            const mainNav = document.querySelector('.main-nav');
-            const langToggle = document.querySelector('.nav-lang-toggle');
-            
-            // --- Language Toggle Functionality ---
-            function setLanguage(lang) {
-                localStorage.setItem('prokaiwa-lang', lang);
-
-                const isJapanese = lang === 'ja';
-                document.documentElement.lang = lang;
-
-                const allLangElements = document.body.querySelectorAll('[lang="ja"], [lang="en"]');
-                allLangElements.forEach(el => {
-                    if (el.getAttribute('lang') === lang) {
-                        el.style.display = '';
-                        if (el.classList.contains('lang-section')) {
-                            el.classList.add('show');
-                        }
-                    } else {
-                        el.style.display = 'none';
-                        if (el.classList.contains('lang-section')) {
-                            el.classList.remove('show');
-                        }
-                    }
-                });
-
-                langToggle.querySelector('[data-lang="ja"]').classList.toggle('active', isJapanese);
-                langToggle.querySelector('[data-lang="en"]').classList.toggle('active', !isJapanese);
-            }
-
-            langToggle.addEventListener('click', event => {
-                const button = event.target.closest('button[data-lang]');
-                if (button) {
-                    setLanguage(button.dataset.lang);
-                }
-            });
-
-            // --- Initial Language Setup ---
-            const savedLang = localStorage.getItem('prokaiwa-lang');
-            if (savedLang) {
-                setLanguage(savedLang);
-            } else {
-                const userLang = (navigator.language || navigator.userLanguage).split('-')[0];
-                setLanguage(userLang === 'ja' ? 'ja' : 'en');
-            }
-
-            // --- Burger Menu Functionality ---
-            burgerMenu.addEventListener('click', () => {
-                mainNav.classList.toggle('open');
-                burgerMenu.querySelector('i').classList.toggle('fa-bars');
-                burgerMenu.querySelector('i').classList.toggle('fa-times');
-            });
-            
-            // --- Footer Year ---
-            const yearSpan = document.getElementById('year');
-            if (yearSpan) {
-                yearSpan.textContent = new Date().getFullYear();
-            }
-        });
-    </script>
+    <script src="assets/js/script.js"></script>
 </body>
 </html>
