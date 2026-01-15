@@ -904,7 +904,7 @@ async function initCancellationPage() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
         console.log('❌ No session found, redirecting to login');
-        window.location.href = 'questionnaire.html';
+        window.location.href = 'login.html';
         return;
     }
     
