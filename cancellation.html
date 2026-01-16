@@ -2639,12 +2639,13 @@ const retentionOffers = {
 
 const cancellationState = {
     currentLang: 'ja',
-    currentStep: 'reason', // 'reason' | 'details' | 'offer' | 'confirm'
+    currentStep: 'reason',
     selectedReason: null,
     questionAnswers: {},
     universalAnswers: {},
     offerShown: null,
     offerType: null,
+    offerDecision: null,
     offerAccepted: false,
     userData: {
         userId: null,
@@ -2830,19 +2831,19 @@ function renderCurrentStep() {
     
     // Render appropriate content
     switch(step) {
-        case 'reason':
-            renderReasonSelection(lang);
-            break;
-        case 'details':
-            renderQuestionForm(lang);
-            break;
-        case 'offer':
-            renderOffer(lang);
-            break;
-        case 'confirm':
-            renderConfirmation(lang);
-            break;
-    }
+    case 'reason':
+        renderReasonSelection(lang);
+        break;
+    case 'details':
+        renderQuestionForm(lang);
+        break;
+    case 'offer':
+        renderOffer(lang, cancellationState.offerDecision);
+        break;
+    case 'confirm':
+        renderConfirmation(lang);
+        break;
+}
 }
 
 function updateStepIndicators(lang, currentStep) {
@@ -3310,13 +3311,14 @@ function proceedToOfferOrConfirm(lang) {
     );
     
     if (offerDecision) {
-        console.log('✨ Showing retention offer:', offerDecision.type);
-        
-        cancellationState.currentStep = 'offer';
-        cancellationState.offerShown = offerDecision.type;
-        cancellationState.offerType = offerDecision.type;
-        
-        renderOffer(lang, offerDecision);
+    console.log('✨ Showing retention offer:', offerDecision.type);
+    
+    cancellationState.currentStep = 'offer';
+    cancellationState.offerShown = offerDecision.type;
+    cancellationState.offerType = offerDecision.type;
+    cancellationState.offerDecision = offerDecision;
+    
+    renderOffer(lang, offerDecision);
         
         // Track offer shown
         trackEvent('retention_offer_shown', {
