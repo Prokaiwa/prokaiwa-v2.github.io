@@ -2771,16 +2771,16 @@ async function initCancellationFlow() {
     // Get user's subscription data
     try {
         const { data: userData, error } = await supabase
-            .from('questionnaire_responses')
-            .select('student_id, plan, subscription_id')
-            .eq('user_id', user.id)
-            .single();
+    .from('questionnaire_responses')
+    .select('id, plan, stripe_subscription_id')
+    .eq('user_id', user.id)
+    .single();
             
         if (error) throw error;
         
-        cancellationState.userData.studentId = userData.student_id;
+        cancellationState.userData.studentId = userData.id;
         cancellationState.userData.currentPlan = userData.plan;
-        cancellationState.userData.subscriptionId = userData.subscription_id;
+        cancellationState.userData.subscriptionId = userData.stripe_subscription_id;
         
         console.log('✅ User data loaded:', cancellationState.userData);
         
