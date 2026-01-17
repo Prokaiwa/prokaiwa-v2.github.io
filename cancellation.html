@@ -2803,12 +2803,12 @@ async function initCancellationFlow() {
     }
     
     // Get language preference
-    const savedLang = localStorage.getItem('prokaiwa-lang') || 'ja';
+    const savedLang = localStorage.getItem('prokaiwaLang') || 'ja';
     cancellationState.currentLang = savedLang;
     
     // Render initial state
-    renderCurrentStep();
-    updateLanguageDisplay(savedLang);
+renderCurrentStep();
+// Language display is handled by script.js
 }
         
 // =====================================================
@@ -3668,12 +3668,6 @@ function showProcessing(text) {
 function hideProcessing() {
     const overlay = document.getElementById('processing-overlay');
     if (overlay) overlay.classList.remove('show');
-}
-
-function updateLanguageDisplay(lang) {
-    // Show/hide language sections
-    document.getElementById('ja-cancellation').style.display = lang === 'ja' ? 'block' : 'none';
-    document.getElementById('en-cancellation').style.display = lang === 'en' ? 'block' : 'none';
 }
 
 function trackEvent(eventName, eventData) {
