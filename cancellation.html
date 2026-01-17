@@ -3453,14 +3453,17 @@ async function acceptOffer(lang) {
         hideProcessing();
         
         if (result.success) {
-            // Show success message
-            alert(lang === 'ja' ? 
-                'ありがとうございます！変更が適用されました。' :
-                'Thank you! Your changes have been applied.');
-            
-            // Redirect to dashboard
-            window.location.href = 'dashboard.html';
-        } else {
+    // Mark offer as accepted to prevent "unsaved changes" warning
+    cancellationState.offerAccepted = true;
+    
+    // Show success message
+    alert(lang === 'ja' ? 
+        'ありがとうございます！変更が適用されました。' :
+        'Thank you! Your changes have been applied.');
+    
+    // Redirect to dashboard
+    window.location.href = 'dashboard.html';
+} else {
             throw new Error(result.error || 'Unknown error');
         }
         
