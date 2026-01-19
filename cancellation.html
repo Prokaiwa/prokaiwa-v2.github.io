@@ -2783,12 +2783,26 @@ async function initCancellationFlow() {
     // Get user's subscription data
     try {
         const { data: userData, error } = await supabase
-    .from('questionnaire_responses')
-    .select('id, plan, stripe_subscription_id')
-    .eq('user_id', user.id)
-    .single();
+            .from('questionnaire_responses')
+            .select('id, plan, stripe_subscription_id, subscription_status, cancelled_at')  // ← Added fields
+            .eq('user_id', user.id)
+            .single();
             
         if (error) throw error;
+        
+        // ⭐ NEW: Check if already cancelled
+        if (userData.subscription_status === 'cancelled' || userData.cancelled_at) {
+            alert('Your subscription has already been cancelled.');
+            window.location.href = 'dashboard.html';
+            return;
+        }
+        
+        // ⭐ NEW: Check if subscription exists
+        if (!userData.stripe_subscription_id) {
+            alert('No active subscription found.');
+            window.location.href = 'dashboard.html';
+            return;
+        }
         
         cancellationState.userData.studentId = userData.id;
         cancellationState.userData.currentPlan = userData.plan;
@@ -2807,7 +2821,7 @@ async function initCancellationFlow() {
     cancellationState.currentLang = savedLang;
     
     // Render initial state
-renderCurrentStep();
+    renderCurrentStep();
 // Language display is handled by script.js
 }
         
