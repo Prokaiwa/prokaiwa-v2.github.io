@@ -3640,19 +3640,35 @@ async function cancelSubscription(cancellationData) {
     
     try {
         const { data, error } = await supabase.functions.invoke('cancel-subscription', {
-            body: {
-                action: 'cancel',
-                ...cancellationData
-            }
+            body: cancellationData
         });
         
-        if (error) throw error;
+        // Log the response
+        console.log('📦 Response:', { data, error });
         
+        if (error) {
+            console.error('❌ Edge function error:', error);
+            throw error;
+        }
+        
+        if (!data) {
+            throw new Error('No response from server');
+        }
+        
+        // Check if the edge function itself returned an error
+        if (data.success === false) {
+            throw new Error(data.error || 'Cancellation failed');
+        }
+        
+        console.log('✅ Cancellation successful:', data);
         return { success: true, data };
         
     } catch (error) {
-        console.error('❌ Edge function error:', error);
-        return { success: false, error: error.message };
+        console.error('❌ Cancellation error:', error);
+        return { 
+            success: false, 
+            error: error.message || 'An error occurred during cancellation'
+        };
     }
 }
 
