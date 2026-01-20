@@ -571,22 +571,20 @@
             }
         });
 
-        // --- Stripe Payment Links ---
-        const baseStripeLinks = {
-            'A':   'https://buy.stripe.com/7sY6oGbiP7ovf88g2Hes001',
-            'B45': 'https://buy.stripe.com/28E9AS4UrcIP8JK7wbes002',
-            'B60': 'https://buy.stripe.com/28E14mev16kr4tu5o3es003',
-            'C1':  'https://buy.stripe.com/eVq00icmTbEL5xy17Nes004',
-            'C2':  'https://buy.stripe.com/00w9ASfz5bEL4tu8Afes005'
-        };
-        
-        const successUrls = {
-            'A': `${window.location.origin}/thank-you-line.html`,
-            'B45': `${window.location.origin}/thank-you-planb.html`,
-            'B60': `${window.location.origin}/thank-you-planb.html`,
-            'C1': `${window.location.origin}/thank-you-pro.html`,
-            'C2': `${window.location.origin}/thank-you-pro.html`
-        };
+        // Update the Stripe links
+const baseStripeLinks = {
+    'line':       'https://buy.stripe.com/test_00w3cu0EbgZ59NO3fVes006', // Test
+    'video':      'https://buy.stripe.com/test_14A4gyev14cj2lm2bRes007', // Test
+    'power_lite': 'https://buy.stripe.com/test_5kQaEW0EbcIP6BC5o3es008', // Test
+    'power_pro':  'https://buy.stripe.com/test_00w9ASfz5bEL4tu8Afes005' // Test
+};
+
+const successUrls = {
+    'line':       `${window.location.origin}/thank-you-line.html`,
+    'video':      `${window.location.origin}/thank-you.html`,
+    'power_lite': `${window.location.origin}/thank-you-pro.html`,
+    'power_pro':  `${window.location.origin}/thank-you-pro.html`
+};
 
         // --- Language Detection ---
         function getCurrentLang() {
