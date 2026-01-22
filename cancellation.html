@@ -2677,7 +2677,7 @@ function determineOffer(reason, answers, lang) {
         
         // Only offer downgrade if they're on a higher-tier plan
         if ((currentPlan === 'Power Pack Lite' || currentPlan === 'Power Pack Pro' || 
-             currentPlan === 'C1' || currentPlan === 'C2') && 
+             currentPlan === 'power_lite' || currentPlan === 'power_pro') && 
             (reasonablePrice === 'under_3000' || reasonablePrice === '3000_4000' || 
              reasonablePrice === '4000_5000')) {
             return { type: 'downgrade', offer: retentionOffers.expensive[lang].downgrade };
