@@ -855,21 +855,19 @@
     console.log('✅ Supabase client created');
 
     const planNames = {
-        ja: { 
-            'A': 'LINEプラクティスプラン', 
-            'B45': 'ビデオレッスン（45分）',
-            'B60': 'ビデオレッスン（60分）',
-            'C1': 'パワーパック・ライト', 
-            'C2': 'パワーパック・プロ' 
-        },
-        en: { 
-            'A': 'LINE Practice Plan', 
-            'B45': 'Video Lesson (45min)',
-            'B60': 'Video Lesson (60min)',
-            'C1': 'Power Pack Lite', 
-            'C2': 'Power Pack Pro' 
-        }
-    };
+    ja: { 
+        'line': 'LINEプラクティスプラン', 
+        'video': 'ビデオレッスン（50分）',
+        'power_lite': 'パワーパック・ライト', 
+        'power_pro': 'パワーパック・プロ' 
+    },
+    en: { 
+        'line': 'LINE Practice Plan', 
+        'video': 'Video Lesson (50min)',
+        'power_lite': 'Power Pack Lite', 
+        'power_pro': 'Power Pack Pro' 
+    }
+};
 
     const statusNames = {
         ja: { paid: '有効', pending: '支払い待ち', cancelled: 'キャンセル済み' },
