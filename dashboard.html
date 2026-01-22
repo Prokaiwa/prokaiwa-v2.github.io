@@ -3320,7 +3320,7 @@
                 
                 const progressPercent = Math.min((stats.thisMonth / MONTHLY_GOAL) * 100, 100);
 
-                const hasVideoAddon = profile.addons?.includes('B45') || profile.addons?.includes('B60') || false;
+                const hasVideoAddon = profile.addons?.includes('video') || false;
                 const hasVideoAccess = profile.had_video_access || hasVideoAddon;
 
                 ['ja', 'en'].forEach(l => {
