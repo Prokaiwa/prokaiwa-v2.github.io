@@ -1114,26 +1114,26 @@
     </div>
 
 
-    <!-- Power Pro Section (C2) -->
-    <div class="feedback-section" id="plan-c2-section">
+    <!-- Power Pro Section -->
+    <div class="feedback-section" id="plan-power-pro-section">
       <h2>⚡ Power Pro - Daily Quick</h2>
-      <div id="plan-c2-students" class="loading">
+      <div id="plan-power-pro-students" class="loading">
         <i class="fas fa-spinner fa-spin"></i> Loading students...
       </div>
     </div>
 
-    <!-- Power Lite Section (C1) -->
-    <div class="feedback-section" id="plan-c1-section">
+    <!-- Power Lite Section -->
+    <div class="feedback-section" id="plan-power-lite-section">
       <h2>💡 Power Lite - Bi-Weekly</h2>
-      <div id="plan-c1-students" class="loading">
+      <div id="plan-power-lite-students" class="loading">
         <i class="fas fa-spinner fa-spin"></i> Loading students...
       </div>
     </div>
 
-    <!-- LINE Practice Section (A) -->
-    <div class="feedback-section" id="plan-a-section">
+    <!-- LINE Practice Section -->
+    <div class="feedback-section" id="plan-line-section">
       <h2>📱 LINE Practice - Weekly Comprehensive</h2>
-      <div id="plan-a-students" class="loading">
+      <div id="plan-line-students" class="loading">
         <i class="fas fa-spinner fa-spin"></i> Loading students...
       </div>
     </div>
@@ -1376,7 +1376,7 @@
     );
 
     let currentTeacher = null;
-    let feedbackQueue = { planA: [], planC1: [], planC2: [] };
+    let feedbackQueue = { planLine: [], planPowerLite: [], planPowerPro: [] };
     let completedToday = new Set();
     let currentFilters = {}; // Track filter per student
 
@@ -1553,7 +1553,7 @@ Keep practicing! 🌟`
         if (progressError) throw progressError;
 
         // Categorize by plan and feedback need
-        feedbackQueue = { planA: [], planC1: [], planC2: [] };
+        feedbackQueue = { planLine: [], planPowerLite: [], planPowerPro: [] };
 
         for (const student of students) {
           const progress = progressData.find(p => p.user_id === student.user_id);
@@ -1566,9 +1566,9 @@ Keep practicing! 🌟`
 };
 
           if (studentData.needsFeedback) {
-            if (student.plan === 'A') feedbackQueue.planA.push(studentData);
-            else if (student.plan === 'C1') feedbackQueue.planC1.push(studentData);
-            else if (student.plan === 'C2') feedbackQueue.planC2.push(studentData);
+            if (student.plan === 'line') feedbackQueue.planLine.push(studentData);
+            else if (student.plan === 'power_lite') feedbackQueue.planPowerLite.push(studentData);
+            else if (student.plan === 'power_pro') feedbackQueue.planPowerPro.push(studentData);
           }
         }
 
@@ -1589,13 +1589,13 @@ Keep practicing! 🌟`
     async function checkIfNeedsFeedback(plan, progress, userId) {
   const { current_day, total_prompts_sent } = progress;
 
-  if (plan === 'A') {
+  if (plan === 'line') {
     // Weekly: Day 7, 14, 21, 28
     return total_prompts_sent % 7 === 0 && current_day === 7;
-  } else if (plan === 'C1') {
+  } else if (plan === 'power_lite') {
     // Bi-weekly: Days 3 and 7
     return current_day === 3 || current_day === 7;
-  } else if (plan === 'C2') {
+  } else if (plan === 'power_pro') {
     // Daily - but only if they responded today
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -1623,9 +1623,9 @@ if (responseError && responseError.code !== 'PGRST116') {
     // ============================================
 
     function renderFeedbackQueue() {
-      renderPlanSection('plan-c2-students', feedbackQueue.planC2, 'daily');
-      renderPlanSection('plan-c1-students', feedbackQueue.planC1, 'biweekly');
-      renderPlanSection('plan-a-students', feedbackQueue.planA, 'weekly');
+      renderPlanSection('plan-power-pro-students', feedbackQueue.planPowerPro, 'daily');
+      renderPlanSection('plan-power-lite-students', feedbackQueue.planPowerLite, 'biweekly');
+      renderPlanSection('plan-line-students', feedbackQueue.planLine, 'weekly');
     }
 
     function renderPlanSection(containerId, students, templateType) {
@@ -1825,7 +1825,7 @@ if (filterSelect) {
       container.innerHTML = '<p style="text-align:center; padding:1rem; color:#999;"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
 
       try {
-        const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
+        const student = [...feedbackQueue.planLine, ...feedbackQueue.planPowerLite, ...feedbackQueue.planPowerPro]
           .find(s => s.id === studentId);
         
         if (!student || !student.user_id) {
@@ -2082,18 +2082,18 @@ if (filterSelect) {
     // ============================================
 
     function updateStats() {
-      const totalStudents = feedbackQueue.planA.length + feedbackQueue.planC1.length + feedbackQueue.planC2.length;
-      const completed = completedToday.size;
-      
-      // Estimate time: 12 min for weekly, 5 min for biweekly, 3 min for daily
-      const remainingA = feedbackQueue.planA.filter(s => !completedToday.has(s.id)).length;
-      const remainingC1 = feedbackQueue.planC1.filter(s => !completedToday.has(s.id)).length;
-      const remainingC2 = feedbackQueue.planC2.filter(s => !completedToday.has(s.id)).length;
-      
-      const estimatedMinutes = 
-        (remainingA * 12) +
-        (remainingC1 * 5) +
-        (remainingC2 * 3);
+      const totalStudents = feedbackQueue.planLine.length + feedbackQueue.planPowerLite.length + feedbackQueue.planPowerPro.length;
+const completed = completedToday.size;
+
+// Estimate time: 12 min for weekly, 5 min for biweekly, 3 min for daily
+const remainingLine = feedbackQueue.planLine.filter(s => !completedToday.has(s.id)).length;
+const remainingPowerLite = feedbackQueue.planPowerLite.filter(s => !completedToday.has(s.id)).length;
+const remainingPowerPro = feedbackQueue.planPowerPro.filter(s => !completedToday.has(s.id)).length;
+
+const estimatedMinutes = 
+  (remainingLine * 12) +
+  (remainingPowerLite * 5) +
+  (remainingPowerPro * 3);
       
       const hours = Math.floor(estimatedMinutes / 60);
       const minutes = estimatedMinutes % 60;
@@ -2187,7 +2187,7 @@ async function openAssessmentModal(studentId) {
   currentAssessmentStudent = studentId;
   
   // Find student data
-  const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
+  const student = [...feedbackQueue.planLine, ...feedbackQueue.planPowerLite, ...feedbackQueue.planPowerPro]
     .find(s => s.id === studentId);
   
   if (!student) {
@@ -2312,7 +2312,7 @@ async function submitAssessment() {
   
   try {
     // Get student data
-    const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
+    const student = [...feedbackQueue.planLine, ...feedbackQueue.planPowerLite, ...feedbackQueue.planPowerPro]
       .find(s => s.id === currentAssessmentStudent);
     
     if (!student || !student.user_id) {
