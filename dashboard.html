@@ -3599,117 +3599,96 @@
                     document.getElementById(`${l}-stat-total`).textContent = stats.total;
                     document.getElementById(`${l}-stat-month`).textContent = stats.thisMonth;
 
-                    document.getElementById(`${l}-profile-name`).textContent = profile.name;
+document.getElementById(`${l}-profile-name`).textContent = profile.name;
                     document.getElementById(`${l}-profile-email`).textContent = profile.email;
                     document.getElementById(`${l}-profile-level`).textContent = levelNames[l][profile.level] || profile.level;
                     
-                    // Check subscription status
-const isCancelled = profile.subscription_status === 'cancelled';
-const cancelledAt = profile.cancelled_at ? new Date(profile.cancelled_at) : null;
-const dashboardExpiresAt = profile.dashboard_access_expires_at ? new Date(profile.dashboard_access_expires_at) : null;
-const now = new Date();
-const isExpired = dashboardExpiresAt && dashboardExpiresAt < now;
-
-// Update status text
-let statusText = '';
-if (isExpired) {
-    statusText = currentLang === 'ja' ? '期限切れ' : 'Expired';
-    statusEl.style.color = '#dc3545';
-    statusEl.style.fontWeight = '600';
-} else if (isCancelled && dashboardExpiresAt) {
-    const expiresDate = dashboardExpiresAt.toLocaleDateString(
-        currentLang === 'ja' ? 'ja-JP' : 'en-US',
-        { year: 'numeric', month: 'long', day: 'numeric' }
-    );
-    statusText = currentLang === 'ja' 
-        ? `キャンセル済 - ${expiresDate}まで利用可能`
-        : `Cancelled - Access Until ${expiresDate}`;
-    
-    // ADD YELLOW HIGHLIGHT TO STATUS TEXT
-    statusEl.style.color = '#856404';
-    statusEl.style.fontWeight = '600';
-    statusEl.style.backgroundColor = '#fff3cd';
-    statusEl.style.padding = '0.5rem 1rem';
-    statusEl.style.borderRadius = '6px';
-    statusEl.style.display = 'inline-block';
-}
-    const expiryDate = dashboardExpiresAt.toLocaleDateString(l === 'ja' ? 'ja-JP' : 'en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    statusText = l === 'ja' 
-        ? `キャンセル済 - ${expiryDate}まで利用可能`
-        : `Cancelled - Access Until ${expiryDate}`;
-} else {
-    const isPaid = profile.payment_status === 'paid';
-    statusText = isPaid ? statusNames[l].paid : statusNames[l].pending;
-}
-
-document.getElementById(`${l}-profile-status`).textContent = statusText;
-
-// Update plan badge
-const planBadge = document.getElementById(`${l}-plan-badge`);
-planBadge.textContent = planNames[l][profile.plan] || profile.plan;
-if (profile.payment_status !== 'paid') planBadge.classList.add('pending');
-if (isCancelled && !isExpired) planBadge.classList.add('cancelled');
-if (isExpired) planBadge.classList.add('expired');
-if (hasVideoAddon) planBadge.classList.add('has-addon');
-
-// Show cancellation banner if applicable
-if (isCancelled && !isExpired && dashboardExpiresAt) {
-    const banner = document.getElementById(`${l}-cancellation-banner`);
-    const titleEl = document.getElementById(`${l}-cancellation-title`);
-    const messageEl = document.getElementById(`${l}-cancellation-message`);
-    const daysEl = document.getElementById(`${l}-days-remaining`);
-    const timerEl = document.getElementById(`${l}-countdown-timer`);
-    
-    if (banner) {
-        // Calculate days remaining
-        const daysRemaining = Math.ceil((dashboardExpiresAt - now) / (1000 * 60 * 60 * 24));
-        
-        // Update content
-        if (l === 'ja') {
-            titleEl.textContent = 'サブスクリプションがキャンセルされました';
-            messageEl.textContent = `${dashboardExpiresAt.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}までアクセス可能です`;
-        } else {
-            titleEl.textContent = 'Subscription Cancelled';
-            messageEl.textContent = `Your access continues until ${dashboardExpiresAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
-        }
-        
-        daysEl.textContent = daysRemaining;
-        
-        // Show/hide timer based on days remaining
-        if (daysRemaining <= 0) {
-            timerEl.style.display = 'none';
-        } else {
-            timerEl.style.display = 'inline-flex';
-        }
-        
-        banner.style.display = 'block';
-    }
-} else if (isExpired) {
-    // Show expired banner
-    const banner = document.getElementById(`${l}-cancellation-banner`);
-    const titleEl = document.getElementById(`${l}-cancellation-title`);
-    const messageEl = document.getElementById(`${l}-cancellation-message`);
-    const timerEl = document.getElementById(`${l}-countdown-timer`);
-    
-    if (banner) {
-        banner.classList.add('expired');
-        
-        if (l === 'ja') {
-            titleEl.textContent = 'アクセス期限が切れました';
-            messageEl.textContent = '再度サブスクリプションを開始するには、下のボタンをクリックしてください';
-        } else {
-            titleEl.textContent = 'Access Expired';
-            messageEl.textContent = 'Reactivate your subscription to continue learning';
-        }
-        
-        timerEl.style.display = 'none';
-        banner.style.display = 'block';
-    }
-}
+                    // Get status element
+                    const statusEl = document.getElementById(`${l}-profile-status`);
+                    
+                    // Update status text based on subscription state
+                    let statusText = '';
+                    if (isExpired) {
+                        statusText = l === 'ja' ? '期限切れ' : 'Expired';
+                        statusEl.style.color = '#dc3545';
+                        statusEl.style.fontWeight = '600';
+                    } else if (isCancelled && dashboardExpiresAt) {
+                        const expiryDate = dashboardExpiresAt.toLocaleDateString(
+                            l === 'ja' ? 'ja-JP' : 'en-US',
+                            { year: 'numeric', month: 'long', day: 'numeric' }
+                        );
+                        statusText = l === 'ja' 
+                            ? `キャンセル済 - ${expiryDate}まで利用可能`
+                            : `Cancelled - Access Until ${expiryDate}`;
+                        
+                        // Yellow styling for cancelled status
+                        statusEl.style.color = '#856404';
+                        statusEl.style.fontWeight = '600';
+                        statusEl.style.backgroundColor = '#fff3cd';
+                        statusEl.style.padding = '0.5rem 1rem';
+                        statusEl.style.borderRadius = '6px';
+                        statusEl.style.display = 'inline-block';
+                    } else if (profile.subscription_status === 'trialing') {
+                        statusText = l === 'ja' ? '無料トライアル中' : 'Free Trial';
+                    } else if (profile.subscription_status === 'active') {
+                        statusText = l === 'ja' ? '有効' : 'Active';
+                    } else {
+                        statusText = l === 'ja' ? '支払い待ち' : 'Payment Pending';
+                    }
+                    
+                    statusEl.textContent = statusText;
+                    
+                    // Update plan badge
+                    const planBadge = document.getElementById(`${l}-plan-badge`);
+                    planBadge.textContent = planNames[l][profile.plan] || profile.plan;
+                    if (profile.payment_status !== 'paid') planBadge.classList.add('pending');
+                    if (isExpired) planBadge.classList.add('expired');
+                    if (hasVideoAddon) planBadge.classList.add('has-addon');
+                    
+                    // Show cancellation banner if applicable
+                    if (isCancelled && !isExpired && dashboardExpiresAt) {
+                        const banner = document.getElementById(`${l}-cancellation-banner`);
+                        const titleEl = document.getElementById(`${l}-cancellation-title`);
+                        const messageEl = document.getElementById(`${l}-cancellation-message`);
+                        const daysEl = document.getElementById(`${l}-days-remaining`);
+                        const timerEl = document.getElementById(`${l}-countdown-timer`);
+                        
+                        if (banner) {
+                            const daysRemaining = Math.ceil((dashboardExpiresAt - now) / (1000 * 60 * 60 * 24));
+                            
+                            if (l === 'ja') {
+                                titleEl.textContent = 'サブスクリプションがキャンセルされました';
+                                messageEl.textContent = `${dashboardExpiresAt.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}までアクセス可能です`;
+                            } else {
+                                titleEl.textContent = 'Subscription Cancelled';
+                                messageEl.textContent = `Your access continues until ${dashboardExpiresAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+                            }
+                            
+                            daysEl.textContent = daysRemaining;
+                            timerEl.style.display = daysRemaining <= 0 ? 'none' : 'inline-flex';
+                            banner.style.display = 'block';
+                        }
+                    } else if (isExpired) {
+                        const banner = document.getElementById(`${l}-cancellation-banner`);
+                        const titleEl = document.getElementById(`${l}-cancellation-title`);
+                        const messageEl = document.getElementById(`${l}-cancellation-message`);
+                        const timerEl = document.getElementById(`${l}-countdown-timer`);
+                        
+                        if (banner) {
+                            banner.classList.add('expired');
+                            
+                            if (l === 'ja') {
+                                titleEl.textContent = 'アクセス期限が切れました';
+                                messageEl.textContent = '再度サブスクリプションを開始するには、下のボタンをクリックしてください';
+                            } else {
+                                titleEl.textContent = 'Access Expired';
+                                messageEl.textContent = 'Reactivate your subscription to continue learning';
+                            }
+                            
+                            timerEl.style.display = 'none';
+                            banner.style.display = 'block';
+                        }
+                    }
 
                     if (hasVideoAddon) {
                         const badgeContainer = document.getElementById(`${l}-plan-badges`);
