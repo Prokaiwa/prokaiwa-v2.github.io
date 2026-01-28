@@ -581,6 +581,159 @@
     .plan-badge.has-addon {
       background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-gold) 100%);
     }
+    /* Cancellation Status Banner */
+.cancellation-banner {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cancellation-banner.expired {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    border-color: #dc3545;
+}
+
+.cancellation-banner-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.cancellation-banner-icon {
+    font-size: 2.5rem;
+}
+
+.cancellation-banner-content h3 {
+    margin: 0 0 0.5rem 0;
+    color: #856404;
+    font-size: 1.3rem;
+}
+
+.cancellation-banner.expired .cancellation-banner-content h3 {
+    color: #721c24;
+}
+
+.cancellation-banner-content p {
+    margin: 0.25rem 0;
+    color: #856404;
+    font-size: 0.95rem;
+}
+
+.cancellation-banner.expired .cancellation-banner-content p {
+    color: #721c24;
+}
+
+.countdown-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    margin-top: 0.75rem;
+    font-weight: 600;
+    color: #856404;
+}
+
+.cancellation-banner.expired .countdown-timer {
+    color: #721c24;
+}
+
+.countdown-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffc107;
+}
+
+.cancellation-banner.expired .countdown-number {
+    color: #dc3545;
+}
+
+.cancellation-banner-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-reactivate {
+    background: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-reactivate:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+}
+
+.btn-contact-support {
+    background: white;
+    color: var(--color-text);
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-contact-support:hover {
+    border-color: var(--color-text-light);
+    background: var(--color-bg);
+}
+
+/* Status badge updates */
+.plan-badge.cancelled {
+    background: #ffc107;
+    color: #856404;
+}
+
+.plan-badge.expired {
+    background: #dc3545;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .cancellation-banner-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .cancellation-banner-icon {
+        font-size: 2rem;
+    }
+    
+    .cancellation-banner-actions {
+        flex-direction: column;
+    }
+    
+    .btn-reactivate,
+    .btn-contact-support {
+        width: 100%;
+        justify-content: center;
+    }
+}
     .addon-badge {
       display: inline-block;
       padding: 0.15rem 0.5rem;
@@ -1950,7 +2103,30 @@
 
                     <!-- Dashboard Grid -->
                     <div class="dashboard-grid">
-                        
+
+                      <!-- Cancellation Status Banner (Japanese) -->
+<div class="cancellation-banner" id="ja-cancellation-banner" style="display: none;">
+    <div class="cancellation-banner-header">
+        <div class="cancellation-banner-icon">⚠️</div>
+        <div class="cancellation-banner-content">
+            <h3 id="ja-cancellation-title">サブスクリプションがキャンセルされました</h3>
+            <p id="ja-cancellation-message">アクセスは継続されます</p>
+            <div class="countdown-timer" id="ja-countdown-timer">
+                <i class="fas fa-clock"></i>
+                <span>残り <span class="countdown-number" id="ja-days-remaining">0</span> 日</span>
+            </div>
+        </div>
+    </div>
+    <div class="cancellation-banner-actions">
+        <a href="questionnaire.html" class="btn-reactivate">
+            <i class="fas fa-redo"></i> サブスクリプションを再開
+        </a>
+        <a href="contact.html?subject=reactivation" class="btn-contact-support">
+            <i class="fas fa-envelope"></i> サポートに連絡
+        </a>
+    </div>
+</div>
+                      
                         <!-- Skills Assessment Card -->
                         <div class="dashboard-card card-skills">
                             <h3><i class="fas fa-chart-radar"></i>スキル評価</h3>
@@ -2188,7 +2364,29 @@
 
                     <!-- Dashboard Grid -->
                     <div class="dashboard-grid">
-                        
+<!-- Cancellation Status Banner (English) -->
+<div class="cancellation-banner" id="en-cancellation-banner" style="display: none;">
+    <div class="cancellation-banner-header">
+        <div class="cancellation-banner-icon">⚠️</div>
+        <div class="cancellation-banner-content">
+            <h3 id="en-cancellation-title">Subscription Cancelled</h3>
+            <p id="en-cancellation-message">Your access continues</p>
+            <div class="countdown-timer" id="en-countdown-timer">
+                <i class="fas fa-clock"></i>
+                <span><span class="countdown-number" id="en-days-remaining">0</span> days remaining</span>
+            </div>
+        </div>
+    </div>
+    <div class="cancellation-banner-actions">
+        <a href="questionnaire.html" class="btn-reactivate">
+            <i class="fas fa-redo"></i> Reactivate Subscription
+        </a>
+        <a href="contact.html?subject=reactivation" class="btn-contact-support">
+            <i class="fas fa-envelope"></i> Contact Support
+        </a>
+    </div>
+</div>
+                      
                         <!-- Skills Assessment Card -->
                         <div class="dashboard-card card-skills">
                             <h3><i class="fas fa-chart-radar"></i>Skills Assessment</h3>
@@ -3337,15 +3535,95 @@
                     document.getElementById(`${l}-profile-email`).textContent = profile.email;
                     document.getElementById(`${l}-profile-level`).textContent = levelNames[l][profile.level] || profile.level;
                     
-                    const isPaid = profile.payment_status === 'paid';
-                    document.getElementById(`${l}-profile-status`).textContent = isPaid 
-                        ? statusNames[l].paid 
-                        : statusNames[l].pending;
+                    // Check subscription status
+const isCancelled = profile.subscription_status === 'cancelled';
+const cancelledAt = profile.cancelled_at ? new Date(profile.cancelled_at) : null;
+const dashboardExpiresAt = profile.dashboard_access_expires_at ? new Date(profile.dashboard_access_expires_at) : null;
+const now = new Date();
+const isExpired = dashboardExpiresAt && dashboardExpiresAt < now;
 
-                    const planBadge = document.getElementById(`${l}-plan-badge`);
-                    planBadge.textContent = planNames[l][profile.plan] || profile.plan;
-                    if (!isPaid) planBadge.classList.add('pending');
-                    if (hasVideoAddon) planBadge.classList.add('has-addon');
+// Update status text
+let statusText = '';
+if (isExpired) {
+    statusText = l === 'ja' ? '期限切れ' : 'Expired';
+} else if (isCancelled && dashboardExpiresAt) {
+    const expiryDate = dashboardExpiresAt.toLocaleDateString(l === 'ja' ? 'ja-JP' : 'en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    statusText = l === 'ja' 
+        ? `キャンセル済 - ${expiryDate}まで利用可能`
+        : `Cancelled - Access Until ${expiryDate}`;
+} else {
+    const isPaid = profile.payment_status === 'paid';
+    statusText = isPaid ? statusNames[l].paid : statusNames[l].pending;
+}
+
+document.getElementById(`${l}-profile-status`).textContent = statusText;
+
+// Update plan badge
+const planBadge = document.getElementById(`${l}-plan-badge`);
+planBadge.textContent = planNames[l][profile.plan] || profile.plan;
+if (profile.payment_status !== 'paid') planBadge.classList.add('pending');
+if (isCancelled && !isExpired) planBadge.classList.add('cancelled');
+if (isExpired) planBadge.classList.add('expired');
+if (hasVideoAddon) planBadge.classList.add('has-addon');
+
+// Show cancellation banner if applicable
+if (isCancelled && !isExpired && dashboardExpiresAt) {
+    const banner = document.getElementById(`${l}-cancellation-banner`);
+    const titleEl = document.getElementById(`${l}-cancellation-title`);
+    const messageEl = document.getElementById(`${l}-cancellation-message`);
+    const daysEl = document.getElementById(`${l}-days-remaining`);
+    const timerEl = document.getElementById(`${l}-countdown-timer`);
+    
+    if (banner) {
+        // Calculate days remaining
+        const daysRemaining = Math.ceil((dashboardExpiresAt - now) / (1000 * 60 * 60 * 24));
+        
+        // Update content
+        if (l === 'ja') {
+            titleEl.textContent = 'サブスクリプションがキャンセルされました';
+            messageEl.textContent = `${dashboardExpiresAt.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}までアクセス可能です`;
+        } else {
+            titleEl.textContent = 'Subscription Cancelled';
+            messageEl.textContent = `Your access continues until ${dashboardExpiresAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+        }
+        
+        daysEl.textContent = daysRemaining;
+        
+        // Show/hide timer based on days remaining
+        if (daysRemaining <= 0) {
+            timerEl.style.display = 'none';
+        } else {
+            timerEl.style.display = 'inline-flex';
+        }
+        
+        banner.style.display = 'block';
+    }
+} else if (isExpired) {
+    // Show expired banner
+    const banner = document.getElementById(`${l}-cancellation-banner`);
+    const titleEl = document.getElementById(`${l}-cancellation-title`);
+    const messageEl = document.getElementById(`${l}-cancellation-message`);
+    const timerEl = document.getElementById(`${l}-countdown-timer`);
+    
+    if (banner) {
+        banner.classList.add('expired');
+        
+        if (l === 'ja') {
+            titleEl.textContent = 'アクセス期限が切れました';
+            messageEl.textContent = '再度サブスクリプションを開始するには、下のボタンをクリックしてください';
+        } else {
+            titleEl.textContent = 'Access Expired';
+            messageEl.textContent = 'Reactivate your subscription to continue learning';
+        }
+        
+        timerEl.style.display = 'none';
+        banner.style.display = 'block';
+    }
+}
 
                     if (hasVideoAddon) {
                         const badgeContainer = document.getElementById(`${l}-plan-badges`);
