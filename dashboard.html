@@ -1202,6 +1202,19 @@
   opacity: 0.3;
 }
 
+    /* Next month available dates - more specific selector */
+.calendar-day.available {
+    color: var(--color-primary);
+    opacity: 0.7;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.calendar-day.available:hover {
+    opacity: 1;
+    background: var(--color-primary-light);
+    transform: scale(1.05);
+}
 .calendar-day.today {
   border-color: var(--color-gold);
   font-weight: 700;
