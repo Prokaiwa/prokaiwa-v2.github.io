@@ -1843,6 +1843,7 @@ const cancellationState = {
     offerType: null,
     offerDecision: null,
     offerAccepted: false,
+    cancellationCompleted: false,
     userData: {
         userId: null,
         studentId: null,
@@ -2795,8 +2796,11 @@ async function confirmCancellation(lang) {
                 'サブスクリプションがキャンセルされました。ご利用ありがとうございました。' :
                 'Your subscription has been cancelled. Thank you for being a student.');
             
-            // Redirect to home
-            window.location.href = 'index.html';
+            // Mark cancellation as completed to prevent "unsaved changes" warning
+cancellationState.cancellationCompleted = true;
+
+// Redirect to dashboard
+window.location.href = 'dashboard.html';
         } else {
             throw new Error(result.error || 'Cancellation failed');
         }
@@ -2916,7 +2920,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // Warn before leaving
 window.addEventListener('beforeunload', (e) => {
-    if (cancellationState.currentStep !== 'reason' && !cancellationState.offerAccepted) {
+    if (cancellationState.currentStep !== 'reason' && 
+        !cancellationState.offerAccepted && 
+        !cancellationState.cancellationCompleted) {
         e.preventDefault();
         e.returnValue = '';
     }
