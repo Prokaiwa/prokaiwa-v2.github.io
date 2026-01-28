@@ -705,8 +705,8 @@
 
 /* Status badge updates */
 .plan-badge.cancelled {
-    background: #ffc107;
-    color: #856404;
+    background: var(--color-primary);  /* Teal instead of yellow */
+    color: white;
 }
 
 .plan-badge.expired {
@@ -3545,8 +3545,26 @@ const isExpired = dashboardExpiresAt && dashboardExpiresAt < now;
 // Update status text
 let statusText = '';
 if (isExpired) {
-    statusText = l === 'ja' ? '期限切れ' : 'Expired';
+    statusText = currentLang === 'ja' ? '期限切れ' : 'Expired';
+    statusEl.style.color = '#dc3545';
+    statusEl.style.fontWeight = '600';
 } else if (isCancelled && dashboardExpiresAt) {
+    const expiresDate = dashboardExpiresAt.toLocaleDateString(
+        currentLang === 'ja' ? 'ja-JP' : 'en-US',
+        { year: 'numeric', month: 'long', day: 'numeric' }
+    );
+    statusText = currentLang === 'ja' 
+        ? `キャンセル済 - ${expiresDate}まで利用可能`
+        : `Cancelled - Access Until ${expiresDate}`;
+    
+    // ADD YELLOW HIGHLIGHT TO STATUS TEXT
+    statusEl.style.color = '#856404';
+    statusEl.style.fontWeight = '600';
+    statusEl.style.backgroundColor = '#fff3cd';
+    statusEl.style.padding = '0.5rem 1rem';
+    statusEl.style.borderRadius = '6px';
+    statusEl.style.display = 'inline-block';
+}
     const expiryDate = dashboardExpiresAt.toLocaleDateString(l === 'ja' ? 'ja-JP' : 'en-US', {
         year: 'numeric',
         month: 'long',
