@@ -586,9 +586,11 @@
     background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
     border: 2px solid #ffc107;
     border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin: 0 0 2rem 0;
+    display: none;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .cancellation-banner.expired {
@@ -2101,6 +2103,30 @@
                         </a>
                     </div>
 
+                  <!-- Cancellation Banner -->
+        <div class="cancellation-banner" id="ja-cancellation-banner" style="display: none;">
+            <div class="cancellation-banner-header">
+                <div class="cancellation-banner-icon">⚠️</div>
+                <div class="cancellation-banner-content">
+                    <h3 id="ja-cancellation-title">サブスクリプションがキャンセルされました</h3>
+                    <p id="ja-cancellation-message">アクセスは継続されます</p>
+                    <div class="countdown-timer" id="ja-countdown-timer">
+                        <i class="fas fa-clock"></i>
+                        <span>残り <span class="countdown-number" id="ja-days-remaining">0</span> 日</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cancellation-banner-actions">
+                <a href="questionnaire.html" class="btn-reactivate">
+                    <i class="fas fa-redo"></i> サブスクリプションを再開
+                </a>
+                <a href="contact.html?subject=reactivation" class="btn-contact-support">
+                    <i class="fas fa-envelope"></i> サポートに連絡
+                </a>
+            </div>
+        </div>
+
+
                     <!-- Dashboard Grid -->
                     <div class="dashboard-grid">
 
@@ -2361,6 +2387,30 @@
                             <span>Contact Us</span>
                         </a>
                     </div>
+
+                  <!-- Cancellation Banner -->
+        <div class="cancellation-banner" id="en-cancellation-banner" style="display: none;">
+            <div class="cancellation-banner-header">
+                <div class="cancellation-banner-icon">⚠️</div>
+                <div class="cancellation-banner-content">
+                    <h3 id="en-cancellation-title">Subscription Cancelled</h3>
+                    <p id="en-cancellation-message">Your access continues</p>
+                    <div class="countdown-timer" id="en-countdown-timer">
+                        <i class="fas fa-clock"></i>
+                        <span><span class="countdown-number" id="en-days-remaining">0</span> days remaining</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cancellation-banner-actions">
+                <a href="questionnaire.html" class="btn-reactivate">
+                    <i class="fas fa-redo"></i> Reactivate Subscription
+                </a>
+                <a href="contact.html?subject=reactivation" class="btn-contact-support">
+                    <i class="fas fa-envelope"></i> Contact Support
+                </a>
+            </div>
+        </div>
+
 
                     <!-- Dashboard Grid -->
                     <div class="dashboard-grid">
@@ -3522,6 +3572,11 @@
                 const hasVideoAccess = profile.had_video_access || hasVideoAddon;
 
                 ['ja', 'en'].forEach(l => {
+    const isCancelled = profile.subscription_status === 'cancelled';
+    const cancelledAt = profile.cancelled_at ? new Date(profile.cancelled_at) : null;
+    const dashboardExpiresAt = profile.dashboard_access_expires_at ? new Date(profile.dashboard_access_expires_at) : null;
+    const now = new Date();
+    const isExpired = dashboardExpiresAt && dashboardExpiresAt < now;
                     const welcomeText = l === 'ja' 
                         ? `${profile.given_name_romaji || profile.name}さん、おかえりなさい！`
                         : `Welcome back, ${profile.given_name_romaji || profile.name}!`;
@@ -4084,17 +4139,56 @@ monthLabel.textContent =
                     day.addEventListener('click', () => selectDate(day.dataset.date, lang));
                 }
                 
-                calendarGrid.appendChild(day);
-            }
-            
-            const totalCells = calendarGrid.children.length - 7;
-            const remainingCells = 42 - totalCells;
-            for (let date = 1; date <= remainingCells; date++) {
-                const day = document.createElement('div');
-                day.className = 'calendar-day other-month';
-                day.textContent = date;
-                calendarGrid.appendChild(day);
-            }
+                // 🆕 SHOW NEXT MONTH'S AVAILABLE DATES
+const totalCells = calendarGrid.children.length - 7; // Subtract header row
+const remainingCells = 42 - totalCells; // 6 rows x 7 days = 42 total
+
+for (let date = 1; date <= remainingCells; date++) {
+    const nextMonthDate = new Date(year, monthIndex + 1, date);
+    nextMonthDate.setHours(0, 0, 0, 0);
+    
+    const day = document.createElement('div');
+    day.className = 'calendar-day other-month';
+    day.textContent = date;
+    
+    // Format date as YYYY-MM-DD
+    const nextMonth = monthIndex + 1; // JavaScript months are 0-indexed
+    const nextMonthFormatted = nextMonth === 12 ? 0 : nextMonth + 1;
+    const yearFormatted = nextMonth === 12 ? year + 1 : year;
+    day.dataset.date = `${yearFormatted}-${String(nextMonthFormatted + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+    
+    // Check if it's a weekend (Fri=5, Sat=6, Sun=0)
+    const dayOfWeek = nextMonthDate.getDay();
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    
+    // Check if it's in the future
+    const isFuture = nextMonthDate >= today;
+    
+    // Only make it clickable if it's a weekend AND in the future
+    if (isWeekend && isFuture) {
+        day.classList.remove('other-month'); // Remove grey styling
+        day.classList.add('available');
+        day.style.color = 'var(--color-primary)';
+        day.style.opacity = '0.7';
+        day.style.fontWeight = '500';
+        
+        // Check if this date has a booking
+        const hasBooking = bookingState.userBookings.some(booking => {
+            const bookingDate = new Date(booking.scheduled_at);
+            return bookingDate.toISOString().split('T')[0] === day.dataset.date;
+        });
+        
+        if (hasBooking) {
+            day.classList.add('has-booking');
+        }
+        
+        day.addEventListener('click', () => selectDate(day.dataset.date, lang));
+    } else {
+        day.classList.add('disabled');
+    }
+    
+    calendarGrid.appendChild(day);
+}
             
             const prevBtn = document.getElementById(`${lang}-calendar-prev`);
             if (prevBtn) {
