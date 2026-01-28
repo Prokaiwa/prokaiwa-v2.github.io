@@ -899,6 +899,360 @@
     gap: 0.5rem;
   }
 }
+    /* Cancellation Notifications Section */
+.cancellations-section {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+}
+
+.cancellations-section h2 {
+    color: #856404;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.3rem;
+}
+
+.cancellations-section h2 i {
+    font-size: 1.5rem;
+}
+
+.cancellation-count-badge {
+    background: #dc3545;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.cancellation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cancellation-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.cancellation-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.cancellation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.cancellation-student-info {
+    flex: 1;
+}
+
+.cancellation-student-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 0.25rem 0;
+}
+
+.cancellation-plan-badge {
+    display: inline-block;
+    background: #6c757d;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+.cancellation-date {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.cancellation-status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cancellation-status-badge.needs-attention {
+    background: #ffc107;
+    color: #856404;
+}
+
+.cancellation-status-badge.contacted {
+    background: #28a745;
+    color: white;
+}
+
+.cancellation-details {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.cancellation-detail-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.cancellation-detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.cancellation-detail-label {
+    font-weight: 600;
+    color: #495057;
+    min-width: 120px;
+}
+
+.cancellation-detail-value {
+    color: var(--color-text);
+}
+
+.cancellation-reason-highlight {
+    background: #fff3cd;
+    padding: 0.75rem;
+    border-left: 4px solid #ffc107;
+    border-radius: 4px;
+    margin-top: 0.75rem;
+    font-style: italic;
+}
+
+.cancellation-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn-view-details {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-view-details:hover {
+    background: var(--color-primary-dark);
+}
+
+.btn-send-message {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-send-message:hover {
+    background: #218838;
+}
+
+.btn-mark-contacted {
+    background: white;
+    color: #6c757d;
+    border: 2px solid #dee2e6;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-mark-contacted:hover {
+    border-color: #6c757d;
+    background: #f8f9fa;
+}
+
+.no-cancellations-message {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+.no-cancellations-message i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+    opacity: 0.3;
+}
+
+/* Message Template Modal */
+.message-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.message-modal.show {
+    display: flex;
+}
+
+.message-modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.message-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.message-modal-header h3 {
+    margin: 0;
+    color: var(--color-text);
+}
+
+.message-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6c757d;
+}
+
+.message-template-selector {
+    margin-bottom: 1.5rem;
+}
+
+.message-template-selector label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.message-template-selector select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.message-editor {
+    margin-bottom: 1.5rem;
+}
+
+.message-editor label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.message-editor textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+}
+
+.message-modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.btn-send-now {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-send-now:hover {
+    background: #218838;
+}
+
+.btn-cancel {
+    background: white;
+    color: #6c757d;
+    border: 2px solid #dee2e6;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-cancel:hover {
+    border-color: #6c757d;
+}
+
+@media (max-width: 768px) {
+    .cancellation-header {
+        flex-direction: column;
+    }
+    
+    .cancellation-actions {
+        flex-direction: column;
+    }
+    
+    .cancellation-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+}
     /* Video Lessons Section */
 .video-lessons-section {
   background: var(--color-surface);
@@ -1113,7 +1467,59 @@
       </div>
     </div>
 
+<!-- Cancellation Notifications -->
+<div class="cancellations-section" id="cancellations-section" style="display: none;">
+  <h2>
+    <i class="fas fa-user-times"></i>
+    Recent Cancellations
+    <span class="cancellation-count-badge" id="cancellation-count">0</span>
+  </h2>
+  
+  <div class="cancellation-list" id="cancellation-list">
+    <!-- Will be populated by JavaScript -->
+  </div>
+  
+  <div class="no-cancellations-message" id="no-cancellations">
+    <i class="fas fa-check-circle"></i>
+    <p>No recent cancellations. Great job! 🎉</p>
+  </div>
+</div>
 
+<!-- Message Template Modal -->
+<div class="message-modal" id="message-modal">
+  <div class="message-modal-content">
+    <div class="message-modal-header">
+      <h3>Send Message to Student</h3>
+      <button class="message-modal-close" onclick="closeMessageModal()">×</button>
+    </div>
+    
+    <div class="message-template-selector">
+      <label for="template-select">Choose a Template:</label>
+      <select id="template-select" onchange="loadMessageTemplate(this.value)">
+        <option value="">-- Select Template --</option>
+        <option value="expensive">Too Expensive</option>
+        <option value="not_using">Not Using Enough</option>
+        <option value="too_difficult">Too Difficult</option>
+        <option value="scheduling">Scheduling Issues</option>
+        <option value="technical">Technical Problems</option>
+        <option value="general">General Check-in</option>
+      </select>
+    </div>
+    
+    <div class="message-editor">
+      <label for="message-text">Message:</label>
+      <textarea id="message-text" placeholder="Write your message here..."></textarea>
+    </div>
+    
+    <div class="message-modal-actions">
+      <button class="btn-cancel" onclick="closeMessageModal()">Cancel</button>
+      <button class="btn-send-now" onclick="sendMessageToStudent()">
+        <i class="fas fa-paper-plane"></i> Send via LINE
+      </button>
+    </div>
+  </div>
+</div>
+    
     <!-- Power Pro Section -->
     <div class="feedback-section" id="plan-power-pro-section">
       <h2>⚡ Power Pro - Daily Quick</h2>
@@ -2384,7 +2790,427 @@ document.addEventListener('click', (e) => {
     closeGuide();
   }
 });
-    // ============================================
+
+    // =====================================================
+// CANCELLATION NOTIFICATIONS SYSTEM
+// =====================================================
+
+let currentCancellationStudent = null;
+
+// Message templates by cancellation reason
+const messageTemplates = {
+  expensive: {
+    subject: 'We understand budget is important',
+    body: `Hi [Student Name],
+
+I noticed you cancelled your subscription due to cost concerns. I completely understand - budget matters!
+
+I wanted to personally reach out because:
+1. We have flexible plan options that might better fit your budget
+2. I've really enjoyed working with you and seeing your progress
+3. I'd hate to see you stop now when you've come so far
+
+Would you be open to a quick chat about options? No pressure at all - I just want to make sure you have all the information.
+
+Looking forward to hearing from you!
+
+Best regards,
+[Teacher Name]`
+  },
+  
+  not_using: {
+    subject: 'Let\'s make this work with your schedule',
+    body: `Hi [Student Name],
+
+I saw that finding time for practice has been challenging. Trust me, I get it - life gets busy!
+
+I wanted to check in because:
+1. Even 5-10 minutes a day makes a real difference
+2. We can adjust your practice routine to fit your schedule better
+3. You were making great progress, and I'd love to help you continue
+
+What if we tried:
+- Shorter, more focused practice sessions?
+- A different time of day that works better?
+- Taking a short break and resuming when you're ready?
+
+Let me know what would help. I'm here to support you!
+
+Best regards,
+[Teacher Name]`
+  },
+  
+  too_difficult: {
+    subject: 'Let\'s adjust the content to your level',
+    body: `Hi [Student Name],
+
+I noticed you found the content challenging. This is really valuable feedback!
+
+I want you to know:
+1. Feeling challenged is totally normal - it means you're learning!
+2. We can absolutely adjust the difficulty to match your level better
+3. I'm here to support you every step of the way
+
+Let's work together to:
+- Start with easier content and build up gradually
+- Focus on the fundamentals first
+- Make sure you feel confident and successful
+
+Would you like to schedule a quick call to discuss? I'd love to help you get back on track.
+
+Best regards,
+[Teacher Name]`
+  },
+  
+  scheduling: {
+    subject: 'Let\'s find a schedule that works',
+    body: `Hi [Student Name],
+
+I understand scheduling has been difficult. Juggling everything is tough!
+
+I wanted to reach out because:
+1. We have flexible lesson times, including early morning and late evening
+2. You can pause and resume when your schedule settles
+3. Even irregular practice is better than stopping completely
+
+What would work best for you right now? I'm happy to:
+- Find different lesson times
+- Set up a pause so you can return when ready
+- Create a more flexible practice schedule
+
+Let me know - I want to make this work for you!
+
+Best regards,
+[Teacher Name]`
+  },
+  
+  technical: {
+    subject: 'Let\'s fix those technical issues',
+    body: `Hi [Student Name],
+
+I'm really sorry you experienced technical problems. That's so frustrating!
+
+I want to help fix this:
+1. Our tech team can troubleshoot the specific issues you faced
+2. We can extend your access while we resolve everything
+3. I'll personally make sure everything works smoothly
+
+Please don't let technical glitches stop your English progress! You were doing so well.
+
+Can we schedule a quick session to:
+- Identify exactly what went wrong
+- Test everything to make sure it works
+- Get you back to learning smoothly
+
+I'm here to help!
+
+Best regards,
+[Teacher Name]`
+  },
+  
+  general: {
+    subject: 'Checking in on you',
+    body: `Hi [Student Name],
+
+I noticed you cancelled your subscription, and I wanted to reach out personally.
+
+I've really enjoyed working with you, and I was impressed by your progress and dedication. Whatever your reasons for cancelling, I completely understand and respect your decision.
+
+If there's anything I can do to help, or if you'd like to discuss your experience, I'm always here. And if circumstances change and you want to come back, we'd love to have you!
+
+Wishing you all the best with your English learning journey.
+
+Warm regards,
+[Teacher Name]`
+  }
+};
+
+// Load cancellation notifications
+async function loadCancellationNotifications() {
+  try {
+    console.log('📋 Loading cancellation notifications...');
+    
+    const { data: cancellations, error } = await supabaseClient
+      .from('questionnaire_responses')
+      .select('*')
+      .eq('subscription_status', 'cancelled')
+      .not('cancelled_at', 'is', null)
+      .order('cancelled_at', { ascending: false })
+      .limit(10);
+    
+    if (error) throw error;
+    
+    // Filter for recent cancellations (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const recentCancellations = cancellations.filter(c => {
+      const cancelDate = new Date(c.cancelled_at);
+      return cancelDate >= thirtyDaysAgo;
+    });
+    
+    console.log(`✅ Found ${recentCancellations.length} recent cancellations`);
+    
+    renderCancellationNotifications(recentCancellations);
+    
+  } catch (error) {
+    console.error('❌ Error loading cancellations:', error);
+  }
+}
+
+// Render cancellation notifications
+function renderCancellationNotifications(cancellations) {
+  const section = document.getElementById('cancellations-section');
+  const list = document.getElementById('cancellation-list');
+  const noMessage = document.getElementById('no-cancellations');
+  const countBadge = document.getElementById('cancellation-count');
+  
+  if (!cancellations || cancellations.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  
+  section.style.display = 'block';
+  countBadge.textContent = cancellations.length;
+  
+  // Check if we have any cancellations to show
+  if (cancellations.length === 0) {
+    list.style.display = 'none';
+    noMessage.style.display = 'block';
+    return;
+  }
+  
+  list.style.display = 'flex';
+  noMessage.style.display = 'none';
+  
+  // Render each cancellation
+  list.innerHTML = cancellations.map(student => {
+    const cancelDate = new Date(student.cancelled_at);
+    const accessUntil = new Date(student.dashboard_access_expires_at);
+    const daysRemaining = Math.ceil((accessUntil - new Date()) / (1000 * 60 * 60 * 24));
+    
+    const isContacted = student.teacher_contacted || false;
+    
+    let reasonDetails = '';
+    try {
+      const details = typeof student.cancellation_reason_details === 'string' 
+        ? JSON.parse(student.cancellation_reason_details) 
+        : student.cancellation_reason_details;
+      
+      if (details && details.reason_text) {
+        reasonDetails = details.reason_text;
+      } else if (details && details.additional_comments) {
+        reasonDetails = details.additional_comments;
+      }
+    } catch (e) {
+      // If parsing fails, use as-is
+      reasonDetails = student.cancellation_reason_details || '';
+    }
+    
+    return `
+      <div class="cancellation-card">
+        <div class="cancellation-header">
+          <div class="cancellation-student-info">
+            <h4 class="cancellation-student-name">${student.given_name_romaji || student.name}</h4>
+            <div>
+              <span class="cancellation-plan-badge">${student.plan}</span>
+              <span class="cancellation-date">
+                Cancelled ${cancelDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
+            </div>
+          </div>
+          <div class="cancellation-status-badge ${isContacted ? 'contacted' : 'needs-attention'}">
+            ${isContacted ? '✓ Contacted' : 'Needs Attention'}
+          </div>
+        </div>
+        
+        <div class="cancellation-details">
+          <div class="cancellation-detail-row">
+            <span class="cancellation-detail-label">Reason:</span>
+            <span class="cancellation-detail-value">${formatReason(student.cancellation_reason_category)}</span>
+          </div>
+          <div class="cancellation-detail-row">
+            <span class="cancellation-detail-label">Access Until:</span>
+            <span class="cancellation-detail-value">
+              ${accessUntil.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              (${daysRemaining} days remaining)
+            </span>
+          </div>
+          <div class="cancellation-detail-row">
+            <span class="cancellation-detail-label">Email:</span>
+            <span class="cancellation-detail-value">${student.email}</span>
+          </div>
+          ${reasonDetails ? `
+            <div class="cancellation-reason-highlight">
+              "${reasonDetails}"
+            </div>
+          ` : ''}
+        </div>
+        
+        <div class="cancellation-actions">
+          <button class="btn-view-details" onclick="viewStudentDetails('${student.id}')">
+            <i class="fas fa-eye"></i> View Details
+          </button>
+          <button class="btn-send-message" onclick="openMessageModal('${student.id}', '${student.cancellation_reason_category}')">
+            <i class="fas fa-envelope"></i> Send Message
+          </button>
+          ${!isContacted ? `
+            <button class="btn-mark-contacted" onclick="markAsContacted('${student.id}')">
+              <i class="fas fa-check"></i> Mark as Contacted
+            </button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Format cancellation reason
+function formatReason(reason) {
+  const reasonMap = {
+    'expensive': 'Too Expensive',
+    'not_using': 'Not Using Enough',
+    'too_difficult': 'Too Difficult',
+    'too_easy': 'Too Easy',
+    'scheduling': 'Scheduling Issues',
+    'technical': 'Technical Problems',
+    'goals_met': 'Goals Achieved',
+    'switching': 'Switching Services',
+    'circumstances': 'Personal Circumstances',
+    'other': 'Other'
+  };
+  
+  return reasonMap[reason] || reason;
+}
+
+// View student details
+function viewStudentDetails(studentId) {
+  // This would navigate to the student's full profile
+  // For now, just log
+  console.log('Viewing details for student:', studentId);
+  alert('Student detail view - to be implemented');
+}
+
+// Open message modal
+function openMessageModal(studentId, reason) {
+  currentCancellationStudent = studentId;
+  
+  const modal = document.getElementById('message-modal');
+  const templateSelect = document.getElementById('template-select');
+  const messageText = document.getElementById('message-text');
+  
+  // Pre-select template based on reason
+  if (messageTemplates[reason]) {
+    templateSelect.value = reason;
+    loadMessageTemplate(reason);
+  } else {
+    templateSelect.value = 'general';
+    loadMessageTemplate('general');
+  }
+  
+  modal.classList.add('show');
+}
+
+// Close message modal
+function closeMessageModal() {
+  const modal = document.getElementById('message-modal');
+  modal.classList.remove('show');
+  currentCancellationStudent = null;
+}
+
+// Load message template
+function loadMessageTemplate(templateKey) {
+  const messageText = document.getElementById('message-text');
+  const template = messageTemplates[templateKey];
+  
+  if (template) {
+    messageText.value = template.body;
+  } else {
+    messageText.value = '';
+  }
+}
+
+// Send message to student
+async function sendMessageToStudent() {
+  const messageText = document.getElementById('message-text').value;
+  
+  if (!messageText.trim()) {
+    alert('Please enter a message');
+    return;
+  }
+  
+  if (!currentCancellationStudent) {
+    alert('Error: No student selected');
+    return;
+  }
+  
+  try {
+    // Get student's LINE ID
+    const { data: student, error: fetchError } = await supabaseClient
+      .from('questionnaire_responses')
+      .select('line_id, given_name_romaji, name')
+      .eq('id', currentCancellationStudent)
+      .single();
+    
+    if (fetchError || !student.line_id) {
+      throw new Error('Student LINE ID not found');
+    }
+    
+    // Send message via LINE
+    // NOTE: You'll need to create a send-line-message edge function
+    const { data, error } = await supabaseClient.functions.invoke('send-line-message', {
+      body: {
+        userId: student.line_id,
+        message: messageText
+      }
+    });
+    
+    if (error) throw error;
+    
+    // Mark as contacted
+    await markAsContacted(currentCancellationStudent);
+    
+    alert('Message sent successfully!');
+    closeMessageModal();
+    
+    // Reload cancellations
+    await loadCancellationNotifications();
+    
+  } catch (error) {
+    console.error('Error sending message:', error);
+    alert('Error sending message: ' + error.message);
+  }
+}
+
+// Mark student as contacted
+async function markAsContacted(studentId) {
+  try {
+    const { error } = await supabaseClient
+      .from('questionnaire_responses')
+      .update({ 
+        teacher_contacted: true,
+        teacher_contacted_at: new Date().toISOString()
+      })
+      .eq('id', studentId);
+    
+    if (error) throw error;
+    
+    console.log('✅ Marked as contacted:', studentId);
+    
+    // Reload cancellations to update UI
+    await loadCancellationNotifications();
+    
+  } catch (error) {
+    console.error('Error marking as contacted:', error);
+    alert('Error updating status');
+  }
+}
+
+// Call this in your main teacher portal initialization
+// Add after loadFeedbackQueue() call (around line 1585)
+loadCancellationNotifications();
+    
+// ============================================
 // VIDEO LESSONS FUNCTIONS
 // ============================================
 
