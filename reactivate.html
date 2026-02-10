@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KLVF2ZG1WX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KLVF2ZG1WX');
+</script>
+  <meta charset="UTF-8">
+  <title>Prokaiwa | サブスクリプション再開</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Welcome back to Prokaiwa! Reactivate your subscription and continue your English learning journey.">
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    /* Page-specific styles */
+    .reactivate-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    
+    .reactivate-hero {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .reactivate-icon {
+      font-size: 4rem;
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .reactivate-hero h1 {
+      font-size: 2rem;
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+    }
+    
+    .reactivate-hero p {
+      font-size: 1.1rem;
+      color: var(--color-text-light);
+      line-height: 1.6;
+    }
+    
+    .gratitude-box {
+      background: linear-gradient(135deg, var(--color-primary-light) 0%, rgba(0, 128, 128, 0.05) 100%);
+      border-left: 4px solid var(--color-primary);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+    
+    .gratitude-box p {
+      margin: 0.5rem 0;
+      line-height: 1.8;
+      color: var(--color-text);
+    }
+    
+    .gratitude-box strong {
+      color: var(--color-primary-dark);
+    }
+    
+    .plan-summary-card {
+      background-color: var(--color-card-bg);
+      border: 2px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .plan-summary-card h3 {
+      color: var(--color-accent);
+      margin: 0 0 1rem 0;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .plan-summary-card h3 i {
+      color: var(--color-primary);
+    }
+    
+    .plan-details-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .plan-details-list li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .plan-details-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .plan-details-list strong {
+      color: var(--color-text-light);
+      font-weight: 500;
+    }
+    
+    .plan-details-list .plan-value {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+    
+    .plan-badge {
+      display: inline-block;
+      padding: 0.3rem 0.75rem;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .reactivate-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .btn-reactivate {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+    }
+    
+    .btn-reactivate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 128, 128, 0.4);
+    }
+    
+    .btn-reactivate:active {
+      transform: translateY(0);
+    }
+    
+    .btn-reactivate.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    
+    .btn-reactivate.loading::after {
+      content: "";
+      width: 16px;
+      height: 16px;
+      border: 2px solid white;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 0.5rem;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: white;
+      color: var(--color-text);
+      border: 2px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    
+    .btn-secondary:hover {
+      background: var(--color-bg);
+      border-color: var(--color-primary);
+    }
+    
+    .loading-state {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    
+    .loading-state i {
+      font-size: 3rem;
+      color: var(--color-primary);
+      animation: spin 1s linear infinite;
+    }
+    
+    .error-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--color-error);
+    }
+    
+    .error-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .reactivate-hero h1 {
+        font-size: 1.5rem;
+      }
+      
+      .reactivate-hero p {
+        font-size: 1rem;
+      }
+      
+      .reactivate-icon {
+        font-size: 3rem;
+      }
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .gratitude-box {
+        background: linear-gradient(135deg, rgba(0, 168, 168, 0.2) 0%, rgba(0, 168, 168, 0.05) 100%);
+        border-left-color: var(--color-primary);
+      }
+      
+      .gratitude-box strong {
+        color: var(--color-primary);
+      }
+    }
+  </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="index.html"><img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" /></a>
+            <button class="burger-menu" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li>
+                        <div class="nav-lang-toggle">
+                            <button data-lang="ja" aria-label="日本語に切り替え">日本語</button>
+                            <button data-lang="en" aria-label="Switch to English">English</button>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- JAPANESE VERSION -->
+        <section id="ja-reactivate" class="lang-section" lang="ja">
+            <div class="container">
+                <div class="reactivate-container">
+                    <!-- Loading State -->
+                    <div id="ja-loading" class="loading-state">
+                        <i class="fas fa-spinner"></i>
+                        <p>読み込み中...</p>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="ja-error" class="error-state" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h2>エラーが発生しました</h2>
+                        <p id="ja-error-message"></p>
+                        <a href="dashboard.html" class="cta-button" style="margin-top: 1rem;">ダッシュボードに戻る</a>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div id="ja-content" style="display: none;">
+                        <div class="reactivate-hero">
+                            <div class="reactivate-icon">🎉</div>
+                            <h1>おかえりなさい！</h1>
+                            <p>Prokaiwaに戻ってきてくださり、本当にありがとうございます。</p>
+                        </div>
+
+                        <div class="gratitude-box">
+                            <p><strong>心より感謝申し上げます。</strong></p>
+                            <p>あなたが引き続きProkaiwaを選んでくださったこと、そして英語学習の目標に向かって一緒に歩み続けることを決めてくださったことを、心から嬉しく思います。</p>
+                            <p>私たちは、あなたの成長をサポートできることを誇りに思っており、これからもより良いサービスを提供し続けることをお約束します。</p>
+                            <p><strong>あなたのご支援が、Prokaiwaの原動力です。</strong></p>
+                        </div>
+
+                        <div class="plan-summary-card">
+                            <h3><i class="fas fa-box-open"></i>ご利用プラン</h3>
+                            <ul class="plan-details-list">
+                                <li>
+                                    <strong>プラン名</strong>
+                                    <span class="plan-value" id="ja-plan-name">-</span>
+                                </li>
+                                <li>
+                                    <strong>料金</strong>
+                                    <span class="plan-value" id="ja-plan-price">-</span>
+                                </li>
+                                <li>
+                                    <strong>メールアドレス</strong>
+                                    <span class="plan-value" id="ja-user-email">-</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="reactivate-actions">
+                            <button id="ja-reactivate-btn" class="btn-reactivate">
+                                <i class="fas fa-redo"></i>
+                                <span>サブスクリプションを再開</span>
+                            </button>
+                            <a href="dashboard.html" class="btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                ダッシュボードに戻る
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ENGLISH VERSION -->
+        <section id="en-reactivate" class="lang-section" lang="en">
+            <div class="container">
+                <div class="reactivate-container">
+                    <!-- Loading State -->
+                    <div id="en-loading" class="loading-state">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading...</p>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="en-error" class="error-state" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h2>An Error Occurred</h2>
+                        <p id="en-error-message"></p>
+                        <a href="dashboard.html" class="cta-button" style="margin-top: 1rem;">Return to Dashboard</a>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div id="en-content" style="display: none;">
+                        <div class="reactivate-hero">
+                            <div class="reactivate-icon">🎉</div>
+                            <h1>Welcome Back!</h1>
+                            <p>Thank you so much for choosing to continue with Prokaiwa.</p>
+                        </div>
+
+                        <div class="gratitude-box">
+                            <p><strong>We are truly grateful.</strong></p>
+                            <p>Your decision to stay with Prokaiwa and continue your English learning journey with us means the world to our team. We're honored to be part of your growth.</p>
+                            <p>We promise to keep working hard to provide you with the best possible learning experience, and we're committed to helping you achieve your English goals.</p>
+                            <p><strong>Your support is what drives us forward.</strong></p>
+                        </div>
+
+                        <div class="plan-summary-card">
+                            <h3><i class="fas fa-box-open"></i>Your Plan</h3>
+                            <ul class="plan-details-list">
+                                <li>
+                                    <strong>Plan Name</strong>
+                                    <span class="plan-value" id="en-plan-name">-</span>
+                                </li>
+                                <li>
+                                    <strong>Price</strong>
+                                    <span class="plan-value" id="en-plan-price">-</span>
+                                </li>
+                                <li>
+                                    <strong>Email</strong>
+                                    <span class="plan-value" id="en-user-email">-</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="reactivate-actions">
+                            <button id="en-reactivate-btn" class="btn-reactivate">
+                                <i class="fas fa-redo"></i>
+                                <span>Reactivate Subscription</span>
+                            </button>
+                            <a href="dashboard.html" class="btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="commerce-disclosure.html">Commerce Disclosure</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-of-service.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Connect</h3>
+                    <div class="footer-social-icons">
+                        <a href="https://page.line.me/845irjbc" class="social-icon" target="_blank" aria-label="LINE"><i class="fab fa-line"></i></a>
+                        <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
+                    </div>
+                    <a href="mailto:prokaiwa.english@gmail.com" class="footer-email">prokaiwa.english@gmail.com</a>
+                </div>
+            </div>
+            <p>© <span id="year"></span> Prokaiwa. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
+
+        // Supabase Setup
+        const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: true,
+                storageKey: 'prokaiwa-supabase-auth',
+                storage: window.localStorage,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
+
+        // Plan configurations
+        const planConfig = {
+            'line': {
+                name_ja: 'LINEプラクティスプラン',
+                name_en: 'LINE Practice Plan',
+                price: '¥6,000/月',
+                stripe_link: 'https://buy.stripe.com/test_00w3cu0EbgZ59NO3fVes006'
+            },
+            'video': {
+                name_ja: '1対1ビデオレッスン（50分）',
+                name_en: '1-on-1 Video Lesson (50min)',
+                price: '¥4,000/回',
+                stripe_link: 'https://buy.stripe.com/test_14A4gyev14cj2lm2bRes007'
+            },
+            'power_lite': {
+                name_ja: 'パワーパック・ライト',
+                name_en: 'Power Pack Lite',
+                price: '¥10,000/月',
+                stripe_link: 'https://buy.stripe.com/test_5kQaEW0EbcIP6BC5o3es008'
+            },
+            'power_pro': {
+                name_ja: 'パワーパック・プロ',
+                name_en: 'Power Pack Pro',
+                price: '¥16,000/月',
+                stripe_link: 'https://buy.stripe.com/test_00w9ASfz5bEL4tu8Afes005'
+            }
+        };
+
+        // Language management
+        function getCurrentLang() {
+            const stored = localStorage.getItem('prokaiwaLang');
+            if (stored) return stored;
+            const browserLang = navigator.language || navigator.userLanguage;
+            return browserLang.startsWith('ja') ? 'ja' : 'en';
+        }
+
+        function setLanguage(lang) {
+            localStorage.setItem('prokaiwaLang', lang);
+            document.querySelectorAll('.lang-section').forEach(section => {
+                section.classList.remove('show');
+            });
+            document.getElementById(`${lang}-reactivate`).classList.add('show');
+            
+            document.querySelectorAll('.nav-lang-toggle button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.lang === lang) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Error display
+        function showError(lang, message) {
+            document.getElementById(`${lang}-loading`).style.display = 'none';
+            document.getElementById(`${lang}-content`).style.display = 'none';
+            document.getElementById(`${lang}-error`).style.display = 'block';
+            document.getElementById(`${lang}-error-message`).textContent = message;
+        }
+
+        // Main initialization
+        async function initializePage() {
+            const lang = getCurrentLang();
+            
+            try {
+                // Check authentication
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError || !session) {
+                    console.error('Session error:', sessionError);
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const user = session.user;
+
+                // Load user profile
+                const { data: profile, error: profileError } = await supabase
+                    .from('questionnaire_responses')
+                    .select('plan, email, name')
+                    .eq('user_id', user.id)
+                    .single();
+
+                if (profileError) {
+                    console.error('Profile error:', profileError);
+                    showError('ja', 'プロフィールの読み込みに失敗しました。');
+                    showError('en', 'Failed to load profile.');
+                    return;
+                }
+
+                const plan = planConfig[profile.plan];
+                if (!plan) {
+                    showError('ja', 'プラン情報が見つかりません。');
+                    showError('en', 'Plan information not found.');
+                    return;
+                }
+
+                // Populate both language versions
+                ['ja', 'en'].forEach(l => {
+                    document.getElementById(`${l}-plan-name`).textContent = 
+                        l === 'ja' ? plan.name_ja : plan.name_en;
+                    document.getElementById(`${l}-plan-price`).textContent = plan.price;
+                    document.getElementById(`${l}-user-email`).textContent = user.email;
+                    
+                    // Hide loading, show content
+                    document.getElementById(`${l}-loading`).style.display = 'none';
+                    document.getElementById(`${l}-content`).style.display = 'block';
+                });
+
+                // Setup reactivation buttons
+                setupReactivationHandlers(user, profile.plan, plan.stripe_link);
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('ja', '予期しないエラーが発生しました。');
+                showError('en', 'An unexpected error occurred.');
+            }
+        }
+
+        // Reactivation handler
+        function setupReactivationHandlers(user, planCode, stripeLink) {
+            ['ja', 'en'].forEach(lang => {
+                const btn = document.getElementById(`${lang}-reactivate-btn`);
+                btn.addEventListener('click', () => {
+                    btn.classList.add('loading');
+                    
+                    // Redirect to Stripe with user info
+                    const url = `${stripeLink}?client_reference_id=${user.id}&prefilled_email=${encodeURIComponent(user.email)}`;
+                    window.location.href = url;
+                });
+            });
+        }
+
+        // Language toggle
+        document.querySelectorAll('.nav-lang-toggle button').forEach(button => {
+            button.addEventListener('click', () => {
+                setLanguage(button.dataset.lang);
+            });
+        });
+
+        // Initialize
+        const initialLang = getCurrentLang();
+        setLanguage(initialLang);
+        initializePage();
+
+        // Set year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
