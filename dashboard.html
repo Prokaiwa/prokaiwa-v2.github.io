@@ -5228,30 +5228,6 @@ function renderLessonCard(lesson, isFirst = false, lang = 'en') {
     `;
 }
 
-// Start auto-refresh for existing bookings on page load
-// ADD THIS TO initializeEnhancedLessonsCard():
-/*
-FIND THIS CODE:
-function initializeEnhancedLessonsCard() {
-    renderUpcomingLessonsCard(bookingState.userBookings || []);
-    
-    if (bookingState.userBookings && bookingState.userBookings.length > 0) {
-        startCountdownUpdates();
-    }
-}
-
-AND ADD THIS BEFORE THE CLOSING }:
-
-    // Start auto-refresh for bookings without Meet links
-    if (bookingState.userBookings) {
-        bookingState.userBookings.forEach(booking => {
-            if (!booking.google_meet_link && booking.google_calendar_event_id) {
-                console.log(`🔄 Starting auto-refresh for existing booking ${booking.id}`);
-                meetLinkRefresh.start(booking.id, booking.google_calendar_event_id);
-            }
-        });
-    }
-
 // Clean up intervals when user leaves page
 window.addEventListener('beforeunload', () => {
     meetLinkRefresh.stopAll();
