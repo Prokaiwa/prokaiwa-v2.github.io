@@ -4128,12 +4128,15 @@ monthLabel.textContent =
                     day.classList.add('has-booking');
                 }
                 
-                if (!day.classList.contains('disabled')) {
-                    day.addEventListener('click', () => selectDate(day.dataset.date, lang));
-                }
-                
-                // 🆕 SHOW NEXT MONTH'S AVAILABLE DATES
-const totalCells = calendarGrid.children.length - 7; // Subtract header row
+if (!day.classList.contains('disabled')) {
+                day.addEventListener('click', () => selectDate(day.dataset.date, lang));
+            }
+            
+            calendarGrid.appendChild(day);
+        } 
+        
+        // SHOW NEXT MONTH'S AVAILABLE DATES
+        const totalCells = calendarGrid.children.length - 7;
 const remainingCells = 42 - totalCells; // 6 rows x 7 days = 42 total
 
 for (let date = 1; date <= remainingCells; date++) {
@@ -4181,8 +4184,7 @@ for (let date = 1; date <= remainingCells; date++) {
     }
     
     calendarGrid.appendChild(day);
-}
-            }          
+}          
             const prevBtn = document.getElementById(`${lang}-calendar-prev`);
             if (prevBtn) {
                 const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
