@@ -4182,7 +4182,7 @@ for (let date = 1; date <= remainingCells; date++) {
     
     calendarGrid.appendChild(day);
 }
-            
+            }          
             const prevBtn = document.getElementById(`${lang}-calendar-prev`);
             if (prevBtn) {
                 const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -5107,30 +5107,6 @@ const meetLinkRefresh = {
         }
     }
 };
-
-// Update the bookLesson function to start auto-refresh
-// ADD THIS CODE INSIDE YOUR EXISTING bookLesson function, right after the booking succeeds:
-
-/*
-FIND THIS CODE IN bookLesson():
-        if (!result.success) {
-            throw new Error(result.error || 'Booking failed');
-        }
-        
-        alert(...);
-
-AND ADD THIS AFTER THE ALERT:
-
-        // Start auto-refresh for Meet link
-        if (result.booking && result.booking.google_calendar_event_id) {
-            console.log('🔄 Starting auto-refresh for Meet link...');
-            meetLinkRefresh.start(
-                result.booking.id,
-                result.booking.google_calendar_event_id
-            );
-        }
-
-*/
 
 // Update renderLessonCard to show "Meeting link loading" status
 
