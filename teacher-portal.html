@@ -1428,12 +1428,48 @@ I'm proud of your dedication. Let's keep building! 🚀`
           <div id="responses-${ck}" class="response-area"><p style="color:#999;">Loading...</p></div>
           <div class="feedback-box">
             <h3>🎭 Day 6 Quick Reply</h3>
-            <p class="reply-tip">Keep it short and encouraging — 1 to 2 sentences. React to their response, give one tip if needed.</p>
-            <textarea
-              class="feedback-textarea short"
-              id="feedback-${ck}"
-              placeholder="e.g. Great reaction — that 'Oh no way!' sounded completely natural! 🎉 Try adding a follow-up question next time to keep the conversation going."
-            ></textarea>
+
+            <!-- Reply mode toggle: Text vs Voice -->
+            <div class="template-toggle" id="reply-mode-toggle-${ck}" style="margin-bottom:1rem;">
+              <button class="toggle-pill active" id="pill-text-${ck}"  onclick="setReplyMode('${ck}','text')">💬 Text Reply</button>
+              <button class="toggle-pill"        id="pill-voice-${ck}" onclick="setReplyMode('${ck}','voice')">🎙 Voice Reply</button>
+            </div>
+
+            <!-- Text reply panel -->
+            <div id="text-panel-${ck}">
+              <p class="reply-tip">Keep it short and encouraging — 1 to 2 sentences. React to their response, give one tip if needed.</p>
+              <textarea
+                class="feedback-textarea short"
+                id="feedback-${ck}"
+                placeholder="e.g. Great reaction — that 'Oh no way!' sounded completely natural! 🎉 Try adding a follow-up question next time to keep the conversation going."
+              ></textarea>
+            </div>
+
+            <!-- Voice reply panel -->
+            <div id="voice-panel-${ck}" style="display:none;">
+              <p class="reply-tip">Record a short voice reply (aim for 10–30 seconds). Students hear your voice directly in LINE.</p>
+
+              <!-- Recorder widget -->
+              <div class="voice-recorder" id="recorder-widget-${ck}">
+                <button class="rec-btn" id="rec-btn-${ck}" onclick="toggleRecording('${ck}')">
+                  <i class="fas fa-microphone"></i> Start Recording
+                </button>
+                <span class="rec-status" id="rec-status-${ck}">Ready</span>
+                <span id="rec-timer-${ck}" style="font-size:0.8rem; color:#c2185b; font-weight:700; min-width:36px;"></span>
+              </div>
+
+              <!-- Playback preview (shown after recording) -->
+              <div id="rec-preview-${ck}" style="display:none; margin-top:0.75rem;">
+                <audio id="rec-audio-${ck}" controls style="width:100%; max-width:360px; border-radius:4px;"></audio>
+                <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--color-text-light);">
+                  <span id="rec-format-note-${ck}"></span>
+                </div>
+                <button onclick="discardRecording('${ck}')" style="margin-top:0.5rem; background:none; border:1px solid #ccc; padding:0.3rem 0.75rem; border-radius:4px; cursor:pointer; font-size:0.82rem; color:#666;">
+                  🗑 Discard &amp; Re-record
+                </button>
+              </div>
+            </div>
+
             <div class="action-buttons">
               <button class="send-btn day6-btn" id="send-btn-${ck}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard('${ck}', 'day6')">
                 <i class="fas fa-paper-plane"></i> Send to LINE
@@ -1782,20 +1818,60 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // SEND FEEDBACK
   // ============================================================
   async function sendFeedbackFromCard(cardKey, sectionType) {
-    const textarea     = document.getElementById(`feedback-${cardKey}`);
-    const feedbackText = textarea.value.trim();
-    const sendBtn      = document.getElementById(`send-btn-${cardKey}`);
-    const qi           = queueItemsMap.get(cardKey);
+    const sendBtn = document.getElementById(`send-btn-${cardKey}`);
+    const qi      = queueItemsMap.get(cardKey);
+    if (!qi) { alert('Error: could not find this response. Please refresh.'); return; }
 
-    if (!qi)           { alert('Error: could not find this response. Please refresh.'); return; }
-    if (!feedbackText) { alert('Please write some feedback first!'); return; }
-    if (!confirm('Send this feedback to the student via LINE?')) return;
+    // ── Determine reply mode (Day 6 only has text/voice toggle) ───────────
+    const voicePillActive = document.getElementById(`pill-voice-${cardKey}`)?.classList.contains('active');
+    const rs = recState[cardKey];
+    const isVoiceMode = voicePillActive && rs?.audioBlob;
+
+    // ── Validate ──────────────────────────────────────────────────────────
+    if (isVoiceMode) {
+      if (!confirm('Send this voice message to the student via LINE?')) return;
+    } else {
+      const textarea     = document.getElementById(`feedback-${cardKey}`);
+      const feedbackText = textarea?.value.trim();
+      if (!feedbackText) { alert('Please write some feedback first!'); return; }
+      if (!confirm('Send this feedback to the student via LINE?')) return;
+    }
 
     const originalHTML = sendBtn.innerHTML;
-    sendBtn.disabled = true;
-    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    sendBtn.disabled   = true;
+    sendBtn.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
     try {
+      let body;
+
+      if (isVoiceMode) {
+        // Upload audio to Supabase Storage first
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading audio...';
+        const upload = await uploadAudioToStorage(cardKey);
+
+        if (upload.isM4A) {
+          // M4A — LINE will play it natively as an audio message
+          body = {
+            studentId:     qi.studentId,
+            teacherId:     currentTeacher.id,
+            audioUrl:      upload.url,
+            audioDuration: upload.duration
+          };
+        } else {
+          // WebM (Chrome) — LINE rejects WebM as audio messages.
+          // Send as a text message with a playable link instead.
+          body = {
+            studentId:    qi.studentId,
+            teacherId:    currentTeacher.id,
+            feedbackText: `🎙 Voice message from your teacher:\n${upload.url}\n\n(Tap the link to listen)`
+          };
+        }
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+      } else {
+        const feedbackText = document.getElementById(`feedback-${cardKey}`).value.trim();
+        body = { studentId: qi.studentId, teacherId: currentTeacher.id, feedbackText };
+      }
+
       const response = await fetch(
         'https://luyzyzefgintksydmwoh.supabase.co/functions/v1/send-teacher-feedback',
         {
@@ -1804,18 +1880,19 @@ I'm proud of your dedication. Let's keep building! 🚀`
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
           },
-          body: JSON.stringify({ studentId: qi.studentId, feedbackText, teacherId: currentTeacher.id })
+          body: JSON.stringify(body)
         }
       );
       if (!response.ok) throw new Error('Failed to send feedback');
 
-      completedToday.add(cardKey);  // Mark this specific response as reviewed
+      completedToday.add(cardKey);
       alert('Feedback sent! ✅');
       await loadDayTypeQueue();
+
     } catch(err) {
       console.error('sendFeedbackFromCard:', err);
-      alert('Error sending feedback. Please try again.');
-      sendBtn.disabled = false;
+      alert('Error sending feedback: ' + err.message);
+      sendBtn.disabled  = false;
       sendBtn.innerHTML = originalHTML;
     }
   }
@@ -1856,8 +1933,178 @@ I'm proud of your dedication. Let's keep building! 🚀`
   }
 
   // ============================================================
-  // STATS
+  // VOICE RECORDING — DAY 6 CARDS
   // ============================================================
+
+  // Per-card recording state — keyed by cardKey (responseId)
+  const recState = {};
+  // recState[ck] = {
+  //   mediaRecorder: MediaRecorder | null,
+  //   audioChunks:   Blob[],
+  //   audioBlob:     Blob | null,
+  //   audioUrl:      string | null,   // Supabase Storage public URL
+  //   mimeType:      string,
+  //   duration:      number,          // milliseconds
+  //   timerInterval: number | null,
+  //   timerSeconds:  number,
+  // }
+
+  function setReplyMode(ck, mode) {
+    const textPanel  = document.getElementById(`text-panel-${ck}`);
+    const voicePanel = document.getElementById(`voice-panel-${ck}`);
+    const pillText   = document.getElementById(`pill-text-${ck}`);
+    const pillVoice  = document.getElementById(`pill-voice-${ck}`);
+    if (mode === 'text') {
+      textPanel.style.display  = 'block';
+      voicePanel.style.display = 'none';
+      pillText.classList.add('active'); pillVoice.classList.remove('active');
+    } else {
+      textPanel.style.display  = 'none';
+      voicePanel.style.display = 'block';
+      pillText.classList.remove('active'); pillVoice.classList.add('active');
+    }
+  }
+
+  async function toggleRecording(ck) {
+    if (!recState[ck]) recState[ck] = { mediaRecorder: null, audioChunks: [], audioBlob: null, audioUrl: null, mimeType: '', duration: 0, timerInterval: null, timerSeconds: 0 };
+    const rs = recState[ck];
+
+    if (rs.mediaRecorder && rs.mediaRecorder.state === 'recording') {
+      // Stop recording
+      rs.mediaRecorder.stop();
+    } else {
+      // Start recording
+      await startRecording(ck);
+    }
+  }
+
+  async function startRecording(ck) {
+    const rs = recState[ck];
+    const btn      = document.getElementById(`rec-btn-${ck}`);
+    const status   = document.getElementById(`rec-status-${ck}`);
+    const widget   = document.getElementById(`recorder-widget-${ck}`);
+    const preview  = document.getElementById(`rec-preview-${ck}`);
+
+    // Reset state
+    rs.audioChunks = [];
+    rs.audioBlob   = null;
+    rs.audioUrl    = null;
+    preview.style.display = 'none';
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // Prefer M4A (Safari/iOS) — LINE requires it for native audio messages.
+      // Fall back to WebM (Chrome) — will send as text link instead.
+      const preferredTypes = ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg'];
+      rs.mimeType = preferredTypes.find(t => MediaRecorder.isTypeSupported(t)) || '';
+
+      rs.mediaRecorder = new MediaRecorder(stream, rs.mimeType ? { mimeType: rs.mimeType } : {});
+
+      rs.mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) rs.audioChunks.push(e.data);
+      };
+
+      rs.mediaRecorder.onstop = () => {
+        // Stop all mic tracks
+        stream.getTracks().forEach(t => t.stop());
+
+        // Clear timer
+        clearInterval(rs.timerInterval);
+        rs.duration = rs.timerSeconds * 1000;
+
+        // Build blob
+        const actualMime = rs.mediaRecorder.mimeType || rs.mimeType || 'audio/webm';
+        rs.audioBlob = new Blob(rs.audioChunks, { type: actualMime });
+
+        // Show preview
+        const blobUrl = URL.createObjectURL(rs.audioBlob);
+        const audioEl = document.getElementById(`rec-audio-${ck}`);
+        audioEl.src   = blobUrl;
+        preview.style.display = 'block';
+
+        // Format note — tell teacher if LINE will accept it natively
+        const formatNote = document.getElementById(`rec-format-note-${ck}`);
+        const isLineCompatible = actualMime.includes('mp4') || actualMime.includes('aac');
+        if (isLineCompatible) {
+          formatNote.innerHTML = `<span style="color:#4caf50;">✓ M4A format — will play natively in LINE</span>`;
+        } else {
+          formatNote.innerHTML = `<span style="color:#ff9800;">⚠ ${actualMime.split(';')[0]} format — will send as audio link (Chrome limitation)</span>`;
+        }
+
+        // Reset button
+        btn.innerHTML   = '<i class="fas fa-microphone"></i> Re-record';
+        btn.className   = 'rec-btn';
+        widget.classList.remove('recording');
+        status.textContent = `Recorded (${rs.timerSeconds}s)`;
+        document.getElementById(`rec-timer-${ck}`).textContent = '';
+      };
+
+      // Start recording
+      rs.mediaRecorder.start(100);  // Collect data every 100ms
+      rs.timerSeconds = 0;
+      widget.classList.add('recording');
+      btn.innerHTML  = '<i class="fas fa-stop"></i> Stop';
+      btn.className  = 'rec-btn recording';
+      status.textContent = 'Recording...';
+
+      // Timer
+      rs.timerInterval = setInterval(() => {
+        rs.timerSeconds++;
+        document.getElementById(`rec-timer-${ck}`).textContent = `${rs.timerSeconds}s`;
+        // Auto-stop at 120 seconds (LINE max is 200s but keep it reasonable)
+        if (rs.timerSeconds >= 120) rs.mediaRecorder.stop();
+      }, 1000);
+
+    } catch(err) {
+      console.error('Microphone error:', err);
+      if (err.name === 'NotAllowedError') {
+        alert('Microphone access denied. Please allow microphone access in your browser settings.');
+      } else {
+        alert('Could not start recording: ' + err.message);
+      }
+    }
+  }
+
+  function discardRecording(ck) {
+    const rs = recState[ck];
+    if (!rs) return;
+    rs.audioBlob = null;
+    rs.audioUrl  = null;
+    rs.audioChunks = [];
+    rs.timerSeconds = 0;
+    document.getElementById(`rec-preview-${ck}`).style.display = 'none';
+    const btn = document.getElementById(`rec-btn-${ck}`);
+    btn.innerHTML  = '<i class="fas fa-microphone"></i> Start Recording';
+    btn.className  = 'rec-btn';
+    document.getElementById(`rec-status-${ck}`).textContent = 'Ready';
+    document.getElementById(`rec-timer-${ck}`).textContent  = '';
+  }
+
+  // Upload audio blob to Supabase Storage and return public URL
+  async function uploadAudioToStorage(ck) {
+    const rs  = recState[ck];
+    if (!rs?.audioBlob) return null;
+
+    const ext      = rs.audioBlob.type.includes('mp4') || rs.audioBlob.type.includes('aac') ? 'm4a' : 'webm';
+    const filename = `teacher-audio/${currentTeacher.id}/${Date.now()}.${ext}`;
+
+    const { data, error } = await supabaseClient.storage
+      .from('teacher-feedback-audio')
+      .upload(filename, rs.audioBlob, {
+        contentType: rs.audioBlob.type,
+        upsert: false
+      });
+
+    if (error) throw new Error('Upload failed: ' + error.message);
+
+    // Get public URL
+    const { data: urlData } = supabaseClient.storage
+      .from('teacher-feedback-audio')
+      .getPublicUrl(filename);
+
+    return { url: urlData.publicUrl, duration: rs.duration, isM4A: ext === 'm4a' };
+  }
   function updateStats() {
     const total     = allStudentsData.length;
     const allItems  = [...dayQueues.day6, ...dayQueues.day5, ...dayQueues.day7other];
