@@ -641,7 +641,7 @@ Keep it up! 🌟</textarea>
       </div>
       <div class="info-row">
         <span class="info-label">Purpose</span>
-        <span class="info-value">${s.learning_purpose || s.goals || 'Not set'}</span>
+        <span class="info-value">${parsePurpose(s)}</span>
       </div>
       <div class="info-row">
         <span class="info-label">Current week</span>
@@ -894,6 +894,21 @@ Keep it up! 🌟</textarea>
   }
   function closeDetailAssessment() {
     document.getElementById('assessment-modal').style.display = 'none';
+  }
+
+  function parsePurpose(s) {
+    // Try learning_purpose first (flat string)
+    if (s.learning_purpose) return s.learning_purpose;
+    // goals is stored as JSON string: '{"purpose": "Hobby"}'
+    if (s.goals) {
+      try {
+        const parsed = typeof s.goals === 'string' ? JSON.parse(s.goals) : s.goals;
+        return parsed.purpose || JSON.stringify(parsed);
+      } catch(e) {
+        return s.goals;  // Fall back to raw value if not valid JSON
+      }
+    }
+    return 'Not set';
   }
 
   function formatPlanName(p) {
