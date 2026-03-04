@@ -948,7 +948,8 @@
   let currentTeacher   = null;
   let allStudentsData  = [];   // All students with progress
   let dayQueues        = { day6: [], day5: [], day7other: [] };
-  let completedToday   = new Set();
+  let completedToday   = new Set();  // Set of responseIds (message_log UUIDs)
+  let queueItemsMap    = new Map();  // responseId → full queueItem object
   let currentFilters   = {};
   let currentAssessmentStudent = null;
   let currentCancellationStudent = null;
@@ -1101,7 +1102,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // ============================================================
   async function loadDayTypeQueue() {
     try {
-      // Fetch all assigned students
+      // ── 1. Fetch all students assigned to this teacher ──────────────────
       const { data: assignments, error: assignError } = await supabaseClient
         .from('student_teacher_assignments')
         .select(`student_id, questionnaire_responses(id, user_id, given_name_romaji, name, line_id, plan)`)
@@ -1109,46 +1110,126 @@ I'm proud of your dedication. Let's keep building! 🚀`
       if (assignError) throw assignError;
 
       const students = assignments.map(a => a.questionnaire_responses).filter(Boolean);
-      const userIds  = students.map(s => s.user_id).filter(Boolean);
+      const userIds   = students.map(s => s.user_id).filter(Boolean);
+      const studentIds = students.map(s => s.id).filter(Boolean);
 
-      // Fetch progress
-      const { data: progressData, error: progError } = await supabaseClient
+      // ── 2. Fetch progress for all students ──────────────────────────────
+      const { data: progressData } = await supabaseClient
         .from('student_progress').select('*').in('user_id', userIds);
-      if (progError) throw progError;
 
-      // Check who responded today (for Day 5 and Day 6 detection)
-      const todayStart = new Date(); todayStart.setHours(0,0,0,0);
-      const { data: todayResponses } = await supabaseClient
-        .from('message_log').select('user_id, message_type')
-        .in('user_id', userIds)
-        .eq('message_type', 'student_response')
-        .gte('created_at', todayStart.toISOString());
-
-      const respondedTodayIds = new Set((todayResponses || []).map(r => r.user_id));
-
-      // Build full student records
       allStudentsData = students.map(s => {
-        const progress = progressData.find(p => p.user_id === s.user_id) || {};
-        return { ...s, ...progress, respondedToday: respondedTodayIds.has(s.user_id) };
+        const progress = (progressData || []).find(p => p.user_id === s.user_id) || {};
+        return { ...s, ...progress };
       });
 
-      // Sort into day queues
-      dayQueues = { day6: [], day5: [], day7other: [] };
+      // ── 3. Fetch ALL student responses (no date filter) ─────────────────
+      const { data: allResponses, error: respError } = await supabaseClient
+        .from('message_log')
+        .select('id, user_id, prompt_id, message_text, media_type, message_id, line_message_id, created_at')
+        .in('user_id', userIds)
+        .eq('message_type', 'student_response')
+        .order('created_at', { ascending: false });
+      if (respError) throw respError;
 
-      for (const student of allStudentsData) {
-        const day = student.current_day;
-        const plan = student.plan;
+      // ── 4. Fetch all feedback timestamps per student ─────────────────────
+      // A response is UNREVIEWED if no feedback was sent to that student AFTER
+      // that response's created_at timestamp.
+      const { data: allFeedback } = await supabaseClient
+        .from('feedback_log')
+        .select('student_id, sent_at')
+        .in('student_id', studentIds);
 
-        if (day === 6 && student.respondedToday) {
-          dayQueues.day6.push(student);
-        } else if (day === 5 && student.respondedToday) {
-          dayQueues.day5.push(student);
-        } else if (day === 7 && plan === 'line') {
-          dayQueues.day7other.push(student);
-        } else if ((day === 3 || day === 7) && plan === 'power_lite') {
-          dayQueues.day7other.push(student);
-        } else if (plan === 'power_pro' && student.respondedToday && day !== 5 && day !== 6) {
-          dayQueues.day7other.push(student);
+      // Build map: studentId (integer) → sorted array of feedback timestamps (ms)
+      const feedbackMap = {};
+      for (const fb of allFeedback || []) {
+        if (!feedbackMap[fb.student_id]) feedbackMap[fb.student_id] = [];
+        feedbackMap[fb.student_id].push(new Date(fb.sent_at).getTime());
+      }
+
+      // ── 5. Filter to unreviewed responses only ───────────────────────────
+      const unreviewedResponses = (allResponses || []).filter(r => {
+        const student = allStudentsData.find(s => s.user_id === r.user_id);
+        if (!student) return false;
+        const feedbackTimes  = feedbackMap[student.id] || [];
+        const responseTime   = new Date(r.created_at).getTime();
+        // Unreviewed = no feedback sent after this response
+        return !feedbackTimes.some(ft => ft > responseTime);
+      });
+
+      // ── 6. Fetch prompt metadata for responses that have a prompt_id ─────
+      const promptIds = [...new Set(
+        unreviewedResponses.map(r => r.prompt_id).filter(Boolean)
+      )];
+
+      let promptMap = {};
+      if (promptIds.length > 0) {
+        const { data: promptData } = await supabaseClient
+          .from('prompts')
+          .select('id, day_number, type, prompt_text')
+          .in('id', promptIds);
+        for (const p of promptData || []) promptMap[p.id] = p;
+      }
+
+      // ── 7. Build queueItems and sort into buckets ────────────────────────
+      // Each queue item is response-centric, not student-centric.
+      // A student can appear in multiple sections if they have multiple
+      // unreviewed responses of different types (catch-up scenario).
+      dayQueues  = { day6: [], day5: [], day7other: [] };
+      queueItemsMap.clear();
+
+      // Which day numbers require teacher action per plan:
+      // LINE        → Day 5 (Quiz), Day 6 (Real Talk), Day 7 (Weekly Summary)
+      // power_lite  → Day 3, 5, 6, 7
+      // power_pro   → All days (daily teacher replies)
+      const planDays = {
+        line:        [5, 6, 7],
+        power_lite:  [3, 5, 6, 7],
+        power_pro:   [1, 2, 3, 4, 5, 6, 7],
+        video:       [5, 6, 7]
+      };
+
+      for (const response of unreviewedResponses) {
+        const student = allStudentsData.find(s => s.user_id === response.user_id);
+        if (!student) continue;
+
+        // Determine which day this response belongs to
+        const prompt = response.prompt_id ? promptMap[response.prompt_id] : null;
+        const dayNumber = prompt?.day_number ?? student.current_day ?? 0;
+        const promptType = prompt?.type ?? null;
+
+        // Does this plan require teacher action on this day?
+        const activeDays = planDays[student.plan] || [5, 6, 7];
+        if (!activeDays.includes(dayNumber)) continue;
+
+        const qi = {
+          responseId:        response.id,         // UUID — unique per queue card
+          studentId:         student.id,           // integer — questionnaire_responses.id
+          studentUserId:     student.user_id,
+          name:              student.given_name_romaji || student.name,
+          plan:              student.plan,
+          lineId:            student.line_id,
+          currentWeek:       student.current_week,
+          currentDay:        student.current_day,
+          responseText:      response.message_text,
+          mediaType:         response.media_type || 'text',
+          responseMessageId: response.message_id || response.line_message_id,
+          responseCreatedAt: response.created_at,
+          promptId:          response.prompt_id,
+          promptDayNumber:   dayNumber,
+          promptType:        promptType,
+          promptText:        prompt?.prompt_text || null,
+        };
+
+        queueItemsMap.set(response.id, qi);
+
+        // Route to correct section by prompt type
+        if (promptType === 'Real Talk' || dayNumber === 6) {
+          dayQueues.day6.push(qi);
+        } else if (promptType === 'Quiz' || dayNumber === 5) {
+          dayQueues.day5.push(qi);
+        } else {
+          // Day 7 assessments + all other Power Pro days
+          dayQueues.day7other.push(qi);
         }
       }
 
@@ -1177,60 +1258,60 @@ I'm proud of your dedication. Let's keep building! 🚀`
   function renderDay6Section() {
     const body  = document.getElementById('body-day6');
     const badge = document.getElementById('badge-day6');
-    const students = dayQueues.day6;
-    const pending  = students.filter(s => !completedToday.has(s.id));
+    const items   = dayQueues.day6;
+    const pending = items.filter(qi => !completedToday.has(qi.responseId));
     badge.textContent = pending.length;
-    if (pending.length === 0) {
-      badge.className = 'task-count-badge badge-done';
-      badge.textContent = '✓';
+    if (pending.length === 0 && items.length > 0) {
+      badge.className = 'task-count-badge badge-done'; badge.textContent = '✓';
+    } else if (items.length === 0) {
+      badge.className = 'task-count-badge badge-day6'; badge.textContent = '0';
     }
-
-    if (students.length === 0) {
-      body.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle"></i><p>No Day 6 responses today.</p></div>`;
+    if (items.length === 0) {
+      body.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle"></i><p>No Day 6 responses awaiting reply.</p></div>`;
       return;
     }
-    body.innerHTML = students.map(s => createDay6Card(s)).join('');
-    addCardListeners(students, 'day6');
+    body.innerHTML = items.map(qi => createDay6Card(qi)).join('');
+    addCardListeners(items);
   }
 
   // --- DAY 5 ---
   function renderDay5Section() {
     const body  = document.getElementById('body-day5');
     const badge = document.getElementById('badge-day5');
-    const students = dayQueues.day5;
-    const pending  = students.filter(s => !completedToday.has(s.id));
+    const items   = dayQueues.day5;
+    const pending = items.filter(qi => !completedToday.has(qi.responseId));
     badge.textContent = pending.length;
-    if (pending.length === 0 && students.length > 0) {
-      badge.className = 'task-count-badge badge-done';
-      badge.textContent = '✓';
+    if (pending.length === 0 && items.length > 0) {
+      badge.className = 'task-count-badge badge-done'; badge.textContent = '✓';
+    } else if (items.length === 0) {
+      badge.className = 'task-count-badge badge-day5'; badge.textContent = '0';
     }
-
-    if (students.length === 0) {
-      body.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle"></i><p>No Day 5 quiz responses today.</p></div>`;
+    if (items.length === 0) {
+      body.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle"></i><p>No Day 5 quiz responses awaiting correction.</p></div>`;
       return;
     }
-    body.innerHTML = students.map(s => createDay5Card(s)).join('');
-    addCardListeners(students, 'day5');
+    body.innerHTML = items.map(qi => createDay5Card(qi)).join('');
+    addCardListeners(items);
   }
 
   // --- DAY 7 / OTHER ---
   function renderDay7Section() {
     const body  = document.getElementById('body-day7');
     const badge = document.getElementById('badge-day7');
-    const students = dayQueues.day7other;
-    const pending  = students.filter(s => !completedToday.has(s.id));
+    const items   = dayQueues.day7other;
+    const pending = items.filter(qi => !completedToday.has(qi.responseId));
     badge.textContent = pending.length;
-    if (pending.length === 0 && students.length > 0) {
-      badge.className = 'task-count-badge badge-done';
-      badge.textContent = '✓';
+    if (pending.length === 0 && items.length > 0) {
+      badge.className = 'task-count-badge badge-done'; badge.textContent = '✓';
+    } else if (items.length === 0) {
+      badge.className = 'task-count-badge badge-day7'; badge.textContent = '0';
     }
-
-    if (students.length === 0) {
-      body.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle"></i><p>No assessments or check-ins today.</p></div>`;
+    if (items.length === 0) {
+      body.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle"></i><p>No assessments or check-ins awaiting feedback.</p></div>`;
       return;
     }
-    body.innerHTML = students.map(s => createDay7Card(s)).join('');
-    addCardListeners(students, 'day7');
+    body.innerHTML = items.map(qi => createDay7Card(qi)).join('');
+    addCardListeners(items);
   }
 
   // --- ALL STUDENTS ---
@@ -1284,67 +1365,80 @@ I'm proud of your dedication. Let's keep building! 🚀`
     return `<span class="plan-badge plan-${plan}">${formatPlanName(plan)}</span>`;
   }
 
-  function filterBarHtml(studentId) {
+  // responsePreviewHtml — shows the student's actual response inside the card
+  // so the teacher can see it without scrolling the full history
+  function responsePreviewHtml(qi) {
+    const when = new Date(qi.responseCreatedAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    let html = `<div style="background:#f8f8f8; border:1px solid #e0e0e0; border-radius:6px; padding:0.75rem 1rem; margin-bottom:1rem; font-size:0.88rem;">
+      <div style="font-size:0.75rem; color:#888; margin-bottom:0.35rem;">📬 Student response · ${when}</div>`;
+    if (qi.responseText) html += `<p style="margin:0; color:#333;">"${qi.responseText}"</p>`;
+    if (qi.mediaType === 'audio') html += `<audio controls style="width:100%; max-width:360px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${qi.responseMessageId}">Audio not supported.</audio>`;
+    if (qi.mediaType === 'video') html += `<video controls style="width:100%; max-width:360px; border-radius:4px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${qi.responseMessageId}">Video not supported.</video>`;
+    if (qi.mediaType === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${qi.responseMessageId}" style="max-width:100%; max-height:200px; border-radius:4px; margin-top:0.4rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
+    html += `</div>`;
+    return html;
+  }
+
+  function filterBarHtml(studentId, cardKey) {
     return `
-      <div class="filter-bar" id="filter-bar-${studentId}">
-        <span class="filter-label">Show:</span>
+      <div class="filter-bar" id="filter-bar-${cardKey}">
+        <span class="filter-label">Full history:</span>
         <div class="filter-buttons-desktop">
-          <button class="filter-btn active" data-filter="recent" data-student="${studentId}">Since Last Feedback</button>
-          <button class="filter-btn" data-filter="3"   data-student="${studentId}">3 Days</button>
-          <button class="filter-btn" data-filter="7"   data-student="${studentId}">7 Days</button>
-          <button class="filter-btn" data-filter="14"  data-student="${studentId}">14 Days</button>
-          <button class="filter-btn" data-filter="all" data-student="${studentId}">All</button>
+          <button class="filter-btn active" data-filter="recent" data-student="${studentId}" data-card="${cardKey}">Since Last Feedback</button>
+          <button class="filter-btn" data-filter="7"   data-student="${studentId}" data-card="${cardKey}">7 Days</button>
+          <button class="filter-btn" data-filter="14"  data-student="${studentId}" data-card="${cardKey}">14 Days</button>
+          <button class="filter-btn" data-filter="all" data-student="${studentId}" data-card="${cardKey}">All</button>
         </div>
-        <select class="filter-select-mobile" id="filter-${studentId}" data-student="${studentId}">
+        <select class="filter-select-mobile" id="filter-${cardKey}" data-student="${studentId}" data-card="${cardKey}">
           <option value="recent" selected>Since Last Feedback</option>
-          <option value="3">Last 3 Days</option>
           <option value="7">Last 7 Days</option>
           <option value="14">Last 14 Days</option>
           <option value="all">All Messages</option>
         </select>
-        <span class="message-count" id="msg-count-${studentId}"></span>
+        <span class="message-count" id="msg-count-${cardKey}"></span>
       </div>
     `;
   }
 
-  // DAY 6 CARD
-  function createDay6Card(student) {
-    const isDone = completedToday.has(student.id);
-    const name   = student.given_name_romaji || student.name;
+  // DAY 6 CARD — response-centric, cardKey = qi.responseId
+  function createDay6Card(qi) {
+    const isDone = completedToday.has(qi.responseId);
+    const ck = qi.responseId;  // shorthand — used for all DOM IDs within this card
     return `
-      <div class="student-card" id="student-${student.id}">
-        <div class="student-header" onclick="toggleCard(${student.id})">
+      <div class="student-card" id="card-${ck}">
+        <div class="student-header" onclick="toggleCard('${ck}')">
           <div>
             <div class="student-name">
-              ${name} ${planBadgeHtml(student.plan)}
+              ${qi.name} ${planBadgeHtml(qi.plan)}
               ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ''}
             </div>
-            <div class="student-meta">Week ${student.current_week || 1} · Day 6 · Real Talk response received</div>
+            <div class="student-meta">Week ${qi.currentWeek || 1} · Day 6 · Real Talk response received</div>
           </div>
           <div class="student-actions">
-            <button class="btn-expand" onclick="event.stopPropagation(); toggleCard(${student.id})">
+            <button class="btn-expand" onclick="event.stopPropagation(); toggleCard('${ck}')">
               ${isDone ? 'View' : 'Reply'} ▼
             </button>
-            <button class="btn-assess" onclick="event.stopPropagation(); openAssessmentModal(${student.id})">📊</button>
-            <button class="btn-profile" onclick="event.stopPropagation(); window.location.href='student-detail.html?id=${student.id}'"><i class="fas fa-user"></i></button>
+            <button class="btn-assess"  onclick="event.stopPropagation(); openAssessmentModal(${qi.studentId})">📊</button>
+            <button class="btn-profile" onclick="event.stopPropagation(); window.location.href='student-detail.html?id=${qi.studentId}'"><i class="fas fa-user"></i></button>
           </div>
         </div>
         <div class="student-details">
-          ${filterBarHtml(student.id)}
-          <div id="responses-${student.id}" class="response-area"><p style="color:#999;">Loading...</p></div>
+          ${responsePreviewHtml(qi)}
+          ${filterBarHtml(qi.studentId, ck)}
+          <div id="responses-${ck}" class="response-area"><p style="color:#999;">Loading...</p></div>
           <div class="feedback-box">
             <h3>🎭 Day 6 Quick Reply</h3>
             <p class="reply-tip">Keep it short and encouraging — 1 to 2 sentences. React to their response, give one tip if needed.</p>
             <textarea
               class="feedback-textarea short"
-              id="feedback-${student.id}"
+              id="feedback-${ck}"
               placeholder="e.g. Great reaction — that 'Oh no way!' sounded completely natural! 🎉 Try adding a follow-up question next time to keep the conversation going."
             ></textarea>
             <div class="action-buttons">
-              <button class="send-btn day6-btn" id="send-btn-${student.id}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard(${student.id}, 'day6')">
+              <button class="send-btn day6-btn" id="send-btn-${ck}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard('${ck}', 'day6')">
                 <i class="fas fa-paper-plane"></i> Send to LINE
               </button>
-              <button class="mark-done-btn" ${isDone ? 'disabled' : ''} onclick="markComplete(${student.id})">
+              <button class="mark-done-btn" ${isDone ? 'disabled' : ''} onclick="markComplete('${ck}')">
                 <i class="fas fa-check"></i> Mark Complete
               </button>
             </div>
@@ -1355,42 +1449,43 @@ I'm proud of your dedication. Let's keep building! 🚀`
   }
 
   // DAY 5 CARD
-  function createDay5Card(student) {
-    const isDone = completedToday.has(student.id);
-    const name   = student.given_name_romaji || student.name;
+  function createDay5Card(qi) {
+    const isDone = completedToday.has(qi.responseId);
+    const ck = qi.responseId;
     return `
-      <div class="student-card" id="student-${student.id}">
-        <div class="student-header" onclick="toggleCard(${student.id})">
+      <div class="student-card" id="card-${ck}">
+        <div class="student-header" onclick="toggleCard('${ck}')">
           <div>
             <div class="student-name">
-              ${name} ${planBadgeHtml(student.plan)}
+              ${qi.name} ${planBadgeHtml(qi.plan)}
               ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ''}
             </div>
-            <div class="student-meta">Week ${student.current_week || 1} · Day 5 · Quiz response received</div>
+            <div class="student-meta">Week ${qi.currentWeek || 1} · Day 5 · Quiz response received</div>
           </div>
           <div class="student-actions">
-            <button class="btn-expand" onclick="event.stopPropagation(); toggleCard(${student.id})">
+            <button class="btn-expand" onclick="event.stopPropagation(); toggleCard('${ck}')">
               ${isDone ? 'View' : 'Correct Quiz'} ▼
             </button>
-            <button class="btn-assess" onclick="event.stopPropagation(); openAssessmentModal(${student.id})">📊</button>
-            <button class="btn-profile" onclick="event.stopPropagation(); window.location.href='student-detail.html?id=${student.id}'"><i class="fas fa-user"></i></button>
+            <button class="btn-assess"  onclick="event.stopPropagation(); openAssessmentModal(${qi.studentId})">📊</button>
+            <button class="btn-profile" onclick="event.stopPropagation(); window.location.href='student-detail.html?id=${qi.studentId}'"><i class="fas fa-user"></i></button>
           </div>
         </div>
         <div class="student-details">
-          ${filterBarHtml(student.id)}
-          <div id="responses-${student.id}" class="response-area"><p style="color:#999;">Loading...</p></div>
+          ${responsePreviewHtml(qi)}
+          ${filterBarHtml(qi.studentId, ck)}
+          <div id="responses-${ck}" class="response-area"><p style="color:#999;">Loading...</p></div>
           <div class="feedback-box">
             <h3>✅ Quiz Correction</h3>
             <textarea
               class="feedback-textarea"
-              id="feedback-${student.id}"
+              id="feedback-${ck}"
               style="min-height:160px;"
             >${feedbackTemplates.quiz_correction}</textarea>
             <div class="action-buttons">
-              <button class="send-btn day5-btn" id="send-btn-${student.id}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard(${student.id}, 'day5')">
+              <button class="send-btn day5-btn" id="send-btn-${ck}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard('${ck}', 'day5')">
                 <i class="fas fa-paper-plane"></i> Send to LINE
               </button>
-              <button class="mark-done-btn" ${isDone ? 'disabled' : ''} onclick="markComplete(${student.id})">
+              <button class="mark-done-btn" ${isDone ? 'disabled' : ''} onclick="markComplete('${ck}')">
                 <i class="fas fa-check"></i> Mark Complete
               </button>
             </div>
@@ -1401,97 +1496,88 @@ I'm proud of your dedication. Let's keep building! 🚀`
   }
 
   // DAY 7 / OTHER CARD
-  function createDay7Card(student) {
-    const isDone     = completedToday.has(student.id);
-    const name       = student.given_name_romaji || student.name;
-    const isFullWeek = student.plan === 'line' && student.current_day === 7;
-    const defaultTpl = isFullWeek ? 'weekly' : (student.plan === 'power_pro' ? 'daily' : 'biweekly');
-    const sectionLabel = isFullWeek ? '📋 Weekly Assessment' : '✨ Check-in';
+  function createDay7Card(qi) {
+    const isDone     = completedToday.has(qi.responseId);
+    const ck         = qi.responseId;
+    const isFullWeek = qi.plan === 'line' && qi.promptDayNumber === 7;
+    const isPro      = qi.plan === 'power_pro' && qi.promptDayNumber !== 7;
+    const defaultTpl = isFullWeek ? 'weekly' : (isPro ? 'daily' : 'biweekly');
+    const dayLabel   = qi.promptType || `Day ${qi.promptDayNumber}`;
+    const sectionLabel = isFullWeek ? '📋 Weekly Assessment' : (isPro ? `⚡ Daily Reply (${dayLabel})` : '✨ Check-in');
 
-    // Init draft store
-    if (!draftStore[student.id]) {
-      draftStore[student.id] = {
-        templateText: feedbackTemplates[defaultTpl],
-        freeText: ''
-      };
+    if (!draftStore[ck]) {
+      draftStore[ck] = { templateText: feedbackTemplates[defaultTpl], freeText: '' };
     }
 
     return `
-      <div class="student-card" id="student-${student.id}">
-        <div class="student-header" onclick="toggleCard(${student.id})">
+      <div class="student-card" id="card-${ck}">
+        <div class="student-header" onclick="toggleCard('${ck}')">
           <div>
             <div class="student-name">
-              ${name} ${planBadgeHtml(student.plan)}
+              ${qi.name} ${planBadgeHtml(qi.plan)}
               ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ''}
             </div>
-            <div class="student-meta">Week ${student.current_week || 1} · Day ${student.current_day || 7} · ${sectionLabel}</div>
+            <div class="student-meta">Week ${qi.currentWeek || 1} · ${dayLabel} · ${sectionLabel}</div>
           </div>
           <div class="student-actions">
-            <button class="btn-expand" onclick="event.stopPropagation(); toggleCard(${student.id})">
-              ${isDone ? 'View' : 'Write Assessment'} ▼
+            <button class="btn-expand" onclick="event.stopPropagation(); toggleCard('${ck}')">
+              ${isDone ? 'View' : 'Write Feedback'} ▼
             </button>
-            <button class="btn-assess" onclick="event.stopPropagation(); openAssessmentModal(${student.id})">📊</button>
-            <button class="btn-profile" onclick="event.stopPropagation(); window.location.href='student-detail.html?id=${student.id}'"><i class="fas fa-user"></i></button>
+            <button class="btn-assess"  onclick="event.stopPropagation(); openAssessmentModal(${qi.studentId})">📊</button>
+            <button class="btn-profile" onclick="event.stopPropagation(); window.location.href='student-detail.html?id=${qi.studentId}'"><i class="fas fa-user"></i></button>
           </div>
         </div>
         <div class="student-details">
-          ${filterBarHtml(student.id)}
-          <div id="responses-${student.id}" class="response-area"><p style="color:#999;">Loading...</p></div>
+          ${responsePreviewHtml(qi)}
+          ${filterBarHtml(qi.studentId, ck)}
+          <div id="responses-${ck}" class="response-area"><p style="color:#999;">Loading...</p></div>
           <div class="feedback-box">
             <h3>${sectionLabel}</h3>
-
-            <!-- Template selector -->
             <div style="margin-bottom:0.75rem;">
               <label style="font-size:0.85rem; font-weight:600; color:var(--color-text-light); margin-right:0.5rem;">Template:</label>
-              <select id="tpl-select-${student.id}" onchange="onTemplateSelect(${student.id}, this.value)" style="padding:0.35rem 0.6rem; border:1px solid var(--color-border); border-radius:4px; font-size:0.85rem;">
-                <option value="weekly"       ${defaultTpl==='weekly'    ?'selected':''}>Weekly Assessment (LINE)</option>
-                <option value="biweekly"     ${defaultTpl==='biweekly'  ?'selected':''}>Bi-weekly Check-in</option>
-                <option value="daily"        ${defaultTpl==='daily'     ?'selected':''}>Daily Quick (Power Pro)</option>
-                <option value="great_effort" >Great Effort</option>
-                <option value="milestone"    >Milestone 🎉</option>
+              <select id="tpl-select-${ck}" onchange="onTemplateSelect('${ck}', this.value)" style="padding:0.35rem 0.6rem; border:1px solid var(--color-border); border-radius:4px; font-size:0.85rem;">
+                <option value="weekly"              ${defaultTpl==='weekly'   ?'selected':''}>Weekly Assessment (LINE)</option>
+                <option value="biweekly"            ${defaultTpl==='biweekly' ?'selected':''}>Bi-weekly Check-in</option>
+                <option value="daily"               ${defaultTpl==='daily'    ?'selected':''}>Daily Quick (Power Pro)</option>
+                <option value="great_effort">Great Effort</option>
+                <option value="milestone">Milestone 🎉</option>
                 <option value="pronunciation_focus">Pronunciation Focus</option>
               </select>
             </div>
-
-            <!-- Free write toggle -->
-            <div class="template-toggle" id="toggle-${student.id}">
-              <button class="toggle-pill active" id="pill-template-${student.id}" onclick="switchMode(${student.id},'template')">📋 Template</button>
-              <button class="toggle-pill"        id="pill-free-${student.id}"     onclick="switchMode(${student.id},'free')">✏️ Free Write</button>
+            <div class="template-toggle" id="toggle-${ck}">
+              <button class="toggle-pill active" id="pill-template-${ck}" onclick="switchMode('${ck}','template')">📋 Template</button>
+              <button class="toggle-pill"        id="pill-free-${ck}"     onclick="switchMode('${ck}','free')">✏️ Free Write</button>
             </div>
-
             <textarea
               class="feedback-textarea"
-              id="feedback-${student.id}"
+              id="feedback-${ck}"
               placeholder="Write your assessment here..."
             >${feedbackTemplates[defaultTpl]}</textarea>
-
-            <!-- Skills accordion (optional) -->
-            <div class="skills-accordion" id="skills-accordion-${student.id}">
-              <div class="skills-accordion-header" onclick="toggleSkillsAccordion(${student.id})">
+            <div class="skills-accordion" id="skills-accordion-${ck}">
+              <div class="skills-accordion-header" onclick="toggleSkillsAccordion('${ck}')">
                 <span>⚙️ Update skill scores (optional)</span>
-                <i class="fas fa-chevron-down" id="skills-chevron-${student.id}" style="transition:transform 0.2s;"></i>
+                <i class="fas fa-chevron-down" id="skills-chevron-${ck}" style="transition:transform 0.2s;"></i>
               </div>
-              <div class="skills-accordion-body" id="skills-body-${student.id}">
+              <div class="skills-accordion-body" id="skills-body-${ck}">
                 ${['Fluency','Grammar','Comprehension','Vocabulary','Pronunciation'].map(skill => `
                   <div class="mini-skill-row">
                     <span class="mini-skill-label">${skill}</span>
                     <input type="range" min="0" max="10" value="5" class="mini-skill-slider"
-                      id="mini-${skill.toLowerCase()}-${student.id}"
-                      oninput="document.getElementById('mini-score-${skill.toLowerCase()}-${student.id}').textContent=this.value">
-                    <span class="mini-skill-score" id="mini-score-${skill.toLowerCase()}-${student.id}">5</span>
+                      id="mini-${skill.toLowerCase()}-${ck}"
+                      oninput="document.getElementById('mini-score-${skill.toLowerCase()}-${ck}').textContent=this.value">
+                    <span class="mini-skill-score" id="mini-score-${skill.toLowerCase()}-${ck}">5</span>
                   </div>
                 `).join('')}
-                <button onclick="saveSkillScores(${student.id})" style="margin-top:0.5rem; padding:0.4rem 1rem; background:var(--color-primary); color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.85rem;">
+                <button onclick="saveSkillScores('${ck}')" style="margin-top:0.5rem; padding:0.4rem 1rem; background:var(--color-primary); color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.85rem;">
                   Save Scores
                 </button>
               </div>
             </div>
-
             <div class="action-buttons">
-              <button class="send-btn day7-btn" id="send-btn-${student.id}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard(${student.id}, 'day7')">
+              <button class="send-btn day7-btn" id="send-btn-${ck}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard('${ck}', 'day7')">
                 <i class="fas fa-paper-plane"></i> Send to LINE
               </button>
-              <button class="mark-done-btn" ${isDone ? 'disabled' : ''} onclick="markComplete(${student.id})">
+              <button class="mark-done-btn" ${isDone ? 'disabled' : ''} onclick="markComplete('${ck}')">
                 <i class="fas fa-check"></i> Mark Complete
               </button>
             </div>
@@ -1504,20 +1590,22 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // ============================================================
   // CARD INTERACTION HELPERS
   // ============================================================
-  function addCardListeners(students, sectionType) {
-    students.forEach(student => {
-      const card = document.getElementById(`student-${student.id}`);
+  function addCardListeners(queueItems) {
+    queueItems.forEach(qi => {
+      const ck   = qi.responseId;
+      const card = document.getElementById(`card-${ck}`);
       if (!card) return;
 
       // Filter buttons (desktop)
       card.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
-          const filter = e.target.dataset.filter;
-          const sid    = parseInt(e.target.dataset.student);
+          const filter    = e.target.dataset.filter;
+          const studentId = parseInt(e.target.dataset.student);
+          const cardKey   = e.target.dataset.card;
           card.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
           e.target.classList.add('active');
-          currentFilters[sid] = filter;
-          await loadStudentResponses(sid, filter);
+          currentFilters[cardKey] = filter;
+          await loadStudentResponses(studentId, filter, cardKey);
         });
       });
 
@@ -1525,64 +1613,65 @@ I'm proud of your dedication. Let's keep building! 🚀`
       const sel = card.querySelector('.filter-select-mobile');
       if (sel) {
         sel.addEventListener('change', async (e) => {
-          currentFilters[parseInt(e.target.dataset.student)] = e.target.value;
-          await loadStudentResponses(parseInt(e.target.dataset.student), e.target.value);
+          const studentId = parseInt(e.target.dataset.student);
+          const cardKey   = e.target.dataset.card;
+          currentFilters[cardKey] = e.target.value;
+          await loadStudentResponses(studentId, e.target.value, cardKey);
         });
       }
     });
   }
 
-  async function toggleCard(studentId) {
-    const card     = document.getElementById(`student-${studentId}`);
+  async function toggleCard(cardKey) {
+    const card       = document.getElementById(`card-${cardKey}`);
     const isExpanded = card.classList.contains('expanded');
     document.querySelectorAll('.student-card').forEach(c => c.classList.remove('expanded'));
     if (!isExpanded) {
       card.classList.add('expanded');
-      if (!currentFilters[studentId]) currentFilters[studentId] = 'recent';
-      await loadStudentResponses(studentId, currentFilters[studentId]);
+      const qi = queueItemsMap.get(cardKey);
+      if (!currentFilters[cardKey]) currentFilters[cardKey] = 'recent';
+      await loadStudentResponses(qi ? qi.studentId : null, currentFilters[cardKey], cardKey);
+    }
+  }
     }
   }
 
-  // Template mode switch for Day 7 cards
-  function switchMode(studentId, mode) {
-    const textarea  = document.getElementById(`feedback-${studentId}`);
-    const pillTpl   = document.getElementById(`pill-template-${studentId}`);
-    const pillFree  = document.getElementById(`pill-free-${studentId}`);
-    const tplSelect = document.getElementById(`tpl-select-${studentId}`);
+  // Template mode switch for Day 7 cards — cardKey = responseId
+  function switchMode(cardKey, mode) {
+    const textarea  = document.getElementById(`feedback-${cardKey}`);
+    const pillTpl   = document.getElementById(`pill-template-${cardKey}`);
+    const pillFree  = document.getElementById(`pill-free-${cardKey}`);
+    const tplSelect = document.getElementById(`tpl-select-${cardKey}`);
 
-    if (!draftStore[studentId]) draftStore[studentId] = { templateText: '', freeText: '' };
+    if (!draftStore[cardKey]) draftStore[cardKey] = { templateText: '', freeText: '' };
 
     if (mode === 'template') {
-      // Save free text draft first
-      draftStore[studentId].freeText = textarea.value;
-      // Restore template text
-      textarea.value = draftStore[studentId].templateText;
+      draftStore[cardKey].freeText = textarea.value;
+      textarea.value = draftStore[cardKey].templateText;
       if (tplSelect) tplSelect.style.display = '';
       pillTpl.classList.add('active'); pillFree.classList.remove('active');
     } else {
-      // Save template text
-      draftStore[studentId].templateText = textarea.value;
-      // Restore free text
-      textarea.value = draftStore[studentId].freeText;
+      draftStore[cardKey].templateText = textarea.value;
+      textarea.value = draftStore[cardKey].freeText;
       if (tplSelect) tplSelect.style.display = 'none';
       pillFree.classList.add('active'); pillTpl.classList.remove('active');
     }
   }
 
-  function onTemplateSelect(studentId, tplKey) {
-    const textarea = document.getElementById(`feedback-${studentId}`);
-    if (!draftStore[studentId]) draftStore[studentId] = { templateText: '', freeText: '' };
+  function onTemplateSelect(cardKey, tplKey) {
+    const textarea = document.getElementById(`feedback-${cardKey}`);
+    if (!draftStore[cardKey]) draftStore[cardKey] = { templateText: '', freeText: '' };
     const newTpl = feedbackTemplates[tplKey] || '';
-    if (textarea.value && textarea.value !== draftStore[studentId].templateText) {
+    if (textarea.value && textarea.value !== draftStore[cardKey].templateText) {
       if (!confirm('Replace your current text with the template?')) return;
     }
     textarea.value = newTpl;
-    draftStore[studentId].templateText = newTpl;
+    draftStore[cardKey].templateText = newTpl;
   }
 
-  function toggleSkillsAccordion(studentId) {
-    const body    = document.getElementById(`skills-body-${studentId}`);
-    const chevron = document.getElementById(`skills-chevron-${studentId}`);
+  function toggleSkillsAccordion(cardKey) {
+    const body    = document.getElementById(`skills-body-${cardKey}`);
+    const chevron = document.getElementById(`skills-chevron-${cardKey}`);
     const isOpen  = body.classList.contains('open');
     body.classList.toggle('open');
     chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
@@ -1591,9 +1680,12 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // ============================================================
   // LOAD STUDENT RESPONSES (CONVERSATION HISTORY)
   // ============================================================
-  async function loadStudentResponses(studentId, daysFilter = 'recent') {
-    const container = document.getElementById(`responses-${studentId}`);
-    const msgCountEl = document.getElementById(`msg-count-${studentId}`);
+  async function loadStudentResponses(studentId, daysFilter = 'recent', cardKey = null) {
+    const containerId = cardKey ? `responses-${cardKey}` : `responses-${studentId}`;
+    const msgCountId  = cardKey ? `msg-count-${cardKey}` : `msg-count-${studentId}`;
+    const container   = document.getElementById(containerId);
+    const msgCountEl  = document.getElementById(msgCountId);
+    if (!container) return;
     container.innerHTML = '<p style="text-align:center; padding:1rem; color:#999;"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
 
     try {
@@ -1691,11 +1783,13 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // ============================================================
   // SEND FEEDBACK
   // ============================================================
-  async function sendFeedbackFromCard(studentId, sectionType) {
-    const textarea    = document.getElementById(`feedback-${studentId}`);
+  async function sendFeedbackFromCard(cardKey, sectionType) {
+    const textarea     = document.getElementById(`feedback-${cardKey}`);
     const feedbackText = textarea.value.trim();
-    const sendBtn     = document.getElementById(`send-btn-${studentId}`);
+    const sendBtn      = document.getElementById(`send-btn-${cardKey}`);
+    const qi           = queueItemsMap.get(cardKey);
 
+    if (!qi)           { alert('Error: could not find this response. Please refresh.'); return; }
     if (!feedbackText) { alert('Please write some feedback first!'); return; }
     if (!confirm('Send this feedback to the student via LINE?')) return;
 
@@ -1712,17 +1806,13 @@ I'm proud of your dedication. Let's keep building! 🚀`
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
           },
-          body: JSON.stringify({ studentId, feedbackText, teacherId: currentTeacher.id })
+          body: JSON.stringify({ studentId: qi.studentId, feedbackText, teacherId: currentTeacher.id })
         }
       );
       if (!response.ok) throw new Error('Failed to send feedback');
 
-      completedToday.add(studentId);
+      completedToday.add(cardKey);  // Mark this specific response as reviewed
       alert('Feedback sent! ✅');
-
-      // Optionally save skill scores if accordion was used (Day 7)
-      // (scores are saved separately via saveSkillScores button)
-
       await loadDayTypeQueue();
     } catch(err) {
       console.error('sendFeedbackFromCard:', err);
@@ -1732,20 +1822,20 @@ I'm proud of your dedication. Let's keep building! 🚀`
     }
   }
 
-  async function markComplete(studentId) {
-    completedToday.add(studentId);
+  async function markComplete(cardKey) {
+    completedToday.add(cardKey);
     await loadDayTypeQueue();
   }
 
-  // Save skill scores from mini sliders (optional, Day 7)
-  async function saveSkillScores(studentId) {
-    const student = allStudentsData.find(s => s.id === studentId);
-    if (!student) return;
+  // Save skill scores from mini sliders in Day 7 cards
+  async function saveSkillScores(cardKey) {
+    const qi = queueItemsMap.get(cardKey);
+    if (!qi) return;
 
     const skills = ['fluency','grammar','comprehension','vocabulary','pronunciation'];
     const scores = {};
     skills.forEach(sk => {
-      const el = document.getElementById(`mini-${sk}-${studentId}`);
+      const el = document.getElementById(`mini-${sk}-${cardKey}`);
       if (el) scores[sk] = parseInt(el.value);
     });
 
@@ -1753,8 +1843,8 @@ I'm proud of your dedication. Let's keep building! 🚀`
       const { error } = await supabaseClient
         .from('student_assessments')
         .insert({
-          user_id:         student.user_id,
-          student_id:      studentId,
+          user_id:         qi.studentUserId,
+          student_id:      qi.studentId,
           assessed_by:     currentTeacher.id,
           ...scores,
           assessment_type: 'weekly_checkin'
@@ -1771,30 +1861,29 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // STATS
   // ============================================================
   function updateStats() {
-    const total = allStudentsData.length;
-    const allTasks = [...dayQueues.day6, ...dayQueues.day5, ...dayQueues.day7other];
-    const totalTasks = allTasks.length;
-    const completed  = allTasks.filter(s => completedToday.has(s.id)).length;
+    const total     = allStudentsData.length;
+    const allItems  = [...dayQueues.day6, ...dayQueues.day5, ...dayQueues.day7other];
+    const totalTasks = allItems.length;
+    const completed  = allItems.filter(qi => completedToday.has(qi.responseId)).length;
 
-    // ETA per task type
-    const d6Remaining     = dayQueues.day6.filter(s => !completedToday.has(s.id)).length;
-    const d5Remaining     = dayQueues.day5.filter(s => !completedToday.has(s.id)).length;
-    const d7LineRemaining = dayQueues.day7other.filter(s => !completedToday.has(s.id) && s.plan === 'line' && s.current_day === 7).length;
-    const d7OtherRemaining = dayQueues.day7other.filter(s => !completedToday.has(s.id) && !(s.plan === 'line' && s.current_day === 7)).length;
+    const d6Remaining = dayQueues.day6.filter(qi => !completedToday.has(qi.responseId)).length;
+    const d5Remaining = dayQueues.day5.filter(qi => !completedToday.has(qi.responseId)).length;
+    const d7LineRemaining  = dayQueues.day7other.filter(qi => !completedToday.has(qi.responseId) && qi.plan === 'line' && qi.promptDayNumber === 7).length;
+    const d7OtherRemaining = dayQueues.day7other.filter(qi => !completedToday.has(qi.responseId) && !(qi.plan === 'line' && qi.promptDayNumber === 7)).length;
 
     const etaMinutes =
-      (d6Remaining     * 2)  +   // Day 6 quick reply: 2 min
-      (d5Remaining     * 1.5) +  // Day 5 quiz correction: 1.5 min
-      (d7LineRemaining * 10) +   // Day 7 LINE full assessment: 10 min
-      (d7OtherRemaining * 4);    // Day 7 check-in: 4 min
+      (d6Remaining          * 2)   +
+      (d5Remaining          * 1.5) +
+      (d7LineRemaining      * 10)  +
+      (d7OtherRemaining     * 4);
 
     const hrs = Math.floor(etaMinutes / 60);
     const min = Math.round(etaMinutes % 60);
 
-    document.getElementById('total-students').textContent = total;
-    document.getElementById('today-tasks').textContent    = totalTasks;
-    document.getElementById('completed-today').textContent = `${completed}/${totalTasks}`;
-    document.getElementById('estimated-time').textContent  = etaMinutes > 0
+    document.getElementById('total-students').textContent    = total;
+    document.getElementById('today-tasks').textContent       = totalTasks;
+    document.getElementById('completed-today').textContent   = `${completed}/${totalTasks}`;
+    document.getElementById('estimated-time').textContent    = etaMinutes > 0
       ? (hrs > 0 ? `${hrs}h ${min}m` : `${min}m`)
       : '0m';
   }
