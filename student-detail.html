@@ -428,14 +428,48 @@
                 <p style="font-size:0.85rem; color:var(--color-text-light); margin-bottom:1rem;">
                   Send a free-form message directly to this student on LINE. Not tied to any specific day or template.
                 </p>
-                <div class="tpl-grid">
-                  <div class="tpl-chip" onclick="applyTpl(this,'adhoc','great_effort')">💪 Great Effort</div>
-                  <div class="tpl-chip" onclick="applyTpl(this,'adhoc','pronunciation_focus')">🎤 Pronunciation</div>
-                  <div class="tpl-chip" onclick="applyTpl(this,'adhoc','milestone')">🎉 Milestone</div>
-                  <div class="tpl-chip" onclick="applyTpl(this,'adhoc','daily')">⚡ Quick Note</div>
-                  <div class="tpl-chip active" onclick="applyTpl(this,'adhoc','blank')">✏️ Blank</div>
+
+                <!-- Text / Voice toggle -->
+                <div class="template-toggle" style="margin-bottom:1rem;">
+                  <button class="toggle-pill active" id="pill-text-adhoc"  onclick="setDetailReplyMode('adhoc','text')">💬 Text</button>
+                  <button class="toggle-pill"        id="pill-voice-adhoc" onclick="setDetailReplyMode('adhoc','voice')">🎙 Voice</button>
                 </div>
-                <textarea class="compose-textarea" id="compose-adhoc" placeholder="Write your message to the student..."></textarea>
+
+                <!-- Text panel -->
+                <div id="detail-text-panel-adhoc">
+                  <div class="tpl-grid">
+                    <div class="tpl-chip" onclick="applyTpl(this,'adhoc','great_effort')">💪 Great Effort</div>
+                    <div class="tpl-chip" onclick="applyTpl(this,'adhoc','pronunciation_focus')">🎤 Pronunciation</div>
+                    <div class="tpl-chip" onclick="applyTpl(this,'adhoc','milestone')">🎉 Milestone</div>
+                    <div class="tpl-chip" onclick="applyTpl(this,'adhoc','daily')">⚡ Quick Note</div>
+                    <div class="tpl-chip active" onclick="applyTpl(this,'adhoc','blank')">✏️ Blank</div>
+                  </div>
+                  <textarea class="compose-textarea" id="compose-adhoc" placeholder="Write your message to the student..."></textarea>
+                </div>
+
+                <!-- Voice panel -->
+                <div id="detail-voice-panel-adhoc" style="display:none;">
+                  <p style="font-size:0.83rem; color:var(--color-text-light); margin-bottom:0.75rem; font-style:italic;">
+                    Record a short voice message. Students hear it directly in LINE.
+                  </p>
+                  <div class="voice-recorder" id="detail-recorder-widget-adhoc">
+                    <button class="rec-btn" id="detail-rec-btn-adhoc" onclick="toggleDetailRecording('adhoc')">
+                      <i class="fas fa-microphone"></i> Start Recording
+                    </button>
+                    <span class="rec-status" id="detail-rec-status-adhoc">Ready</span>
+                    <span id="detail-rec-timer-adhoc" style="font-size:0.8rem; color:#c2185b; font-weight:700; min-width:36px;"></span>
+                  </div>
+                  <div id="detail-rec-preview-adhoc" style="display:none; margin-top:0.75rem;">
+                    <audio id="detail-rec-audio-adhoc" controls style="width:100%; max-width:360px; border-radius:4px;"></audio>
+                    <div style="margin-top:0.4rem; font-size:0.8rem; color:var(--color-text-light);">
+                      <span id="detail-rec-format-adhoc"></span>
+                    </div>
+                    <button onclick="discardDetailRecording('adhoc')" style="margin-top:0.5rem; background:none; border:1px solid #ccc; padding:0.3rem 0.75rem; border-radius:4px; cursor:pointer; font-size:0.82rem; color:#666;">
+                      🗑 Discard &amp; Re-record
+                    </button>
+                  </div>
+                </div>
+
                 <div class="compose-actions">
                   <button class="btn-secondary" onclick="clearCompose('adhoc')">Clear</button>
                   <button class="btn-send-line" id="send-adhoc-btn" onclick="sendAdHocMessage()">
@@ -450,8 +484,42 @@
                 <p class="reply-tip" style="font-size:0.85rem; color:var(--color-text-light); margin-bottom:1rem; font-style:italic;">
                   Keep it short and encouraging — 1 to 2 sentences. React to their response, give one tip if needed.
                 </p>
-                <textarea class="compose-textarea" id="compose-day6"
-                  placeholder="e.g. Great reaction — that 'Oh no way!' sounded completely natural! 🎉 Try adding a follow-up question next time to keep the conversation going."></textarea>
+
+                <!-- Text / Voice toggle -->
+                <div class="template-toggle" style="margin-bottom:1rem;">
+                  <button class="toggle-pill active" id="pill-text-day6"  onclick="setDetailReplyMode('day6','text')">💬 Text</button>
+                  <button class="toggle-pill"        id="pill-voice-day6" onclick="setDetailReplyMode('day6','voice')">🎙 Voice</button>
+                </div>
+
+                <!-- Text panel -->
+                <div id="detail-text-panel-day6">
+                  <textarea class="compose-textarea" id="compose-day6"
+                    placeholder="e.g. Great reaction — that 'Oh no way!' sounded completely natural! 🎉 Try adding a follow-up question next time to keep the conversation going."></textarea>
+                </div>
+
+                <!-- Voice panel -->
+                <div id="detail-voice-panel-day6" style="display:none;">
+                  <p style="font-size:0.83rem; color:var(--color-text-light); margin-bottom:0.75rem; font-style:italic;">
+                    Record a short voice reply. Students hear it directly in LINE.
+                  </p>
+                  <div class="voice-recorder" id="detail-recorder-widget-day6">
+                    <button class="rec-btn" id="detail-rec-btn-day6" onclick="toggleDetailRecording('day6')">
+                      <i class="fas fa-microphone"></i> Start Recording
+                    </button>
+                    <span class="rec-status" id="detail-rec-status-day6">Ready</span>
+                    <span id="detail-rec-timer-day6" style="font-size:0.8rem; color:#c2185b; font-weight:700; min-width:36px;"></span>
+                  </div>
+                  <div id="detail-rec-preview-day6" style="display:none; margin-top:0.75rem;">
+                    <audio id="detail-rec-audio-day6" controls style="width:100%; max-width:360px; border-radius:4px;"></audio>
+                    <div style="margin-top:0.4rem; font-size:0.8rem; color:var(--color-text-light);">
+                      <span id="detail-rec-format-day6"></span>
+                    </div>
+                    <button onclick="discardDetailRecording('day6')" style="margin-top:0.5rem; background:none; border:1px solid #ccc; padding:0.3rem 0.75rem; border-radius:4px; cursor:pointer; font-size:0.82rem; color:#666;">
+                      🗑 Discard &amp; Re-record
+                    </button>
+                  </div>
+                </div>
+
                 <div class="compose-actions">
                   <button class="btn-secondary" onclick="clearCompose('day6')">Clear</button>
                   <button class="btn-send-line" id="send-day6-btn" onclick="sendComposerMessage('day6')">
@@ -838,24 +906,166 @@ Keep it up! 🌟</textarea>
     document.getElementById(`compose-${panel}`).value = '';
   }
 
+  // ============================================================
+  // VOICE RECORDING — STUDENT DETAIL COMPOSER
+  // ============================================================
+  const detailRecState = {};
+  // keyed by panel ('adhoc' or 'day6')
+
+  function setDetailReplyMode(panel, mode) {
+    document.getElementById(`detail-text-panel-${panel}`).style.display  = mode === 'text'  ? 'block' : 'none';
+    document.getElementById(`detail-voice-panel-${panel}`).style.display = mode === 'voice' ? 'block' : 'none';
+    document.getElementById(`pill-text-${panel}`).classList.toggle('active',  mode === 'text');
+    document.getElementById(`pill-voice-${panel}`).classList.toggle('active', mode === 'voice');
+  }
+
+  async function toggleDetailRecording(panel) {
+    if (!detailRecState[panel]) detailRecState[panel] = { mediaRecorder: null, audioChunks: [], audioBlob: null, audioUrl: null, mimeType: '', duration: 0, timerInterval: null, timerSeconds: 0 };
+    const rs = detailRecState[panel];
+    if (rs.mediaRecorder && rs.mediaRecorder.state === 'recording') {
+      rs.mediaRecorder.stop();
+    } else {
+      await startDetailRecording(panel);
+    }
+  }
+
+  async function startDetailRecording(panel) {
+    const rs     = detailRecState[panel];
+    const btn    = document.getElementById(`detail-rec-btn-${panel}`);
+    const status = document.getElementById(`detail-rec-status-${panel}`);
+    const widget = document.getElementById(`detail-recorder-widget-${panel}`);
+    const preview = document.getElementById(`detail-rec-preview-${panel}`);
+
+    rs.audioChunks = []; rs.audioBlob = null; rs.audioUrl = null;
+    preview.style.display = 'none';
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const preferredTypes = ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg'];
+      rs.mimeType = preferredTypes.find(t => MediaRecorder.isTypeSupported(t)) || '';
+      rs.mediaRecorder = new MediaRecorder(stream, rs.mimeType ? { mimeType: rs.mimeType } : {});
+
+      rs.mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) rs.audioChunks.push(e.data); };
+
+      rs.mediaRecorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        clearInterval(rs.timerInterval);
+        rs.duration = rs.timerSeconds * 1000;
+
+        const actualMime = rs.mediaRecorder.mimeType || rs.mimeType || 'audio/webm';
+        rs.audioBlob = new Blob(rs.audioChunks, { type: actualMime });
+
+        const audioEl = document.getElementById(`detail-rec-audio-${panel}`);
+        audioEl.src = URL.createObjectURL(rs.audioBlob);
+        preview.style.display = 'block';
+
+        const isLineCompatible = actualMime.includes('mp4') || actualMime.includes('aac');
+        document.getElementById(`detail-rec-format-${panel}`).innerHTML = isLineCompatible
+          ? `<span style="color:#4caf50;">✓ M4A format — will play natively in LINE</span>`
+          : `<span style="color:#ff9800;">⚠ ${actualMime.split(';')[0]} — will send as audio link (Chrome limitation)</span>`;
+
+        btn.innerHTML = '<i class="fas fa-microphone"></i> Re-record';
+        btn.className = 'rec-btn';
+        widget.classList.remove('recording');
+        status.textContent = `Recorded (${rs.timerSeconds}s)`;
+        document.getElementById(`detail-rec-timer-${panel}`).textContent = '';
+      };
+
+      rs.mediaRecorder.start(100);
+      rs.timerSeconds = 0;
+      widget.classList.add('recording');
+      btn.innerHTML = '<i class="fas fa-stop"></i> Stop';
+      btn.className = 'rec-btn recording';
+      status.textContent = 'Recording...';
+
+      rs.timerInterval = setInterval(() => {
+        rs.timerSeconds++;
+        document.getElementById(`detail-rec-timer-${panel}`).textContent = `${rs.timerSeconds}s`;
+        if (rs.timerSeconds >= 120) rs.mediaRecorder.stop();
+      }, 1000);
+
+    } catch(err) {
+      if (err.name === 'NotAllowedError') {
+        alert('Microphone access denied. Please allow microphone access in your browser settings.');
+      } else {
+        alert('Could not start recording: ' + err.message);
+      }
+    }
+  }
+
+  function discardDetailRecording(panel) {
+    const rs = detailRecState[panel];
+    if (!rs) return;
+    rs.audioBlob = null; rs.audioUrl = null; rs.audioChunks = []; rs.timerSeconds = 0;
+    document.getElementById(`detail-rec-preview-${panel}`).style.display = 'none';
+    const btn = document.getElementById(`detail-rec-btn-${panel}`);
+    btn.innerHTML = '<i class="fas fa-microphone"></i> Start Recording';
+    btn.className = 'rec-btn';
+    document.getElementById(`detail-rec-status-${panel}`).textContent = 'Ready';
+    document.getElementById(`detail-rec-timer-${panel}`).textContent  = '';
+  }
+
+  async function uploadDetailAudio(panel) {
+    const rs  = detailRecState[panel];
+    if (!rs?.audioBlob) return null;
+    const ext      = rs.audioBlob.type.includes('mp4') || rs.audioBlob.type.includes('aac') ? 'm4a' : 'webm';
+    const filename = `teacher-audio/${currentTeacher.id}/${Date.now()}.${ext}`;
+    const { error } = await supabaseClient.storage
+      .from('teacher-feedback-audio')
+      .upload(filename, rs.audioBlob, { contentType: rs.audioBlob.type, upsert: false });
+    if (error) throw new Error('Upload failed: ' + error.message);
+    const { data: urlData } = supabaseClient.storage.from('teacher-feedback-audio').getPublicUrl(filename);
+    return { url: urlData.publicUrl, duration: rs.duration, isM4A: ext === 'm4a' };
+  }
+
+  // ============================================================
+  // SEND FUNCTIONS
+  // ============================================================
   async function sendAdHocMessage() {
     await sendComposerMessage('adhoc');
   }
 
   async function sendComposerMessage(panel) {
-    const textarea = document.getElementById(`compose-${panel}`);
-    const text     = textarea.value.trim();
-    const sendBtn  = document.getElementById(`send-${panel}-btn`);
-
-    if (!text) { alert('Please write a message first.'); return; }
+    const sendBtn = document.getElementById(`send-${panel}-btn`);
     if (!currentStudent.line_id) { alert('This student has no LINE ID connected.'); return; }
-    if (!confirm('Send this message to the student via LINE?')) return;
+
+    // Check if voice mode is active for panels that support it
+    const voicePanels    = ['adhoc', 'day6'];
+    const isVoiceCapable = voicePanels.includes(panel);
+    const voicePillActive = isVoiceCapable && document.getElementById(`pill-voice-${panel}`)?.classList.contains('active');
+    const rs = detailRecState[panel];
+    const isVoiceMode = voicePillActive && rs?.audioBlob;
+
+    // Validate
+    if (isVoiceMode) {
+      if (!confirm('Send this voice message to the student via LINE?')) return;
+    } else {
+      const text = document.getElementById(`compose-${panel}`)?.value.trim();
+      if (!text) { alert('Please write a message first.'); return; }
+      if (!confirm('Send this message to the student via LINE?')) return;
+    }
 
     const orig = sendBtn.innerHTML;
     sendBtn.disabled = true;
     sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
     try {
+      let body;
+
+      if (isVoiceMode) {
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading audio...';
+        const upload = await uploadDetailAudio(panel);
+
+        if (upload.isM4A) {
+          body = { studentId: currentStudent.id, teacherId: currentTeacher.id, audioUrl: upload.url, audioDuration: upload.duration };
+        } else {
+          body = { studentId: currentStudent.id, teacherId: currentTeacher.id, feedbackText: `🎙 Voice message from your teacher:\n${upload.url}\n\n(Tap the link to listen)` };
+        }
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+      } else {
+        body = { studentId: currentStudent.id, teacherId: currentTeacher.id, feedbackText: document.getElementById(`compose-${panel}`).value.trim() };
+      }
+
       const response = await fetch(
         'https://luyzyzefgintksydmwoh.supabase.co/functions/v1/send-teacher-feedback',
         {
@@ -864,20 +1074,17 @@ Keep it up! 🌟</textarea>
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
           },
-          body: JSON.stringify({
-            studentId:    currentStudent.id,
-            feedbackText: text,
-            teacherId:    currentTeacher.id
-          })
+          body: JSON.stringify(body)
         }
       );
       if (!response.ok) throw new Error('Failed to send message');
 
-      // Flash success
       const flash = document.getElementById(`flash-${panel}`);
       if (flash) { flash.classList.add('show'); setTimeout(() => flash.classList.remove('show'), 3000); }
 
-      // Reload conversation
+      // Reset voice state if used
+      if (isVoiceMode) discardDetailRecording(panel);
+
       await loadConversationHistory(currentConvFilter);
 
     } catch(err) {
