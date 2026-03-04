@@ -225,11 +225,15 @@
     .rec-btn {
       background: #e91e8c; color: white; border: none;
       padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;
-      font-weight: 600; font-size: 0.85rem; display: flex;
+      font-weight: 700; font-size: 0.85rem; display: flex;
       align-items: center; gap: 0.4rem;
+      transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
     }
-    .rec-btn.recording { background: #f44336; }
-    .rec-status { font-size: 0.85rem; color: #c2185b; font-weight: 600; }
+    .rec-btn:hover           { background: #c2185b; transform: translateY(-1px); }
+    .rec-btn.recording       { background: #f44336; }
+    .rec-btn.recording:hover { background: #c62828; }
+    .rec-status { font-size: 0.85rem; color: #c2185b; font-weight: 600; flex: 1; }
     audio.recorded-preview { max-width: 100%; margin-top: 0.5rem; border-radius: 4px; }
 
     /* Skills accordion */
@@ -1886,8 +1890,17 @@ I'm proud of your dedication. Let's keep building! 🚀`
       if (!response.ok) throw new Error('Failed to send feedback');
 
       completedToday.add(cardKey);
-      alert('Feedback sent! ✅');
-      await loadDayTypeQueue();
+
+      // Reset voice recorder if it was used
+      if (isVoiceMode) {
+        discardRecording(cardKey);
+        setReplyMode(cardKey, 'text');
+      }
+
+      // Show brief confirmation then reload queue
+      const sendBtn2 = document.getElementById(`send-btn-${cardKey}`);
+      if (sendBtn2) { sendBtn2.innerHTML = '<i class="fas fa-check"></i> Sent! ✅'; }
+      setTimeout(async () => { await loadDayTypeQueue(); }, 1200);
 
     } catch(err) {
       console.error('sendFeedbackFromCard:', err);
