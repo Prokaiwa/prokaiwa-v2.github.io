@@ -207,16 +207,243 @@
       cursor: pointer; font-weight: 600; font-size: 0.9rem;
     }
 
-    /* Sent confirmation */
+    /* Sent confirmation toast */
     .sent-flash {
-      background: #e8f5e9; border: 1px solid #4caf50;
-      color: #2e7d32; padding: 0.75rem 1rem; border-radius: 6px;
-      margin-top: 0.75rem; display: none; font-weight: 600; font-size: 0.9rem;
+      display: none;
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: #2e7d32;
+      color: white;
+      padding: 0.85rem 1.75rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      z-index: 9999;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      transition: opacity 0.3s, transform 0.3s;
+      opacity: 0;
+      white-space: nowrap;
     }
-    .sent-flash.show { display: block; }
+    .sent-flash.show {
+      display: block;
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
 
-    /* Text / Voice toggle pills */
-    .template-toggle {
+    /* ================================================================
+       STUDIO RECORDER WIDGET
+       Dark console aesthetic — phosphor green on near-black
+       ================================================================ */
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700&display=swap');
+
+    .studio-recorder {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 14px;
+      padding: 1.25rem 1.25rem 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 0 1px #222, 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 #1e1e1e;
+      position: relative;
+      overflow: hidden;
+      max-width: 480px;
+    }
+    /* Subtle scanline texture */
+    .studio-recorder::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.012) 2px, rgba(255,255,255,0.012) 4px);
+      pointer-events: none; z-index: 0; border-radius: 14px;
+    }
+    .studio-recorder > * { position: relative; z-index: 1; }
+
+    /* Header row */
+    .sr-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.6rem;
+    }
+    .sr-header-left { display: flex; align-items: center; gap: 0.5rem; }
+    .sr-rec-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #333; box-shadow: 0 0 0 2px #222;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .sr-rec-dot.armed {
+      background: #00ff6a;
+      box-shadow: 0 0 8px #00ff6a, 0 0 16px rgba(0,255,106,0.4);
+    }
+    .sr-rec-dot.recording {
+      background: #ff3b3b;
+      box-shadow: 0 0 8px #ff3b3b, 0 0 20px rgba(255,59,59,0.5);
+      animation: dot-pulse 0.8s ease-in-out infinite;
+    }
+    .sr-rec-dot.done {
+      background: #00aaff;
+      box-shadow: 0 0 8px #00aaff, 0 0 16px rgba(0,170,255,0.4);
+    }
+    @keyframes dot-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+    .sr-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.12em;
+      color: #555; text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .sr-label.recording { color: #ff3b3b; }
+    .sr-label.done      { color: #00aaff; }
+    .sr-label.armed     { color: #00ff6a; }
+
+    .sr-format-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.08em;
+      color: #444; border: 1px solid #2a2a2a;
+      padding: 0.15rem 0.45rem; border-radius: 3px;
+      background: #111;
+    }
+    .sr-format-badge.m4a { color: #00ff6a; border-color: rgba(0,255,106,0.3); }
+    .sr-format-badge.webm { color: #ffaa00; border-color: rgba(255,170,0,0.3); }
+
+    /* Big timer */
+    .sr-timer-display {
+      display: flex; align-items: baseline; gap: 0.4rem;
+      margin-bottom: 0.85rem;
+    }
+    .sr-timer {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.6rem; font-weight: 700;
+      color: #00ff6a; letter-spacing: 0.05em;
+      text-shadow: 0 0 12px rgba(0,255,106,0.5), 0 0 24px rgba(0,255,106,0.2);
+      line-height: 1;
+      transition: color 0.3s, text-shadow 0.3s;
+    }
+    .sr-timer.recording { color: #ff5555; text-shadow: 0 0 12px rgba(255,85,85,0.5); }
+    .sr-timer.done      { color: #44aaff; text-shadow: 0 0 12px rgba(68,170,255,0.4); }
+    .sr-timer-max {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem; color: #333; letter-spacing: 0.05em;
+    }
+
+    /* VU Meter */
+    .sr-vu-section {
+      display: flex; align-items: center; gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+    .sr-vu-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; color: #444; letter-spacing: 0.1em; width: 14px; text-align: right;
+    }
+    .sr-vu-track {
+      flex: 1; height: 8px; background: #111;
+      border-radius: 4px; border: 1px solid #222;
+      position: relative; overflow: visible;
+    }
+    .sr-vu-fill {
+      height: 100%; width: 0%; border-radius: 4px;
+      background: linear-gradient(90deg, #00ff6a 0%, #aaff00 60%, #ffcc00 80%, #ff4444 100%);
+      transition: width 0.05s linear;
+      box-shadow: 0 0 6px rgba(0,255,106,0.4);
+    }
+    .sr-vu-peak {
+      position: absolute; top: 0; bottom: 0; width: 2px;
+      background: #fff; border-radius: 1px; left: 0%;
+      opacity: 0; transition: opacity 0.4s;
+    }
+    .sr-vu-peak.show { opacity: 0.7; }
+    .sr-vu-val {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; color: #444; width: 32px; text-align: right;
+    }
+
+    /* Waveform */
+    .sr-waveform {
+      width: 100%; display: block;
+      border-radius: 6px; background: #080808;
+      border: 1px solid #1a1a1a; margin-bottom: 0.75rem;
+    }
+
+    /* Playback progress bar */
+    .sr-progress-bar {
+      height: 4px; background: #1a1a1a; border-radius: 2px;
+      margin-bottom: 0.75rem; overflow: hidden;
+      cursor: pointer;
+    }
+    .sr-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #0066ff, #00aaff);
+      border-radius: 2px; transition: width 0.1s linear;
+    }
+
+    /* iPod-style wheel */
+    .sr-wheel-zone { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .sr-wheel {
+      position: relative;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 35%, #2a2a2a, #0f0f0f);
+      box-shadow: 0 0 0 2px #222, 0 0 0 4px #111, 0 6px 24px rgba(0,0,0,0.8), inset 0 1px 0 #333;
+    }
+    .sr-wheel-ring { position: absolute; inset: 0; border-radius: 50%; }
+
+    .sr-wheel-btn {
+      position: absolute;
+      background: none; border: none; cursor: pointer;
+      color: #555; font-size: 0.75rem; padding: 0;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s, transform 0.15s;
+      border-radius: 50%;
+    }
+    .sr-wheel-btn:hover { color: #00ff6a; transform: scale(1.2); }
+    .sr-wheel-top    { top: 10px;  left: 50%; transform: translateX(-50%); }
+    .sr-wheel-top:hover { transform: translateX(-50%) scale(1.2); }
+    .sr-wheel-bottom { bottom: 10px; left: 50%; transform: translateX(-50%); }
+    .sr-wheel-bottom:hover { transform: translateX(-50%) scale(1.2); color: #ff4444; }
+    .sr-wheel-left   { left: 10px; top: 50%; transform: translateY(-50%); }
+    .sr-wheel-left:hover { transform: translateY(-50%) scale(1.2); color: #00aaff; }
+    .sr-wheel-right  { right: 10px; top: 50%; transform: translateY(-50%); }
+    .sr-wheel-right:hover { transform: translateY(-50%) scale(1.2); }
+
+    .sr-wheel-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 72px; height: 72px; border-radius: 50%;
+      background: radial-gradient(circle at 38% 35%, #1e1e1e, #0a0a0a);
+      border: 1px solid #2a2a2a;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6), inset 0 1px 0 #222;
+      cursor: pointer; color: #00ff6a;
+      font-size: 1.3rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .sr-wheel-center:hover {
+      background: radial-gradient(circle at 38% 35%, #222, #111);
+      box-shadow: 0 0 12px rgba(0,255,106,0.3), 0 2px 8px rgba(0,0,0,0.6);
+      color: #44ff88;
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+    .sr-wheel-center.recording {
+      color: #ff4444;
+      box-shadow: 0 0 16px rgba(255,68,68,0.4), 0 2px 8px rgba(0,0,0,0.6);
+      animation: center-pulse 0.8s ease-in-out infinite;
+    }
+    .sr-wheel-center.playback { color: #44aaff; }
+    @keyframes center-pulse { 0%,100%{box-shadow:0 0 16px rgba(255,68,68,0.4),0 2px 8px rgba(0,0,0,0.6);} 50%{box-shadow:0 0 28px rgba(255,68,68,0.7),0 2px 8px rgba(0,0,0,0.6);} }
+
+    .sr-wheel-hints {
+      display: flex; gap: 1.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.58rem; color: #2a2a2a; letter-spacing: 0.06em;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 480px) {
+      .sr-timer { font-size: 2rem; }
+      .sr-wheel  { width: 140px; height: 140px; }
+      .sr-wheel-center { width: 60px; height: 60px; font-size: 1.1rem; }
+      .sr-wheel-hints { gap: 0.9rem; font-size: 0.52rem; }
+    }
       display: inline-flex; background: #f0f0f0;
       border-radius: 20px; padding: 3px;
       margin-bottom: 1rem; gap: 2px;
@@ -494,24 +721,54 @@
 
                 <!-- Voice panel -->
                 <div id="detail-voice-panel-adhoc" style="display:none;">
-                  <p style="font-size:0.83rem; color:var(--color-text-light); margin-bottom:0.75rem; font-style:italic;">
-                    Record a short voice message. Students hear it directly in LINE.
-                  </p>
-                  <div class="voice-recorder" id="detail-recorder-widget-adhoc">
-                    <button class="rec-btn" id="detail-rec-btn-adhoc" onclick="toggleDetailRecording('adhoc')">
-                      <i class="fas fa-microphone"></i> Start Recording
-                    </button>
-                    <span class="rec-status" id="detail-rec-status-adhoc">Ready</span>
-                    <span id="detail-rec-timer-adhoc" style="font-size:0.8rem; color:#c2185b; font-weight:700; min-width:36px;"></span>
-                  </div>
-                  <div id="detail-rec-preview-adhoc" style="display:none; margin-top:0.75rem;">
-                    <audio id="detail-rec-audio-adhoc" controls style="width:100%; max-width:360px; border-radius:4px;"></audio>
-                    <div style="margin-top:0.4rem; font-size:0.8rem; color:var(--color-text-light);">
-                      <span id="detail-rec-format-adhoc"></span>
+                  <div class="studio-recorder" id="studio-adhoc">
+                    <!-- Header bar -->
+                    <div class="sr-header">
+                      <div class="sr-header-left">
+                        <span class="sr-rec-dot" id="sr-dot-adhoc"></span>
+                        <span class="sr-label" id="sr-label-adhoc">READY</span>
+                      </div>
+                      <div class="sr-format-badge" id="sr-format-adhoc"></div>
                     </div>
-                    <button onclick="discardDetailRecording('adhoc')" style="margin-top:0.5rem; background:none; border:1px solid #ccc; padding:0.3rem 0.75rem; border-radius:4px; cursor:pointer; font-size:0.82rem; color:#666;">
-                      🗑 Discard &amp; Re-record
-                    </button>
+                    <!-- Timer display -->
+                    <div class="sr-timer-display">
+                      <span class="sr-timer" id="sr-timer-adhoc">00:00</span>
+                      <span class="sr-timer-max">/02:00</span>
+                    </div>
+                    <!-- VU Meter -->
+                    <div class="sr-vu-section">
+                      <span class="sr-vu-label">dB</span>
+                      <div class="sr-vu-track">
+                        <div class="sr-vu-fill" id="sr-vu-adhoc"></div>
+                        <div class="sr-vu-peak" id="sr-peak-adhoc"></div>
+                      </div>
+                      <span class="sr-vu-val" id="sr-vu-val-adhoc">–∞</span>
+                    </div>
+                    <!-- Waveform canvas -->
+                    <canvas class="sr-waveform" id="sr-wave-adhoc" height="54"></canvas>
+                    <!-- Progress bar (playback) -->
+                    <div class="sr-progress-bar" id="sr-progress-adhoc" style="display:none;">
+                      <div class="sr-progress-fill" id="sr-progress-fill-adhoc"></div>
+                    </div>
+                    <!-- iPod wheel controls -->
+                    <div class="sr-wheel-zone">
+                      <div class="sr-wheel" id="sr-wheel-adhoc">
+                        <div class="sr-wheel-ring">
+                          <button class="sr-wheel-btn sr-wheel-top"    onclick="srWheelAction('adhoc','prev')"  title="Restart"><i class="fas fa-backward-step"></i></button>
+                          <button class="sr-wheel-btn sr-wheel-right"  onclick="srWheelAction('adhoc','next')"  title="Skip"><i class="fas fa-forward-step"></i></button>
+                          <button class="sr-wheel-btn sr-wheel-bottom" onclick="srWheelAction('adhoc','trash')" title="Discard"><i class="fas fa-trash"></i></button>
+                          <button class="sr-wheel-btn sr-wheel-left"   onclick="srWheelAction('adhoc','send')"  title="Send"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                        <button class="sr-wheel-center" id="sr-center-adhoc" onclick="toggleDetailRecording('adhoc')">
+                          <i class="fas fa-microphone" id="sr-center-icon-adhoc"></i>
+                        </button>
+                      </div>
+                      <div class="sr-wheel-hints">
+                        <span>↑ restart</span><span>→ skip end</span><span>↓ discard</span><span>← send</span>
+                      </div>
+                    </div>
+                    <!-- Hidden audio element for playback -->
+                    <audio id="detail-rec-audio-adhoc" style="display:none;"></audio>
                   </div>
                 </div>
 
@@ -544,24 +801,47 @@
 
                 <!-- Voice panel -->
                 <div id="detail-voice-panel-day6" style="display:none;">
-                  <p style="font-size:0.83rem; color:var(--color-text-light); margin-bottom:0.75rem; font-style:italic;">
-                    Record a short voice reply. Students hear it directly in LINE.
-                  </p>
-                  <div class="voice-recorder" id="detail-recorder-widget-day6">
-                    <button class="rec-btn" id="detail-rec-btn-day6" onclick="toggleDetailRecording('day6')">
-                      <i class="fas fa-microphone"></i> Start Recording
-                    </button>
-                    <span class="rec-status" id="detail-rec-status-day6">Ready</span>
-                    <span id="detail-rec-timer-day6" style="font-size:0.8rem; color:#c2185b; font-weight:700; min-width:36px;"></span>
-                  </div>
-                  <div id="detail-rec-preview-day6" style="display:none; margin-top:0.75rem;">
-                    <audio id="detail-rec-audio-day6" controls style="width:100%; max-width:360px; border-radius:4px;"></audio>
-                    <div style="margin-top:0.4rem; font-size:0.8rem; color:var(--color-text-light);">
-                      <span id="detail-rec-format-day6"></span>
+                  <div class="studio-recorder" id="studio-day6">
+                    <div class="sr-header">
+                      <div class="sr-header-left">
+                        <span class="sr-rec-dot" id="sr-dot-day6"></span>
+                        <span class="sr-label" id="sr-label-day6">READY</span>
+                      </div>
+                      <div class="sr-format-badge" id="sr-format-day6"></div>
                     </div>
-                    <button onclick="discardDetailRecording('day6')" style="margin-top:0.5rem; background:none; border:1px solid #ccc; padding:0.3rem 0.75rem; border-radius:4px; cursor:pointer; font-size:0.82rem; color:#666;">
-                      🗑 Discard &amp; Re-record
-                    </button>
+                    <div class="sr-timer-display">
+                      <span class="sr-timer" id="sr-timer-day6">00:00</span>
+                      <span class="sr-timer-max">/02:00</span>
+                    </div>
+                    <div class="sr-vu-section">
+                      <span class="sr-vu-label">dB</span>
+                      <div class="sr-vu-track">
+                        <div class="sr-vu-fill" id="sr-vu-day6"></div>
+                        <div class="sr-vu-peak" id="sr-peak-day6"></div>
+                      </div>
+                      <span class="sr-vu-val" id="sr-vu-val-day6">–∞</span>
+                    </div>
+                    <canvas class="sr-waveform" id="sr-wave-day6" height="54"></canvas>
+                    <div class="sr-progress-bar" id="sr-progress-day6" style="display:none;">
+                      <div class="sr-progress-fill" id="sr-progress-fill-day6"></div>
+                    </div>
+                    <div class="sr-wheel-zone">
+                      <div class="sr-wheel" id="sr-wheel-day6">
+                        <div class="sr-wheel-ring">
+                          <button class="sr-wheel-btn sr-wheel-top"    onclick="srWheelAction('day6','prev')"  title="Restart"><i class="fas fa-backward-step"></i></button>
+                          <button class="sr-wheel-btn sr-wheel-right"  onclick="srWheelAction('day6','next')"  title="Skip"><i class="fas fa-forward-step"></i></button>
+                          <button class="sr-wheel-btn sr-wheel-bottom" onclick="srWheelAction('day6','trash')" title="Discard"><i class="fas fa-trash"></i></button>
+                          <button class="sr-wheel-btn sr-wheel-left"   onclick="srWheelAction('day6','send')"  title="Send"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                        <button class="sr-wheel-center" id="sr-center-day6" onclick="toggleDetailRecording('day6')">
+                          <i class="fas fa-microphone" id="sr-center-icon-day6"></i>
+                        </button>
+                      </div>
+                      <div class="sr-wheel-hints">
+                        <span>↑ restart</span><span>→ skip end</span><span>↓ discard</span><span>← send</span>
+                      </div>
+                    </div>
+                    <audio id="detail-rec-audio-day6" style="display:none;"></audio>
                   </div>
                 </div>
 
@@ -792,6 +1072,10 @@ Keep it up! 🌟</textarea>
   async function loadConversationHistory(daysFilter) {
     const container = document.getElementById('conversation-timeline');
     const countEl   = document.getElementById('conv-count');
+
+    // Preserve scroll position so the page doesn't jump on reload
+    const scrollY = window.scrollY;
+
     container.innerHTML = '<div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
 
     try {
@@ -863,9 +1147,20 @@ Keep it up! 🌟</textarea>
             if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}" style="max-width:100%; max-height:240px; border-radius:4px; margin-top:0.35rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
             html += `</div>`;
           } else if (msg._type === 'feedback') {
+            // Detect voice messages — stored as "[Voice message] https://..."
+            const isVoice   = msg.feedback_text && msg.feedback_text.startsWith('[Voice message]');
+            const audioUrl  = isVoice ? msg.feedback_text.replace('[Voice message] ', '').trim() : null;
             html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:#f0fff4; border-left:3px solid #4caf50; border-radius:0 6px 6px 0; font-size:0.88rem;">
-              <div style="font-size:0.75rem; color:#666; margin-bottom:0.3rem;">${time} · 👨‍🏫 Teacher Feedback</div>
-              <p style="margin:0; color:#333; white-space:pre-wrap;">${msg.feedback_text}</p>
+              <div style="font-size:0.75rem; color:#666; margin-bottom:0.4rem;">${time} · 👨‍🏫 Teacher Feedback</div>
+              ${isVoice
+                ? `<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                     <span style="font-size:0.8rem;color:#666;">🎙 Voice message</span>
+                     <audio controls style="height:36px; max-width:100%; border-radius:4px;">
+                       <source src="${audioUrl}">
+                     </audio>
+                   </div>`
+                : `<p style="margin:0; color:#333; white-space:pre-wrap;">${msg.feedback_text}</p>`
+              }
             </div>`;
           }
         });
@@ -873,6 +1168,10 @@ Keep it up! 🌟</textarea>
       });
 
       container.innerHTML = html;
+
+      // Restore scroll position — prevents page jumping to top on reload
+      window.scrollTo({ top: scrollY, behavior: 'instant' });
+
     } catch(err) {
       console.error('loadConversationHistory:', err);
       container.innerHTML = '<p style="color:red;">Error loading conversation.</p>';
@@ -952,21 +1251,150 @@ Keep it up! 🌟</textarea>
   }
 
   // ============================================================
-  // VOICE RECORDING — STUDENT DETAIL COMPOSER
+  // STUDIO RECORDER — STUDENT DETAIL
   // ============================================================
   const detailRecState = {};
-  // keyed by panel ('adhoc' or 'day6')
+  // State per panel: mediaRecorder, audioChunks, audioBlob, audioUrl,
+  //   mimeType, duration, timerInterval, timerSeconds,
+  //   audioCtx, analyser, animFrame, wavePoints[]
+
+  function srSetState(panel, state) {
+    // state: 'ready' | 'recording' | 'done'
+    const dot    = document.getElementById(`sr-dot-${panel}`);
+    const label  = document.getElementById(`sr-label-${panel}`);
+    const timer  = document.getElementById(`sr-timer-${panel}`);
+    const center = document.getElementById(`sr-center-${panel}`);
+    const icon   = document.getElementById(`sr-center-icon-${panel}`);
+    if (!dot) return;
+    dot.className    = 'sr-rec-dot ' + (state === 'done' ? 'done' : state === 'recording' ? 'recording' : 'armed');
+    label.textContent = state === 'recording' ? 'REC' : state === 'done' ? 'READY TO SEND' : 'READY';
+    label.className  = 'sr-label ' + state;
+    timer.className  = 'sr-timer ' + (state === 'recording' ? 'recording' : state === 'done' ? 'done' : '');
+    center.className = 'sr-wheel-center ' + (state === 'recording' ? 'recording' : state === 'done' ? 'playback' : '');
+    if (icon) icon.className = state === 'recording' ? 'fas fa-stop' : state === 'done' ? 'fas fa-play' : 'fas fa-microphone';
+    // Progress bar visibility
+    const prog = document.getElementById(`sr-progress-${panel}`);
+    if (prog) prog.style.display = state === 'done' ? 'block' : 'none';
+  }
+
+  function srFormatTime(seconds) {
+    const m = Math.floor(seconds / 60).toString().padStart(2,'0');
+    const s = (seconds % 60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  function srDrawWaveform(panel, points, isLive) {
+    const canvas = document.getElementById(`sr-wave-${panel}`);
+    if (!canvas) return;
+    const W = canvas.offsetWidth || 400;
+    canvas.width = W;
+    const ctx    = canvas.getContext('2d');
+    const H      = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    if (points.length === 0) {
+      // Draw flat idle line
+      ctx.strokeStyle = '#1e1e1e';
+      ctx.lineWidth   = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, H / 2);
+      ctx.lineTo(W, H / 2);
+      ctx.stroke();
+      return;
+    }
+
+    const step = W / Math.max(points.length, 1);
+    const mid  = H / 2;
+    ctx.lineWidth = 1.5;
+
+    if (isLive) {
+      // Green gradient for live recording
+      const grad = ctx.createLinearGradient(0, 0, W, 0);
+      grad.addColorStop(0,   '#004d1a');
+      grad.addColorStop(0.5, '#00ff6a');
+      grad.addColorStop(1,   '#aaff44');
+      ctx.strokeStyle = grad;
+    } else {
+      // Blue for playback mode
+      ctx.strokeStyle = '#2266aa';
+    }
+
+    ctx.beginPath();
+    points.forEach((v, i) => {
+      const x = i * step;
+      const y = mid - (v * mid * 0.85);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    // Mirror bottom half
+    for (let i = points.length - 1; i >= 0; i--) {
+      const x = i * step;
+      const y = mid + (points[i] * mid * 0.85);
+      ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = isLive ? 'rgba(0,255,106,0.08)' : 'rgba(34,102,170,0.08)';
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  function srAnimateLive(panel) {
+    const rs = detailRecState[panel];
+    if (!rs?.analyser) return;
+
+    const data = new Uint8Array(rs.analyser.frequencyBinCount);
+    rs.analyser.getByteTimeDomainData(data);
+
+    // VU meter from frequency data
+    rs.analyser.getByteFrequencyData(data);
+    const avg = data.reduce((a,b) => a+b, 0) / data.length;
+    const pct = Math.min(avg / 128 * 100, 100);
+    const vu  = document.getElementById(`sr-vu-${panel}`);
+    const peak = document.getElementById(`sr-peak-${panel}`);
+    const vuVal = document.getElementById(`sr-vu-val-${panel}`);
+    if (vu)  { vu.style.width = pct + '%'; }
+    if (peak && pct > 0) {
+      peak.style.left  = pct + '%';
+      peak.classList.add('show');
+    }
+    if (vuVal) {
+      const db = pct > 0 ? (20 * Math.log10(pct / 100)).toFixed(1) : '–∞';
+      vuVal.textContent = db;
+    }
+
+    // Waveform points — push normalised amplitude
+    rs.analyser.getByteTimeDomainData(data);
+    const amplitude = Math.max(...Array.from(data).map(v => Math.abs(v - 128))) / 128;
+    rs.wavePoints.push(amplitude);
+    if (rs.wavePoints.length > 120) rs.wavePoints.shift();
+    srDrawWaveform(panel, rs.wavePoints, true);
+
+    rs.animFrame = requestAnimationFrame(() => srAnimateLive(panel));
+  }
 
   function setDetailReplyMode(panel, mode) {
     document.getElementById(`detail-text-panel-${panel}`).style.display  = mode === 'text'  ? 'block' : 'none';
     document.getElementById(`detail-voice-panel-${panel}`).style.display = mode === 'voice' ? 'block' : 'none';
     document.getElementById(`pill-text-${panel}`).classList.toggle('active',  mode === 'text');
     document.getElementById(`pill-voice-${panel}`).classList.toggle('active', mode === 'voice');
+    if (mode === 'voice') {
+      srSetState(panel, 'ready');
+      srDrawWaveform(panel, [], true);
+    }
   }
 
   async function toggleDetailRecording(panel) {
-    if (!detailRecState[panel]) detailRecState[panel] = { mediaRecorder: null, audioChunks: [], audioBlob: null, audioUrl: null, mimeType: '', duration: 0, timerInterval: null, timerSeconds: 0 };
+    if (!detailRecState[panel]) {
+      detailRecState[panel] = { mediaRecorder:null, audioChunks:[], audioBlob:null, audioUrl:null, mimeType:'', duration:0, timerInterval:null, timerSeconds:0, audioCtx:null, analyser:null, animFrame:null, wavePoints:[], playbackEl:null };
+    }
     const rs = detailRecState[panel];
+
+    if (rs.audioBlob) {
+      // Done state — center button toggles playback
+      const audio = document.getElementById(`detail-rec-audio-${panel}`);
+      if (audio.paused) { audio.play(); } else { audio.pause(); }
+      return;
+    }
+
     if (rs.mediaRecorder && rs.mediaRecorder.state === 'recording') {
       rs.mediaRecorder.stop();
     } else {
@@ -975,61 +1403,84 @@ Keep it up! 🌟</textarea>
   }
 
   async function startDetailRecording(panel) {
-    const rs     = detailRecState[panel];
-    const btn    = document.getElementById(`detail-rec-btn-${panel}`);
-    const status = document.getElementById(`detail-rec-status-${panel}`);
-    const widget = document.getElementById(`detail-recorder-widget-${panel}`);
-    const preview = document.getElementById(`detail-rec-preview-${panel}`);
-
-    rs.audioChunks = []; rs.audioBlob = null; rs.audioUrl = null;
-    preview.style.display = 'none';
+    const rs = detailRecState[panel];
+    rs.audioChunks = []; rs.audioBlob = null; rs.audioUrl = null; rs.wavePoints = [];
+    srSetState(panel, 'recording');
+    srDrawWaveform(panel, [], true);
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const preferredTypes = ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg'];
+
+      // Web Audio API for live visualisation
+      rs.audioCtx  = new (window.AudioContext || window.webkitAudioContext)();
+      rs.analyser  = rs.audioCtx.createAnalyser();
+      rs.analyser.fftSize = 256;
+      rs.audioCtx.createMediaStreamSource(stream).connect(rs.analyser);
+
+      const preferredTypes = ['audio/mp4','audio/aac','audio/webm;codecs=opus','audio/webm','audio/ogg'];
       rs.mimeType = preferredTypes.find(t => MediaRecorder.isTypeSupported(t)) || '';
       rs.mediaRecorder = new MediaRecorder(stream, rs.mimeType ? { mimeType: rs.mimeType } : {});
-
       rs.mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) rs.audioChunks.push(e.data); };
 
       rs.mediaRecorder.onstop = () => {
         stream.getTracks().forEach(t => t.stop());
+        cancelAnimationFrame(rs.animFrame);
+        rs.audioCtx?.close();
         clearInterval(rs.timerInterval);
         rs.duration = rs.timerSeconds * 1000;
 
         const actualMime = rs.mediaRecorder.mimeType || rs.mimeType || 'audio/webm';
         rs.audioBlob = new Blob(rs.audioChunks, { type: actualMime });
 
-        const audioEl = document.getElementById(`detail-rec-audio-${panel}`);
-        audioEl.src = URL.createObjectURL(rs.audioBlob);
-        preview.style.display = 'block';
+        // Show waveform frozen in blue
+        srDrawWaveform(panel, rs.wavePoints, false);
 
-        const isLineCompatible = actualMime.includes('mp4') || actualMime.includes('aac');
-        document.getElementById(`detail-rec-format-${panel}`).innerHTML = isLineCompatible
-          ? `<span style="color:#4caf50;">✓ M4A format — will play natively in LINE</span>`
-          : `<span style="color:#ff9800;">⚠ ${actualMime.split(';')[0]} — will send as audio link (Chrome limitation)</span>`;
+        // Wire up audio element for playback
+        const audio = document.getElementById(`detail-rec-audio-${panel}`);
+        audio.src = URL.createObjectURL(rs.audioBlob);
+        audio.ontimeupdate = () => {
+          const fill = document.getElementById(`sr-progress-fill-${panel}`);
+          if (fill && audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+        };
+        audio.onended = () => {
+          const icon = document.getElementById(`sr-center-icon-${panel}`);
+          if (icon) icon.className = 'fas fa-play';
+        };
+        audio.onplay = () => {
+          const icon = document.getElementById(`sr-center-icon-${panel}`);
+          if (icon) icon.className = 'fas fa-pause';
+        };
 
-        btn.innerHTML = '<i class="fas fa-microphone"></i> Re-record';
-        btn.className = 'rec-btn';
-        widget.classList.remove('recording');
-        status.textContent = `Recorded (${rs.timerSeconds}s)`;
-        document.getElementById(`detail-rec-timer-${panel}`).textContent = '';
+        // Format badge
+        const isM4A = actualMime.includes('mp4') || actualMime.includes('aac');
+        const badge = document.getElementById(`sr-format-${panel}`);
+        if (badge) {
+          badge.textContent = isM4A ? 'M4A · LINE ✓' : 'WEBM · LINK';
+          badge.className   = 'sr-format-badge ' + (isM4A ? 'm4a' : 'webm');
+        }
+
+        // Reset VU meter
+        const vu = document.getElementById(`sr-vu-${panel}`);
+        if (vu) vu.style.width = '0%';
+        const vuVal = document.getElementById(`sr-vu-val-${panel}`);
+        if (vuVal) vuVal.textContent = '–∞';
+
+        srSetState(panel, 'done');
+        document.getElementById(`sr-timer-${panel}`).textContent = srFormatTime(rs.timerSeconds);
       };
 
       rs.mediaRecorder.start(100);
       rs.timerSeconds = 0;
-      widget.classList.add('recording');
-      btn.innerHTML = '<i class="fas fa-stop"></i> Stop';
-      btn.className = 'rec-btn recording';
-      status.textContent = 'Recording...';
+      srAnimateLive(panel);
 
       rs.timerInterval = setInterval(() => {
         rs.timerSeconds++;
-        document.getElementById(`detail-rec-timer-${panel}`).textContent = `${rs.timerSeconds}s`;
+        document.getElementById(`sr-timer-${panel}`).textContent = srFormatTime(rs.timerSeconds);
         if (rs.timerSeconds >= 120) rs.mediaRecorder.stop();
       }, 1000);
 
     } catch(err) {
+      srSetState(panel, 'ready');
       if (err.name === 'NotAllowedError') {
         alert('Microphone access denied. Please allow microphone access in your browser settings.');
       } else {
@@ -1041,13 +1492,38 @@ Keep it up! 🌟</textarea>
   function discardDetailRecording(panel) {
     const rs = detailRecState[panel];
     if (!rs) return;
-    rs.audioBlob = null; rs.audioUrl = null; rs.audioChunks = []; rs.timerSeconds = 0;
-    document.getElementById(`detail-rec-preview-${panel}`).style.display = 'none';
-    const btn = document.getElementById(`detail-rec-btn-${panel}`);
-    btn.innerHTML = '<i class="fas fa-microphone"></i> Start Recording';
-    btn.className = 'rec-btn';
-    document.getElementById(`detail-rec-status-${panel}`).textContent = 'Ready';
-    document.getElementById(`detail-rec-timer-${panel}`).textContent  = '';
+    cancelAnimationFrame(rs.animFrame);
+    rs.audioCtx?.close();
+    clearInterval(rs.timerInterval);
+    rs.audioBlob = null; rs.audioUrl = null; rs.audioChunks = [];
+    rs.timerSeconds = 0; rs.wavePoints = [];
+    const audio = document.getElementById(`detail-rec-audio-${panel}`);
+    if (audio) { audio.pause(); audio.src = ''; }
+    const badge = document.getElementById(`sr-format-${panel}`);
+    if (badge) { badge.textContent = ''; badge.className = 'sr-format-badge'; }
+    const vu = document.getElementById(`sr-vu-${panel}`);
+    if (vu) vu.style.width = '0%';
+    srSetState(panel, 'ready');
+    srDrawWaveform(panel, [], true);
+    document.getElementById(`sr-timer-${panel}`).textContent = '00:00';
+  }
+
+  function srWheelAction(panel, action) {
+    const rs    = detailRecState[panel];
+    const audio = document.getElementById(`detail-rec-audio-${panel}`);
+    if (action === 'trash') {
+      if (!rs?.audioBlob && rs?.mediaRecorder?.state !== 'recording') return;
+      if (rs?.mediaRecorder?.state === 'recording') rs.mediaRecorder.stop();
+      setTimeout(() => discardDetailRecording(panel), 100);
+    } else if (action === 'send') {
+      if (!rs?.audioBlob) { alert('Record something first!'); return; }
+      sendComposerMessage(panel);
+    } else if (action === 'prev' && audio) {
+      audio.currentTime = 0;
+      if (audio.paused) audio.play();
+    } else if (action === 'next' && audio) {
+      audio.currentTime = audio.duration || 0;
+    }
   }
 
   async function uploadDetailAudio(panel) {
