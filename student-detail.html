@@ -220,7 +220,47 @@
     .empty-state i { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; color: var(--color-border); }
     .loading-state { text-align: center; padding: 2rem; color: var(--color-text-light); }
 
-    /* ---- MOBILE ---- */
+    /* ---- DATA VIZ ---- */
+    .viz-panel { min-height: 160px; }
+
+    /* Bar chart */
+    .bar-chart { display:flex; align-items:flex-end; gap:4px; height:120px; padding-bottom:24px; position:relative; }
+    .bar-col   { display:flex; flex-direction:column; align-items:center; flex:1; min-width:28px; }
+    .bar-rect  {
+      width:100%; border-radius:4px 4px 0 0; transition:height 0.4s ease;
+      cursor:default; position:relative;
+    }
+    .bar-rect:hover::after {
+      content: attr(data-tip);
+      position:absolute; bottom:calc(100% + 4px); left:50%; transform:translateX(-50%);
+      background:#333; color:white; padding:3px 7px; border-radius:4px;
+      font-size:0.72rem; white-space:nowrap; pointer-events:none; z-index:10;
+    }
+    .bar-label { font-size:0.65rem; color:var(--color-text-light); margin-top:4px; white-space:nowrap; }
+
+    /* Streak grid */
+    .streak-grid { display:flex; gap:3px; }
+    .streak-week { display:flex; flex-direction:column; gap:3px; }
+    .streak-cell {
+      width:14px; height:14px; border-radius:3px; cursor:default;
+      position:relative;
+    }
+    .streak-cell:hover::after {
+      content: attr(data-tip);
+      position:absolute; bottom:calc(100% + 4px); left:50%; transform:translateX(-50%);
+      background:#333; color:white; padding:3px 7px; border-radius:4px;
+      font-size:0.72rem; white-space:nowrap; pointer-events:none; z-index:10;
+    }
+    .streak-month-labels { display:flex; gap:3px; margin-bottom:4px; }
+    .streak-month-label  { font-size:0.65rem; color:var(--color-text-light); }
+
+    /* Skill line chart */
+    .skill-chart-svg { overflow:visible; }
+
+    @media (max-width: 600px) {
+      .bar-label { font-size:0.6rem; }
+      .streak-cell { width:11px; height:11px; }
+    }
     @media (max-width: 900px) {
       .detail-layout { grid-template-columns: 1fr; }
     }
@@ -318,7 +358,59 @@
             </div>
           </div>
 
-          <!-- Message composer -->
+          <!-- ===== DATA VISUALIZATION ===== -->
+          <div class="main-card" id="dataviz-card">
+            <div class="main-card-header">
+              <h2>📊 Progress Insights</h2>
+              <span id="dataviz-period" style="font-size:0.85rem; color:var(--color-text-light);"></span>
+            </div>
+            <div class="main-card-body" style="padding-bottom:0.5rem;">
+              <!-- Viz tabs -->
+              <div style="display:flex; gap:0; border-bottom:2px solid var(--color-border); margin-bottom:1.5rem; overflow-x:auto;">
+                <button class="composer-tab active" id="viz-tab-rate"   onclick="switchVizTab('rate')">📅 Response Rate</button>
+                <button class="composer-tab"        id="viz-tab-streak" onclick="switchVizTab('streak')">🔥 Streak</button>
+                <button class="composer-tab"        id="viz-tab-skills" onclick="switchVizTab('skills')">📈 Skill Growth</button>
+                <button class="composer-tab"        id="viz-tab-types"  onclick="switchVizTab('types')">🎙 Response Types</button>
+              </div>
+
+              <!-- Response Rate chart -->
+              <div id="viz-rate" class="viz-panel">
+                <p style="font-size:0.82rem; color:var(--color-text-light); margin:0 0 1rem 0;">% of prompts answered per week</p>
+                <div id="chart-rate" style="width:100%; overflow-x:auto;"></div>
+              </div>
+
+              <!-- Streak calendar -->
+              <div id="viz-streak" class="viz-panel" style="display:none;">
+                <p style="font-size:0.82rem; color:var(--color-text-light); margin:0 0 1rem 0;">Days with at least one response (last 12 weeks)</p>
+                <div id="chart-streak" style="overflow-x:auto;"></div>
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.75rem; font-size:0.78rem; color:var(--color-text-light);">
+                  <span>No response</span>
+                  <div style="width:14px;height:14px;background:#eee;border-radius:3px;"></div>
+                  <div style="width:14px;height:14px;background:#c6e48b;border-radius:3px;"></div>
+                  <div style="width:14px;height:14px;background:#40c463;border-radius:3px;"></div>
+                  <div style="width:14px;height:14px;background:#216e39;border-radius:3px;"></div>
+                  <span>More responses</span>
+                </div>
+              </div>
+
+              <!-- Skill growth line chart -->
+              <div id="viz-skills" class="viz-panel" style="display:none;">
+                <p style="font-size:0.82rem; color:var(--color-text-light); margin:0 0 1rem 0;">Score per skill over assessment dates (0–10)</p>
+                <div id="chart-skills" style="overflow-x:auto;"></div>
+                <div id="chart-skills-legend" style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:0.75rem; font-size:0.78rem;"></div>
+              </div>
+
+              <!-- Response types donut -->
+              <div id="viz-types" class="viz-panel" style="display:none;">
+                <p style="font-size:0.82rem; color:var(--color-text-light); margin:0 0 1rem 0;">Breakdown of how the student responds</p>
+                <div style="display:flex; align-items:center; gap:2rem; flex-wrap:wrap;">
+                  <canvas id="chart-types" width="160" height="160" style="flex-shrink:0;"></canvas>
+                  <div id="chart-types-legend" style="font-size:0.85rem;"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
           <div class="main-card" id="composer-card">
             <div class="main-card-header">
               <h2>✉️ Send Message</h2>
@@ -500,6 +592,7 @@ Keep it up! 🌟</textarea>
       renderSidebar();
       await loadConversationHistory('7');
       await loadAssessmentHistory();
+      await initViz();
 
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('main-content').style.display  = 'block';
@@ -806,6 +899,348 @@ Keep it up! 🌟</textarea>
   function formatPlanName(p) {
     const m = { line:'LINE Practice', power_pro:'Power Pro', power_lite:'Power Lite', video:'Video Lessons' };
     return m[p] || p;
+  }
+
+
+  // ============================================================
+  // DATA VISUALIZATION
+  // ============================================================
+  let vizDataCache = null;
+
+  async function loadVizData() {
+    if (vizDataCache) return vizDataCache;
+
+    const s = currentStudent;
+
+    // Fetch all responses (no limit — full history)
+    const { data: responses } = await supabaseClient
+      .from('message_log')
+      .select('id, created_at, media_type, message_type, prompt_id')
+      .eq('user_id', s.user_id)
+      .eq('message_type', 'student_response')
+      .order('created_at', { ascending: true });
+
+    // Fetch all prompts sent (to calculate response rate)
+    const { data: prompts } = await supabaseClient
+      .from('message_log')
+      .select('id, created_at, prompt_id')
+      .eq('user_id', s.user_id)
+      .eq('message_type', 'prompt')
+      .order('created_at', { ascending: true });
+
+    // Fetch all assessments
+    const { data: assessments } = await supabaseClient
+      .from('student_assessments')
+      .select('*')
+      .eq('student_id', s.id)
+      .order('assessed_at', { ascending: true });
+
+    vizDataCache = { responses: responses || [], prompts: prompts || [], assessments: assessments || [] };
+    return vizDataCache;
+  }
+
+  function switchVizTab(tab) {
+    ['rate','streak','skills','types'].forEach(t => {
+      document.getElementById(`viz-tab-${t}`).classList.toggle('active', t === tab);
+      document.getElementById(`viz-${t}`).style.display = t === tab ? 'block' : 'none';
+    });
+    renderVizTab(tab);
+  }
+
+  async function renderVizTab(tab) {
+    const data = await loadVizData();
+    if (tab === 'rate')   renderResponseRate(data);
+    if (tab === 'streak') renderStreakCalendar(data);
+    if (tab === 'skills') renderSkillGrowth(data);
+    if (tab === 'types')  renderResponseTypes(data);
+  }
+
+  async function initViz() {
+    const data = await loadVizData();
+    const total    = data.prompts.length;
+    const answered = data.responses.length;
+    const pct      = total > 0 ? Math.round((answered / total) * 100) : 0;
+    document.getElementById('dataviz-period').textContent =
+      `${answered}/${total} prompts answered (${pct}%)`;
+    renderResponseRate(data);  // Render first tab immediately
+  }
+
+  // ── 1. RESPONSE RATE BAR CHART ─────────────────────────────────────────
+  function renderResponseRate(data) {
+    const container = document.getElementById('chart-rate');
+    if (!container) return;
+
+    // Group prompts by ISO week (Mon–Sun), count how many had a response
+    const weekMap = {};  // 'YYYY-Www' → { sent: 0, answered: 0 }
+
+    for (const p of data.prompts) {
+      const wk = getISOWeekKey(new Date(p.created_at));
+      if (!weekMap[wk]) weekMap[wk] = { sent: 0, answered: 0, label: weekLabel(new Date(p.created_at)) };
+      weekMap[wk].sent++;
+    }
+
+    // Mark a week's responses — link by proximity (response within 7 days of prompt)
+    for (const r of data.responses) {
+      const rDate = new Date(r.created_at);
+      const wk    = getISOWeekKey(rDate);
+      if (weekMap[wk]) weekMap[wk].answered = Math.min(weekMap[wk].answered + 1, weekMap[wk].sent);
+    }
+
+    const weeks = Object.entries(weekMap).sort(([a],[b]) => a.localeCompare(b)).slice(-12);
+    if (weeks.length === 0) { container.innerHTML = '<p style="color:#999; font-size:0.85rem;">No data yet.</p>'; return; }
+
+    const maxSent = Math.max(...weeks.map(([,w]) => w.sent), 1);
+
+    const bars = weeks.map(([key, w]) => {
+      const pct = w.sent > 0 ? Math.round((w.answered / w.sent) * 100) : 0;
+      const barH = Math.round((w.answered / maxSent) * 100);
+      const color = pct >= 80 ? '#4caf50' : pct >= 50 ? '#ff9800' : '#f44336';
+      return `
+        <div class="bar-col">
+          <div class="bar-rect" style="height:${barH}px; background:${color};" data-tip="${w.answered}/${w.sent} · ${pct}%"></div>
+          <div class="bar-label">${w.label}</div>
+        </div>`;
+    }).join('');
+
+    container.innerHTML = `<div class="bar-chart">${bars}</div>
+      <div style="display:flex;gap:1rem;margin-top:0.5rem;font-size:0.75rem;color:var(--color-text-light);">
+        <span style="color:#4caf50;">■</span> ≥80% &nbsp;
+        <span style="color:#ff9800;">■</span> 50–79% &nbsp;
+        <span style="color:#f44336;">■</span> &lt;50%
+      </div>`;
+  }
+
+  // ── 2. STREAK CALENDAR ─────────────────────────────────────────────────
+  function renderStreakCalendar(data) {
+    const container = document.getElementById('chart-streak');
+    if (!container) return;
+
+    // Build a date → count map from responses
+    const dateMap = {};
+    for (const r of data.responses) {
+      const d = new Date(r.created_at).toISOString().slice(0, 10);
+      dateMap[d] = (dateMap[d] || 0) + 1;
+    }
+
+    // Build 12 weeks back from today, Mon–Sun columns
+    const today     = new Date(); today.setHours(0,0,0,0);
+    const monday    = new Date(today);
+    monday.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
+
+    const weeks = [];
+    for (let w = 11; w >= 0; w--) {
+      const weekDays = [];
+      for (let d = 0; d < 7; d++) {
+        const day = new Date(monday);
+        day.setDate(monday.getDate() - w * 7 + d);
+        const key   = day.toISOString().slice(0, 10);
+        const count = dateMap[key] || 0;
+        const isFuture = day > today;
+        weekDays.push({ key, count, day, isFuture });
+      }
+      weeks.push(weekDays);
+    }
+
+    // Color scale
+    function cellColor(count, isFuture) {
+      if (isFuture) return '#f9f9f9';
+      if (count === 0) return '#eee';
+      if (count === 1) return '#c6e48b';
+      if (count === 2) return '#40c463';
+      return '#216e39';
+    }
+
+    // Month labels
+    const monthLabels = weeks.map(week => {
+      const firstDay = week[0].day;
+      if (firstDay.getDate() <= 7) {
+        return firstDay.toLocaleDateString('en-US', { month: 'short' });
+      }
+      return '';
+    });
+
+    const labelRow = `<div class="streak-month-labels">
+      ${monthLabels.map(l => `<div class="streak-month-label" style="width:14px; margin-right:3px;">${l}</div>`).join('')}
+    </div>`;
+
+    const grid = weeks.map(week =>
+      `<div class="streak-week">
+        ${week.map(d => `<div class="streak-cell"
+          style="background:${cellColor(d.count, d.isFuture)};"
+          data-tip="${d.key}${d.count > 0 ? ' · '+d.count+' response'+(d.count>1?'s':'') : ' · No response'}">
+        </div>`).join('')}
+      </div>`
+    ).join('');
+
+    container.innerHTML = labelRow + `<div class="streak-grid">${grid}</div>`;
+  }
+
+  // ── 3. SKILL GROWTH LINE CHART ─────────────────────────────────────────
+  function renderSkillGrowth(data) {
+    const container = document.getElementById('chart-skills');
+    const legend    = document.getElementById('chart-skills-legend');
+    if (!container) return;
+
+    if (data.assessments.length === 0) {
+      container.innerHTML = '<p style="color:#999; font-size:0.85rem;">No assessments recorded yet.</p>';
+      if (legend) legend.innerHTML = '';
+      return;
+    }
+
+    const skills = [
+      { key:'fluency',       label:'Fluency',       color:'#4A90E2' },
+      { key:'grammar',       label:'Grammar',       color:'#7b2d8b' },
+      { key:'comprehension', label:'Comprehension', color:'#2e7d32' },
+      { key:'vocabulary',    label:'Vocabulary',    color:'#e65100' },
+      { key:'pronunciation', label:'Pronunciation', color:'#c62828' },
+    ];
+
+    const W = 480, H = 140, PAD = { top:10, right:10, bottom:30, left:24 };
+    const innerW = W - PAD.left - PAD.right;
+    const innerH = H - PAD.top  - PAD.bottom;
+    const pts    = data.assessments;
+    const n      = pts.length;
+
+    function xPos(i)     { return PAD.left + (n === 1 ? innerW / 2 : (i / (n - 1)) * innerW); }
+    function yPos(score) { return PAD.top  + innerH - (score / 10) * innerH; }
+
+    // Grid lines at 0, 5, 10
+    let svgLines = [0, 5, 10].map(v => {
+      const y = yPos(v);
+      return `<line x1="${PAD.left}" y1="${y}" x2="${W-PAD.right}" y2="${y}" stroke="#eee" stroke-width="1"/>
+              <text x="${PAD.left - 4}" y="${y+4}" font-size="9" fill="#999" text-anchor="end">${v}</text>`;
+    }).join('');
+
+    // X-axis date labels
+    const dateLabels = pts.map((a, i) => {
+      const d   = new Date(a.assessed_at || a.created_at);
+      const lbl = d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+      return `<text x="${xPos(i)}" y="${H - 4}" font-size="9" fill="#999" text-anchor="middle">${lbl}</text>`;
+    }).join('');
+
+    // Lines + dots per skill
+    let svgSkills = '';
+    skills.forEach(sk => {
+      const values = pts.map(a => a[sk.key] ?? null);
+      // Polyline
+      const validPts = values.map((v,i) => v !== null ? `${xPos(i)},${yPos(v)}` : null).filter(Boolean);
+      if (validPts.length > 1) {
+        svgSkills += `<polyline points="${validPts.join(' ')}" fill="none" stroke="${sk.color}" stroke-width="2" stroke-linejoin="round"/>`;
+      }
+      // Dots
+      values.forEach((v,i) => {
+        if (v !== null) {
+          svgSkills += `<circle cx="${xPos(i)}" cy="${yPos(v)}" r="4" fill="${sk.color}" stroke="white" stroke-width="1.5">
+            <title>${sk.label}: ${v}/10</title></circle>`;
+        }
+      });
+    });
+
+    container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="skill-chart-svg" style="width:100%; max-width:${W}px; height:auto;">
+      ${svgLines}${svgSkills}${dateLabels}
+    </svg>`;
+
+    if (legend) {
+      legend.innerHTML = skills.map(sk =>
+        `<span style="display:flex;align-items:center;gap:4px;">
+          <span style="width:14px;height:3px;background:${sk.color};display:inline-block;border-radius:2px;"></span>
+          ${sk.label}
+        </span>`
+      ).join('');
+    }
+  }
+
+  // ── 4. RESPONSE TYPES DONUT ────────────────────────────────────────────
+  function renderResponseTypes(data) {
+    const canvas  = document.getElementById('chart-types');
+    const legend  = document.getElementById('chart-types-legend');
+    if (!canvas) return;
+
+    const counts = { Text: 0, Audio: 0, Video: 0, Image: 0, Skipped: 0 };
+    for (const r of data.responses) {
+      const t = r.media_type || 'text';
+      if (t === 'audio')  counts.Audio++;
+      else if (t === 'video')  counts.Video++;
+      else if (t === 'image')  counts.Image++;
+      else counts.Text++;
+    }
+
+    // Skipped = prompts with no matching response within 7 days
+    const respondedDates = new Set(data.responses.map(r => new Date(r.created_at).toISOString().slice(0,10)));
+    for (const p of data.prompts) {
+      const pDate    = new Date(p.created_at);
+      const sevenLater = new Date(pDate.getTime() + 7 * 86400000);
+      if (sevenLater < new Date()) {  // Only count as skipped if window has passed
+        const hasResponse = data.responses.some(r => {
+          const rDate = new Date(r.created_at);
+          return rDate >= pDate && rDate <= sevenLater;
+        });
+        if (!hasResponse) counts.Skipped++;
+      }
+    }
+
+    const colors = { Text:'#4A90E2', Audio:'#7b2d8b', Video:'#2e7d32', Image:'#e65100', Skipped:'#e0e0e0' };
+    const total  = Object.values(counts).reduce((a,b) => a+b, 0);
+    if (total === 0) { canvas.style.display = 'none'; if (legend) legend.innerHTML = '<p style="color:#999; font-size:0.85rem;">No data yet.</p>'; return; }
+
+    // Draw donut
+    const ctx = canvas.getContext('2d');
+    const cx  = 80, cy = 80, ro = 70, ri = 42;
+    let angle = -Math.PI / 2;
+
+    ctx.clearRect(0, 0, 160, 160);
+    for (const [label, count] of Object.entries(counts)) {
+      if (count === 0) continue;
+      const slice = (count / total) * 2 * Math.PI;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, ro, angle, angle + slice);
+      ctx.closePath();
+      ctx.fillStyle = colors[label];
+      ctx.fill();
+      angle += slice;
+    }
+    // Inner circle cutout
+    ctx.beginPath();
+    ctx.arc(cx, cy, ri, 0, 2 * Math.PI);
+    ctx.fillStyle = 'white';
+    ctx.fill();
+    // Center text
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(total, cx, cy + 4);
+    ctx.font = '10px sans-serif';
+    ctx.fillStyle = '#999';
+    ctx.fillText('total', cx, cy + 16);
+
+    if (legend) {
+      legend.innerHTML = Object.entries(counts)
+        .filter(([,c]) => c > 0)
+        .map(([label, count]) => {
+          const pct = Math.round((count / total) * 100);
+          return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+            <div style="width:12px;height:12px;border-radius:3px;background:${colors[label]};flex-shrink:0;"></div>
+            <span>${label}</span>
+            <span style="margin-left:auto;font-weight:700;color:var(--color-primary);">${count}</span>
+            <span style="color:var(--color-text-light);font-size:0.8rem;">${pct}%</span>
+          </div>`;
+        }).join('');
+    }
+  }
+
+  // ── HELPERS ────────────────────────────────────────────────────────────
+  function getISOWeekKey(date) {
+    const d = new Date(date);
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+    const yearStart = new Date(d.getFullYear(), 0, 1);
+    const wk = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+    return `${d.getFullYear()}-W${String(wk).padStart(2,'0')}`;
+  }
+
+  function weekLabel(date) {
+    return date.toLocaleDateString('en-US', { month:'short', day:'numeric' });
   }
 
   // Start
