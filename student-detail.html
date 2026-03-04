@@ -215,6 +215,51 @@
     }
     .sent-flash.show { display: block; }
 
+    /* Text / Voice toggle pills */
+    .template-toggle {
+      display: inline-flex; background: #f0f0f0;
+      border-radius: 20px; padding: 3px;
+      margin-bottom: 1rem; gap: 2px;
+    }
+    .toggle-pill {
+      padding: 0.4rem 1.1rem; border-radius: 18px;
+      border: none; cursor: pointer; font-size: 0.88rem;
+      font-weight: 600; background: transparent;
+      color: var(--color-text-light); transition: all 0.2s;
+    }
+    .toggle-pill:hover { color: var(--color-primary); }
+    .toggle-pill.active {
+      background: white; color: var(--color-primary);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+
+    /* Voice recorder widget */
+    .voice-recorder {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.85rem 1rem; background: #fce4ec;
+      border: 1px dashed #e91e8c; border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .voice-recorder.recording {
+      background: #ffebee; border-color: #f44336;
+      animation: pulse-rec 1s infinite;
+    }
+    @keyframes pulse-rec { 0%,100% { opacity:1; } 50% { opacity:0.75; } }
+    .rec-btn {
+      background: #e91e8c; color: white; border: none;
+      padding: 0.5rem 1.1rem; border-radius: 6px; cursor: pointer;
+      font-weight: 700; font-size: 0.88rem;
+      display: flex; align-items: center; gap: 0.4rem;
+      transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+    .rec-btn:hover  { background: #c2185b; transform: translateY(-1px); }
+    .rec-btn.recording         { background: #f44336; }
+    .rec-btn.recording:hover   { background: #c62828; }
+    .rec-status {
+      font-size: 0.85rem; color: #c2185b; font-weight: 600; flex: 1;
+    }
+
     /* Empty / loading */
     .empty-state { text-align: center; padding: 2.5rem; color: var(--color-text-light); }
     .empty-state i { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; color: var(--color-border); }
@@ -1082,8 +1127,11 @@ Keep it up! 🌟</textarea>
       const flash = document.getElementById(`flash-${panel}`);
       if (flash) { flash.classList.add('show'); setTimeout(() => flash.classList.remove('show'), 3000); }
 
-      // Reset voice state if used
-      if (isVoiceMode) discardDetailRecording(panel);
+      // Reset voice state and switch back to text mode
+      if (isVoiceMode) {
+        discardDetailRecording(panel);
+        setDetailReplyMode(panel, 'text');
+      }
 
       await loadConversationHistory(currentConvFilter);
 
