@@ -22,8 +22,8 @@
     }
     .btn-secondary:hover { background: #f0f0f0; border-color: #444; }
     @media (prefers-color-scheme: dark) {
-      .btn-secondary { background: #2a2a2a; color: #ccc; border-color: #555; }
-      .btn-secondary:hover { background: #333; border-color: #888; color: #fff; }
+      .btn-secondary { background: #444; color: #ddd; border-color: #555; }
+      .btn-secondary:hover { background: #2a2a2a; border-color: #777; color: #fff; }
     }
 
     /* ---- HEADER ---- */
@@ -369,24 +369,18 @@
     @media (prefers-color-scheme: light) { .sr-progress-bar { background: rgba(0,0,0,0.2); } }
     .sr-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #0055cc, #44aaff); border-radius: 2px; transition: width 0.1s linear; }
 
-    /* ── Desktop: car-stereo horizontal transport buttons ─────────────── */
+    /* Transport buttons — always visible, bigger on mobile */
     .sr-transport { display: flex; flex-direction: column; gap: 0.45rem; }
     .sr-transport-row { display: flex; gap: 0.45rem; }
 
-    /* Hide wheel on desktop, show transport */
-    .sr-wheel-zone { display: none; }
-
-    /* Mobile: hide transport, show wheel */
     @media (max-width: 700px) {
       .sr-body { grid-template-columns: 1fr !important; gap: 0.75rem; }
       .sr-right { width: 100%; }
-      .sr-transport { display: none !important; }
-      .sr-wheel-zone { display: flex !important; flex-direction: column; align-items: center; gap: 0.6rem; }
+      .sr-transport { display: flex !important; flex-direction: row; flex-wrap: wrap; gap: 0.5rem; justify-content: stretch; }
+      .sr-transport-row { display: contents; }
+      .sr-btn { flex: 1; min-width: 72px; padding: 0.85rem 0.5rem; font-size: 0.78rem; border-radius: 10px; }
+      .sr-btn-record { flex: 1 1 100%; font-size: 1rem; padding: 1rem; border-radius: 10px; }
       .sr-timer { font-size: 2.1rem; }
-      .sr-wheel  { width: 240px; height: 240px; }
-      .sr-wheel-center { width: 100px; height: 100px; font-size: 1.7rem; }
-      .sr-wheel-btn { width: 46px; height: 46px; font-size: 1rem; }
-      .sr-wheel-hints { gap: 1.5rem; font-size: 0.6rem; }
     }
 
     /* Text / Voice toggle pills */
@@ -456,66 +450,6 @@
       .sr-btn-send:hover { background: rgba(0,60,160,0.15); color: #0033aa; }
     }
 
-    /* Hide wheel on desktop */
-    .sr-wheel-zone { display: none; }
-
-    /* ── iPod wheel ─────────────────────────────────────────────────────── */
-    .sr-wheel {
-      position: relative; width: 180px; height: 180px; border-radius: 50%;
-      background: radial-gradient(circle at 38% 35%, #2a2a2a, #0f0f0f);
-      box-shadow: 0 0 0 2px #333, 0 0 0 4px #111, 0 6px 22px rgba(0,0,0,0.7), inset 0 1px 0 #333;
-    }
-    @media (prefers-color-scheme: light) {
-      .sr-wheel {
-        background: radial-gradient(circle at 38% 35%, #d5dae0, #a8adb8);
-        box-shadow: 0 0 0 2px #bbb, 0 0 0 4px #999, 0 4px 14px rgba(0,0,0,0.25), inset 0 1px 0 #e8ecf0;
-      }
-    }
-    .sr-wheel-ring { position: absolute; inset: 0; border-radius: 50%; }
-    .sr-wheel-btn {
-      position: absolute; background: none; border: none; cursor: pointer;
-      color: #555; padding: 0; width: 38px; height: 38px;
-      display: flex; align-items: center; justify-content: center;
-      transition: color 0.18s; font-size: 0.85rem; border-radius: 50%;
-    }
-    @media (prefers-color-scheme: light) { .sr-wheel-btn { color: #888; } }
-    .sr-wheel-btn:hover { color: #00ff6a; }
-    @media (prefers-color-scheme: light) { .sr-wheel-btn:hover { color: #009944; } }
-    .sr-wheel-top    { top: 10px;    left: 50%; transform: translateX(-50%); }
-    .sr-wheel-bottom { bottom: 10px; left: 50%; transform: translateX(-50%); }
-    .sr-wheel-bottom:hover { color: #ff4444; }
-    .sr-wheel-left   { left: 10px;  top: 50%; transform: translateY(-50%); }
-    .sr-wheel-left:hover { color: #44aaff; }
-    @media (prefers-color-scheme: light) { .sr-wheel-left:hover { color: #0055cc; } }
-    .sr-wheel-right  { right: 10px; top: 50%; transform: translateY(-50%); }
-    .sr-wheel-center {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 78px; height: 78px; border-radius: 50%;
-      background: radial-gradient(circle at 38% 35%, #1e1e1e, #0a0a0a);
-      border: 1px solid #282828;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.6), inset 0 1px 0 #222;
-      cursor: pointer; color: #00ff6a; font-size: 1.35rem;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.18s;
-    }
-    @media (prefers-color-scheme: light) {
-      .sr-wheel-center {
-        background: radial-gradient(circle at 38% 35%, #cdd2d8, #9098a0);
-        border-color: #b0b8c0; color: #009944;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.22), inset 0 1px 0 #e0e6ec;
-      }
-    }
-    .sr-wheel-center:hover { color: #44ff88; box-shadow: 0 0 14px rgba(0,255,106,0.3), 0 2px 8px rgba(0,0,0,0.6); }
-    .sr-wheel-center.recording { color: #ff4444; animation: center-pulse 0.8s infinite; }
-    @media (prefers-color-scheme: light) { .sr-wheel-center.recording { color: #cc2200; } }
-    .sr-wheel-center.playback  { color: #44aaff; }
-    @media (prefers-color-scheme: light) { .sr-wheel-center.playback { color: #0055cc; } }
-    @keyframes center-pulse { 0%,100%{box-shadow:0 0 16px rgba(255,68,68,0.4),0 2px 8px rgba(0,0,0,0.6);} 50%{box-shadow:0 0 28px rgba(255,68,68,0.7),0 2px 8px rgba(0,0,0,0.6);} }
-    .sr-wheel-hints {
-      display: flex; gap: 1.5rem;
-      font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: #2e2e2e;
-    }
-    @media (prefers-color-scheme: light) { .sr-wheel-hints { color: #aab0b8; } }
     .empty-state { text-align: center; padding: 2.5rem; color: var(--color-text-light); }
     .empty-state i { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; color: var(--color-border); }
     .loading-state { text-align: center; padding: 2rem; color: var(--color-text-light); }
@@ -750,7 +684,6 @@
                 <!-- Voice panel -->
                 <div id="detail-voice-panel-adhoc" style="display:none;">
                   <div class="studio-recorder" id="studio-adhoc">
-                    <!-- Header bar -->
                     <div class="sr-header">
                       <div class="sr-header-left">
                         <span class="sr-rec-dot armed" id="sr-dot-adhoc"></span>
@@ -758,9 +691,7 @@
                       </div>
                       <div class="sr-format-badge" id="sr-format-adhoc"></div>
                     </div>
-                    <!-- Two-column body -->
                     <div class="sr-body">
-                      <!-- Left: display panel -->
                       <div class="sr-left">
                         <div class="sr-timer-display">
                           <span class="sr-timer" id="sr-timer-adhoc">00:00</span>
@@ -779,7 +710,6 @@
                           <div class="sr-progress-fill" id="sr-progress-fill-adhoc"></div>
                         </div>
                       </div>
-                      <!-- Right: desktop car-stereo controls -->
                       <div class="sr-right">
                         <div class="sr-transport">
                           <button class="sr-btn sr-btn-record" id="sr-center-adhoc" onclick="toggleDetailRecording('adhoc')">
@@ -806,64 +736,11 @@
                             </button>
                           </div>
                         </div>
-                        <!-- Mobile: iPod wheel -->
-                        <div class="sr-wheel-zone">
-                          <div class="sr-wheel" id="sr-wheel-adhoc">
-                            <div class="sr-wheel-ring">
-                              <button class="sr-wheel-btn sr-wheel-top"    onclick="srWheelAction('adhoc','rerecord')" title="Re-record"><i class="fas fa-rotate-left"></i></button>
-                              <button class="sr-wheel-btn sr-wheel-right"  onclick="srWheelAction('adhoc','next')"     title="Skip"><i class="fas fa-forward-step"></i></button>
-                              <button class="sr-wheel-btn sr-wheel-bottom" onclick="srWheelAction('adhoc','trash')"    title="Discard"><i class="fas fa-trash"></i></button>
-                              <button class="sr-wheel-btn sr-wheel-left"   onclick="srWheelAction('adhoc','send')"     title="Send"><i class="fas fa-paper-plane"></i></button>
-                            </div>
-                            <button class="sr-wheel-center" id="sr-wheel-center-adhoc" onclick="toggleDetailRecording('adhoc')">
-                              <i class="fas fa-microphone" id="sr-center-icon-adhoc-m"></i>
-                            </button>
-                          </div>
-                          <div class="sr-wheel-hints">
-                            <span>↑ re-record</span><span>→ skip</span><span>↓ discard</span><span>← send</span>
-                          </div>
-                        </div>
                       </div>
                     </div>
                     <audio id="detail-rec-audio-adhoc" style="display:none;"></audio>
                   </div>
                 </div>
-                    <div class="sr-vu-section">
-                      <span class="sr-vu-label">dB</span>
-                      <div class="sr-vu-track">
-                        <div class="sr-vu-fill" id="sr-vu-adhoc"></div>
-                        <div class="sr-vu-peak" id="sr-peak-adhoc"></div>
-                      </div>
-                      <span class="sr-vu-val" id="sr-vu-val-adhoc">–∞</span>
-                    </div>
-                    <!-- Waveform canvas -->
-                    <canvas class="sr-waveform" id="sr-wave-adhoc" height="54"></canvas>
-                    <!-- Progress bar (playback) -->
-                    <div class="sr-progress-bar" id="sr-progress-adhoc" style="display:none;">
-                      <div class="sr-progress-fill" id="sr-progress-fill-adhoc"></div>
-                    </div>
-                    <!-- iPod wheel controls -->
-                    <div class="sr-wheel-zone">
-                      <div class="sr-wheel" id="sr-wheel-adhoc">
-                        <div class="sr-wheel-ring">
-                          <button class="sr-wheel-btn sr-wheel-top"    onclick="srWheelAction('adhoc','prev')"  title="Restart"><i class="fas fa-backward-step"></i></button>
-                          <button class="sr-wheel-btn sr-wheel-right"  onclick="srWheelAction('adhoc','next')"  title="Skip"><i class="fas fa-forward-step"></i></button>
-                          <button class="sr-wheel-btn sr-wheel-bottom" onclick="srWheelAction('adhoc','trash')" title="Discard"><i class="fas fa-trash"></i></button>
-                          <button class="sr-wheel-btn sr-wheel-left"   onclick="srWheelAction('adhoc','send')"  title="Send"><i class="fas fa-paper-plane"></i></button>
-                        </div>
-                        <button class="sr-wheel-center" id="sr-center-adhoc" onclick="toggleDetailRecording('adhoc')">
-                          <i class="fas fa-microphone" id="sr-center-icon-adhoc"></i>
-                        </button>
-                      </div>
-                      <div class="sr-wheel-hints">
-                        <span>↑ restart</span><span>→ skip end</span><span>↓ discard</span><span>← send</span>
-                      </div>
-                    </div>
-                    <!-- Hidden audio element for playback -->
-                    <audio id="detail-rec-audio-adhoc" style="display:none;"></audio>
-                  </div>
-                </div>
-
                 <div class="compose-actions">
                   <button class="btn-secondary" onclick="clearCompose('adhoc')">Clear</button>
                   <button class="btn-send-line" id="send-adhoc-btn" onclick="sendAdHocMessage()">
@@ -946,28 +823,11 @@
                             </button>
                           </div>
                         </div>
-                        <div class="sr-wheel-zone">
-                          <div class="sr-wheel" id="sr-wheel-day6">
-                            <div class="sr-wheel-ring">
-                              <button class="sr-wheel-btn sr-wheel-top"    onclick="srWheelAction('day6','rerecord')" title="Re-record"><i class="fas fa-rotate-left"></i></button>
-                              <button class="sr-wheel-btn sr-wheel-right"  onclick="srWheelAction('day6','next')"     title="Skip"><i class="fas fa-forward-step"></i></button>
-                              <button class="sr-wheel-btn sr-wheel-bottom" onclick="srWheelAction('day6','trash')"    title="Discard"><i class="fas fa-trash"></i></button>
-                              <button class="sr-wheel-btn sr-wheel-left"   onclick="srWheelAction('day6','send')"     title="Send"><i class="fas fa-paper-plane"></i></button>
-                            </div>
-                            <button class="sr-wheel-center" id="sr-wheel-center-day6" onclick="toggleDetailRecording('day6')">
-                              <i class="fas fa-microphone" id="sr-center-icon-day6-m"></i>
-                            </button>
-                          </div>
-                          <div class="sr-wheel-hints">
-                            <span>↑ re-record</span><span>→ skip</span><span>↓ discard</span><span>← send</span>
-                          </div>
-                        </div>
                       </div>
                     </div>
                     <audio id="detail-rec-audio-day6" style="display:none;"></audio>
                   </div>
                 </div>
-
                 <div class="compose-actions">
                   <button class="btn-secondary" onclick="clearCompose('day6')">Clear</button>
                   <button class="btn-send-line" id="send-day6-btn" onclick="sendComposerMessage('day6')">
@@ -1382,28 +1242,21 @@ Keep it up! 🌟</textarea>
   //   audioCtx, analyser, animFrame, wavePoints[]
 
   function srSetState(panel, state) {
-    const dot    = document.getElementById(`sr-dot-${panel}`);
-    const label  = document.getElementById(`sr-label-${panel}`);
-    const timer  = document.getElementById(`sr-timer-${panel}`);
-    const centerD  = document.getElementById(`sr-center-${panel}`);      // desktop record btn
-    const iconD    = document.getElementById(`sr-center-icon-${panel}`);  // desktop icon
-    const btnLabel = document.getElementById(`sr-btn-label-${panel}`);    // desktop label text
-    const centerM  = document.getElementById(`sr-wheel-center-${panel}`); // mobile wheel center
-    const iconM    = document.getElementById(`sr-center-icon-${panel}-m`);// mobile wheel icon
+    const dot      = document.getElementById(`sr-dot-${panel}`);
+    const label    = document.getElementById(`sr-label-${panel}`);
+    const timer    = document.getElementById(`sr-timer-${panel}`);
+    const centerD  = document.getElementById(`sr-center-${panel}`);
+    const iconD    = document.getElementById(`sr-center-icon-${panel}`);
+    const btnLabel = document.getElementById(`sr-btn-label-${panel}`);
     if (!dot) return;
 
     dot.className     = 'sr-rec-dot ' + (state === 'done' ? 'done' : state === 'recording' ? 'recording' : 'armed');
     label.textContent = state === 'recording' ? 'REC' : state === 'done' ? 'READY TO SEND' : 'READY';
     label.className   = 'sr-label ' + (state === 'done' ? 'done' : state === 'recording' ? 'recording' : 'armed');
     timer.className   = 'sr-timer ' + (state === 'recording' ? 'recording' : state === 'done' ? 'done' : '');
-
-    if (centerD)  centerD.className  = 'sr-btn sr-btn-record' + (state === 'recording' ? ' recording' : '');
-    if (iconD)    iconD.className    = state === 'recording' ? 'fas fa-stop' : 'fas fa-microphone';
-    if (btnLabel) btnLabel.textContent = state === 'recording' ? 'STOP' : state === 'done' ? 'PLAY' : 'REC';
-
-    if (centerM) centerM.className = 'sr-wheel-center' + (state === 'recording' ? ' recording' : state === 'done' ? ' playback' : '');
-    if (iconM)   iconM.className   = state === 'recording' ? 'fas fa-stop' : state === 'done' ? 'fas fa-play' : 'fas fa-microphone';
-
+    if (centerD)   centerD.className    = 'sr-btn sr-btn-record' + (state === 'recording' ? ' recording' : '');
+    if (iconD)     iconD.className      = state === 'recording' ? 'fas fa-stop' : state === 'done' ? 'fas fa-play' : 'fas fa-microphone';
+    if (btnLabel)  btnLabel.textContent = state === 'recording' ? 'STOP' : state === 'done' ? 'PLAY' : 'REC';
     const prog = document.getElementById(`sr-progress-${panel}`);
     if (prog) prog.style.display = state === 'done' ? 'block' : 'none';
   }
