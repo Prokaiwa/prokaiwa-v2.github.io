@@ -378,48 +378,98 @@
       .sr-right { width: 100%; }
       .sr-transport { display: flex !important; flex-direction: row; flex-wrap: wrap; gap: 0.5rem; justify-content: stretch; }
       .sr-transport-row { display: contents; }
-      .sr-btn { flex: 1; min-width: 72px; padding: 0.85rem 0.5rem; font-size: 0.78rem; border-radius: 10px; }
-      .sr-btn-record { flex: 1 1 100%; font-size: 1rem; padding: 1rem; border-radius: 10px; }
+      .sr-btn { flex: 1; min-width: 80px; padding: 1rem 0.6rem; font-size: 0.82rem; border-radius: 10px; }
+      .sr-btn-record { flex: 1 1 100%; font-size: 1.05rem; padding: 1.1rem; border-radius: 10px; }
       .sr-timer { font-size: 2.1rem; }
     }
 
-    /* Text / Voice toggle pills */
+    /* Text / Voice toggle pills — dark mode rules AFTER light rules to win cascade */
     .template-toggle {
       display: inline-flex; background: #f0f0f0;
       border-radius: 20px; padding: 3px; margin-bottom: 1rem; gap: 2px;
-    }
-    @media (prefers-color-scheme: dark) {
-      .template-toggle { background: #1e1e1e; border: 1px solid #333; }
     }
     .toggle-pill {
       padding: 0.4rem 1.1rem; border-radius: 18px;
       border: none; cursor: pointer; font-size: 0.88rem;
       font-weight: 600; background: transparent;
-      color: var(--color-text-light); transition: all 0.2s;
-    }
-    @media (prefers-color-scheme: dark) {
-      .toggle-pill { color: #888; }
-      .toggle-pill:hover { color: var(--color-primary); }
-      .toggle-pill.active { background: #2a2a2a; color: var(--color-primary); box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+      color: #888; transition: all 0.2s;
     }
     .toggle-pill:hover { color: var(--color-primary); }
     .toggle-pill.active {
       background: white; color: var(--color-primary);
       box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     }
-
-    /* Mobile: full-width layout, no horizontal scroll */
-    @media (max-width: 600px) {
-      .container { width: 100%; padding: 0 0.75rem; box-sizing: border-box; }
-      main.container { padding: 0.75rem; }
-      .detail-layout { gap: 0.75rem; }
+    /* Dark mode — must come AFTER the light rules above */
+    @media (prefers-color-scheme: dark) {
+      .template-toggle { background: #252525; border: 1px solid #333; }
+      .toggle-pill { color: #777; }
+      .toggle-pill:hover { color: var(--color-primary); }
+      .toggle-pill.active { background: #333; color: var(--color-primary); box-shadow: 0 1px 4px rgba(0,0,0,0.5); }
     }
+
+    /* ── MOBILE OVERFLOW FIX ─────────────────────────────────────────── */
+    /* Universal box-sizing so padding never adds to width */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    /* Prevent anything from ever exceeding the viewport */
+    html { overflow-x: hidden; }
+    body { overflow-x: hidden; max-width: 100vw; }
+
+    /* Constrain the global .container on this page */
+    .container {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    /* Charts that could be wide — scroll inside, never push page */
+    #chart-streak,
+    #chart-rate,
+    #chart-skills,
+    .bar-chart,
+    .streak-grid {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 900px) {
+      .detail-layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      /* Container: full width, tight padding */
+      .container    { width: 100% !important; padding: 0 !important; }
+      main.container { padding: 0.5rem !important; }
+      .detail-header .container { padding: 0 0.75rem !important; }
+
+      /* All cards constrained */
+      .sidebar-card,
+      .main-card { max-width: 100%; overflow-x: hidden; }
+
+      /* Template chips */
+      .tpl-grid { grid-template-columns: repeat(2, 1fr); }
+
+      /* Compose actions stack */
+      .compose-actions { flex-direction: column; }
+      .btn-send-line, .btn-secondary { width: 100%; justify-content: center; }
+
+      /* Textarea full width */
+      .compose-textarea { width: 100%; }
+
+      /* Streak cells smaller */
+      .streak-cell { width: 10px !important; height: 10px !important; }
+      .bar-label   { font-size: 0.6rem; }
+
+      /* Studio recorder stacks on mobile */
+      .sr-body { grid-template-columns: 1fr !important; }
+      .sr-right { width: 100%; }
+    }
+  </style>
     .sr-btn {
       background: #0e0e0e; border: 1px solid #2e2e2e; color: #777;
-      padding: 0.6rem 0.85rem; border-radius: 8px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 0.3rem;
-      font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
-      letter-spacing: 0.05em; white-space: nowrap; min-width: 52px;
+      padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
+      letter-spacing: 0.05em; white-space: nowrap; min-width: 60px;
       transition: all 0.18s;
     }
     .sr-btn:hover { color: #00ff6a; border-color: rgba(0,255,106,0.35); background: #141414; }
@@ -429,7 +479,7 @@
     }
     .sr-btn-record {
       background: #180404; border-color: #4a1010; color: #ff5555;
-      font-size: 0.85rem; padding: 0.7rem 1.1rem; letter-spacing: 0;
+      font-size: 0.95rem; padding: 0.85rem 1.3rem; letter-spacing: 0;
     }
     .sr-btn-record:hover { background: #220808; border-color: #882020; color: #ff2222; box-shadow: 0 0 10px rgba(255,40,40,0.2); }
     .sr-btn-record.recording {
@@ -491,18 +541,6 @@
     /* Skill line chart */
     .skill-chart-svg { overflow:visible; }
 
-    @media (max-width: 600px) {
-      .bar-label { font-size:0.6rem; }
-      .streak-cell { width:11px; height:11px; }
-    }
-    @media (max-width: 900px) {
-      .detail-layout { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 600px) {
-      .tpl-grid { grid-template-columns: repeat(2, 1fr); }
-      .compose-actions { flex-direction: column; }
-      .btn-send-line, .btn-secondary { width: 100%; justify-content: center; }
-    }
   </style>
 </head>
 <body>
@@ -721,18 +759,15 @@
                               <i class="fas fa-rotate-left"></i> REDO
                             </button>
                             <button class="sr-btn sr-btn-trash" onclick="srWheelAction('adhoc','trash')" title="Discard">
-                              <i class="fas fa-trash"></i>
+                              <i class="fas fa-trash"></i> TRASH
+                            </button>
+                            <button class="sr-btn sr-btn-send" onclick="srWheelAction('adhoc','send')" title="Send">
+                              <i class="fas fa-paper-plane"></i> SEND
                             </button>
                           </div>
                           <div class="sr-transport-row">
                             <button class="sr-btn" onclick="srWheelAction('adhoc','prev')" title="Restart playback">
-                              <i class="fas fa-backward-step"></i>
-                            </button>
-                            <button class="sr-btn" onclick="srWheelAction('adhoc','next')" title="Skip to end">
-                              <i class="fas fa-forward-step"></i>
-                            </button>
-                            <button class="sr-btn sr-btn-send" onclick="srWheelAction('adhoc','send')" title="Send">
-                              <i class="fas fa-paper-plane"></i> SEND
+                              <i class="fas fa-backward-step"></i> RESTART
                             </button>
                           </div>
                         </div>
@@ -808,18 +843,15 @@
                               <i class="fas fa-rotate-left"></i> REDO
                             </button>
                             <button class="sr-btn sr-btn-trash" onclick="srWheelAction('day6','trash')" title="Discard">
-                              <i class="fas fa-trash"></i>
+                              <i class="fas fa-trash"></i> TRASH
+                            </button>
+                            <button class="sr-btn sr-btn-send" onclick="srWheelAction('day6','send')" title="Send">
+                              <i class="fas fa-paper-plane"></i> SEND
                             </button>
                           </div>
                           <div class="sr-transport-row">
                             <button class="sr-btn" onclick="srWheelAction('day6','prev')" title="Restart playback">
-                              <i class="fas fa-backward-step"></i>
-                            </button>
-                            <button class="sr-btn" onclick="srWheelAction('day6','next')" title="Skip to end">
-                              <i class="fas fa-forward-step"></i>
-                            </button>
-                            <button class="sr-btn sr-btn-send" onclick="srWheelAction('day6','send')" title="Send">
-                              <i class="fas fa-paper-plane"></i> SEND
+                              <i class="fas fa-backward-step"></i> RESTART
                             </button>
                           </div>
                         </div>
