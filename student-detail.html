@@ -11,13 +11,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
   <style>
     /* ================================================================
-       PAGE RESETS
+       PAGE RESETS — contain everything within viewport
        ================================================================ */
     *, *::before, *::after { box-sizing: border-box; }
     html  { overflow-x: hidden; }
     body  { background: #f5f5f5; overflow-x: hidden; max-width: 100vw; }
-    /* Override global .container padding on this page without !important */
-    .container { max-width: 100%; overflow-x: hidden; }
+
+    /* Neutralise global style.css .container on this page.
+       The global sheet sets width:95%, padding:0 2rem, border, border-radius.
+       This page uses its own card-based layout so we strip all of that. */
+    .container {
+      width: 100%;
+      max-width: 100%;
+      padding: 0;
+      background: none;
+      border: none;
+      border-radius: 0;
+      overflow-x: hidden;
+    }
+    /* Re-add targeted padding only where each context needs it */
+    .detail-header .container { padding: 0 1.5rem; }
+    main.container            { padding: 1.5rem; }
 
     /* ================================================================
        HEADER
@@ -107,6 +121,8 @@
     .qa-btn-purple:hover { background: #6a1f78; }
     .qa-btn-blue      { background: #1565c0; color: white; }
     .qa-btn-blue:hover { background: #0d47a1; }
+    .qa-btn-orange    { background: #e65100; color: white; }
+    .qa-btn-orange:hover { background: #bf360c; }
     .qa-btn-secondary { background: #f5f5f5; color: var(--color-text); border: 1px solid var(--color-border); }
     .qa-btn-secondary:hover { background: #eeeeee; }
     .assessment-entry {
@@ -171,11 +187,12 @@
       gap: 0.5rem; margin-bottom: 1rem;
     }
     .tpl-chip {
-      padding: 0.4rem 0.5rem; border: 1px solid var(--color-border);
-      background: white; border-radius: 4px; cursor: pointer;
+      padding: 0.4rem 0.6rem; border: 1px solid var(--color-border);
+      background: transparent; border-radius: 18px; cursor: pointer;
       font-size: 0.78rem; text-align: center; transition: all 0.2s;
+      color: #888;
     }
-    .tpl-chip:hover  { background: #f5f5f5; }
+    .tpl-chip:hover  { color: var(--color-primary); border-color: var(--color-primary); }
     .tpl-chip.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
     .compose-textarea {
       width: 100%; min-height: 140px; padding: 0.9rem;
@@ -371,15 +388,15 @@
       /* Studio recorder: stack display panel above controls */
       .sr-body          { grid-template-columns: 1fr; gap: 0.75rem; }
       .sr-right         { width: 100%; }
-      .sr-transport     { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; justify-content: stretch; }
+      .sr-transport     { flex-direction: row; flex-wrap: wrap; gap: 0.4rem; }
       .sr-transport-row { display: contents; }
-      .sr-btn           { flex: 1; min-width: 80px; padding: 1rem 0.6rem; font-size: 0.82rem; border-radius: 10px; }
-      .sr-btn-record    { flex: 1 1 100%; font-size: 1.05rem; padding: 1.1rem; border-radius: 10px; }
-      .sr-timer         { font-size: 2.1rem; }
+      /* No min-width — buttons shrink to fit on any screen */
+      .sr-btn           { flex: 1 1 auto; min-width: 0; padding: 0.9rem 0.5rem; font-size: 0.78rem; border-radius: 10px; white-space: normal; text-align: center; }
+      .sr-btn-record    { flex: 1 1 100%; font-size: 1rem; padding: 1rem; border-radius: 10px; }
+      .sr-timer         { font-size: 2rem; }
     }
 
     @media (max-width: 600px) {
-      /* Use higher specificity to override global style.css container padding */
       main.container              { padding: 0.5rem; }
       .detail-header .container   { padding: 0 0.75rem; }
       .sidebar-card, .main-card   { max-width: 100%; overflow-x: hidden; }
@@ -488,7 +505,7 @@
               <button class="qa-btn qa-btn-primary" onclick="scrollToComposer(); setComposerTab('adhoc')">
                 <i class="fas fa-paper-plane"></i> Send Ad-hoc Message
               </button>
-              <button class="qa-btn qa-btn-secondary" onclick="openAssessmentFromDetail()">
+              <button class="qa-btn qa-btn-orange" onclick="openAssessmentFromDetail()">
                 📊 Run Full Assessment
               </button>
             </div>
