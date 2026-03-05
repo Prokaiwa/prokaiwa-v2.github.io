@@ -299,7 +299,7 @@
     .sr-timer-max { font-family: 'Share Tech Mono', monospace; font-size: 0.73rem; color: #444; letter-spacing: 0.05em; }
     .sr-vu-section { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.65rem; }
     .sr-vu-label { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: #555; width: 14px; text-align: right; }
-    .sr-vu-track { flex: 1; height: 8px; background: #0a0a0a; border-radius: 4px; border: 1px solid #222; position: relative; overflow: visible; }
+    .sr-vu-track { flex: 1; height: 8px; background: #0a0a0a; border-radius: 4px; border: 1px solid #222; position: relative; overflow: hidden; min-width: 0; }
     .sr-vu-fill {
       height: 100%; width: 0%; border-radius: 4px;
       background: linear-gradient(90deg, #00ff6a 0%, #aaff00 60%, #ffcc00 80%, #ff4444 100%);
@@ -321,7 +321,7 @@
       padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 0.35rem;
       font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
-      letter-spacing: 0.05em; white-space: nowrap; min-width: 60px; transition: all 0.18s;
+      letter-spacing: 0.05em; min-width: 0; transition: all 0.18s;
     }
     .sr-btn:hover { color: #00ff6a; border-color: rgba(0,255,106,0.35); background: #141414; }
     .sr-btn-record {
@@ -350,7 +350,7 @@
     #chart-streak, #chart-rate, #chart-skills, .bar-chart, .streak-grid { max-width: 100%; overflow-x: auto; }
 
     .bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 120px; padding-bottom: 24px; position: relative; }
-    .bar-col   { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 28px; }
+    .bar-col   { display: flex; flex-direction: column; align-items: center; flex: 1 1 0%; min-width: 0; }
     .bar-rect  { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.4s ease; cursor: default; position: relative; }
     .bar-rect:hover::after {
       content: attr(data-tip); position: absolute; bottom: calc(100% + 4px);
@@ -373,24 +373,40 @@
     .skill-chart-svg { overflow: visible; }
 
     /* ================================================================
-       RESPONSIVE BREAKPOINTS  (one block per breakpoint, no duplicates)
+       RESPONSIVE BREAKPOINTS
        ================================================================ */
     @media (max-width: 900px) {
       .detail-layout { grid-template-columns: 1fr; }
     }
 
+    /* Override global style.css .container (width:95% + padding:0 2rem).
+       Those 32px-per-side paddings eat too much of a 375px screen. */
+    @media (max-width: 768px) {
+      main.container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0.75rem;
+      }
+      .detail-header .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+    }
+
     @media (max-width: 600px) {
-      /* Recorder buttons and timer scale down on small screens */
-      .sr-btn        { padding: 0.75rem 0.5rem; font-size: 0.75rem; }
-      .sr-btn-record { padding: 0.85rem 1rem; font-size: 0.9rem; }
-      .sr-timer      { font-size: 2rem; }
-      /* Layout */
-      .tpl-grid      { grid-template-columns: repeat(2, 1fr); }
-      .compose-actions { flex-direction: column; }
+      main.container              { padding: 0.4rem; }
+      .detail-header .container   { padding-left: 0.5rem; padding-right: 0.5rem; }
+      .main-card-body             { padding: 1rem; }
+      .studio-recorder            { padding: 0.9rem 0.85rem; }
+      .sr-btn                     { padding: 0.7rem 0.4rem; font-size: 0.7rem; }
+      .sr-btn-record              { padding: 0.8rem; font-size: 0.85rem; }
+      .sr-timer                   { font-size: 1.8rem; }
+      .tpl-grid                   { grid-template-columns: repeat(2, 1fr); }
+      .compose-actions            { flex-direction: column; }
       .btn-send-line,
-      .btn-secondary { width: 100%; justify-content: center; }
-      .streak-cell   { width: 10px; height: 10px; }
-      .bar-label     { font-size: 0.6rem; }
+      .btn-secondary              { width: 100%; justify-content: center; }
+      .streak-cell                { width: 10px; height: 10px; }
+      .bar-label                  { font-size: 0.58rem; }
     }
 
     /* ================================================================
