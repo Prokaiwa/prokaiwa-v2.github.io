@@ -14,8 +14,15 @@
        PAGE RESETS
        ================================================================ */
     *, *::before, *::after { box-sizing: border-box; }
+
+    /* Universal overflow safety net for iOS Safari and all mobile browsers.
+       No block element can exceed its parent's width.
+       Charts/calendars that need to scroll use overflow-x:auto on their wrapper. */
+    img, video, canvas, audio, iframe, embed, object { max-width: 100%; }
+    div, section, article, aside, header, footer, main, nav { max-width: 100%; }
+
     html { overflow-x: hidden; }
-    body { background: #f5f5f5; overflow-x: hidden; }
+    body { background: #f5f5f5; overflow-x: hidden; position: relative; }
 
     /* Let global style.css handle .container sizing (width:95%, padding:0 2rem).
        Only strip the card visual styling — this page uses its own card system. */
@@ -37,7 +44,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       margin-bottom: 2rem;
     }
-    .detail-header .container { display: flex; align-items: center; gap: 1rem; }
+    .detail-header .container { display: flex; align-items: center; gap: 0.75rem; overflow: hidden; min-width: 0; }
     .back-btn {
       display: inline-flex; align-items: center; gap: 0.5rem;
       background: var(--color-primary); color: white;
@@ -51,7 +58,7 @@
       transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     .back-btn i { font-size: 0.8rem; }
-    .detail-header h1 { margin: 0; font-size: 1.3rem; color: var(--color-primary); }
+    .detail-header h1 { margin: 0; font-size: 1.3rem; color: var(--color-primary); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     /* ================================================================
        LAYOUT
@@ -358,7 +365,7 @@
       padding: 3px 7px; border-radius: 4px; font-size: 0.72rem; white-space: nowrap;
       pointer-events: none; z-index: 10;
     }
-    .bar-label { font-size: 0.65rem; color: var(--color-text-light); margin-top: 4px; white-space: nowrap; }
+    .bar-label { font-size: 0.65rem; color: var(--color-text-light); margin-top: 4px; white-space: nowrap; overflow: hidden; width: 100%; text-align: center; }
     .streak-grid  { display: flex; gap: 3px; }
     .streak-week  { display: flex; flex-direction: column; gap: 3px; }
     .streak-cell  { width: 14px; height: 14px; border-radius: 3px; cursor: default; position: relative; }
@@ -368,9 +375,9 @@
       padding: 3px 7px; border-radius: 4px; font-size: 0.72rem; white-space: nowrap;
       pointer-events: none; z-index: 10;
     }
-    .streak-month-labels { display: flex; gap: 3px; margin-bottom: 4px; }
+    .streak-month-labels { display: flex; gap: 3px; margin-bottom: 4px; overflow: hidden; }
     .streak-month-label  { font-size: 0.65rem; color: var(--color-text-light); }
-    .skill-chart-svg { overflow: visible; }
+    .skill-chart-svg { overflow: hidden; max-width: 100%; }
 
     /* ================================================================
        RESPONSIVE BREAKPOINTS
@@ -540,7 +547,7 @@
                 <button class="conv-filter-btn"        data-filter="30"  onclick="changeConvFilter(this,'30')">30 days</button>
                 <button class="conv-filter-btn"        data-filter="all" onclick="changeConvFilter(this,'all')">All time</button>
               </div>
-              <div id="conversation-timeline">
+              <div id="conversation-timeline" style="overflow:hidden; word-break:break-word;">
                 <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
               </div>
             </div>
@@ -1051,12 +1058,12 @@ Keep it up! 🌟</textarea>
           const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
 
           if (msg._type === 'message' && msg.message_type === 'prompt') {
-            html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:#eef7ff; border-left:3px solid #4A90E2; border-radius:0 6px 6px 0; font-size:0.88rem;">
+            html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:#eef7ff; border-left:3px solid #4A90E2; border-radius:0 6px 6px 0; font-size:0.88rem; overflow:hidden; word-break:break-word;">
               <div style="font-size:0.75rem; color:#666; margin-bottom:0.3rem;">${time} · 🤖 Daily Prompt</div>
               <p style="margin:0; color:#333;">"${msg.message_text || ''}"</p>
             </div>`;
           } else if (msg._type === 'message' && msg.message_type === 'student_response') {
-            html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:white; border:1px solid #e8e8e8; border-radius:6px; font-size:0.88rem;">
+            html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:white; border:1px solid #e8e8e8; border-radius:6px; font-size:0.88rem; overflow:hidden; word-break:break-word;">
               <div style="font-size:0.75rem; color:#666; margin-bottom:0.3rem;">${time} · 👤 ${sName}</div>`;
             if (msg.message_text) html += `<p style="margin:0.25rem 0; color:#333;">"${msg.message_text}"</p>`;
             if (msg.media_type === 'audio') html += `<audio controls style="width:100%; max-width:340px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">Audio not supported.</audio>`;
@@ -1067,7 +1074,7 @@ Keep it up! 🌟</textarea>
             // Detect voice messages — stored as "[Voice message] https://..."
             const isVoice   = msg.feedback_text && msg.feedback_text.startsWith('[Voice message]');
             const audioUrl  = isVoice ? msg.feedback_text.replace('[Voice message] ', '').trim() : null;
-            html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:#f0fff4; border-left:3px solid #4caf50; border-radius:0 6px 6px 0; font-size:0.88rem;">
+            html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:#f0fff4; border-left:3px solid #4caf50; border-radius:0 6px 6px 0; font-size:0.88rem; overflow:hidden; word-break:break-word;">
               <div style="font-size:0.75rem; color:#666; margin-bottom:0.4rem;">${time} · 👨‍🏫 Teacher Feedback</div>
               ${isVoice
                 ? `<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
