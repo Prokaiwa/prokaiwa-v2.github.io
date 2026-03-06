@@ -517,7 +517,7 @@
       try {
         const { data, error } = await supabaseClient
           .from('prompts')
-          .select('id,level,purpose,week_number,day_number,competency,theme,prompt_text,prompt_text_japanese,audio_url')
+          .select('id,level,purpose,week_number,day_number,competency,theme,type,prompt_text,prompt_text_japanese,audio_url')
           .eq('type', 'Listening Practice')
           .order('level')
           .order('week_number')
@@ -647,6 +647,16 @@
     function renderExpandedPanel(p) {
       const hasAudio = !!p.audio_url;
       return `
+        <!-- Prompt metadata strip -->
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;padding:0.75rem 1rem;background:#f8f9fa;border-radius:8px;border:1px solid #e0e0e0;align-items:center;">
+          <span class="badge badge-level">${p.level}</span>
+          <span class="badge badge-purpose">${p.purpose}</span>
+          <span class="badge badge-week">Week ${p.week_number}</span>
+          <span class="badge badge-day" style="background:#e3f2fd;color:#1565c0;">Day ${p.day_number} · ${p.type || 'Listening Practice'}</span>
+          ${p.competency ? `<span style="font-size:0.78rem;font-weight:600;color:#555;padding:0.15rem 0.5rem;background:#fff;border:1px solid #ddd;border-radius:5px;">${p.competency}</span>` : ''}
+          ${p.theme ? `<span style="font-size:0.75rem;color:#888;padding:0.15rem 0.5rem;background:#fff;border:1px solid #e8e8e8;border-radius:5px;">${p.theme}</span>` : ''}
+        </div>
+
         <div class="prompt-full-text">
           <strong style="font-size:0.75rem;color:#4A90E2;letter-spacing:0.05em;text-transform:uppercase;">Full Prompt Text</strong><br>
           <span style="margin-top:0.35rem;display:block;">${p.prompt_text || '—'}</span>
@@ -731,17 +741,20 @@
 
     function toggleRow(promptId) {
       const expandedRow = document.getElementById(`expanded-${promptId}`);
+      const panel       = document.getElementById(`panel-${promptId}`);
       const chevron     = document.getElementById(`chevron-${promptId}`);
       const row         = document.getElementById(`row-${promptId}`);
       const isOpen      = expandedRow.style.display !== 'none';
 
       // Close all others first
       document.querySelectorAll('[id^="expanded-"]').forEach(el => { el.style.display = 'none'; });
+      document.querySelectorAll('[id^="panel-"]').forEach(el => { el.style.display = 'none'; });
       document.querySelectorAll('[id^="chevron-"]').forEach(el => { el.style.transform = 'rotate(0deg)'; });
       document.querySelectorAll('.prompts-table tr').forEach(el => el.classList.remove('expanded'));
 
       if (!isOpen) {
         expandedRow.style.display = '';
+        panel.style.display = 'block';
         chevron.style.transform = 'rotate(90deg)';
         row.classList.add('expanded');
         // Init recorder
