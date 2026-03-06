@@ -153,10 +153,16 @@
       display: inline-block; padding: 0.15rem 0.55rem; border-radius: 6px;
       font-size: 0.72rem; font-weight: 700; white-space: nowrap;
     }
-    .badge-week   { background: #e8f5e9; color: #2e7d32; }
-    .badge-day    { background: #e3f2fd; color: #1565c0; }
-    .badge-purpose { background: #fce4ec; color: #880e4f; }
-    .badge-level  { background: #f3e5f5; color: #6a1b9a; }
+
+    /* Table row badges — deliberately NOT using global .badge class to avoid
+       conflict with style.css which sets position:absolute on .badge */
+    .row-badge {
+      display: inline-block; padding: 0.2rem 0.55rem; border-radius: 6px;
+      font-size: 0.72rem; font-weight: 700; white-space: nowrap; position: static;
+    }
+    .row-badge-week    { background: #e8f5e9; color: #2e7d32; }
+    .row-badge-purpose { background: #fce4ec; color: #880e4f; }
+    .row-badge-level   { background: #f3e5f5; color: #6a1b9a; }
 
     /* Scoped metadata badges — used inside expanded panel only.
        Scoped selector (.row-expanded-panel .meta-badge) beats any global .badge rule. */
@@ -410,11 +416,10 @@
       .prompts-table td { border-color: #1e2130; }
       .prompts-table tr:hover .row-main { background: #1e2235; }
       .prompts-table tr.expanded .row-main { background: #1a2640; }
-      /* Table badges (used in main table rows) */
-      .badge-week    { background: #1a2e1a; color: #6dbf74; }
-      .badge-day     { background: #1a2440; color: #6bb3f0; }
-      .badge-purpose { background: #2a1520; color: #f48fa8; }
-      .badge-level   { background: #221540; color: #ce93d8; }
+      /* Table row badges */
+      .row-badge-week    { background: #1a2e1a; color: #6dbf74; }
+      .row-badge-purpose { background: #2a1520; color: #f48fa8; }
+      .row-badge-level   { background: #221540; color: #ce93d8; }
       /* Row controls */
       .expand-row-btn { color: #7a82a0; }
       .expand-row-btn:hover { background: #22263a; color: #5b9cf6; }
@@ -709,17 +714,17 @@
             </td>
             <td>
               <div class="row-main" style="padding-left:0;">
-                <span class="badge badge-week">W${p.week_number}</span>
+                <span class="row-badge row-badge-week">W${p.week_number}</span>
               </div>
             </td>
             <td>
               <div class="row-main" style="padding-left:0;">
-                <span class="badge badge-purpose">${p.purpose}</span>
+                <span class="row-badge row-badge-purpose">${p.purpose}</span>
               </div>
             </td>
             <td>
               <div class="row-main" style="padding-left:0;">
-                <span class="badge badge-level" style="font-size:0.68rem;">${p.level}</span>
+                <span class="row-badge row-badge-level">${p.level}</span>
               </div>
             </td>
             <td>
@@ -766,7 +771,6 @@
           <strong style="font-size:0.75rem;color:#4A90E2;letter-spacing:0.05em;text-transform:uppercase;">Full Prompt Text</strong><br>
           <span style="margin-top:0.35rem;display:block;">${p.prompt_text || '—'}</span>
         </div>
-        ${p.prompt_text_japanese ? `<div class="prompt-jp-text"><strong style="font-size:0.72rem;color:#e65100;letter-spacing:0.05em;text-transform:uppercase;">Japanese Support</strong><br><span style="margin-top:0.3rem;display:block;">${p.prompt_text_japanese}</span></div>` : ''}
 
         ${hasAudio ? `
           <div class="current-audio-wrap">
