@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prompt Recordings | Prokaiwa Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ================================================================
+       PAGE RESETS
+       ================================================================ */
+    *, *::before, *::after { box-sizing: border-box; }
+    img, video, canvas, audio, iframe { max-width: 100%; }
+    div, section, article, aside, header, footer, main, nav { max-width: 100%; }
+    html { overflow-x: hidden; }
+    body { background: #f0f2f5; overflow-x: hidden; position: relative; }
+
+    /* ================================================================
+       HEADER
+       ================================================================ */
+    .page-header {
+      background: var(--color-surface);
+      padding: 0.9rem 0;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .page-header .container {
+      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    }
+    .page-header h1 {
+      font-size: 1.35rem; color: var(--color-primary);
+      margin: 0; font-weight: 800; letter-spacing: -0.01em;
+    }
+    .page-header h1 span { color: #e65100; }
+    .header-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--color-primary); color: white; border: none; border-radius: 8px;
+      padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 700;
+      text-decoration: none; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .back-btn:hover { background: var(--color-primary-dark); transform: translateY(-1px); }
+    .logout-btn {
+      background: var(--color-accent); color: white;
+      padding: 0.5rem 1rem; border: none; border-radius: 8px;
+      cursor: pointer; font-weight: 600; font-size: 0.88rem; transition: all 0.2s;
+    }
+    .logout-btn:hover { opacity: 0.88; }
+
+    /* ================================================================
+       STATS BANNER
+       ================================================================ */
+    .stats-banner {
+      display: flex; gap: 1rem; margin-bottom: 1.75rem; flex-wrap: wrap;
+    }
+    .stat-pill {
+      background: var(--color-surface); border-radius: 10px;
+      padding: 0.85rem 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      display: flex; align-items: center; gap: 0.6rem; flex: 1 1 auto;
+    }
+    .stat-pill-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .stat-pill-val  { font-size: 1.5rem; font-weight: 800; color: var(--color-primary); line-height: 1; }
+    .stat-pill-lbl  { font-size: 0.78rem; color: var(--color-text-light); }
+
+    /* ================================================================
+       FILTERS
+       ================================================================ */
+    .filter-bar {
+      background: var(--color-surface); border-radius: 12px;
+      padding: 1.1rem 1.5rem; margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      display: flex; flex-wrap: wrap; gap: 0.85rem; align-items: center;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .filter-group label { font-size: 0.72rem; font-weight: 700; color: var(--color-text-light); text-transform: uppercase; letter-spacing: 0.06em; }
+    .filter-select, .filter-toggle-btn {
+      padding: 0.45rem 0.75rem; border: 1px solid var(--color-border);
+      border-radius: 7px; background: white; font-size: 0.88rem;
+      color: var(--color-text); cursor: pointer; transition: all 0.2s;
+    }
+    .filter-select:focus { outline: none; border-color: var(--color-primary); }
+    .filter-toggle-btn { font-weight: 600; display: flex; align-items: center; gap: 0.4rem; }
+    .filter-toggle-btn.active { background: #fff3e0; border-color: #e65100; color: #e65100; }
+    .filter-toggle-btn:hover { border-color: var(--color-primary); }
+    .filter-count {
+      margin-left: auto; font-size: 0.85rem; color: var(--color-text-light);
+      font-weight: 600; white-space: nowrap; align-self: flex-end;
+    }
+
+    /* ================================================================
+       PROGRESS BAR
+       ================================================================ */
+    .progress-section {
+      background: var(--color-surface); border-radius: 12px;
+      padding: 1.1rem 1.5rem; margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+    .progress-header span { font-size: 0.88rem; color: var(--color-text-light); }
+    .progress-header strong { font-size: 1rem; color: var(--color-text); }
+    .progress-track {
+      height: 10px; background: #e8e8e8; border-radius: 5px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--color-primary), #00c896);
+      border-radius: 5px; transition: width 0.5s ease;
+    }
+
+    /* ================================================================
+       PROMPT TABLE
+       ================================================================ */
+    .prompts-section {
+      background: var(--color-surface); border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07); overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .prompts-section-header {
+      padding: 1.1rem 1.5rem; border-bottom: 2px solid var(--color-border);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .prompts-section-header h2 {
+      font-size: 1rem; font-weight: 700; color: var(--color-text); margin: 0;
+    }
+    .prompts-table-wrap { overflow-x: auto; }
+    .prompts-table {
+      width: 100%; border-collapse: collapse; font-size: 0.88rem;
+      min-width: 600px;
+    }
+    .prompts-table thead tr { background: #f8f9fa; }
+    .prompts-table th {
+      padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem;
+      font-weight: 700; color: var(--color-text-light); text-transform: uppercase;
+      letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+    .prompts-table td {
+      padding: 0; border-bottom: 1px solid #f0f0f0;
+      vertical-align: top;
+    }
+    .row-main {
+      padding: 0.85rem 1rem; display: flex; align-items: flex-start;
+      width: 100%; gap: 0.5rem;
+    }
+    .prompts-table tr:last-child td { border-bottom: none; }
+    .prompts-table tr:hover .row-main { background: #fafeff; }
+    .prompts-table tr.expanded .row-main { background: #f0fbff; }
+
+    .badge {
+      display: inline-block; padding: 0.15rem 0.55rem; border-radius: 6px;
+      font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+    }
+    .badge-week   { background: #e8f5e9; color: #2e7d32; }
+    .badge-day    { background: #e3f2fd; color: #1565c0; }
+    .badge-purpose { background: #fce4ec; color: #880e4f; }
+    .badge-level  { background: #f3e5f5; color: #6a1b9a; }
+    .status-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
+    }
+    .status-dot.has-audio   { background: #4caf50; box-shadow: 0 0 0 3px rgba(76,175,80,0.15); }
+    .status-dot.needs-audio { background: #ff9800; box-shadow: 0 0 0 3px rgba(255,152,0,0.15); }
+    .prompt-preview {
+      flex: 1; min-width: 0; color: var(--color-text); line-height: 1.45; word-break: break-word;
+      font-size: 0.88rem;
+    }
+    .prompt-meta {
+      display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.25rem;
+    }
+    .expand-row-btn {
+      background: none; border: none; color: var(--color-text-light); cursor: pointer;
+      padding: 0.25rem; font-size: 0.85rem; flex-shrink: 0; transition: all 0.2s;
+      border-radius: 4px; margin-top: 1px;
+    }
+    .expand-row-btn:hover { background: #f0f0f0; color: var(--color-primary); }
+    .row-expanded-panel {
+      display: none; padding: 0 1.25rem 1.25rem; border-top: 1px solid #e8f4fd;
+    }
+    tr.expanded .row-expanded-panel { display: block; }
+    .prompt-full-text {
+      background: #f8f9fa; border-radius: 8px; padding: 0.9rem 1rem;
+      font-size: 0.88rem; line-height: 1.6; color: #333; margin-bottom: 1rem;
+      border-left: 3px solid #4A90E2;
+    }
+    .prompt-jp-text {
+      background: #fff8f0; border-radius: 8px; padding: 0.75rem 1rem;
+      font-size: 0.85rem; color: #555; margin-bottom: 1rem;
+      border-left: 3px solid #ff9800;
+    }
+
+    /* Current audio player */
+    .current-audio-wrap {
+      display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;
+      background: #e8f5e9; border-radius: 8px; padding: 0.65rem 1rem; flex-wrap: wrap;
+    }
+    .current-audio-label {
+      font-size: 0.78rem; font-weight: 700; color: #2e7d32; white-space: nowrap;
+    }
+    .current-audio-url {
+      font-size: 0.72rem; color: #555; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;
+    }
+    .remove-audio-btn {
+      background: #ffebee; border: none; color: #c62828; border-radius: 6px;
+      padding: 0.3rem 0.6rem; font-size: 0.78rem; font-weight: 700;
+      cursor: pointer; white-space: nowrap; transition: all 0.2s;
+    }
+    .remove-audio-btn:hover { background: #f44336; color: white; }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed var(--color-border); border-radius: 10px;
+      padding: 1.25rem; text-align: center; transition: all 0.2s;
+      cursor: pointer; margin-bottom: 0.75rem; position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--color-primary); background: #f0fbff;
+    }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+      width: 100%; height: 100%;
+    }
+    .upload-zone-icon { font-size: 1.75rem; color: var(--color-text-light); margin-bottom: 0.4rem; }
+    .upload-zone-label { font-size: 0.88rem; color: var(--color-text-light); line-height: 1.4; }
+    .upload-zone-label strong { color: var(--color-primary); }
+    .upload-zone.has-file { border-color: #4caf50; background: #f1fff5; }
+    .upload-zone.has-file .upload-zone-icon { color: #4caf50; }
+    .upload-zone.has-file .upload-zone-label strong { color: #2e7d32; }
+
+    /* OR divider */
+    .or-divider {
+      text-align: center; position: relative; margin: 0.6rem 0;
+      font-size: 0.78rem; color: var(--color-text-light); font-weight: 600;
+    }
+    .or-divider::before, .or-divider::after {
+      content: ''; position: absolute; top: 50%; width: 45%; height: 1px; background: var(--color-border);
+    }
+    .or-divider::before { left: 0; }
+    .or-divider::after  { right: 0; }
+
+    /* Save button */
+    .save-recording-btn {
+      background: #06c755; color: white; border: none; border-radius: 8px;
+      padding: 0.65rem 1.5rem; font-size: 0.92rem; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 0.4rem;
+      transition: all 0.2s; margin-top: 0.75rem;
+    }
+    .save-recording-btn:hover { background: #05a847; transform: translateY(-1px); }
+    .save-recording-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+    /* ================================================================
+       STUDIO RECORDER (same as portal)
+       ================================================================ */
+    .studio-recorder {
+      width: 100%; border-radius: 12px; padding: 1rem 1.2rem 0.9rem;
+      position: relative; overflow: hidden;
+      background: #141414; border: 1px solid #252525;
+      box-shadow: 0 0 0 1px #222, 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 #1e1e1e;
+    }
+    .studio-recorder::before {
+      content: ''; position: absolute; inset: 0; border-radius: 12px;
+      background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.013) 2px,rgba(255,255,255,0.013) 4px);
+      pointer-events: none; z-index: 0;
+    }
+    .studio-recorder > * { position: relative; z-index: 1; }
+    .sr-body  { display: flex; flex-direction: column; gap: 0.55rem; min-width: 0; }
+    .sr-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem; }
+    .sr-header-left { display: flex; align-items: center; gap: 0.45rem; }
+    .sr-rec-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #333; box-shadow: 0 0 0 2px #222; transition: all 0.3s;
+    }
+    .sr-rec-dot.armed     { background: #00ff6a; box-shadow: 0 0 6px #00ff6a, 0 0 14px rgba(0,255,106,0.4); }
+    .sr-rec-dot.recording { background: #ff3b3b; box-shadow: 0 0 6px #ff3b3b; animation: dot-pulse 0.8s infinite; }
+    .sr-rec-dot.done      { background: #44aaff; box-shadow: 0 0 6px #44aaff; }
+    @keyframes dot-pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+    .sr-label { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.13em; color: #555; text-transform: uppercase; transition: color 0.3s; }
+    .sr-label.armed     { color: #00cc55; }
+    .sr-label.recording { color: #ff3b3b; }
+    .sr-label.done      { color: #44aaff; }
+    .sr-format-badge { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; letter-spacing: 0.07em; color: #444; border: 1px solid #2a2a2a; padding: 0.1rem 0.38rem; border-radius: 3px; background: rgba(0,0,0,0.35); }
+    .sr-format-badge.m4a  { color: #00ff6a; border-color: rgba(0,255,106,0.35); }
+    .sr-format-badge.webm { color: #ffaa00; border-color: rgba(255,170,0,0.35); }
+    .sr-timer-display { display: flex; align-items: baseline; gap: 0.3rem; }
+    .sr-timer { font-family: 'Orbitron', sans-serif; font-size: 1.9rem; font-weight: 700; line-height: 1; color: #00ff6a; letter-spacing: 0.04em; text-shadow: 0 0 8px rgba(0,255,106,0.5); transition: color 0.3s, text-shadow 0.3s; }
+    .sr-timer.recording { color: #ff5555; text-shadow: 0 0 8px rgba(255,85,85,0.5); }
+    .sr-timer.done      { color: #44aaff; text-shadow: 0 0 8px rgba(68,170,255,0.4); }
+    .sr-timer-max { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: #444; }
+    .sr-vu-section { display: flex; align-items: center; gap: 0.4rem; min-width: 0; }
+    .sr-vu-label { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: #555; width: 13px; text-align: right; flex-shrink: 0; }
+    .sr-vu-track { flex: 1; height: 7px; background: #0a0a0a; border-radius: 4px; border: 1px solid #222; position: relative; overflow: hidden; min-width: 0; }
+    .sr-vu-fill { height: 100%; width: 0%; border-radius: 4px; background: linear-gradient(90deg,#00ff6a 0%,#aaff00 60%,#ffcc00 80%,#ff4444 100%); transition: width 0.05s linear; }
+    .sr-vu-peak { position: absolute; top: 0; bottom: 0; width: 2px; background: white; border-radius: 1px; left: 0; opacity: 0; transition: opacity 0.4s; }
+    .sr-vu-peak.show { opacity: 0.6; }
+    .sr-vu-val { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: #555; width: 32px; text-align: right; flex-shrink: 0; }
+    .sr-waveform { width: 100%; display: block; border-radius: 5px; background: #060606; border: 1px solid #1e1e1e; }
+    .sr-transport { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .sr-transport-row { display: contents; }
+    .sr-btn { flex: 1 1 auto; min-width: 0; background: #0e0e0e; border: 1px solid #2e2e2e; color: #777; padding: 0.6rem 0.65rem; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 0.04em; transition: all 0.18s; }
+    .sr-btn:hover { color: #00ff6a; border-color: rgba(0,255,106,0.35); background: #141414; }
+    .sr-btn-record { flex: 1 1 100%; background: #180404; border-color: #4a1010; color: #ff5555; font-size: 0.88rem; padding: 0.75rem 1rem; letter-spacing: 0; }
+    .sr-btn-record:hover { background: #220808; border-color: #882020; color: #ff2222; }
+    .sr-btn-record.recording { background: #dd2222; border-color: #ff1111; color: white; animation: rec-glow 0.8s infinite; }
+    @keyframes rec-glow { 0%,100%{box-shadow:0 0 6px rgba(255,40,40,0.35);}50%{box-shadow:0 0 16px rgba(255,40,40,0.65);} }
+    .sr-btn-trash:hover { color: #ff4444; border-color: rgba(255,68,68,0.35); }
+
+    @media (prefers-color-scheme: light) {
+      .studio-recorder { background: linear-gradient(160deg,#cdd2d8 0%,#b0b6be 50%,#c0c6ce 100%); border: 1px solid #909aa5; box-shadow: 0 0 0 1px rgba(255,255,255,0.6) inset, 0 2px 0 #6a7580, 0 4px 16px rgba(0,0,0,0.18); }
+      .sr-rec-dot { background: #8a9099; box-shadow: 0 0 0 2px #a0a8b0; }
+      .sr-label { color: #6a7580; }
+      .sr-label.armed { color: #009944; }
+      .sr-label.recording { color: #cc2200; }
+      .sr-label.done { color: #0066cc; }
+      .sr-format-badge { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.18); color: #6a7580; }
+      .sr-format-badge.m4a { color: #009944; border-color: rgba(0,153,68,0.4); }
+      .sr-timer { color: #00aa44; text-shadow: 0 0 6px rgba(0,170,68,0.4); }
+      .sr-timer.recording { color: #cc2200; text-shadow: 0 0 6px rgba(204,34,0,0.4); }
+      .sr-timer.done { color: #0066cc; text-shadow: none; }
+      .sr-timer-max { color: #7a8590; }
+      .sr-vu-track { background: #8a9099; border-color: #7a8090; }
+      .sr-vu-label, .sr-vu-val { color: #7a8590; }
+      .sr-waveform { background: #1a1a1a; border-color: #8a9099; }
+      .sr-btn { background: rgba(0,0,0,0.09); border-color: rgba(0,0,0,0.2); color: #6a7580; }
+      .sr-btn:hover { background: rgba(0,0,0,0.15); color: #009944; border-color: rgba(0,153,68,0.35); }
+      .sr-btn-record { background: rgba(160,20,0,0.1); border-color: rgba(160,20,0,0.3); color: #cc2200; }
+      .sr-btn-record.recording { background: #cc2200; border-color: #991800; color: white; }
+    }
+
+    /* ================================================================
+       EMPTY / LOADING
+       ================================================================ */
+    .empty-state { text-align: center; padding: 3rem 2rem; color: var(--color-text-light); }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; color: #d0d0d0; }
+    .loading-state { text-align: center; padding: 2.5rem; color: var(--color-text-light); }
+
+    /* ================================================================
+       TOAST
+       ================================================================ */
+    .toast {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: #1a1a1a; color: white; padding: 0.75rem 1.5rem;
+      border-radius: 10px; font-size: 0.9rem; font-weight: 600;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 9999;
+      opacity: 0; transition: all 0.3s; white-space: nowrap; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #2e7d32; }
+    .toast.error   { background: #c62828; }
+
+    /* ================================================================
+       RESPONSIVE
+       ================================================================ */
+    @media (max-width: 768px) {
+      .page-header h1 { font-size: 1.1rem; }
+      .back-btn span  { display: none; }
+      .stats-banner   { gap: 0.65rem; }
+      .stat-pill      { padding: 0.65rem 1rem; }
+      .filter-bar     { padding: 0.85rem 1rem; gap: 0.65rem; }
+      .row-main       { padding: 0.7rem 0.75rem; }
+      .row-expanded-panel { padding: 0 0.75rem 0.85rem; }
+      .prompts-table  { min-width: 400px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="page-header">
+    <div class="container">
+      <h1>🎙 Prompt <span>Recordings</span> — Admin</h1>
+      <div class="header-actions">
+        <a href="teacher-portal.html" class="back-btn">
+          <i class="fas fa-arrow-left"></i>
+          <span>Back to Portal</span>
+        </a>
+        <button type="button" class="logout-btn" id="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top:1.75rem;">
+
+    <!-- Stats banner -->
+    <div class="stats-banner" id="stats-banner">
+      <div class="stat-pill">
+        <span class="stat-pill-icon">🎵</span>
+        <div><div class="stat-pill-val" id="stat-total">—</div><div class="stat-pill-lbl">Total Day 1 Prompts</div></div>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-pill-icon">✅</span>
+        <div><div class="stat-pill-val" id="stat-done">—</div><div class="stat-pill-lbl">Recorded</div></div>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-pill-icon">⚠️</span>
+        <div><div class="stat-pill-val" id="stat-missing">—</div><div class="stat-pill-lbl">Missing</div></div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-section">
+      <div class="progress-header">
+        <strong>Recording Progress</strong>
+        <span id="progress-label">0 / 0</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>Level</label>
+        <select class="filter-select" id="filter-level">
+          <option value="">All Levels</option>
+          <option value="Super Beginner">Super Beginner</option>
+          <option value="Beginner">Beginner</option>
+          <option value="Intermediate">Intermediate</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Purpose</label>
+        <select class="filter-select" id="filter-purpose">
+          <option value="">All Purposes</option>
+          <option value="Work">Work</option>
+          <option value="Hobby">Hobby</option>
+          <option value="Travel">Travel</option>
+          <option value="Casual">Casual</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Week</label>
+        <select class="filter-select" id="filter-week">
+          <option value="">All Weeks</option>
+        </select>
+      </div>
+      <div class="filter-group" style="justify-content:flex-end;">
+        <label>&nbsp;</label>
+        <button type="button" class="filter-toggle-btn" id="missing-only-btn" onclick="toggleMissingOnly()">
+          <i class="fas fa-exclamation-circle"></i> Missing Only
+        </button>
+      </div>
+      <span class="filter-count" id="filter-count"></span>
+    </div>
+
+    <!-- Prompts table -->
+    <div class="prompts-section">
+      <div class="prompts-section-header">
+        <h2>Listening Practice Prompts (Day 1)</h2>
+        <span id="table-count" style="font-size:0.85rem;color:var(--color-text-light);"></span>
+      </div>
+      <div class="prompts-table-wrap">
+        <table class="prompts-table" id="prompts-table">
+          <thead>
+            <tr>
+              <th style="width:32px;"></th>
+              <th>Wk</th>
+              <th>Purpose</th>
+              <th>Level</th>
+              <th>Competency · Theme</th>
+              <th>Prompt</th>
+              <th style="width:60px;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="prompts-tbody">
+            <tr><td colspan="7"><div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading prompts...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseClient = supabase.createClient(
+      'https://luyzyzefgintksydmwoh.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg'
+    );
+
+    let allPrompts   = [];
+    let currentTeacher = null;
+    let missingOnly  = false;
+
+    // Per-prompt recorder state
+    const recState = {};
+
+    // ============================================
+    // AUTH — must be admin
+    // ============================================
+    async function checkAuth() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) { window.location.href = '/teacher-login.html'; return; }
+
+      const { data: teacher, error } = await supabaseClient
+        .from('teachers').select('*').eq('auth_user_id', session.user.id).single();
+
+      if (error || !teacher || !teacher.is_active || teacher.role !== 'admin') {
+        await supabaseClient.auth.signOut();
+        window.location.href = '/teacher-login.html';
+        return;
+      }
+
+      currentTeacher = teacher;
+      await loadPrompts();
+    }
+
+    // ============================================
+    // LOAD PROMPTS
+    // ============================================
+    async function loadPrompts() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('prompts')
+          .select('id,level,purpose,week_number,day_number,competency,theme,prompt_text,prompt_text_japanese,audio_url')
+          .eq('type', 'Listening Practice')
+          .order('level')
+          .order('week_number')
+          .order('purpose');
+
+        if (error) throw error;
+
+        allPrompts = data || [];
+        buildWeekFilter();
+        updateStats();
+        renderTable();
+      } catch (err) {
+        console.error('Load prompts error:', err);
+        document.getElementById('prompts-tbody').innerHTML =
+          '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading prompts. Please refresh.</p></div></td></tr>';
+      }
+    }
+
+    function buildWeekFilter() {
+      const weeks = [...new Set(allPrompts.map(p => p.week_number))].sort((a,b) => a-b);
+      const sel   = document.getElementById('filter-week');
+      weeks.forEach(w => {
+        const opt = document.createElement('option');
+        opt.value = w; opt.textContent = `Week ${w}`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function updateStats() {
+      const total   = allPrompts.length;
+      const done    = allPrompts.filter(p => p.audio_url).length;
+      const missing = total - done;
+      document.getElementById('stat-total').textContent   = total;
+      document.getElementById('stat-done').textContent    = done;
+      document.getElementById('stat-missing').textContent = missing;
+      document.getElementById('progress-label').textContent = `${done} / ${total}`;
+      document.getElementById('progress-fill').style.width = total ? `${Math.round(done/total*100)}%` : '0%';
+    }
+
+    function getFiltered() {
+      const level   = document.getElementById('filter-level').value;
+      const purpose = document.getElementById('filter-purpose').value;
+      const week    = document.getElementById('filter-week').value;
+      return allPrompts.filter(p => {
+        if (level   && p.level   !== level)              return false;
+        if (purpose && p.purpose !== purpose)            return false;
+        if (week    && p.week_number !== parseInt(week)) return false;
+        if (missingOnly && p.audio_url)                  return false;
+        return true;
+      });
+    }
+
+    function toggleMissingOnly() {
+      missingOnly = !missingOnly;
+      const btn = document.getElementById('missing-only-btn');
+      btn.classList.toggle('active', missingOnly);
+      renderTable();
+    }
+
+    // ============================================
+    // RENDER TABLE
+    // ============================================
+    function renderTable() {
+      const filtered = getFiltered();
+      const tbody    = document.getElementById('prompts-tbody');
+      document.getElementById('table-count').textContent = `${filtered.length} prompt${filtered.length !== 1 ? 's' : ''}`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-check-circle"></i><p>No prompts match these filters.</p></div></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(p => {
+        const hasAudio = !!p.audio_url;
+        const preview  = p.prompt_text ? p.prompt_text.substring(0, 100) + (p.prompt_text.length > 100 ? '…' : '') : '—';
+        return `
+          <tr id="row-${p.id}">
+            <td>
+              <div class="row-main" style="padding-right:0.4rem;flex:none;">
+                <button type="button" class="expand-row-btn" onclick="toggleRow('${p.id}')" title="Expand">
+                  <i class="fas fa-chevron-right" id="chevron-${p.id}"></i>
+                </button>
+              </div>
+            </td>
+            <td>
+              <div class="row-main" style="padding-left:0;">
+                <span class="badge badge-week">W${p.week_number}</span>
+              </div>
+            </td>
+            <td>
+              <div class="row-main" style="padding-left:0;">
+                <span class="badge badge-purpose">${p.purpose}</span>
+              </div>
+            </td>
+            <td>
+              <div class="row-main" style="padding-left:0;">
+                <span class="badge badge-level" style="font-size:0.68rem;">${p.level}</span>
+              </div>
+            </td>
+            <td>
+              <div class="row-main" style="padding-left:0;flex-direction:column;gap:0.2rem;">
+                <span style="font-size:0.82rem;font-weight:600;color:var(--color-text);">${p.competency || '—'}</span>
+                <span style="font-size:0.75rem;color:var(--color-text-light);">${p.theme || '—'}</span>
+              </div>
+            </td>
+            <td>
+              <div class="row-main" style="padding-left:0;">
+                <span class="prompt-preview">${preview}</span>
+              </div>
+            </td>
+            <td>
+              <div class="row-main" style="padding-left:0;justify-content:center;">
+                <div class="status-dot ${hasAudio ? 'has-audio' : 'needs-audio'}" title="${hasAudio ? 'Recording uploaded' : 'Needs recording'}"></div>
+              </div>
+            </td>
+          </tr>
+          <tr id="expanded-${p.id}" style="display:none;">
+            <td colspan="7">
+              <div class="row-expanded-panel" id="panel-${p.id}">
+                ${renderExpandedPanel(p)}
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function renderExpandedPanel(p) {
+      const hasAudio = !!p.audio_url;
+      return `
+        <div class="prompt-full-text">
+          <strong style="font-size:0.75rem;color:#4A90E2;letter-spacing:0.05em;text-transform:uppercase;">Full Prompt Text</strong><br>
+          <span style="margin-top:0.35rem;display:block;">${p.prompt_text || '—'}</span>
+        </div>
+        ${p.prompt_text_japanese ? `<div class="prompt-jp-text"><strong style="font-size:0.72rem;color:#e65100;letter-spacing:0.05em;text-transform:uppercase;">Japanese Support</strong><br><span style="margin-top:0.3rem;display:block;">${p.prompt_text_japanese}</span></div>` : ''}
+
+        ${hasAudio ? `
+          <div class="current-audio-wrap">
+            <span class="current-audio-label">🎵 Current Recording</span>
+            <audio controls style="height:32px;flex:1;min-width:120px;max-width:280px;">
+              <source src="${p.audio_url}">
+            </audio>
+            <span class="current-audio-url" title="${p.audio_url}">${p.audio_url.split('/').pop()}</span>
+            <button type="button" class="remove-audio-btn" onclick="removeAudio('${p.id}')">
+              <i class="fas fa-trash"></i> Remove
+            </button>
+          </div>` : ''}
+
+        <div style="margin-bottom:0.5rem;">
+          <p style="font-size:0.82rem;font-weight:700;color:var(--color-text);margin:0 0 0.5rem;">
+            ${hasAudio ? '🔄 Replace Recording' : '⬆️ Add Recording'}
+          </p>
+        </div>
+
+        <!-- Upload zone -->
+        <div class="upload-zone" id="upload-zone-${p.id}" ondragover="onDragOver(event,'${p.id}')" ondragleave="onDragLeave(event,'${p.id}')" ondrop="onDrop(event,'${p.id}')">
+          <input type="file" accept="audio/mp4,audio/m4a,.m4a,audio/webm,.webm,audio/*"
+                 onchange="onFileSelect(event,'${p.id}')" id="file-input-${p.id}">
+          <div class="upload-zone-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+          <div class="upload-zone-label" id="upload-label-${p.id}">
+            <strong>Click to upload</strong> or drag & drop<br>
+            <span style="font-size:0.78rem;">M4A preferred — max 5 MB</span>
+          </div>
+        </div>
+
+        <div class="or-divider">OR RECORD IN BROWSER</div>
+
+        <!-- Studio recorder -->
+        <div class="studio-recorder">
+          <div class="sr-header">
+            <div class="sr-header-left">
+              <div class="sr-rec-dot armed" id="sr-dot-${p.id}"></div>
+              <span class="sr-label armed" id="sr-label-${p.id}">READY</span>
+            </div>
+            <span class="sr-format-badge m4a" id="sr-format-${p.id}">M4A · LINE ✓</span>
+          </div>
+          <div class="sr-body">
+            <div class="sr-timer-display">
+              <span class="sr-timer" id="sr-timer-${p.id}">00:00</span>
+              <span class="sr-timer-max">/ 05:00</span>
+            </div>
+            <div class="sr-vu-section">
+              <span class="sr-vu-label">VU</span>
+              <div class="sr-vu-track">
+                <div class="sr-vu-fill" id="sr-vu-fill-${p.id}"></div>
+                <div class="sr-vu-peak" id="sr-vu-peak-${p.id}"></div>
+              </div>
+              <span class="sr-vu-val" id="sr-vu-val-${p.id}">-∞ dB</span>
+            </div>
+            <canvas class="sr-waveform" id="sr-wave-${p.id}" height="42"></canvas>
+            <div class="sr-transport">
+              <div class="sr-transport-row">
+                <button type="button" class="sr-btn sr-btn-record" id="sr-rec-btn-${p.id}" onclick="prToggle('${p.id}')">
+                  <i class="fas fa-microphone"></i> REC
+                </button>
+              </div>
+              <div class="sr-transport-row">
+                <button type="button" class="sr-btn sr-btn-trash" onclick="prDiscard('${p.id}')" title="Discard & re-record">
+                  <i class="fas fa-redo"></i> REDO
+                </button>
+              </div>
+            </div>
+            <audio id="sr-audio-${p.id}" style="display:none;"></audio>
+          </div>
+        </div>
+
+        <!-- Save button -->
+        <button type="button" class="save-recording-btn" id="save-btn-${p.id}" onclick="saveRecording('${p.id}')">
+          <i class="fas fa-save"></i> Save & Upload to Supabase
+        </button>`;
+    }
+
+    function toggleRow(promptId) {
+      const expandedRow = document.getElementById(`expanded-${promptId}`);
+      const chevron     = document.getElementById(`chevron-${promptId}`);
+      const row         = document.getElementById(`row-${promptId}`);
+      const isOpen      = expandedRow.style.display !== 'none';
+
+      // Close all others first
+      document.querySelectorAll('[id^="expanded-"]').forEach(el => { el.style.display = 'none'; });
+      document.querySelectorAll('[id^="chevron-"]').forEach(el => { el.style.transform = 'rotate(0deg)'; });
+      document.querySelectorAll('.prompts-table tr').forEach(el => el.classList.remove('expanded'));
+
+      if (!isOpen) {
+        expandedRow.style.display = '';
+        chevron.style.transform = 'rotate(90deg)';
+        row.classList.add('expanded');
+        // Init recorder
+        initRec(promptId);
+        requestAnimationFrame(() => {
+          srSetState(promptId, 'ready');
+          srDrawWaveform(promptId, [], false);
+        });
+      }
+    }
+
+    // ============================================
+    // FILE UPLOAD HANDLING
+    // ============================================
+    function onFileSelect(e, promptId) {
+      const file = e.target.files[0];
+      if (!file) return;
+      setUploadFile(promptId, file);
+    }
+
+    function onDragOver(e, promptId) {
+      e.preventDefault();
+      document.getElementById(`upload-zone-${promptId}`).classList.add('drag-over');
+    }
+    function onDragLeave(e, promptId) {
+      document.getElementById(`upload-zone-${promptId}`).classList.remove('drag-over');
+    }
+    function onDrop(e, promptId) {
+      e.preventDefault();
+      document.getElementById(`upload-zone-${promptId}`).classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) setUploadFile(promptId, file);
+    }
+
+    function setUploadFile(promptId, file) {
+      initRec(promptId);
+      // Store file reference in state
+      recState[promptId].uploadFile = file;
+      // Clear any existing browser recording
+      recState[promptId].audioBlob = null;
+      recState[promptId].audioUrl  = null;
+      // Update UI
+      const zone  = document.getElementById(`upload-zone-${promptId}`);
+      const label = document.getElementById(`upload-label-${promptId}`);
+      zone.classList.add('has-file');
+      const sizeKb = (file.size / 1024).toFixed(0);
+      label.innerHTML = `<strong>${file.name}</strong><br><span style="font-size:0.78rem;">${sizeKb} KB — ready to upload</span>`;
+      showToast(`File selected: ${file.name}`, 'success');
+    }
+
+    // ============================================
+    // RECORDER (prompt-recordings variant)
+    // ============================================
+    function initRec(id) {
+      if (recState[id]) return;
+      recState[id] = {
+        mediaRecorder: null, audioChunks: [], audioBlob: null, audioUrl: null,
+        mimeType: null, duration: 0, timerSeconds: 0, timerInterval: null,
+        audioCtx: null, analyser: null, animFrame: null, wavePoints: [],
+        uploadFile: null, state: 'ready'
+      };
+    }
+
+    function srFormatTime(s) {
+      const m = Math.floor(s / 60).toString().padStart(2,'0');
+      return `${m}:${(s % 60).toString().padStart(2,'0')}`;
+    }
+
+    function srSetState(id, state) {
+      initRec(id);
+      recState[id].state = state;
+      const dot    = document.getElementById(`sr-dot-${id}`);
+      const label  = document.getElementById(`sr-label-${id}`);
+      const timer  = document.getElementById(`sr-timer-${id}`);
+      const recBtn = document.getElementById(`sr-rec-btn-${id}`);
+      if (!dot) return;
+      dot.className   = `sr-rec-dot ${state}`;
+      label.className = `sr-label ${state}`;
+      if (state === 'ready')     { label.textContent = 'READY'; timer.className = 'sr-timer'; if(recBtn){ recBtn.innerHTML='<i class="fas fa-microphone"></i> REC'; recBtn.className='sr-btn sr-btn-record'; } }
+      if (state === 'recording') { label.textContent = 'REC';   timer.className = 'sr-timer recording'; if(recBtn){ recBtn.innerHTML='<i class="fas fa-stop"></i> STOP'; recBtn.className='sr-btn sr-btn-record recording'; } }
+      if (state === 'done')      { label.textContent = 'READY TO SAVE'; timer.className = 'sr-timer done'; if(recBtn){ recBtn.innerHTML='<i class="fas fa-play"></i> PLAY'; recBtn.className='sr-btn sr-btn-record'; } }
+    }
+
+    function srDrawWaveform(id, points, isLive) {
+      const canvas = document.getElementById(`sr-wave-${id}`);
+      if (!canvas) return;
+      const W = canvas.offsetWidth || 300; canvas.width = W;
+      const ctx = canvas.getContext('2d'); const H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      if (points.length === 0) {
+        ctx.strokeStyle = '#1e1e1e'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(0, H/2); ctx.lineTo(W, H/2); ctx.stroke(); return;
+      }
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      if (isLive) { grad.addColorStop(0,'rgba(0,255,106,0.8)'); grad.addColorStop(1,'rgba(0,255,106,0.15)'); }
+      else        { grad.addColorStop(0,'rgba(68,170,255,0.8)'); grad.addColorStop(1,'rgba(68,170,255,0.15)'); }
+      const mid = H/2;
+      ctx.strokeStyle = grad; ctx.lineWidth = 1.5;
+      ['top','bottom'].forEach(side => {
+        ctx.beginPath();
+        points.forEach((p,i) => { const x = (i/(points.length-1))*W; ctx.lineTo(x, side==='top' ? mid - p*mid*0.85 : mid + p*mid*0.85); });
+        ctx.stroke();
+      });
+    }
+
+    function srAnimateLive(id) {
+      const rs = recState[id];
+      if (!rs || !rs.analyser || rs.state !== 'recording') return;
+      const freqData = new Uint8Array(rs.analyser.frequencyBinCount);
+      const timeData = new Uint8Array(rs.analyser.fftSize);
+      rs.analyser.getByteFrequencyData(freqData);
+      rs.analyser.getByteTimeDomainData(timeData);
+      const avg = freqData.reduce((a,b) => a+b,0) / freqData.length;
+      const pct = Math.min(avg/128,1) * 100;
+      const vuFill = document.getElementById(`sr-vu-fill-${id}`);
+      const vuPeak = document.getElementById(`sr-vu-peak-${id}`);
+      const vuVal  = document.getElementById(`sr-vu-val-${id}`);
+      if (vuFill) vuFill.style.width = pct + '%';
+      if (vuPeak) { vuPeak.style.left = pct + '%'; vuPeak.classList.toggle('show', pct > 5); }
+      if (vuVal)  vuVal.textContent = (pct > 0 ? (20*Math.log10(pct/100)).toFixed(1) : '-∞') + ' dB';
+      const amp = timeData.reduce((max,v) => Math.max(max, Math.abs(v-128)),0) / 128;
+      rs.wavePoints.push(amp);
+      if (rs.wavePoints.length > 120) rs.wavePoints.shift();
+      srDrawWaveform(id, rs.wavePoints, true);
+      rs.animFrame = requestAnimationFrame(() => srAnimateLive(id));
+    }
+
+    async function prToggle(id) {
+      initRec(id);
+      const rs = recState[id];
+      if (rs.state === 'ready')     { await prStart(id); }
+      else if (rs.state === 'recording') { prStop(id); }
+      else if (rs.state === 'done') {
+        const audio = document.getElementById(`sr-audio-${id}`);
+        if (audio && rs.audioUrl) { audio.src = rs.audioUrl; audio.play(); }
+      }
+    }
+
+    async function prStart(id) {
+      initRec(id);
+      const rs = recState[id];
+      try {
+        const stream   = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4'
+                       : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+        const badge = document.getElementById(`sr-format-${id}`);
+        if (badge) {
+          if (mimeType === 'audio/mp4') { badge.textContent = 'M4A · LINE ✓'; badge.className = 'sr-format-badge m4a'; }
+          else { badge.textContent = 'WEBM · LINK'; badge.className = 'sr-format-badge webm'; }
+        }
+        rs.mimeType = mimeType; rs.audioChunks = []; rs.uploadFile = null;
+        rs.mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+        rs.mediaRecorder.ondataavailable = e => { if (e.data.size > 0) rs.audioChunks.push(e.data); };
+        rs.mediaRecorder.onstop = () => {
+          rs.audioBlob = new Blob(rs.audioChunks, { type: rs.mimeType || 'audio/webm' });
+          rs.audioUrl  = URL.createObjectURL(rs.audioBlob);
+          rs.duration  = rs.timerSeconds;
+          stream.getTracks().forEach(t => t.stop());
+          if (rs.audioCtx) { rs.audioCtx.close(); rs.audioCtx = null; }
+          if (rs.animFrame) { cancelAnimationFrame(rs.animFrame); rs.animFrame = null; }
+          srSetState(id, 'done');
+          srDrawWaveform(id, rs.wavePoints, false);
+        };
+        rs.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = rs.audioCtx.createMediaStreamSource(stream);
+        rs.analyser  = rs.audioCtx.createAnalyser();
+        rs.analyser.fftSize = 256;
+        source.connect(rs.analyser);
+        rs.wavePoints = [];
+        rs.mediaRecorder.start();
+        srSetState(id, 'recording');
+        rs.timerSeconds = 0;
+        rs.timerInterval = setInterval(() => {
+          rs.timerSeconds++;
+          const timerEl = document.getElementById(`sr-timer-${id}`);
+          if (timerEl) timerEl.textContent = srFormatTime(rs.timerSeconds);
+          if (rs.timerSeconds >= 300) prStop(id); // 5 min cap for prompts
+        }, 1000);
+        srAnimateLive(id);
+      } catch (err) {
+        alert('Microphone access denied. Please allow microphone access and try again.');
+      }
+    }
+
+    function prStop(id) {
+      const rs = recState[id];
+      if (!rs || !rs.mediaRecorder) return;
+      clearInterval(rs.timerInterval);
+      if (rs.mediaRecorder.state !== 'inactive') rs.mediaRecorder.stop();
+    }
+
+    function prDiscard(id) {
+      const rs = recState[id];
+      if (!rs) return;
+      if (rs.mediaRecorder && rs.mediaRecorder.state === 'recording') {
+        rs.mediaRecorder.stop();
+        setTimeout(() => prReset(id), 150);
+      } else { prReset(id); }
+    }
+
+    function prReset(id) {
+      initRec(id);
+      const rs = recState[id];
+      clearInterval(rs.timerInterval);
+      if (rs.audioCtx) { rs.audioCtx.close(); rs.audioCtx = null; }
+      if (rs.animFrame) { cancelAnimationFrame(rs.animFrame); rs.animFrame = null; }
+      rs.audioBlob = null; rs.audioUrl = null; rs.wavePoints = []; rs.timerSeconds = 0; rs.uploadFile = null;
+      const timerEl = document.getElementById(`sr-timer-${id}`);
+      if (timerEl) timerEl.textContent = '00:00';
+      const vuFill = document.getElementById(`sr-vu-fill-${id}`);
+      if (vuFill) vuFill.style.width = '0%';
+      // Reset upload zone
+      const zone  = document.getElementById(`upload-zone-${id}`);
+      const label = document.getElementById(`upload-label-${id}`);
+      const input = document.getElementById(`file-input-${id}`);
+      if (zone)  zone.classList.remove('has-file');
+      if (label) label.innerHTML = '<strong>Click to upload</strong> or drag & drop<br><span style="font-size:0.78rem;">M4A preferred — max 5 MB</span>';
+      if (input) input.value = '';
+      srSetState(id, 'ready');
+      srDrawWaveform(id, [], false);
+    }
+
+    // ============================================
+    // SAVE RECORDING — upload to storage + update prompts.audio_url
+    // ============================================
+    async function saveRecording(promptId) {
+      const rs  = recState[promptId];
+      const btn = document.getElementById(`save-btn-${promptId}`);
+
+      // Determine source: uploaded file OR browser recording
+      let blob, ext, mimeType;
+      if (rs && rs.uploadFile) {
+        blob     = rs.uploadFile;
+        mimeType = blob.type || 'audio/mp4';
+        ext      = blob.name.split('.').pop().toLowerCase() || 'm4a';
+      } else if (rs && rs.audioBlob) {
+        blob     = rs.audioBlob;
+        mimeType = rs.mimeType || 'audio/mp4';
+        ext      = mimeType === 'audio/mp4' ? 'm4a' : 'webm';
+      } else {
+        alert('No audio to save. Please upload a file or record audio first.');
+        return;
+      }
+
+      // Find prompt to get level, purpose, week
+      const prompt = allPrompts.find(p => p.id === promptId);
+      if (!prompt) { alert('Prompt not found.'); return; }
+
+      const lvl  = prompt.level.replace(/\s+/g, '-').toLowerCase();
+      const purp = prompt.purpose.toLowerCase();
+      const wk   = prompt.week_number.toString().padStart(2, '0');
+      const path = `prompts/${lvl}/${purp}/week-${wk}-${Date.now()}.${ext}`;
+
+      const origHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…';
+
+      try {
+        // 1. Upload to Supabase Storage
+        const { error: uploadError } = await supabaseClient.storage
+          .from('prompt-recordings')
+          .upload(path, blob, { contentType: mimeType, upsert: true });
+        if (uploadError) throw uploadError;
+
+        // 2. Get public URL
+        const { data: { publicUrl } } = supabaseClient.storage
+          .from('prompt-recordings')
+          .getPublicUrl(path);
+
+        // 3. Update prompts.audio_url
+        const { error: updateError } = await supabaseClient
+          .from('prompts')
+          .update({ audio_url: publicUrl })
+          .eq('id', promptId);
+        if (updateError) throw updateError;
+
+        // 4. Update local data + re-render
+        const idx = allPrompts.findIndex(p => p.id === promptId);
+        if (idx !== -1) allPrompts[idx].audio_url = publicUrl;
+        updateStats();
+
+        // 5. Update status dot without full re-render
+        const statusDot = document.querySelector(`#row-${promptId} .status-dot`);
+        if (statusDot) { statusDot.className = 'status-dot has-audio'; statusDot.title = 'Recording uploaded'; }
+
+        // 6. Re-render expanded panel with new audio player
+        const panel = document.getElementById(`panel-${promptId}`);
+        const updatedPrompt = allPrompts.find(p => p.id === promptId);
+        if (panel && updatedPrompt) panel.innerHTML = renderExpandedPanel(updatedPrompt);
+
+        // 7. Re-init recorder for this row
+        delete recState[promptId];
+        initRec(promptId);
+        requestAnimationFrame(() => { srSetState(promptId, 'ready'); srDrawWaveform(promptId, [], false); });
+
+        showToast('✅ Recording saved successfully!', 'success');
+      } catch (err) {
+        console.error('Save recording error:', err);
+        showToast('❌ Upload failed: ' + err.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+      }
+    }
+
+    // ============================================
+    // REMOVE AUDIO
+    // ============================================
+    async function removeAudio(promptId) {
+      if (!confirm('Remove this recording? The audio_url will be cleared from the database.')) return;
+      try {
+        const { error } = await supabaseClient
+          .from('prompts').update({ audio_url: null }).eq('id', promptId);
+        if (error) throw error;
+        const idx = allPrompts.findIndex(p => p.id === promptId);
+        if (idx !== -1) allPrompts[idx].audio_url = null;
+        updateStats();
+        const statusDot = document.querySelector(`#row-${promptId} .status-dot`);
+        if (statusDot) { statusDot.className = 'status-dot needs-audio'; statusDot.title = 'Needs recording'; }
+        const panel = document.getElementById(`panel-${promptId}`);
+        const updatedPrompt = allPrompts.find(p => p.id === promptId);
+        if (panel && updatedPrompt) panel.innerHTML = renderExpandedPanel(updatedPrompt);
+        delete recState[promptId];
+        initRec(promptId);
+        requestAnimationFrame(() => { srSetState(promptId, 'ready'); srDrawWaveform(promptId, [], false); });
+        showToast('Recording removed.', 'success');
+      } catch (err) {
+        console.error('Remove audio error:', err);
+        showToast('❌ Error removing recording: ' + err.message, 'error');
+      }
+    }
+
+    // ============================================
+    // FILTER LISTENERS
+    // ============================================
+    document.getElementById('filter-level').addEventListener('change', renderTable);
+    document.getElementById('filter-purpose').addEventListener('change', renderTable);
+    document.getElementById('filter-week').addEventListener('change', renderTable);
+
+    // ============================================
+    // TOAST
+    // ============================================
+    let toastTimer;
+    function showToast(msg, type = '') {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className   = `toast ${type} show`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.classList.remove('show'); }, 3000);
+    }
+
+    // ============================================
+    // LOGOUT
+    // ============================================
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      if (confirm('Are you sure you want to logout?')) {
+        await supabaseClient.auth.signOut();
+        window.location.href = '/teacher-login.html';
+      }
+    });
+
+    // ============================================
+    // INIT
+    // ============================================
+    checkAuth();
+  </script>
+</body>
+</html>
