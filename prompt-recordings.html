@@ -157,6 +157,27 @@
     .badge-day    { background: #e3f2fd; color: #1565c0; }
     .badge-purpose { background: #fce4ec; color: #880e4f; }
     .badge-level  { background: #f3e5f5; color: #6a1b9a; }
+
+    /* Scoped metadata badges — used inside expanded panel only.
+       Scoped selector (.row-expanded-panel .meta-badge) beats any global .badge rule. */
+    .row-expanded-panel .meta-badge {
+      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 6px;
+      font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+    }
+    .row-expanded-panel .meta-badge-level   { background: #f3e5f5; color: #6a1b9a; }
+    .row-expanded-panel .meta-badge-purpose { background: #fce4ec; color: #880e4f; }
+    .row-expanded-panel .meta-badge-week    { background: #e8f5e9; color: #2e7d32; }
+    .row-expanded-panel .meta-badge-day     { background: #e3f2fd; color: #1565c0; }
+    .row-expanded-panel .meta-tag-comp {
+      display: inline-block; font-size: 0.78rem; font-weight: 600; color: #444;
+      padding: 0.15rem 0.55rem; background: #f5f5f5; border: 1px solid #ddd;
+      border-radius: 5px; white-space: nowrap;
+    }
+    .row-expanded-panel .meta-tag-theme {
+      display: inline-block; font-size: 0.75rem; color: #777;
+      padding: 0.15rem 0.55rem; background: #f5f5f5; border: 1px solid #e8e8e8;
+      border-radius: 5px; white-space: nowrap;
+    }
     .status-dot {
       width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
     }
@@ -228,16 +249,15 @@
     .upload-zone.has-file .upload-zone-icon { color: #4caf50; }
     .upload-zone.has-file .upload-zone-label strong { color: #2e7d32; }
 
-    /* OR divider */
+    /* OR divider — flex approach: lines are flex children, no z-index issues */
     .or-divider {
-      text-align: center; position: relative; margin: 0.6rem 0;
-      font-size: 0.78rem; color: var(--color-text-light); font-weight: 600;
+      display: flex; align-items: center; gap: 0.6rem;
+      margin: 0.75rem 0; font-size: 0.78rem; color: var(--color-text-light);
+      font-weight: 600;
     }
     .or-divider::before, .or-divider::after {
-      content: ''; position: absolute; top: 50%; width: 45%; height: 1px; background: var(--color-border);
+      content: ''; flex: 1; height: 1px; background: var(--color-border);
     }
-    .or-divider::before { left: 0; }
-    .or-divider::after  { right: 0; }
 
     /* Save button */
     .save-recording-btn {
@@ -347,6 +367,91 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .toast.success { background: #2e7d32; }
     .toast.error   { background: #c62828; }
+
+    /* ================================================================
+       DARK MODE
+       ================================================================ */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-surface: #1a1d28;
+        --color-border:  #2c2f42;
+        --color-text:    #dde1f0;
+        --color-text-light: #7a82a0;
+        --color-primary: #5b9cf6;
+        --color-primary-dark: #3d7fda;
+      }
+      body { background: #11131d; }
+      .page-header { background: #1a1d28; box-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+      .page-header h1 { color: #5b9cf6; }
+      /* Stats */
+      .stat-pill { background: #1a1d28; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+      .stat-pill-val { color: #5b9cf6; }
+      .stat-pill-lbl { color: #7a82a0; }
+      /* Filters */
+      .filter-bar { background: #1a1d28; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+      .filter-group label { color: #7a82a0; }
+      .filter-select { background: #22263a; color: #dde1f0; border-color: #2c2f42; }
+      .filter-select:focus { border-color: #5b9cf6; }
+      .filter-toggle-btn { background: #22263a; color: #9aa2be; border-color: #2c2f42; }
+      .filter-toggle-btn.active { background: #2a1f12; border-color: #e65100; color: #ff8a50; }
+      .filter-toggle-btn:hover { border-color: #5b9cf6; color: #dde1f0; }
+      .filter-count { color: #7a82a0; }
+      /* Progress */
+      .progress-section { background: #1a1d28; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+      .progress-header strong { color: #dde1f0; }
+      .progress-header span { color: #7a82a0; }
+      .progress-track { background: #22263a; }
+      /* Table */
+      .prompts-section { background: #1a1d28; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+      .prompts-section-header { border-color: #2c2f42; }
+      .prompts-section-header h2 { color: #dde1f0; }
+      .prompts-table thead tr { background: #22263a; }
+      .prompts-table th { color: #7a82a0; border-color: #2c2f42; }
+      .prompts-table td { border-color: #1e2130; }
+      .prompts-table tr:hover .row-main { background: #1e2235; }
+      .prompts-table tr.expanded .row-main { background: #1a2640; }
+      /* Table badges (used in main table rows) */
+      .badge-week    { background: #1a2e1a; color: #6dbf74; }
+      .badge-day     { background: #1a2440; color: #6bb3f0; }
+      .badge-purpose { background: #2a1520; color: #f48fa8; }
+      .badge-level   { background: #221540; color: #ce93d8; }
+      /* Row controls */
+      .expand-row-btn { color: #7a82a0; }
+      .expand-row-btn:hover { background: #22263a; color: #5b9cf6; }
+      .row-expanded-panel { border-top-color: #2c3e58; background: #1a1d28; }
+      /* Expanded panel meta badges */
+      .row-expanded-panel .meta-badge-level   { background: #221540; color: #ce93d8; }
+      .row-expanded-panel .meta-badge-purpose { background: #2a1520; color: #f48fa8; }
+      .row-expanded-panel .meta-badge-week    { background: #1a2e1a; color: #6dbf74; }
+      .row-expanded-panel .meta-badge-day     { background: #1a2440; color: #6bb3f0; }
+      .row-expanded-panel .meta-tag-comp { color: #9aa2be; background: #22263a; border-color: #2c2f42; }
+      .row-expanded-panel .meta-tag-theme { color: #7a82a0; background: #22263a; border-color: #252840; }
+      /* Prompt text areas */
+      .prompt-full-text { background: #1e2235; color: #bbc4da; border-left-color: #4a90e2; }
+      .prompt-full-text strong { color: #6aabff; }
+      .prompt-jp-text { background: #1e180e; color: #c8a870; border-left-color: #e65100; }
+      .prompt-jp-text strong { color: #ff8a50; }
+      /* Current audio */
+      .current-audio-wrap { background: #152015; }
+      .current-audio-label { color: #6dbf74; }
+      .current-audio-url { color: #7a82a0; }
+      .remove-audio-btn { background: #2a1010; color: #ee6868; border: none; }
+      .remove-audio-btn:hover { background: #c62828; color: white; }
+      /* Upload zone */
+      .upload-zone { border-color: #2c2f42; }
+      .upload-zone:hover, .upload-zone.drag-over { background: #1a2538; border-color: #5b9cf6; }
+      .upload-zone.has-file { border-color: #4caf50; background: #152015; }
+      .upload-zone-label strong { color: #5b9cf6; }
+      /* Save button */
+      .save-recording-btn { background: #049a42; }
+      .save-recording-btn:hover { background: #038436; }
+      .save-recording-btn:disabled { background: #333; color: #666; }
+      /* Studio recorder — keep as dark (it already is) */
+      .or-divider { color: #7a82a0; }
+      .or-divider::before, .or-divider::after { background: #2c2f42; }
+      /* Empty/loading */
+      .empty-state i { color: #2c2f42; }
+    }
 
     /* ================================================================
        RESPONSIVE
@@ -648,13 +753,13 @@
       const hasAudio = !!p.audio_url;
       return `
         <!-- Prompt metadata strip -->
-        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;padding:0.75rem 1rem;background:#f8f9fa;border-radius:8px;border:1px solid #e0e0e0;align-items:center;">
-          <span class="badge badge-level">${p.level}</span>
-          <span class="badge badge-purpose">${p.purpose}</span>
-          <span class="badge badge-week">Week ${p.week_number}</span>
-          <span class="badge badge-day" style="background:#e3f2fd;color:#1565c0;">Day ${p.day_number} · ${p.type || 'Listening Practice'}</span>
-          ${p.competency ? `<span style="font-size:0.78rem;font-weight:600;color:#555;padding:0.15rem 0.5rem;background:#fff;border:1px solid #ddd;border-radius:5px;">${p.competency}</span>` : ''}
-          ${p.theme ? `<span style="font-size:0.75rem;color:#888;padding:0.15rem 0.5rem;background:#fff;border:1px solid #e8e8e8;border-radius:5px;">${p.theme}</span>` : ''}
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;padding:0.75rem 0 0.5rem;align-items:center;border-bottom:1px solid var(--color-border);">
+          <span class="meta-badge meta-badge-level">${p.level}</span>
+          <span class="meta-badge meta-badge-purpose">${p.purpose}</span>
+          <span class="meta-badge meta-badge-week">Week ${p.week_number}</span>
+          <span class="meta-badge meta-badge-day">Day ${p.day_number} · ${p.type || 'Listening Practice'}</span>
+          ${p.competency ? `<span class="meta-tag-comp">${p.competency}</span>` : ''}
+          ${p.theme ? `<span class="meta-tag-theme">${p.theme}</span>` : ''}
         </div>
 
         <div class="prompt-full-text">
@@ -814,7 +919,7 @@
         mediaRecorder: null, audioChunks: [], audioBlob: null, audioUrl: null,
         mimeType: null, duration: 0, timerSeconds: 0, timerInterval: null,
         audioCtx: null, analyser: null, animFrame: null, wavePoints: [],
-        uploadFile: null, state: 'ready'
+        uploadFile: null, state: 'ready', isPlaying: false
       };
     }
 
@@ -888,8 +993,26 @@
       if (rs.state === 'ready')     { await prStart(id); }
       else if (rs.state === 'recording') { prStop(id); }
       else if (rs.state === 'done') {
-        const audio = document.getElementById(`sr-audio-${id}`);
-        if (audio && rs.audioUrl) { audio.src = rs.audioUrl; audio.play(); }
+        const audio  = document.getElementById(`sr-audio-${id}`);
+        const recBtn = document.getElementById(`sr-rec-btn-${id}`);
+        if (!audio || !rs.audioUrl) return;
+        if (!rs.isPlaying) {
+          // Start playback
+          audio.src = rs.audioUrl;
+          audio.play();
+          rs.isPlaying = true;
+          if (recBtn) { recBtn.innerHTML = '<i class="fas fa-stop"></i> STOP'; recBtn.classList.add('recording'); }
+          audio.onended = () => {
+            rs.isPlaying = false;
+            if (recBtn) { recBtn.innerHTML = '<i class="fas fa-play"></i> PLAY'; recBtn.classList.remove('recording'); }
+          };
+        } else {
+          // Stop playback
+          audio.pause();
+          audio.currentTime = 0;
+          rs.isPlaying = false;
+          if (recBtn) { recBtn.innerHTML = '<i class="fas fa-play"></i> PLAY'; recBtn.classList.remove('recording'); }
+        }
       }
     }
 
@@ -961,7 +1084,7 @@
       clearInterval(rs.timerInterval);
       if (rs.audioCtx) { rs.audioCtx.close(); rs.audioCtx = null; }
       if (rs.animFrame) { cancelAnimationFrame(rs.animFrame); rs.animFrame = null; }
-      rs.audioBlob = null; rs.audioUrl = null; rs.wavePoints = []; rs.timerSeconds = 0; rs.uploadFile = null;
+      rs.audioBlob = null; rs.audioUrl = null; rs.wavePoints = []; rs.timerSeconds = 0; rs.uploadFile = null; rs.isPlaying = false;
       const timerEl = document.getElementById(`sr-timer-${id}`);
       if (timerEl) timerEl.textContent = '00:00';
       const vuFill = document.getElementById(`sr-vu-fill-${id}`);
