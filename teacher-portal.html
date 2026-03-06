@@ -781,17 +781,6 @@
       </div>
     </div>
 
-    <!-- ==================== DAY 6: REAL TALK REPLIES ==================== -->
-    <div class="queue-section" id="section-day6">
-      <div class="queue-section-header">
-        <h2 class="day6-color">🎭 Day 6 — Real Talk Replies</h2>
-        <span class="task-count-badge badge-day6" id="badge-day6">0</span>
-      </div>
-      <div class="queue-section-body" id="body-day6">
-        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
-      </div>
-    </div>
-
     <!-- ==================== DAY 5: QUIZ CORRECTIONS ==================== -->
     <div class="queue-section" id="section-day5">
       <div class="queue-section-header">
@@ -799,6 +788,17 @@
         <span class="task-count-badge badge-day5" id="badge-day5">0</span>
       </div>
       <div class="queue-section-body" id="body-day5">
+        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+      </div>
+    </div>
+
+    <!-- ==================== DAY 6: REAL TALK REPLIES ==================== -->
+    <div class="queue-section" id="section-day6">
+      <div class="queue-section-header">
+        <h2 class="day6-color">🎭 Day 6 — Real Talk Replies</h2>
+        <span class="task-count-badge badge-day6" id="badge-day6">0</span>
+      </div>
+      <div class="queue-section-body" id="body-day6">
         <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
       </div>
     </div>
@@ -1493,7 +1493,39 @@ I'm proud of your dedication. Let's keep building! 🚀`
           <div id="responses-${ck}" class="response-area"><p style="color:#999;">Loading...</p></div>
           <div class="feedback-box">
             <h3>✅ Quiz Correction</h3>
-            <textarea class="feedback-textarea" id="feedback-${ck}" style="min-height:160px;">${feedbackTemplates.quiz_correction}</textarea>
+
+            <!-- Text / Voice toggle -->
+            <div class="template-toggle" style="margin-bottom:1rem;">
+              <button class="toggle-pill active" id="pill-text-${ck}"  onclick="setReplyMode('${ck}','text')">💬 Text Reply</button>
+              <button class="toggle-pill"        id="pill-voice-${ck}" onclick="setReplyMode('${ck}','voice')">🎙 Voice Reply</button>
+            </div>
+
+            <!-- Text panel -->
+            <div id="text-panel-${ck}">
+              <textarea class="feedback-textarea" id="feedback-${ck}" style="min-height:160px;">${feedbackTemplates.quiz_correction}</textarea>
+            </div>
+
+            <!-- Voice panel -->
+            <div id="voice-panel-${ck}" style="display:none;">
+              <p class="reply-tip">Record a voice correction — great for explaining the nuance behind the answer in a natural, encouraging way.</p>
+              <div class="voice-recorder" id="recorder-widget-${ck}">
+                <button class="rec-btn" id="rec-btn-${ck}" onclick="toggleRecording('${ck}')">
+                  <i class="fas fa-microphone"></i> Start Recording
+                </button>
+                <span class="rec-status" id="rec-status-${ck}">Ready</span>
+                <span id="rec-timer-${ck}" style="font-size:0.8rem; color:#c2185b; font-weight:700; min-width:36px;"></span>
+              </div>
+              <div id="rec-preview-${ck}" style="display:none; margin-top:0.75rem;">
+                <audio id="rec-audio-${ck}" controls style="width:100%; max-width:360px; border-radius:4px;"></audio>
+                <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--color-text-light);">
+                  <span id="rec-format-note-${ck}"></span>
+                </div>
+                <button onclick="discardRecording('${ck}')" style="margin-top:0.5rem; background:none; border:1px solid #ccc; padding:0.3rem 0.75rem; border-radius:4px; cursor:pointer; font-size:0.82rem; color:#666;">
+                  🗑 Discard &amp; Re-record
+                </button>
+              </div>
+            </div>
+
             <div class="action-buttons">
               <button class="send-btn day5-btn" id="send-btn-${ck}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard('${ck}', 'day5')">
                 <i class="fas fa-paper-plane"></i> Send to LINE
@@ -1547,42 +1579,74 @@ I'm proud of your dedication. Let's keep building! 🚀`
           <div id="responses-${ck}" class="response-area"><p style="color:#999;">Loading...</p></div>
           <div class="feedback-box">
             <h3>${sectionLabel}</h3>
-            <div style="margin-bottom:0.75rem;">
-              <label style="font-size:0.85rem; font-weight:600; color:var(--color-text-light); margin-right:0.5rem;">Template:</label>
-              <select id="tpl-select-${ck}" onchange="onTemplateSelect('${ck}', this.value)" style="padding:0.35rem 0.6rem; border:1px solid var(--color-border); border-radius:4px; font-size:0.85rem;">
-                <option value="weekly"              ${defaultTpl==='weekly'   ?'selected':''}>Weekly Assessment (Day 7)</option>
-                <option value="biweekly"            ${defaultTpl==='biweekly' ?'selected':''}>Check-in</option>
-                <option value="daily"               >Daily Quick Reply</option>
-                <option value="great_effort">Great Effort</option>
-                <option value="milestone">Milestone 🎉</option>
-                <option value="pronunciation_focus">Pronunciation Focus</option>
-              </select>
+
+            <!-- Text / Voice top-level toggle -->
+            <div class="template-toggle" style="margin-bottom:1rem;">
+              <button class="toggle-pill active" id="pill-text-${ck}"  onclick="setReplyMode('${ck}','text')">💬 Text</button>
+              <button class="toggle-pill"        id="pill-voice-${ck}" onclick="setReplyMode('${ck}','voice')">🎙 Voice</button>
             </div>
-            <div class="template-toggle" id="toggle-${ck}">
-              <button class="toggle-pill active" id="pill-template-${ck}" onclick="switchMode('${ck}','template')">📋 Template</button>
-              <button class="toggle-pill"        id="pill-free-${ck}"     onclick="switchMode('${ck}','free')">✏️ Free Write</button>
-            </div>
-            <textarea class="feedback-textarea" id="feedback-${ck}" placeholder="Write your assessment here...">${feedbackTemplates[defaultTpl]}</textarea>
-            <div class="skills-accordion" id="skills-accordion-${ck}">
-              <div class="skills-accordion-header" onclick="toggleSkillsAccordion('${ck}')">
-                <span>⚙️ Update skill scores (optional)</span>
-                <i class="fas fa-chevron-down" id="skills-chevron-${ck}" style="transition:transform 0.2s;"></i>
+
+            <!-- TEXT PANEL: template selector + free-write toggle + textarea + skills -->
+            <div id="text-panel-${ck}">
+              <div style="margin-bottom:0.75rem;">
+                <label style="font-size:0.85rem; font-weight:600; color:var(--color-text-light); margin-right:0.5rem;">Template:</label>
+                <select id="tpl-select-${ck}" onchange="onTemplateSelect('${ck}', this.value)" style="padding:0.35rem 0.6rem; border:1px solid var(--color-border); border-radius:4px; font-size:0.85rem;">
+                  <option value="weekly"              ${defaultTpl==='weekly'   ?'selected':''}>Weekly Assessment (Day 7)</option>
+                  <option value="biweekly"            ${defaultTpl==='biweekly' ?'selected':''}>Check-in</option>
+                  <option value="daily"               >Daily Quick Reply</option>
+                  <option value="great_effort">Great Effort</option>
+                  <option value="milestone">Milestone 🎉</option>
+                  <option value="pronunciation_focus">Pronunciation Focus</option>
+                </select>
               </div>
-              <div class="skills-accordion-body" id="skills-body-${ck}">
-                ${['Fluency','Grammar','Comprehension','Vocabulary','Pronunciation'].map(skill => `
-                  <div class="mini-skill-row">
-                    <span class="mini-skill-label">${skill}</span>
-                    <input type="range" min="0" max="10" value="5" class="mini-skill-slider"
-                      id="mini-${skill.toLowerCase()}-${ck}"
-                      oninput="document.getElementById('mini-score-${skill.toLowerCase()}-${ck}').textContent=this.value">
-                    <span class="mini-skill-score" id="mini-score-${skill.toLowerCase()}-${ck}">5</span>
-                  </div>
-                `).join('')}
-                <button onclick="saveSkillScores('${ck}')" style="margin-top:0.5rem; padding:0.4rem 1rem; background:var(--color-primary); color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.85rem;">
-                  Save Scores
+              <div class="template-toggle" id="toggle-${ck}">
+                <button class="toggle-pill active" id="pill-template-${ck}" onclick="switchMode('${ck}','template')">📋 Template</button>
+                <button class="toggle-pill"        id="pill-free-${ck}"     onclick="switchMode('${ck}','free')">✏️ Free Write</button>
+              </div>
+              <textarea class="feedback-textarea" id="feedback-${ck}" placeholder="Write your assessment here...">${feedbackTemplates[defaultTpl]}</textarea>
+              <div class="skills-accordion" id="skills-accordion-${ck}">
+                <div class="skills-accordion-header" onclick="toggleSkillsAccordion('${ck}')">
+                  <span>⚙️ Update skill scores (optional)</span>
+                  <i class="fas fa-chevron-down" id="skills-chevron-${ck}" style="transition:transform 0.2s;"></i>
+                </div>
+                <div class="skills-accordion-body" id="skills-body-${ck}">
+                  ${['Fluency','Grammar','Comprehension','Vocabulary','Pronunciation'].map(skill => `
+                    <div class="mini-skill-row">
+                      <span class="mini-skill-label">${skill}</span>
+                      <input type="range" min="0" max="10" value="5" class="mini-skill-slider"
+                        id="mini-${skill.toLowerCase()}-${ck}"
+                        oninput="document.getElementById('mini-score-${skill.toLowerCase()}-${ck}').textContent=this.value">
+                      <span class="mini-skill-score" id="mini-score-${skill.toLowerCase()}-${ck}">5</span>
+                    </div>
+                  `).join('')}
+                  <button onclick="saveSkillScores('${ck}')" style="margin-top:0.5rem; padding:0.4rem 1rem; background:var(--color-primary); color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.85rem;">
+                    Save Scores
+                  </button>
+                </div>
+              </div>
+            </div><!-- /text-panel -->
+
+            <!-- VOICE PANEL -->
+            <div id="voice-panel-${ck}" style="display:none;">
+              <p class="reply-tip">Record a voice message — great for weekly reviews that feel warm and personal.</p>
+              <div class="voice-recorder" id="recorder-widget-${ck}">
+                <button class="rec-btn" id="rec-btn-${ck}" onclick="toggleRecording('${ck}')">
+                  <i class="fas fa-microphone"></i> Start Recording
+                </button>
+                <span class="rec-status" id="rec-status-${ck}">Ready</span>
+                <span id="rec-timer-${ck}" style="font-size:0.8rem; color:#c2185b; font-weight:700; min-width:36px;"></span>
+              </div>
+              <div id="rec-preview-${ck}" style="display:none; margin-top:0.75rem;">
+                <audio id="rec-audio-${ck}" controls style="width:100%; max-width:360px; border-radius:4px;"></audio>
+                <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--color-text-light);">
+                  <span id="rec-format-note-${ck}"></span>
+                </div>
+                <button onclick="discardRecording('${ck}')" style="margin-top:0.5rem; background:none; border:1px solid #ccc; padding:0.3rem 0.75rem; border-radius:4px; cursor:pointer; font-size:0.82rem; color:#666;">
+                  🗑 Discard &amp; Re-record
                 </button>
               </div>
             </div>
+
             <div class="action-buttons">
               <button class="send-btn day7-btn" id="send-btn-${ck}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard('${ck}', 'day7')">
                 <i class="fas fa-paper-plane"></i> Send to LINE
