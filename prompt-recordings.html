@@ -746,9 +746,7 @@
           </tr>
           <tr id="expanded-${p.id}" style="display:none;">
             <td colspan="7">
-              <div class="row-expanded-panel" id="panel-${p.id}">
-                ${renderExpandedPanel(p)}
-              </div>
+              <div class="row-expanded-panel" id="panel-${p.id}" style="display:none;"></div>
             </td>
           </tr>`;
       }).join('');
@@ -855,18 +853,23 @@
       const row         = document.getElementById(`row-${promptId}`);
       const isOpen      = expandedRow.style.display !== 'none';
 
-      // Close all others first
+      // Close all others first — clear their content to remove dark elements from DOM
       document.querySelectorAll('[id^="expanded-"]').forEach(el => { el.style.display = 'none'; });
-      document.querySelectorAll('[id^="panel-"]').forEach(el => { el.style.display = 'none'; });
+      document.querySelectorAll('[id^="panel-"]').forEach(el => { el.style.display = 'none'; el.innerHTML = ''; });
       document.querySelectorAll('[id^="chevron-"]').forEach(el => { el.style.transform = 'rotate(0deg)'; });
       document.querySelectorAll('.prompts-table tr').forEach(el => el.classList.remove('expanded'));
+      // Clear recorder state for all closed rows
+      Object.keys(recState).forEach(id => { if (id !== promptId) delete recState[id]; });
 
       if (!isOpen) {
+        // Lazy render — inject content only now
+        const prompt = allPrompts.find(p => p.id === promptId);
+        if (!prompt) return;
+        panel.innerHTML = renderExpandedPanel(prompt);
         expandedRow.style.display = '';
         panel.style.display = 'block';
         chevron.style.transform = 'rotate(90deg)';
         row.classList.add('expanded');
-        // Init recorder
         initRec(promptId);
         requestAnimationFrame(() => {
           srSetState(promptId, 'ready');
@@ -1152,10 +1155,11 @@
           .getPublicUrl(path);
 
         // 3. Update prompts.audio_url
-        const { error: updateError } = await supabaseClient
+        const { error: updateError, count } = await supabaseClient
           .from('prompts')
           .update({ audio_url: publicUrl })
-          .eq('id', promptId);
+          .eq('id', promptId)
+          .select();
         if (updateError) throw updateError;
 
         // 4. Update local data + re-render
@@ -1167,10 +1171,13 @@
         const statusDot = document.querySelector(`#row-${promptId} .status-dot`);
         if (statusDot) { statusDot.className = 'status-dot has-audio'; statusDot.title = 'Recording uploaded'; }
 
-        // 6. Re-render expanded panel with new audio player
+        // 6. Re-render expanded panel with new audio player (keep it open)
         const panel = document.getElementById(`panel-${promptId}`);
         const updatedPrompt = allPrompts.find(p => p.id === promptId);
-        if (panel && updatedPrompt) panel.innerHTML = renderExpandedPanel(updatedPrompt);
+        if (panel && updatedPrompt) {
+          panel.innerHTML = renderExpandedPanel(updatedPrompt);
+          panel.style.display = 'block';
+        }
 
         // 7. Re-init recorder for this row
         delete recState[promptId];
