@@ -636,6 +636,18 @@
     .guide-level p { margin: 0; color: var(--color-text); line-height: 1.6; }
 
     /* ============================================
+       ADMIN BUTTON
+    ============================================ */
+    .admin-recordings-btn {
+      display: none;
+      background: #e65100; color: white;
+      padding: 0.5rem 1rem; border: none; border-radius: 4px;
+      cursor: pointer; font-weight: 600; font-size: 0.9rem;
+      text-decoration: none; align-items: center; gap: 0.4rem;
+    }
+    .admin-recordings-btn:hover { background: #bf360c; }
+
+    /* ============================================
        MOBILE
     ============================================ */
     @media (max-width: 768px) {
@@ -678,6 +690,9 @@
       <h1>📚 Prokaiwa Teacher Portal</h1>
       <div class="teacher-info">
         <span id="teacher-name">Loading...</span>
+        <a href="prompt-recordings.html" class="admin-recordings-btn" id="admin-recordings-btn">
+          <i class="fas fa-microphone-alt"></i> Manage Recordings
+        </a>
         <button class="logout-btn" id="logout-btn">
           <i class="fas fa-sign-out-alt"></i> Logout
         </button>
@@ -950,19 +965,17 @@
   // STATE
   // ============================================================
   let currentTeacher   = null;
-  let allStudentsData  = [];   // All students with progress
+  let allStudentsData  = [];
   let dayQueues        = { day6: [], day5: [], day7other: [] };
-  let completedToday   = new Set();  // Set of responseIds (message_log UUIDs)
-  let queueItemsMap    = new Map();  // responseId → full queueItem object
+  let completedToday   = new Set();
+  let queueItemsMap    = new Map();
   let currentFilters   = {};
   let currentAssessmentStudent = null;
   let currentCancellationStudent = null;
   let mediaRecorder    = null;
   let audioChunks      = [];
   let recordingStudentId = null;
-
-  // Saved draft texts (so toggle doesn't wipe typed content)
-  let draftStore = {};  // { studentId: { freeText: '', templateText: '' } }
+  let draftStore = {};
 
   // ============================================================
   // FEEDBACK TEMPLATES
@@ -1053,7 +1066,7 @@ Next up: [brief preview of what's coming]
 I'm proud of your dedication. Let's keep building! 🚀`
   };
 
-  // Cancellation outreach templates (unchanged)
+  // Cancellation outreach templates
   const messageTemplates = {
     expensive: { body: `Hi [Student Name],\n\nI noticed you cancelled your subscription and wanted to reach out personally. I've really enjoyed working with you.\n\nIf cost was a factor, I'd love to chat about options that might work better for your budget.\n\nBest regards,\n[Teacher Name]` },
     not_using: { body: `Hi [Student Name],\n\nI saw that finding time for practice has been challenging — totally understandable!\n\nEven 5-10 minutes a day makes a big difference. Would you be open to adjusting your practice routine to fit your schedule better?\n\nBest regards,\n[Teacher Name]` },
@@ -1083,6 +1096,12 @@ I'm proud of your dedication. Let's keep building! 🚀`
     currentTeacher = teacher;
     document.getElementById('teacher-name').textContent = teacher.full_name;
 
+    // Show admin button only for admin-role teachers
+    if (teacher.role === 'admin') {
+      const adminBtn = document.getElementById('admin-recordings-btn');
+      adminBtn.style.display = 'inline-flex';
+    }
+
     await loadCompletedToday();
     await loadDayTypeQueue();
     await loadVideoLessons();
@@ -1106,18 +1125,16 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // ============================================================
   async function loadDayTypeQueue() {
     try {
-      // ── 1. Fetch all students assigned to this teacher ──────────────────
       const { data: assignments, error: assignError } = await supabaseClient
         .from('student_teacher_assignments')
         .select(`student_id, questionnaire_responses(id, user_id, given_name_romaji, name, line_id, plan)`)
         .eq('teacher_id', currentTeacher.id);
       if (assignError) throw assignError;
 
-      const students = assignments.map(a => a.questionnaire_responses).filter(Boolean);
+      const students  = assignments.map(a => a.questionnaire_responses).filter(Boolean);
       const userIds   = students.map(s => s.user_id).filter(Boolean);
       const studentIds = students.map(s => s.id).filter(Boolean);
 
-      // ── 2. Fetch progress for all students ──────────────────────────────
       const { data: progressData } = await supabaseClient
         .from('student_progress').select('*').in('user_id', userIds);
 
@@ -1126,7 +1143,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
         return { ...s, ...progress };
       });
 
-      // ── 3. Fetch ALL student responses (no date filter) ─────────────────
       const { data: allResponses, error: respError } = await supabaseClient
         .from('message_log')
         .select('id, user_id, prompt_id, message_text, media_type, message_id, line_message_id, created_at')
@@ -1135,32 +1151,25 @@ I'm proud of your dedication. Let's keep building! 🚀`
         .order('created_at', { ascending: false });
       if (respError) throw respError;
 
-      // ── 4. Fetch all feedback timestamps per student ─────────────────────
-      // A response is UNREVIEWED if no feedback was sent to that student AFTER
-      // that response's created_at timestamp.
       const { data: allFeedback } = await supabaseClient
         .from('feedback_log')
         .select('student_id, sent_at')
         .in('student_id', studentIds);
 
-      // Build map: studentId (integer) → sorted array of feedback timestamps (ms)
       const feedbackMap = {};
       for (const fb of allFeedback || []) {
         if (!feedbackMap[fb.student_id]) feedbackMap[fb.student_id] = [];
         feedbackMap[fb.student_id].push(new Date(fb.sent_at).getTime());
       }
 
-      // ── 5. Filter to unreviewed responses only ───────────────────────────
       const unreviewedResponses = (allResponses || []).filter(r => {
         const student = allStudentsData.find(s => s.user_id === r.user_id);
         if (!student) return false;
         const feedbackTimes  = feedbackMap[student.id] || [];
         const responseTime   = new Date(r.created_at).getTime();
-        // Unreviewed = no feedback sent after this response
         return !feedbackTimes.some(ft => ft > responseTime);
       });
 
-      // ── 6. Fetch prompt metadata for responses that have a prompt_id ─────
       const promptIds = [...new Set(
         unreviewedResponses.map(r => r.prompt_id).filter(Boolean)
       )];
@@ -1174,40 +1183,21 @@ I'm proud of your dedication. Let's keep building! 🚀`
         for (const p of promptData || []) promptMap[p.id] = p;
       }
 
-      // ── 7. Build queueItems and sort into buckets ────────────────────────
-      // Each queue item is response-centric, not student-centric.
-      // A student can appear in multiple sections if they have multiple
-      // unreviewed responses of different types (catch-up scenario).
+      // Route by prompt type / day number — no plan-based filtering
       dayQueues  = { day6: [], day5: [], day7other: [] };
       queueItemsMap.clear();
-
-      // Which day numbers require teacher action per plan:
-      // LINE        → Day 5 (Quiz), Day 6 (Real Talk), Day 7 (Weekly Summary)
-      // power_lite  → Day 3, 5, 6, 7
-      // power_pro   → All days (daily teacher replies)
-      const planDays = {
-        line:        [5, 6, 7],
-        power_lite:  [3, 5, 6, 7],
-        power_pro:   [1, 2, 3, 4, 5, 6, 7],
-        video:       [5, 6, 7]
-      };
 
       for (const response of unreviewedResponses) {
         const student = allStudentsData.find(s => s.user_id === response.user_id);
         if (!student) continue;
 
-        // Determine which day this response belongs to
-        const prompt = response.prompt_id ? promptMap[response.prompt_id] : null;
-        const dayNumber = prompt?.day_number ?? student.current_day ?? 0;
+        const prompt     = response.prompt_id ? promptMap[response.prompt_id] : null;
+        const dayNumber  = prompt?.day_number ?? student.current_day ?? 0;
         const promptType = prompt?.type ?? null;
 
-        // Does this plan require teacher action on this day?
-        const activeDays = planDays[student.plan] || [5, 6, 7];
-        if (!activeDays.includes(dayNumber)) continue;
-
         const qi = {
-          responseId:        response.id,         // UUID — unique per queue card
-          studentId:         student.id,           // integer — questionnaire_responses.id
+          responseId:        response.id,
+          studentId:         student.id,
           studentUserId:     student.user_id,
           name:              student.given_name_romaji || student.name,
           plan:              student.plan,
@@ -1226,13 +1216,11 @@ I'm proud of your dedication. Let's keep building! 🚀`
 
         queueItemsMap.set(response.id, qi);
 
-        // Route to correct section by prompt type
         if (promptType === 'Real Talk' || dayNumber === 6) {
           dayQueues.day6.push(qi);
         } else if (promptType === 'Quiz' || dayNumber === 5) {
           dayQueues.day5.push(qi);
         } else {
-          // Day 7 assessments + all other Power Pro days
           dayQueues.day7other.push(qi);
         }
       }
@@ -1258,7 +1246,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
     renderDay7Section();
   }
 
-  // --- DAY 6 ---
   function renderDay6Section() {
     const body  = document.getElementById('body-day6');
     const badge = document.getElementById('badge-day6');
@@ -1278,7 +1265,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
     addCardListeners(items);
   }
 
-  // --- DAY 5 ---
   function renderDay5Section() {
     const body  = document.getElementById('body-day5');
     const badge = document.getElementById('badge-day5');
@@ -1298,7 +1284,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
     addCardListeners(items);
   }
 
-  // --- DAY 7 / OTHER ---
   function renderDay7Section() {
     const body  = document.getElementById('body-day7');
     const badge = document.getElementById('badge-day7');
@@ -1318,21 +1303,18 @@ I'm proud of your dedication. Let's keep building! 🚀`
     addCardListeners(items);
   }
 
-  // --- ALL STUDENTS ---
   function renderAllStudents() {
-    const body = document.getElementById('all-students-body');
+    const body    = document.getElementById('all-students-body');
     const countEl = document.getElementById('all-students-count');
     countEl.textContent = `(${allStudentsData.length})`;
-
     if (allStudentsData.length === 0) {
       body.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><p>No students assigned yet.</p></div>`;
       return;
     }
-
     body.innerHTML = allStudentsData.map(s => {
-      const name = s.given_name_romaji || s.name;
-      const planClass = `plan-${s.plan}`;
-      const planLabel = formatPlanName(s.plan);
+      const name       = s.given_name_romaji || s.name;
+      const planClass  = `plan-${s.plan}`;
+      const planLabel  = formatPlanName(s.plan);
       return `
         <div class="roster-card">
           <div class="roster-info">
@@ -1369,8 +1351,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
     return `<span class="plan-badge plan-${plan}">${formatPlanName(plan)}</span>`;
   }
 
-  // responsePreviewHtml — shows the student's actual response inside the card
-  // so the teacher can see it without scrolling the full history
   function responsePreviewHtml(qi) {
     const when = new Date(qi.responseCreatedAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
     let html = `<div style="background:#f8f8f8; border:1px solid #e0e0e0; border-radius:6px; padding:0.75rem 1rem; margin-bottom:1rem; font-size:0.88rem;">
@@ -1404,10 +1384,12 @@ I'm proud of your dedication. Let's keep building! 🚀`
     `;
   }
 
-  // DAY 6 CARD — response-centric, cardKey = qi.responseId
+  // ============================================================
+  // DAY 6 CARD
+  // ============================================================
   function createDay6Card(qi) {
     const isDone = completedToday.has(qi.responseId);
-    const ck = qi.responseId;  // shorthand — used for all DOM IDs within this card
+    const ck = qi.responseId;
     return `
       <div class="student-card" id="card-${ck}">
         <div class="student-header" onclick="toggleCard('${ck}')">
@@ -1433,27 +1415,22 @@ I'm proud of your dedication. Let's keep building! 🚀`
           <div class="feedback-box">
             <h3>🎭 Day 6 Quick Reply</h3>
 
-            <!-- Reply mode toggle: Text vs Voice -->
-            <div class="template-toggle" id="reply-mode-toggle-${ck}" style="margin-bottom:1rem;">
+            <!-- Text / Voice toggle -->
+            <div class="template-toggle" style="margin-bottom:1rem;">
               <button class="toggle-pill active" id="pill-text-${ck}"  onclick="setReplyMode('${ck}','text')">💬 Text Reply</button>
               <button class="toggle-pill"        id="pill-voice-${ck}" onclick="setReplyMode('${ck}','voice')">🎙 Voice Reply</button>
             </div>
 
-            <!-- Text reply panel -->
+            <!-- Text panel -->
             <div id="text-panel-${ck}">
               <p class="reply-tip">Keep it short and encouraging — 1 to 2 sentences. React to their response, give one tip if needed.</p>
-              <textarea
-                class="feedback-textarea short"
-                id="feedback-${ck}"
-                placeholder="e.g. Great reaction — that 'Oh no way!' sounded completely natural! 🎉 Try adding a follow-up question next time to keep the conversation going."
-              ></textarea>
+              <textarea class="feedback-textarea short" id="feedback-${ck}"
+                placeholder="e.g. Great reaction — that 'Oh no way!' sounded completely natural! 🎉 Try adding a follow-up question next time to keep the conversation going."></textarea>
             </div>
 
-            <!-- Voice reply panel -->
+            <!-- Voice panel -->
             <div id="voice-panel-${ck}" style="display:none;">
               <p class="reply-tip">Record a short voice reply (aim for 10–30 seconds). Students hear your voice directly in LINE.</p>
-
-              <!-- Recorder widget -->
               <div class="voice-recorder" id="recorder-widget-${ck}">
                 <button class="rec-btn" id="rec-btn-${ck}" onclick="toggleRecording('${ck}')">
                   <i class="fas fa-microphone"></i> Start Recording
@@ -1461,8 +1438,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
                 <span class="rec-status" id="rec-status-${ck}">Ready</span>
                 <span id="rec-timer-${ck}" style="font-size:0.8rem; color:#c2185b; font-weight:700; min-width:36px;"></span>
               </div>
-
-              <!-- Playback preview (shown after recording) -->
               <div id="rec-preview-${ck}" style="display:none; margin-top:0.75rem;">
                 <audio id="rec-audio-${ck}" controls style="width:100%; max-width:360px; border-radius:4px;"></audio>
                 <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--color-text-light);">
@@ -1488,7 +1463,9 @@ I'm proud of your dedication. Let's keep building! 🚀`
     `;
   }
 
+  // ============================================================
   // DAY 5 CARD
+  // ============================================================
   function createDay5Card(qi) {
     const isDone = completedToday.has(qi.responseId);
     const ck = qi.responseId;
@@ -1516,11 +1493,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
           <div id="responses-${ck}" class="response-area"><p style="color:#999;">Loading...</p></div>
           <div class="feedback-box">
             <h3>✅ Quiz Correction</h3>
-            <textarea
-              class="feedback-textarea"
-              id="feedback-${ck}"
-              style="min-height:160px;"
-            >${feedbackTemplates.quiz_correction}</textarea>
+            <textarea class="feedback-textarea" id="feedback-${ck}" style="min-height:160px;">${feedbackTemplates.quiz_correction}</textarea>
             <div class="action-buttons">
               <button class="send-btn day5-btn" id="send-btn-${ck}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard('${ck}', 'day5')">
                 <i class="fas fa-paper-plane"></i> Send to LINE
@@ -1535,15 +1508,16 @@ I'm proud of your dedication. Let's keep building! 🚀`
     `;
   }
 
+  // ============================================================
   // DAY 7 / OTHER CARD
+  // ============================================================
   function createDay7Card(qi) {
     const isDone     = completedToday.has(qi.responseId);
     const ck         = qi.responseId;
-    const isFullWeek = qi.plan === 'line' && qi.promptDayNumber === 7;
-    const isPro      = qi.plan === 'power_pro' && qi.promptDayNumber !== 7;
-    const defaultTpl = isFullWeek ? 'weekly' : (isPro ? 'daily' : 'biweekly');
+    const isWeekEnd  = qi.promptDayNumber === 7;
+    const defaultTpl = isWeekEnd ? 'weekly' : 'biweekly';
     const dayLabel   = qi.promptType || `Day ${qi.promptDayNumber}`;
-    const sectionLabel = isFullWeek ? '📋 Weekly Assessment' : (isPro ? `⚡ Daily Reply (${dayLabel})` : '✨ Check-in');
+    const sectionLabel = isWeekEnd ? '📋 Weekly Assessment' : `✨ Check-in (${dayLabel})`;
 
     if (!draftStore[ck]) {
       draftStore[ck] = { templateText: feedbackTemplates[defaultTpl], freeText: '' };
@@ -1576,9 +1550,9 @@ I'm proud of your dedication. Let's keep building! 🚀`
             <div style="margin-bottom:0.75rem;">
               <label style="font-size:0.85rem; font-weight:600; color:var(--color-text-light); margin-right:0.5rem;">Template:</label>
               <select id="tpl-select-${ck}" onchange="onTemplateSelect('${ck}', this.value)" style="padding:0.35rem 0.6rem; border:1px solid var(--color-border); border-radius:4px; font-size:0.85rem;">
-                <option value="weekly"              ${defaultTpl==='weekly'   ?'selected':''}>Weekly Assessment (LINE)</option>
-                <option value="biweekly"            ${defaultTpl==='biweekly' ?'selected':''}>Bi-weekly Check-in</option>
-                <option value="daily"               ${defaultTpl==='daily'    ?'selected':''}>Daily Quick (Power Pro)</option>
+                <option value="weekly"              ${defaultTpl==='weekly'   ?'selected':''}>Weekly Assessment (Day 7)</option>
+                <option value="biweekly"            ${defaultTpl==='biweekly' ?'selected':''}>Check-in</option>
+                <option value="daily"               >Daily Quick Reply</option>
                 <option value="great_effort">Great Effort</option>
                 <option value="milestone">Milestone 🎉</option>
                 <option value="pronunciation_focus">Pronunciation Focus</option>
@@ -1588,11 +1562,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
               <button class="toggle-pill active" id="pill-template-${ck}" onclick="switchMode('${ck}','template')">📋 Template</button>
               <button class="toggle-pill"        id="pill-free-${ck}"     onclick="switchMode('${ck}','free')">✏️ Free Write</button>
             </div>
-            <textarea
-              class="feedback-textarea"
-              id="feedback-${ck}"
-              placeholder="Write your assessment here..."
-            >${feedbackTemplates[defaultTpl]}</textarea>
+            <textarea class="feedback-textarea" id="feedback-${ck}" placeholder="Write your assessment here...">${feedbackTemplates[defaultTpl]}</textarea>
             <div class="skills-accordion" id="skills-accordion-${ck}">
               <div class="skills-accordion-header" onclick="toggleSkillsAccordion('${ck}')">
                 <span>⚙️ Update skill scores (optional)</span>
@@ -1636,7 +1606,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
       const card = document.getElementById(`card-${ck}`);
       if (!card) return;
 
-      // Filter buttons (desktop)
       card.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const filter    = e.target.dataset.filter;
@@ -1649,7 +1618,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
         });
       });
 
-      // Filter dropdown (mobile)
       const sel = card.querySelector('.filter-select-mobile');
       if (sel) {
         sel.addEventListener('change', async (e) => {
@@ -1674,7 +1642,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
     }
   }
 
-  // Template mode switch for Day 7 cards — cardKey = responseId
   function switchMode(cardKey, mode) {
     const textarea  = document.getElementById(`feedback-${cardKey}`);
     const pillTpl   = document.getElementById(`pill-template-${cardKey}`);
@@ -1773,7 +1740,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
         return;
       }
 
-      // Group by date
       const byDate = {};
       allMsgs.forEach(m => {
         const d = new Date(m.created_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
@@ -1826,12 +1792,10 @@ I'm proud of your dedication. Let's keep building! 🚀`
     const qi      = queueItemsMap.get(cardKey);
     if (!qi) { alert('Error: could not find this response. Please refresh.'); return; }
 
-    // ── Determine reply mode (Day 6 only has text/voice toggle) ───────────
     const voicePillActive = document.getElementById(`pill-voice-${cardKey}`)?.classList.contains('active');
     const rs = recState[cardKey];
     const isVoiceMode = voicePillActive && rs?.audioBlob;
 
-    // ── Validate ──────────────────────────────────────────────────────────
     if (isVoiceMode) {
       if (!confirm('Send this voice message to the student via LINE?')) return;
     } else {
@@ -1849,12 +1813,10 @@ I'm proud of your dedication. Let's keep building! 🚀`
       let body;
 
       if (isVoiceMode) {
-        // Upload audio to Supabase Storage first
         sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading audio...';
         const upload = await uploadAudioToStorage(cardKey);
 
         if (upload.isM4A) {
-          // M4A — LINE will play it natively as an audio message
           body = {
             studentId:     qi.studentId,
             teacherId:     currentTeacher.id,
@@ -1862,8 +1824,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
             audioDuration: upload.duration
           };
         } else {
-          // WebM (Chrome) — LINE rejects WebM as audio messages.
-          // Send as a text message with a playable link instead.
           body = {
             studentId:    qi.studentId,
             teacherId:    currentTeacher.id,
@@ -1891,13 +1851,11 @@ I'm proud of your dedication. Let's keep building! 🚀`
 
       completedToday.add(cardKey);
 
-      // Reset voice recorder if it was used
       if (isVoiceMode) {
         discardRecording(cardKey);
         setReplyMode(cardKey, 'text');
       }
 
-      // Show brief confirmation then reload queue
       const sendBtn2 = document.getElementById(`send-btn-${cardKey}`);
       if (sendBtn2) { sendBtn2.innerHTML = '<i class="fas fa-check"></i> Sent! ✅'; }
       setTimeout(async () => { await loadDayTypeQueue(); }, 1200);
@@ -1915,18 +1873,15 @@ I'm proud of your dedication. Let's keep building! 🚀`
     await loadDayTypeQueue();
   }
 
-  // Save skill scores from mini sliders in Day 7 cards
   async function saveSkillScores(cardKey) {
     const qi = queueItemsMap.get(cardKey);
     if (!qi) return;
-
     const skills = ['fluency','grammar','comprehension','vocabulary','pronunciation'];
     const scores = {};
     skills.forEach(sk => {
       const el = document.getElementById(`mini-${sk}-${cardKey}`);
       if (el) scores[sk] = parseInt(el.value);
     });
-
     try {
       const { error } = await supabaseClient
         .from('student_assessments')
@@ -1948,19 +1903,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // ============================================================
   // VOICE RECORDING — DAY 6 CARDS
   // ============================================================
-
-  // Per-card recording state — keyed by cardKey (responseId)
   const recState = {};
-  // recState[ck] = {
-  //   mediaRecorder: MediaRecorder | null,
-  //   audioChunks:   Blob[],
-  //   audioBlob:     Blob | null,
-  //   audioUrl:      string | null,   // Supabase Storage public URL
-  //   mimeType:      string,
-  //   duration:      number,          // milliseconds
-  //   timerInterval: number | null,
-  //   timerSeconds:  number,
-  // }
 
   function setReplyMode(ck, mode) {
     const textPanel  = document.getElementById(`text-panel-${ck}`);
@@ -1981,24 +1924,20 @@ I'm proud of your dedication. Let's keep building! 🚀`
   async function toggleRecording(ck) {
     if (!recState[ck]) recState[ck] = { mediaRecorder: null, audioChunks: [], audioBlob: null, audioUrl: null, mimeType: '', duration: 0, timerInterval: null, timerSeconds: 0 };
     const rs = recState[ck];
-
     if (rs.mediaRecorder && rs.mediaRecorder.state === 'recording') {
-      // Stop recording
       rs.mediaRecorder.stop();
     } else {
-      // Start recording
       await startRecording(ck);
     }
   }
 
   async function startRecording(ck) {
-    const rs = recState[ck];
-    const btn      = document.getElementById(`rec-btn-${ck}`);
-    const status   = document.getElementById(`rec-status-${ck}`);
-    const widget   = document.getElementById(`recorder-widget-${ck}`);
-    const preview  = document.getElementById(`rec-preview-${ck}`);
+    const rs      = recState[ck];
+    const btn     = document.getElementById(`rec-btn-${ck}`);
+    const status  = document.getElementById(`rec-status-${ck}`);
+    const widget  = document.getElementById(`recorder-widget-${ck}`);
+    const preview = document.getElementById(`rec-preview-${ck}`);
 
-    // Reset state
     rs.audioChunks = [];
     rs.audioBlob   = null;
     rs.audioUrl    = null;
@@ -2006,12 +1945,8 @@ I'm proud of your dedication. Let's keep building! 🚀`
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      // Prefer M4A (Safari/iOS) — LINE requires it for native audio messages.
-      // Fall back to WebM (Chrome) — will send as text link instead.
       const preferredTypes = ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg'];
       rs.mimeType = preferredTypes.find(t => MediaRecorder.isTypeSupported(t)) || '';
-
       rs.mediaRecorder = new MediaRecorder(stream, rs.mimeType ? { mimeType: rs.mimeType } : {});
 
       rs.mediaRecorder.ondataavailable = (e) => {
@@ -2019,53 +1954,36 @@ I'm proud of your dedication. Let's keep building! 🚀`
       };
 
       rs.mediaRecorder.onstop = () => {
-        // Stop all mic tracks
         stream.getTracks().forEach(t => t.stop());
-
-        // Clear timer
         clearInterval(rs.timerInterval);
         rs.duration = rs.timerSeconds * 1000;
-
-        // Build blob
         const actualMime = rs.mediaRecorder.mimeType || rs.mimeType || 'audio/webm';
         rs.audioBlob = new Blob(rs.audioChunks, { type: actualMime });
-
-        // Show preview
         const blobUrl = URL.createObjectURL(rs.audioBlob);
-        const audioEl = document.getElementById(`rec-audio-${ck}`);
-        audioEl.src   = blobUrl;
+        document.getElementById(`rec-audio-${ck}`).src = blobUrl;
         preview.style.display = 'block';
-
-        // Format note — tell teacher if LINE will accept it natively
         const formatNote = document.getElementById(`rec-format-note-${ck}`);
         const isLineCompatible = actualMime.includes('mp4') || actualMime.includes('aac');
-        if (isLineCompatible) {
-          formatNote.innerHTML = `<span style="color:#4caf50;">✓ M4A format — will play natively in LINE</span>`;
-        } else {
-          formatNote.innerHTML = `<span style="color:#ff9800;">⚠ ${actualMime.split(';')[0]} format — will send as audio link (Chrome limitation)</span>`;
-        }
-
-        // Reset button
-        btn.innerHTML   = '<i class="fas fa-microphone"></i> Re-record';
-        btn.className   = 'rec-btn';
+        formatNote.innerHTML = isLineCompatible
+          ? `<span style="color:#4caf50;">✓ M4A format — will play natively in LINE</span>`
+          : `<span style="color:#ff9800;">⚠ ${actualMime.split(';')[0]} format — will send as audio link (Chrome limitation)</span>`;
+        btn.innerHTML = '<i class="fas fa-microphone"></i> Re-record';
+        btn.className = 'rec-btn';
         widget.classList.remove('recording');
         status.textContent = `Recorded (${rs.timerSeconds}s)`;
         document.getElementById(`rec-timer-${ck}`).textContent = '';
       };
 
-      // Start recording
-      rs.mediaRecorder.start(100);  // Collect data every 100ms
+      rs.mediaRecorder.start(100);
       rs.timerSeconds = 0;
       widget.classList.add('recording');
       btn.innerHTML  = '<i class="fas fa-stop"></i> Stop';
       btn.className  = 'rec-btn recording';
       status.textContent = 'Recording...';
 
-      // Timer
       rs.timerInterval = setInterval(() => {
         rs.timerSeconds++;
         document.getElementById(`rec-timer-${ck}`).textContent = `${rs.timerSeconds}s`;
-        // Auto-stop at 120 seconds (LINE max is 200s but keep it reasonable)
         if (rs.timerSeconds >= 120) rs.mediaRecorder.stop();
       }, 1000);
 
@@ -2082,68 +2000,53 @@ I'm proud of your dedication. Let's keep building! 🚀`
   function discardRecording(ck) {
     const rs = recState[ck];
     if (!rs) return;
-    rs.audioBlob = null;
-    rs.audioUrl  = null;
-    rs.audioChunks = [];
-    rs.timerSeconds = 0;
+    rs.audioBlob = null; rs.audioUrl = null; rs.audioChunks = []; rs.timerSeconds = 0;
     document.getElementById(`rec-preview-${ck}`).style.display = 'none';
     const btn = document.getElementById(`rec-btn-${ck}`);
-    btn.innerHTML  = '<i class="fas fa-microphone"></i> Start Recording';
-    btn.className  = 'rec-btn';
+    btn.innerHTML = '<i class="fas fa-microphone"></i> Start Recording';
+    btn.className = 'rec-btn';
     document.getElementById(`rec-status-${ck}`).textContent = 'Ready';
     document.getElementById(`rec-timer-${ck}`).textContent  = '';
   }
 
-  // Upload audio blob to Supabase Storage and return public URL
   async function uploadAudioToStorage(ck) {
-    const rs  = recState[ck];
+    const rs = recState[ck];
     if (!rs?.audioBlob) return null;
-
     const ext      = rs.audioBlob.type.includes('mp4') || rs.audioBlob.type.includes('aac') ? 'm4a' : 'webm';
     const filename = `teacher-audio/${currentTeacher.id}/${Date.now()}.${ext}`;
-
     const { data, error } = await supabaseClient.storage
       .from('teacher-feedback-audio')
-      .upload(filename, rs.audioBlob, {
-        contentType: rs.audioBlob.type,
-        upsert: false
-      });
-
+      .upload(filename, rs.audioBlob, { contentType: rs.audioBlob.type, upsert: false });
     if (error) throw new Error('Upload failed: ' + error.message);
-
-    // Get public URL
     const { data: urlData } = supabaseClient.storage
       .from('teacher-feedback-audio')
       .getPublicUrl(filename);
-
     return { url: urlData.publicUrl, duration: rs.duration, isM4A: ext === 'm4a' };
   }
+
+  // ============================================================
+  // STATS
+  // ============================================================
   function updateStats() {
-    const total     = allStudentsData.length;
-    const allItems  = [...dayQueues.day6, ...dayQueues.day5, ...dayQueues.day7other];
+    const total      = allStudentsData.length;
+    const allItems   = [...dayQueues.day6, ...dayQueues.day5, ...dayQueues.day7other];
     const totalTasks = allItems.length;
     const completed  = allItems.filter(qi => completedToday.has(qi.responseId)).length;
 
-    const d6Remaining = dayQueues.day6.filter(qi => !completedToday.has(qi.responseId)).length;
-    const d5Remaining = dayQueues.day5.filter(qi => !completedToday.has(qi.responseId)).length;
-    const d7LineRemaining  = dayQueues.day7other.filter(qi => !completedToday.has(qi.responseId) && qi.plan === 'line' && qi.promptDayNumber === 7).length;
-    const d7OtherRemaining = dayQueues.day7other.filter(qi => !completedToday.has(qi.responseId) && !(qi.plan === 'line' && qi.promptDayNumber === 7)).length;
+    const d6Rem        = dayQueues.day6.filter(qi => !completedToday.has(qi.responseId)).length;
+    const d5Rem        = dayQueues.day5.filter(qi => !completedToday.has(qi.responseId)).length;
+    const d7WeeklyRem  = dayQueues.day7other.filter(qi => !completedToday.has(qi.responseId) && qi.promptDayNumber === 7).length;
+    const d7OtherRem   = dayQueues.day7other.filter(qi => !completedToday.has(qi.responseId) && qi.promptDayNumber !== 7).length;
 
-    const etaMinutes =
-      (d6Remaining          * 2)   +
-      (d5Remaining          * 1.5) +
-      (d7LineRemaining      * 10)  +
-      (d7OtherRemaining     * 4);
-
+    const etaMinutes = (d6Rem * 2) + (d5Rem * 1.5) + (d7WeeklyRem * 10) + (d7OtherRem * 4);
     const hrs = Math.floor(etaMinutes / 60);
     const min = Math.round(etaMinutes % 60);
 
-    document.getElementById('total-students').textContent    = total;
-    document.getElementById('today-tasks').textContent       = totalTasks;
-    document.getElementById('completed-today').textContent   = `${completed}/${totalTasks}`;
-    document.getElementById('estimated-time').textContent    = etaMinutes > 0
-      ? (hrs > 0 ? `${hrs}h ${min}m` : `${min}m`)
-      : '0m';
+    document.getElementById('total-students').textContent  = total;
+    document.getElementById('today-tasks').textContent     = totalTasks;
+    document.getElementById('completed-today').textContent = `${completed}/${totalTasks}`;
+    document.getElementById('estimated-time').textContent  = etaMinutes > 0
+      ? (hrs > 0 ? `${hrs}h ${min}m` : `${min}m`) : '0m';
   }
 
   // ============================================================
@@ -2163,7 +2066,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
   setInterval(() => { loadDayTypeQueue(); loadVideoLessons(); }, 5 * 60 * 1000);
 
   // ============================================================
-  // ASSESSMENT MODAL (FULL — UNCHANGED LOGIC)
+  // ASSESSMENT MODAL
   // ============================================================
   const skillGuides = {
     fluency: {
@@ -2217,16 +2120,13 @@ I'm proud of your dedication. Let's keep building! 🚀`
     currentAssessmentStudent = studentId;
     const student = allStudentsData.find(s => s.id === studentId);
     if (!student) { alert('Student not found'); return; }
-
     document.getElementById('assessment-student-name').textContent =
       `${student.given_name_romaji || student.name} — ${student.level || 'Not set'}`;
-
     try {
       const { data: prev } = await supabaseClient
         .from('student_assessments').select('*')
         .eq('student_id', studentId)
         .order('assessed_at', { ascending: false }).limit(1).maybeSingle();
-
       const skills = ['fluency','grammar','comprehension','vocabulary','pronunciation'];
       skills.forEach(sk => {
         const prevScore = prev ? prev[sk] : '-';
@@ -2242,7 +2142,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
         document.getElementById(`${sk}-score`).textContent = suggested;
       });
     } catch(err) { console.error('openAssessmentModal:', err); }
-
     const skills = ['fluency','grammar','comprehension','vocabulary','pronunciation'];
     skills.forEach(sk => {
       const slider = document.getElementById(`${sk}-slider`);
@@ -2251,7 +2150,6 @@ I'm proud of your dedication. Let's keep building! 🚀`
         updateAssessmentSummary();
       };
     });
-
     updateAssessmentSummary();
     document.getElementById('assessment-modal').classList.add('active');
   }
@@ -2277,7 +2175,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
     }, 0);
     if (prevTotal > 0) {
       const chg = total - prevTotal;
-      const el = document.getElementById('score-change');
+      const el  = document.getElementById('score-change');
       el.textContent = chg >= 0 ? `+${chg}` : chg;
       el.style.color = chg >= 0 ? 'var(--color-success)' : 'var(--color-error)';
     } else {
@@ -2289,11 +2187,9 @@ I'm proud of your dedication. Let's keep building! 🚀`
     if (!currentAssessmentStudent) { alert('No student selected'); return; }
     const btn = document.getElementById('submit-assessment-btn');
     btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-
     try {
       const student = allStudentsData.find(s => s.id === currentAssessmentStudent);
       if (!student?.user_id) throw new Error('Student user_id not found');
-
       const { error } = await supabaseClient.from('student_assessments').insert({
         user_id:     student.user_id,
         student_id:  currentAssessmentStudent,
@@ -2331,7 +2227,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
   });
 
   // ============================================================
-  // CANCELLATIONS (UNCHANGED LOGIC)
+  // CANCELLATIONS
   // ============================================================
   async function loadCancellationNotifications() {
     try {
@@ -2452,7 +2348,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
   }
 
   // ============================================================
-  // VIDEO LESSONS (UNCHANGED)
+  // VIDEO LESSONS
   // ============================================================
   async function loadVideoLessons() {
     try {
@@ -2463,7 +2359,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
         .order('scheduled_at', { ascending: true });
       if (error) throw error;
 
-      const container    = document.getElementById('video-lessons-list');
+      const container      = document.getElementById('video-lessons-list');
       const alertContainer = document.getElementById('pending-alert');
 
       if (!bookings || bookings.length === 0) {
@@ -2519,7 +2415,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
                   <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
                   <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
                   <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
-                  <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+                  <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7z"/>
                 </svg>
                 Join Google Meet
               </a>` : ''}
