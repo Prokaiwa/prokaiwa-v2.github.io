@@ -978,6 +978,20 @@
   let draftStore = {};
 
   // ============================================================
+  // XSS PROTECTION — escapes user-provided strings before innerHTML
+  // ============================================================
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+    
+  // ============================================================
   // FEEDBACK TEMPLATES
   // ============================================================
   const feedbackTemplates = {
@@ -1814,33 +1828,34 @@ I'm proud of your dedication. Let's keep building! 🚀`
       let html = '';
       Object.entries(byDate).reverse().forEach(([date, msgs]) => {
         html += `<div style="margin-bottom:1.5rem;">
-          <h4 style="color:#666; border-bottom:1px solid #ddd; padding-bottom:0.4rem; font-size:0.9rem;">📅 ${date}</h4>`;
+          <h4 style="color:#666; border-bottom:1px solid #ddd; padding-bottom:0.4rem; font-size:0.9rem;">📅 ${escapeHtml(date)}</h4>`;
         msgs.forEach(msg => {
           const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
           if (msg._type === 'message' && msg.message_type === 'prompt') {
             html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#f0f8ff; border-left:3px solid #4A90E2; border-radius:4px; font-size:0.9rem;">
               <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 🤖 Prompt</div>
-              <p style="margin:0; color:#333;">"${msg.message_text}"</p>
+              <p style="margin:0; color:#333;">"${escapeHtml(msg.message_text)}"</p>
             </div>`;
           } else if (msg._type === 'message' && msg.message_type === 'student_response') {
-            const sName = student.given_name_romaji || student.name;
+            const sName = escapeHtml(student.given_name_romaji || student.name);
             html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#fff; border:1px solid #e0e0e0; border-radius:4px; font-size:0.9rem;">
               <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 👤 ${sName}</div>`;
-            if (msg.message_text) html += `<p style="margin:0.25rem 0; color:#333;">"${msg.message_text}"</p>`;
-            if (msg.media_type === 'audio') html += `<audio controls style="width:100%; max-width:380px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">Audio not supported.</audio>`;
-            if (msg.media_type === 'video') html += `<video controls style="width:100%; max-width:380px; border-radius:6px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">Video not supported.</video>`;
-            if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}" style="max-width:100%; border-radius:6px; margin-top:0.4rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
+            if (msg.message_text) html += `<p style="margin:0.25rem 0; color:#333;">"${escapeHtml(msg.message_text)}"</p>`;
+            if (msg.media_type === 'audio') html += `<audio controls style="width:100%; max-width:380px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}">Audio not supported.</audio>`;
+            if (msg.media_type === 'video') html += `<video controls style="width:100%; max-width:380px; border-radius:6px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}">Video not supported.</video>`;
+            if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}" style="max-width:100%; border-radius:6px; margin-top:0.4rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
             html += `</div>`;
           } else if (msg._type === 'feedback') {
             html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#f0fff0; border-left:3px solid #4caf50; border-radius:4px; font-size:0.9rem;">
               <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 👨‍🏫 Teacher Feedback</div>
-              <p style="margin:0; color:#333; white-space:pre-wrap;">${msg.feedback_text}</p>
+              <p style="margin:0; color:#333; white-space:pre-wrap;">${escapeHtml(msg.feedback_text)}</p>
             </div>`;
           }
         });
         html += `</div>`;
       });
 
+      
       container.innerHTML = html;
     } catch(err) {
       console.error('loadStudentResponses:', err);
