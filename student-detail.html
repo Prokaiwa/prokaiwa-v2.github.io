@@ -862,6 +862,16 @@ Keep it up! 🌟</textarea>
   let currentStudent  = null;
   let currentConvFilter = '7';
 
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   const feedbackTemplates = {
     blank: '',
     daily: `Great work today! 👏\n\n✅ [Specific thing they did well]\n💡 Quick tip: [One small correction or suggestion]\n\nKeep it up! 🌟`,
@@ -950,15 +960,15 @@ Keep it up! 🌟</textarea>
     document.getElementById('info-rows').innerHTML = `
       <div class="info-row">
         <span class="info-label">Plan</span>
-        <span class="info-value"><span class="plan-badge ${planClass}">${planLabel}</span></span>
+        <span class="info-value"><span class="plan-badge ${escapeHtml(planClass)}">${escapeHtml(planLabel)}</span></span>
       </div>
       <div class="info-row">
         <span class="info-label">Level</span>
-        <span class="info-value">${s.level || 'Not set'}</span>
+        <span class="info-value">${escapeHtml(s.level || 'Not set')}</span>
       </div>
       <div class="info-row">
         <span class="info-label">Purpose</span>
-        <span class="info-value">${parsePurpose(s)}</span>
+        <span class="info-value">${escapeHtml(parsePurpose(s))}</span>
       </div>
       <div class="info-row">
         <span class="info-label">Current week</span>
@@ -979,7 +989,7 @@ Keep it up! 🌟</textarea>
       <div class="info-row">
         <span class="info-label">Subscription</span>
         <span class="info-value" style="color:${s.subscription_status === 'active' ? '#4caf50' : '#f44336'}">
-          ${s.subscription_status || 'Unknown'}
+          ${escapeHtml(s.subscription_status || 'Unknown')}
         </span>
       </div>
       ${s.started_at ? `
@@ -1044,13 +1054,13 @@ Keep it up! 🌟</textarea>
       });
 
       let html = '';
-      const sName = currentStudent.given_name_romaji || currentStudent.name;
+      const sName = escapeHtml(currentStudent.given_name_romaji || currentStudent.name);
 
       Object.entries(byDate).forEach(([date, msgs]) => {
         html += `<div style="margin-bottom:2rem;">
           <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
             <div style="flex:1; height:1px; background:var(--color-border);"></div>
-            <span style="font-size:0.8rem; color:var(--color-text-light); white-space:nowrap; font-weight:600;">${date}</span>
+            <span style="font-size:0.8rem; color:var(--color-text-light); white-space:nowrap; font-weight:600;">${escapeHtml(date)}</span>
             <div style="flex:1; height:1px; background:var(--color-border);"></div>
           </div>`;
 
@@ -1060,15 +1070,15 @@ Keep it up! 🌟</textarea>
           if (msg._type === 'message' && msg.message_type === 'prompt') {
             html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:#eef7ff; border-left:3px solid #4A90E2; border-radius:0 6px 6px 0; font-size:0.88rem; overflow:hidden; word-break:break-word;">
               <div style="font-size:0.75rem; color:#666; margin-bottom:0.3rem;">${time} · 🤖 Daily Prompt</div>
-              <p style="margin:0; color:#333;">"${msg.message_text || ''}"</p>
+              <p style="margin:0; color:#333;">"${escapeHtml(msg.message_text || '')}"</p>
             </div>`;
           } else if (msg._type === 'message' && msg.message_type === 'student_response') {
             html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:white; border:1px solid #e8e8e8; border-radius:6px; font-size:0.88rem; overflow:hidden; word-break:break-word;">
               <div style="font-size:0.75rem; color:#666; margin-bottom:0.3rem;">${time} · 👤 ${sName}</div>`;
-            if (msg.message_text) html += `<p style="margin:0.25rem 0; color:#333;">"${msg.message_text}"</p>`;
-            if (msg.media_type === 'audio') html += `<audio controls style="width:100%; max-width:340px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">Audio not supported.</audio>`;
-            if (msg.media_type === 'video') html += `<video controls style="width:100%; max-width:340px; border-radius:4px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">Video not supported.</video>`;
-            if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}" style="max-width:100%; max-height:240px; border-radius:4px; margin-top:0.35rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
+            if (msg.message_text) html += `<p style="margin:0.25rem 0; color:#333;">"${escapeHtml(msg.message_text)}"</p>`;
+            if (msg.media_type === 'audio') html += `<audio controls style="width:100%; max-width:340px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}">Audio not supported.</audio>`;
+            if (msg.media_type === 'video') html += `<video controls style="width:100%; max-width:340px; border-radius:4px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}">Video not supported.</video>`;
+            if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}" style="max-width:100%; max-height:240px; border-radius:4px; margin-top:0.35rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
             html += `</div>`;
           } else if (msg._type === 'feedback') {
             // Detect voice messages — stored as "[Voice message] https://..."
@@ -1080,17 +1090,17 @@ Keep it up! 🌟</textarea>
                 ? `<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
                      <span style="font-size:0.8rem;color:#666;">🎙 Voice message</span>
                      <audio controls style="height:36px; max-width:100%; border-radius:4px;">
-                       <source src="${audioUrl}">
+                       <source src="${escapeHtml(audioUrl)}">
                      </audio>
                    </div>`
-                : `<p style="margin:0; color:#333; white-space:pre-wrap;">${msg.feedback_text}</p>`
+                : `<p style="margin:0; color:#333; white-space:pre-wrap;">${escapeHtml(msg.feedback_text)}</p>`
               }
             </div>`;
           }
         });
         html += `</div>`;
       });
-
+      
       container.innerHTML = html;
 
       // Restore scroll position — prevents page jumping to top on reload
@@ -1138,7 +1148,7 @@ Keep it up! 🌟</textarea>
               <span class="score-chip">💬 <strong>${a.vocabulary || 0}</strong></span>
               <span class="score-chip">🎤 <strong>${a.pronunciation || 0}</strong></span>
             </div>
-            ${a.teacher_notes ? `<p style="font-size:0.78rem; color:var(--color-text-light); margin:0.4rem 0 0; font-style:italic;">"${a.teacher_notes}"</p>` : ''}
+            ${a.teacher_notes ? `<p style="font-size:0.78rem; color:var(--color-text-light); margin:0.4rem 0 0; font-style:italic;">"${escapeHtml(a.teacher_notes)}"</p>` : ''}
           </div>
         `;
       }).join('');
