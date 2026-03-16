@@ -2,1074 +2,698 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://api.qrserver.com; connect-src 'self' https://*.supabase.co https://cdn.jsdelivr.net https://www.google-analytics.com https://region1.google-analytics.com; media-src 'self' blob: https://*.supabase.co; frame-src 'none'; object-src 'none';">
   <title>Teacher Portal | Prokaiwa</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <style>
-    /* Teacher Portal Styles */
-    body {
-      background: #f5f5f5;
-    }
-    
+    /* ============================================
+       BASE
+    ============================================ */
+    body { background: #f5f5f5; }
+
     .teacher-header {
       background: var(--color-surface);
       padding: 1rem 0;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       margin-bottom: 2rem;
     }
-    
     .teacher-header .container {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    
-    .teacher-header h1 {
-      font-size: 1.5rem;
-      color: var(--color-primary);
-      margin: 0;
-    }
-    
-    .teacher-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    
+    .teacher-header h1 { font-size: 1.5rem; color: var(--color-primary); margin: 0; }
+    .teacher-info { display: flex; align-items: center; gap: 1rem; }
     .logout-btn {
-      background: var(--color-accent);
-      color: white;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
+      background: var(--color-accent); color: white;
+      padding: 0.5rem 1rem; border: none; border-radius: 4px;
+      cursor: pointer; font-weight: 600;
     }
-    
+
+    /* ============================================
+       STATS GRID
+    ============================================ */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
+      gap: 1rem; margin-bottom: 2rem;
     }
-    
     .stat-card {
-      background: var(--color-surface);
-      padding: 1.5rem;
+      background: var(--color-surface); padding: 1.5rem;
       border-radius: var(--border-radius);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;
     }
-    
-    .stat-card h3 {
-      font-size: 2rem;
-      color: var(--color-primary);
-      margin: 0 0 0.5rem 0;
-    }
-    
-    .stat-card p {
-      color: var(--color-text-light);
-      margin: 0;
-    }
-    
-    .feedback-section {
+    .stat-card h3 { font-size: 2rem; color: var(--color-primary); margin: 0 0 0.5rem 0; }
+    .stat-card p { color: var(--color-text-light); margin: 0; }
+
+    /* ============================================
+       DAY-TYPE QUEUE SECTIONS
+    ============================================ */
+    .queue-section {
       background: var(--color-surface);
-      padding: 2rem;
       border-radius: var(--border-radius);
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       margin-bottom: 2rem;
+      overflow: hidden;
     }
-    
-    .feedback-section h2 {
-      color: var(--color-accent);
-      margin-top: 0;
-      padding-bottom: 0.5rem;
+    .queue-section-header {
+      padding: 1.25rem 2rem;
       border-bottom: 2px solid var(--color-border);
-    }
-    
-    .student-card {
-      background: #fafafa;
-      border: 1px solid var(--color-border);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      transition: all 0.3s;
-    }
-    
-    .student-card.expanded {
-      background: white;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .student-header {
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
     }
-    
-    .student-name {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--color-text);
+    .queue-section-header h2 { margin: 0; font-size: 1.1rem; }
+    .queue-section-header h2.day6-color  { color: #7b2d8b; }
+    .queue-section-header h2.day5-color  { color: #1565c0; }
+    .queue-section-header h2.day7-color  { color: #2e7d32; }
+    .queue-section-header h2.other-color { color: #e65100; }
+
+    .task-count-badge {
+      padding: 0.2rem 0.75rem; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 700; color: white;
     }
-    
-    .student-meta {
-      color: var(--color-text-light);
-      font-size: 0.9rem;
-      margin-top: 0.25rem;
+    .badge-day6  { background: #7b2d8b; }
+    .badge-day5  { background: #1565c0; }
+    .badge-day7  { background: #2e7d32; }
+    .badge-other { background: #e65100; }
+    .badge-done  { background: #4caf50; }
+
+    .queue-section-body { padding: 1.5rem 2rem; }
+
+    /* ============================================
+       STUDENT CARDS
+    ============================================ */
+    .student-card {
+      background: #fafafa; border: 1px solid var(--color-border);
+      border-radius: 8px; padding: 1.25rem;
+      margin-bottom: 1rem; transition: all 0.3s;
     }
-    
-    .expand-btn {
-      background: var(--color-primary);
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
+    .student-card.expanded {
+      background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    
+    .student-card:last-child { margin-bottom: 0; }
+
+    .student-header {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; cursor: pointer;
+    }
+    .student-name { font-size: 1.1rem; font-weight: 700; color: var(--color-text); }
+    .student-meta { color: var(--color-text-light); font-size: 0.85rem; margin-top: 0.3rem; }
+
+    .student-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+
+    .btn-expand {
+      background: var(--color-primary); color: white;
+      border: none; padding: 0.5rem 1rem;
+      border-radius: 4px; cursor: pointer;
+      font-weight: 600; font-size: 0.9rem; white-space: nowrap;
+    }
+    .btn-assess {
+      background: #f0a500; color: white;
+      border: none; padding: 0.5rem 1rem;
+      border-radius: 4px; cursor: pointer;
+      font-weight: 600; font-size: 0.9rem; white-space: nowrap;
+    }
+    .btn-profile {
+      background: #546e7a; color: white;
+      border: none; padding: 0.5rem 0.75rem;
+      border-radius: 4px; cursor: pointer;
+      font-size: 0.9rem; white-space: nowrap;
+    }
+
+    .plan-badge {
+      display: inline-block; padding: 0.15rem 0.6rem;
+      border-radius: 10px; font-size: 0.75rem; font-weight: 600;
+      margin-left: 0.5rem; vertical-align: middle;
+    }
+    .plan-line       { background: #e3f2fd; color: #1565c0; }
+    .plan-power_lite { background: #f3e5f5; color: #7b2d8b; }
+    .plan-power_pro  { background: #fff3e0; color: #e65100; }
+    .plan-video      { background: #e8f5e9; color: #2e7d32; }
+
+    .priority-badge {
+      display: inline-block; padding: 0.15rem 0.6rem;
+      border-radius: 10px; font-size: 0.75rem; font-weight: 600;
+      margin-left: 0.5rem; vertical-align: middle;
+    }
+    .new-badge  { background: #ff9800; color: white; }
+    .done-badge { background: #4caf50; color: white; }
+
+    /* ============================================
+       STUDENT DETAILS (EXPANDED)
+    ============================================ */
     .student-details {
-      display: none;
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--color-border);
+      display: none; margin-top: 1.25rem;
+      padding-top: 1.25rem; border-top: 1px solid var(--color-border);
     }
-    
-    .student-card.expanded .student-details {
-      display: block;
-    }
-    
-    /* Filter Bar Styles */
+    .student-card.expanded .student-details { display: block; }
+
+    /* Filter bar */
     .filter-bar {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
+      display: flex; align-items: center;
+      gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;
     }
-    
-    .filter-label {
-      font-weight: 600;
-      color: var(--color-text);
-      margin-right: 0.5rem;
-    }
-    
+    .filter-label { font-weight: 600; color: var(--color-text); margin-right: 0.25rem; font-size: 0.9rem; }
     .filter-btn {
-      padding: 0.5rem 1rem;
-      border: 1px solid var(--color-border);
-      background: white;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: all 0.2s;
+      padding: 0.4rem 0.8rem; border: 1px solid var(--color-border);
+      background: white; border-radius: 4px; cursor: pointer;
+      font-size: 0.85rem; transition: all 0.2s;
     }
-    
-    .filter-btn:hover {
-      background: #f5f5f5;
-    }
-    
-    .filter-btn.active {
-      background: var(--color-primary);
-      color: white;
-      border-color: var(--color-primary);
-    }
-    
-    .message-count {
-      margin-left: auto;
-      color: var(--color-text-light);
-      font-size: 0.9rem;
-      font-style: italic;
-    }
-    
-    .response-item {
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    
-    .response-item h4 {
-      margin: 0 0 0.5rem 0;
-      color: var(--color-primary);
-    }
-    
-    .response-text {
-      color: var(--color-text);
-      margin: 0.5rem 0;
-    }
-    
-    .audio-player {
-      margin-top: 0.5rem;
-    }
-    
+    .filter-btn:hover  { background: #f5f5f5; }
+    .filter-btn.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+    .filter-buttons-desktop { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .filter-select-mobile   { display: none; }
+    .message-count { margin-left: auto; color: var(--color-text-light); font-size: 0.85rem; font-style: italic; }
+
+    /* Conversation history */
+    .response-area { min-height: 60px; }
+
+    /* ============================================
+       FEEDBACK BOX — SHARED
+    ============================================ */
     .feedback-box {
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
+      margin-top: 1.5rem; padding-top: 1.5rem;
       border-top: 2px solid var(--color-border);
     }
-    
-    .template-selector {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
+    .feedback-box h3 { margin: 0 0 1rem 0; font-size: 1rem; color: var(--color-text); }
+
+    /* Template toggle pill */
+    .template-toggle {
+      display: inline-flex; background: #f0f0f0;
+      border-radius: 20px; padding: 3px;
+      margin-bottom: 1rem; gap: 2px;
     }
-    
-    .template-btn {
-      padding: 0.5rem 1rem;
-      border: 1px solid var(--color-border);
-      background: white;
-      border-radius: 4px;
-      cursor: pointer;
+    .toggle-pill {
+      padding: 0.4rem 1rem; border-radius: 18px;
+      border: none; cursor: pointer; font-size: 0.85rem;
+      font-weight: 600; background: transparent;
+      color: var(--color-text-light); transition: all 0.2s;
     }
-    
-    .template-btn.active {
-      background: var(--color-primary);
-      color: white;
-      border-color: var(--color-primary);
+    .toggle-pill.active {
+      background: white; color: var(--color-primary);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     }
-    
+
     .feedback-textarea {
-      width: 100%;
-      min-height: 300px;
-      padding: 1rem;
-      border: 1px solid var(--color-border);
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 0.95rem;
-      resize: vertical;
+      width: 100%; min-height: 220px;
+      padding: 1rem; border: 1px solid var(--color-border);
+      border-radius: 6px; font-family: inherit;
+      font-size: 0.9rem; resize: vertical;
+      transition: border-color 0.2s;
     }
-    
-    .action-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
+    .feedback-textarea:focus { outline: none; border-color: var(--color-primary); }
+    .feedback-textarea.short { min-height: 100px; }
+
+    /* Day 6 placeholder tip */
+    .reply-tip {
+      font-size: 0.8rem; color: var(--color-text-light);
+      font-style: italic; margin-bottom: 0.5rem;
     }
-    
-    .send-btn {
-      background: var(--color-primary);
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 1rem;
-    }
-    
-    .send-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    
-    .mark-done-btn {
-      background: #4caf50;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    
-    .loading {
-      text-align: center;
-      padding: 2rem;
-      color: var(--color-text-light);
-    }
-    
-    .empty-state {
-      text-align: center;
-      padding: 3rem;
-      color: var(--color-text-light);
-    }
-    
-    .empty-state i {
-      font-size: 3rem;
+
+    /* Voice recorder */
+    .voice-recorder {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1rem; background: #fce4ec;
+      border: 1px dashed #e91e8c; border-radius: 6px;
       margin-bottom: 1rem;
-      color: var(--color-border);
     }
-    
-    .priority-badge {
-      background: #ff9800;
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-left: 0.5rem;
+    .voice-recorder.recording { background: #ffebee; border-color: #f44336; animation: pulse-rec 1s infinite; }
+    @keyframes pulse-rec { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
+    .rec-btn {
+      background: #e91e8c; color: white; border: none;
+      padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;
+      font-weight: 700; font-size: 0.85rem; display: flex;
+      align-items: center; gap: 0.4rem;
+      transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
     }
-  /* ============================================ */
-/* MOBILE RESPONSIVE STYLES */
-/* ============================================ */
-
- /* Default - Desktop */
-.filter-buttons-desktop {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.filter-select-mobile {
-  display: none;
-}
-
-.filter-text-mobile {
-  display: none;
-}   
-@media (max-width: 768px) {
-  /* Header */
-  .teacher-header h1 {
-    font-size: 1.2rem;
-  }
-  
-  .teacher-info {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.5rem;
-  }
-  
-  #teacher-name {
-    font-size: 0.9rem;
-  }
-  
-  .logout-btn {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.85rem;
-  }
-  
-  /* Stats Grid - Single column on mobile */
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .stat-card {
-    padding: 1rem;
-  }
-  
-  .stat-card h3 {
-    font-size: 1.5rem;
-  }
-  
-  .stat-card p {
-    font-size: 0.85rem;
-  }
-  
-  /* Feedback Sections */
-  .feedback-section {
-    padding: 1.25rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .feedback-section h2 {
-    font-size: 1.1rem;
-  }
-  
-  /* Student Cards */
-  .student-card {
-    padding: 1rem;
-  }
-  
-  .student-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .student-name {
-    font-size: 1.1rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .student-meta {
-    font-size: 0.85rem;
-    margin-top: 0.5rem;
-  }
-  
-  .priority-badge {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.6rem;
-    margin-left: 0;
-    display: inline-block;
-  }
-  
-  .expand-btn {
-    width: 100%;
-    padding: 0.6rem 1rem;
-  }
-  
-  /* Filter Bar */
-  .filter-bar {
-    gap: 0.4rem;
-  }
-  
-  .filter-label {
-    width: 100%;
-    margin-bottom: 0.25rem;
-  }
-  
-  /* Hide desktop filter buttons on mobile */
-  .filter-buttons-desktop {
-    display: none;
-  }
-  
-  /* Show mobile dropdown */
-  .filter-select-mobile {
-    display: block;
-    width: 100%;
-    padding: 0.6rem;
-    font-size: 0.95rem;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    background: white;
-    cursor: pointer;
-  }
-  
-  .message-count {
-    width: 100%;
-    margin-left: 0;
-    margin-top: 0.5rem;
-    text-align: center;
-  }
-  
-  /* Template Selector */
-  .template-selector {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .template-btn {
-    width: 100%;
-  }
-  
-  /* Feedback Textarea */
-  .feedback-textarea {
-    min-height: 200px;
-    font-size: 0.9rem;
-  }
-  
-  /* Action Buttons */
-  .action-buttons {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .send-btn,
-  .mark-done-btn {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 0.95rem;
-  }
-  
-  /* Conversation Messages */
-  .student-details h3 {
-    font-size: 1rem;
-  }
-  
-  .feedback-box h3 {
-    font-size: 1rem;
-  }
-}
-
-/* Extra small phones */
-@media (max-width: 380px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .filter-btn {
-    font-size: 0.75rem;
-    padding: 0.35rem 0.5rem;
-  }
-}
-    /* Assessment Modal */
-.assessment-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 1000;
-  overflow-y: auto;
-}
-
-.assessment-modal.active {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.assessment-content {
-  background: var(--color-surface);
-  border-radius: 12px;
-  width: 100%;
-  max-width: 700px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-.assessment-header {
-  padding: 2rem 2rem 1rem;
-  border-bottom: 2px solid var(--color-border);
-  position: sticky;
-  top: 0;
-  background: var(--color-surface);
-  z-index: 10;
-}
-
-.assessment-header h2 {
-  margin: 0 0 0.5rem 0;
-  color: var(--color-primary);
-}
-
-.assessment-header p {
-  margin: 0;
-  color: var(--color-text-light);
-}
-
-.assessment-close {
-  position: absolute;
-  top: 1rem;
-  right: 1.5rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--color-text-light);
-  cursor: pointer;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s;
-  z-index: 20;
-}
-
-.assessment-close:hover {
-  background: var(--color-border);
-  color: var(--color-text);
-}
-
-.assessment-body {
-  padding: 2rem;
-}
-
-.skill-section {
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.skill-section:last-child {
-  border-bottom: none;
-}
-
-.skill-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.skill-name {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.skill-icon {
-  font-size: 1.5rem;
-  margin-right: 0.5rem;
-}
-
-.skill-scores {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.85rem;
-  color: var(--color-text-light);
-}
-
-.skill-scores span {
-  background: var(--color-bg);
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-}
-
-.show-guide-btn {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  border: none;
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-weight: 600;
-}
-
-.show-guide-btn:hover {
-  background: var(--color-primary);
-  color: white;
-}
-
-.slider-container {
-  position: relative;
-  margin: 1rem 0;
-}
-
-.skill-slider {
-  width: 100%;
-  height: 8px;
-  border-radius: 4px;
-  background: var(--color-border);
-  outline: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-}
-
-.skill-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s;
-}
-
-.skill-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 4px 12px rgba(0, 128, 128, 0.4);
-}
-
-.skill-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s;
-}
-
-.slider-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  margin-top: 0.5rem;
-}
-
-.current-score {
-  text-align: center;
-  margin-top: 0.5rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.band-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.7rem;
-  color: var(--color-text-muted);
-  margin-top: 0.25rem;
-  padding: 0 0.5rem;
-}
-
-.assessment-summary {
-  background: var(--color-primary-light);
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-}
-
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.summary-item {
-  text-align: center;
-}
-
-.summary-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  display: block;
-}
-
-.summary-label {
-  font-size: 0.85rem;
-  color: var(--color-text-light);
-}
-
-.notes-section {
-  margin-bottom: 2rem;
-}
-
-.notes-section label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--color-text);
-}
-
-.notes-textarea {
-  width: 100%;
-  min-height: 120px;
-  padding: 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  font-family: var(--font-primary);
-  font-size: 0.95rem;
-  resize: vertical;
-}
-
-.assessment-actions {
-  display: flex;
-  gap: 1rem;
-  padding: 1.5rem 2rem;
-  background: var(--color-bg);
-  border-top: 1px solid var(--color-border);
-  position: sticky;
-  bottom: 0;
-}
-
-.submit-assessment-btn {
-  flex: 1;
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 1rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.submit-assessment-btn:hover {
-  background: var(--color-primary-dark);
-  transform: translateY(-2px);
-}
-
-.submit-assessment-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.cancel-assessment-btn {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.guide-popup {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 2000;
-  overflow-y: auto;
-}
-
-.guide-popup.active {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.guide-content {
-  background: var(--color-surface);
-  border-radius: 12px;
-  width: 100%;
-  max-width: 600px;
-  padding: 2rem;
-  position: relative;
-  max-height: 80vh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-.guide-close {
-  position: sticky;
-  top: 1rem;
-  right: 1rem;
-  float: right;
-  margin-bottom: -1rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--color-text-light);
-  cursor: pointer;
-  z-index: 10;
-  padding: 0.5rem;
-}
-
-.guide-close:hover {
-  color: var(--color-text);
-  background: var(--color-border);
-  border-radius: 4px;
-}
-
-.guide-content h3 {
-  color: var(--color-primary);
-  margin-top: 0;
-}
-
-.guide-level {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: var(--color-bg);
-  border-radius: 8px;
-}
-
-.guide-level h4 {
-  margin: 0 0 0.5rem 0;
-  color: var(--color-accent);
-}
-
-.guide-level p {
-  margin: 0;
-  color: var(--color-text);
-  line-height: 1.6;
-}
-
-@media (max-width: 768px) {
-  .assessment-modal.active {
-    padding: 0;
-  }
-  
-  .assessment-content {
-    max-width: 100%;
-    max-height: 100vh;
-    border-radius: 0;
-  }
-  
-  .assessment-header,
-  .assessment-body,
-  .assessment-actions {
-    padding: 1.5rem;
-  }
-  
-  .summary-grid {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-  
-  .assessment-actions {
-    flex-direction: column;
-  }
-  
-  .skill-scores {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-}
-    /* Video Lessons Section */
-.video-lessons-section {
-  background: var(--color-surface);
-  padding: 2rem;
-  border-radius: var(--border-radius);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-bottom: 2rem;
-}
-
-.video-lessons-section h2 {
-  color: var(--color-accent);
-  margin-top: 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--color-border);
-}
-
-.pending-alert {
-  background: #ff9800;
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.pending-alert:hover {
-  background: #f57c00;
-  transform: translateY(-2px);
-}
-
-.pending-alert i {
-  font-size: 1.5rem;
-  margin-right: 1rem;
-}
-
-.lesson-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  color: var(--color-text);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.lesson-card.needs-link {
-  border-left: 4px solid #ff9800;
-  animation: pulse-border 2s infinite;
-}
-
-@keyframes pulse-border {
-  0%, 100% { border-left-color: #ff9800; }
-  50% { border-left-color: #ffc107; }
-}
-
-.lesson-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.lesson-student {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--color-primary);
-}
-
-.lesson-datetime {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 0.5rem 0;
-  color: var(--color-text-light);
-}
-
-.lesson-datetime i {
-  color: var(--color-primary);
-}
-
-.lesson-status {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.lesson-status.has-link {
-  background: #4caf50;
-  color: white;
-}
-
-.lesson-status.no-link {
-  background: #ff9800;
-  color: white;
-}
-
-.lesson-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.add-link-btn {
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-}
-
-.add-link-btn:hover {
-  background: var(--color-primary-dark);
-  transform: translateY(-2px);
-}
-
-.join-meeting-btn {
-  background: #95a5a6;  /* Light grey */
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.join-meeting-btn:hover {
-  background: #7f8c8d;  /* Slightly darker on hover */
-}
-
-@media (max-width: 768px) {
-  .lesson-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  
-  .lesson-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .add-link-btn,
-  .join-meeting-btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
+    .rec-btn:hover           { background: #c2185b; transform: translateY(-1px); }
+    .rec-btn.recording       { background: #f44336; }
+    .rec-btn.recording:hover { background: #c62828; }
+    .rec-status { font-size: 0.85rem; color: #c2185b; font-weight: 600; flex: 1; }
+    audio.recorded-preview { max-width: 100%; margin-top: 0.5rem; border-radius: 4px; }
+
+    /* Skills accordion */
+    .skills-accordion {
+      margin-top: 1rem; border: 1px solid var(--color-border);
+      border-radius: 6px; overflow: hidden;
+    }
+    .skills-accordion-header {
+      padding: 0.75rem 1rem; background: #f8f8f8;
+      cursor: pointer; display: flex;
+      justify-content: space-between; align-items: center;
+      font-size: 0.9rem; font-weight: 600; color: var(--color-text);
+      user-select: none;
+    }
+    .skills-accordion-header:hover { background: #f0f0f0; }
+    .skills-accordion-body { display: none; padding: 1rem; }
+    .skills-accordion-body.open { display: block; }
+
+    .mini-skill-row {
+      display: flex; align-items: center;
+      gap: 0.75rem; margin-bottom: 0.75rem;
+    }
+    .mini-skill-label { width: 110px; font-size: 0.85rem; font-weight: 600; flex-shrink: 0; }
+    .mini-skill-slider { flex: 1; height: 6px; -webkit-appearance: none; border-radius: 3px; background: var(--color-border); cursor: pointer; }
+    .mini-skill-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      border-radius: 50%; background: var(--color-primary);
+      cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .mini-skill-score { width: 28px; text-align: center; font-weight: 700; color: var(--color-primary); font-size: 0.95rem; }
+
+    /* Action buttons */
+    .action-buttons {
+      display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap;
+    }
+    .send-btn {
+      background: var(--color-primary); color: white;
+      padding: 0.7rem 1.5rem; border: none; border-radius: 4px;
+      cursor: pointer; font-weight: 600; font-size: 0.95rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .send-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .send-btn.day6-btn { background: #7b2d8b; }
+    .send-btn.day5-btn { background: #1565c0; }
+    .send-btn.day7-btn { background: #2e7d32; }
+    .mark-done-btn {
+      background: #4caf50; color: white;
+      padding: 0.7rem 1.5rem; border: none; border-radius: 4px;
+      cursor: pointer; font-weight: 600; font-size: 0.95rem;
+    }
+    .mark-done-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+    /* ============================================
+       QUIZ ANSWER BADGE
+    ============================================ */
+    .quiz-answer-badge {
+      display: inline-block; padding: 0.3rem 0.9rem;
+      border-radius: 6px; font-weight: 700; font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+    .answer-correct { background: #c8e6c9; color: #1b5e20; }
+    .answer-incorrect { background: #ffcdd2; color: #b71c1c; }
+    .answer-unknown { background: #fff9c4; color: #f57f17; }
+
+    /* ============================================
+       ALL STUDENTS SECTION
+    ============================================ */
+    .all-students-section {
+      background: var(--color-surface);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 2rem; overflow: hidden;
+    }
+    .all-students-header {
+      padding: 1.25rem 2rem;
+      display: flex; align-items: center;
+      justify-content: space-between; cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.2s;
+      user-select: none;
+    }
+    .all-students-header:hover { background: #fafafa; }
+    .all-students-header.open { border-bottom-color: var(--color-border); }
+    .all-students-header h2 { margin: 0; font-size: 1.05rem; color: #546e7a; }
+    .all-students-body { display: none; padding: 1.5rem 2rem; }
+    .all-students-body.open { display: block; }
+
+    .roster-card {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 1rem; background: #fafafa;
+      border: 1px solid var(--color-border); border-radius: 6px;
+      margin-bottom: 0.75rem;
+    }
+    .roster-card:last-child { margin-bottom: 0; }
+    .roster-info { flex: 1; }
+    .roster-name { font-weight: 600; color: var(--color-text); }
+    .roster-meta { font-size: 0.82rem; color: var(--color-text-light); margin-top: 0.15rem; }
+    .roster-actions { display: flex; gap: 0.5rem; }
+    .roster-btn {
+      background: var(--color-primary); color: white;
+      border: none; padding: 0.4rem 0.85rem;
+      border-radius: 4px; cursor: pointer;
+      font-size: 0.82rem; font-weight: 600;
+    }
+    .roster-btn.secondary {
+      background: #546e7a;
+    }
+
+    /* ============================================
+       EMPTY / LOADING STATES
+    ============================================ */
+    .empty-state {
+      text-align: center; padding: 2.5rem;
+      color: var(--color-text-light);
+    }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; color: var(--color-border); }
+    .loading { text-align: center; padding: 2rem; color: var(--color-text-light); }
+
+    /* ============================================
+       VIDEO LESSONS SECTION (UNCHANGED)
+    ============================================ */
+    .video-lessons-section {
+      background: var(--color-surface); padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;
+    }
+    .video-lessons-section h2 {
+      color: var(--color-accent); margin-top: 0;
+      padding-bottom: 0.5rem; border-bottom: 2px solid var(--color-border);
+    }
+    .pending-alert {
+      background: #ff9800; color: white; padding: 1rem 1.5rem;
+      border-radius: 8px; margin-bottom: 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .pending-alert:hover { background: #f57c00; transform: translateY(-2px); }
+    .pending-alert i { font-size: 1.5rem; margin-right: 1rem; }
+    .lesson-card {
+      background: rgba(255,255,255,0.95); border-radius: 8px;
+      padding: 1.5rem; margin-bottom: 1rem; color: var(--color-text);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .lesson-card.needs-link { border-left: 4px solid #ff9800; }
+    .lesson-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .lesson-student { font-size: 1.1rem; font-weight: 600; color: var(--color-primary); }
+    .lesson-datetime { display: flex; align-items: center; gap: 1rem; margin: 0.5rem 0; color: var(--color-text-light); }
+    .lesson-datetime i { color: var(--color-primary); }
+    .lesson-status { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.85rem; font-weight: 600; }
+    .lesson-status.has-link { background: #4caf50; color: white; }
+    .lesson-status.no-link  { background: #ff9800; color: white; }
+    .lesson-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+    .add-link-btn {
+      background: var(--color-primary); color: white; border: none;
+      padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer;
+      font-weight: 600; display: flex; align-items: center; gap: 0.5rem;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .add-link-btn:hover { background: var(--color-primary-dark); transform: translateY(-2px); }
+    .join-meeting-btn {
+      background: #95a5a6; color: white; border: none;
+      padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer;
+      font-weight: 600; text-decoration: none;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .join-meeting-btn:hover { background: #7f8c8d; }
+
+    /* ============================================
+       CANCELLATIONS (UNCHANGED)
+    ============================================ */
+    .cancellations-section {
+      background: #fff3cd; border: 2px solid #ffc107;
+      border-radius: 12px; padding: 1.5rem; margin: 2rem 0;
+    }
+    .cancellations-section h2 {
+      color: #856404; margin: 0 0 1rem 0;
+      display: flex; align-items: center; gap: 0.75rem; font-size: 1.3rem;
+    }
+    .cancellation-count-badge {
+      background: #dc3545; color: white;
+      padding: 0.25rem 0.75rem; border-radius: 20px;
+      font-size: 0.9rem; font-weight: 700;
+    }
+    .cancellation-list { display: flex; flex-direction: column; gap: 1rem; }
+    .cancellation-card {
+      background: white; border: 1px solid #dee2e6;
+      border-radius: 8px; padding: 1.25rem; transition: all 0.2s;
+    }
+    .cancellation-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.1); transform: translateY(-2px); }
+    .cancellation-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; gap: 1rem; }
+    .cancellation-student-info { flex: 1; }
+    .cancellation-student-name { font-size: 1.1rem; font-weight: 600; color: var(--color-text); margin: 0 0 0.25rem 0; }
+    .cancellation-plan-badge {
+      display: inline-block; background: #6c757d; color: white;
+      padding: 0.25rem 0.75rem; border-radius: 4px;
+      font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem;
+    }
+    .cancellation-date { color: #6c757d; font-size: 0.85rem; }
+    .cancellation-status-badge { padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+    .cancellation-status-badge.needs-attention { background: #ffc107; color: #856404; }
+    .cancellation-status-badge.contacted { background: #28a745; color: white; }
+    .cancellation-details { background: #f8f9fa; border-radius: 6px; padding: 1rem; margin-bottom: 1rem; }
+    .cancellation-detail-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .cancellation-detail-row:last-child { margin-bottom: 0; }
+    .cancellation-detail-label { font-weight: 600; color: #495057; min-width: 120px; }
+    .cancellation-detail-value { color: var(--color-text); }
+    .cancellation-reason-highlight {
+      background: #fff3cd; padding: 0.75rem;
+      border-left: 4px solid #ffc107; border-radius: 4px;
+      margin-top: 0.75rem; font-style: italic;
+    }
+    .cancellation-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .btn-view-details {
+      background: var(--color-primary); color: white; border: none;
+      padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; display: inline-flex;
+      align-items: center; gap: 0.5rem; transition: all 0.2s;
+    }
+    .btn-view-details:hover { background: var(--color-primary-dark); }
+    .btn-send-message {
+      background: #28a745; color: white; border: none;
+      padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; display: inline-flex;
+      align-items: center; gap: 0.5rem; transition: all 0.2s;
+    }
+    .btn-send-message:hover { background: #218838; }
+    .btn-mark-contacted {
+      background: white; color: #6c757d; border: 2px solid #dee2e6;
+      padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; display: inline-flex;
+      align-items: center; gap: 0.5rem; transition: all 0.2s;
+    }
+    .btn-mark-contacted:hover { border-color: #6c757d; background: #f8f9fa; }
+    .no-cancellations-message { text-align: center; padding: 2rem; color: #6c757d; }
+    .no-cancellations-message i { font-size: 3rem; margin-bottom: 1rem; display: block; opacity: 0.3; }
+
+    /* Message Modal */
+    .message-modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); display: none;
+      align-items: center; justify-content: center; z-index: 10000;
+    }
+    .message-modal.show { display: flex; }
+    .message-modal-content {
+      background: white; border-radius: 12px;
+      max-width: 600px; width: 90%; max-height: 80vh;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .message-modal-header {
+      padding: 1.5rem 2rem 1rem; flex-shrink: 0;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .message-modal-header h3 { margin: 0; color: var(--color-text); }
+    .message-modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6c757d; }
+    .message-template-selector { padding: 0 2rem; margin-bottom: 1rem; flex-shrink: 0; }
+    .message-template-selector label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+    .message-template-selector select { width: 100%; padding: 0.75rem; border: 1px solid #dee2e6; border-radius: 6px; font-size: 0.95rem; }
+    .message-editor { padding: 0 2rem; flex: 1; overflow-y: auto; min-height: 0; }
+    .message-editor label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+    .message-editor textarea {
+      width: 100%; min-height: 200px; max-height: 300px;
+      padding: 1rem; border: 1px solid #dee2e6; border-radius: 6px;
+      font-family: inherit; font-size: 0.95rem; resize: none;
+    }
+    .message-modal-actions {
+      padding: 1.5rem 2rem; flex-shrink: 0;
+      display: flex; gap: 1rem; justify-content: flex-end;
+      border-top: 1px solid #dee2e6;
+    }
+    .btn-send-now {
+      background: #28a745; color: white; border: none;
+      padding: 0.75rem 1.5rem; border-radius: 6px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-cancel {
+      background: white; color: #6c757d; border: 2px solid #dee2e6;
+      padding: 0.75rem 1.5rem; border-radius: 6px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+    }
+
+    /* ============================================
+       ASSESSMENT MODAL (UNCHANGED)
+    ============================================ */
+    .assessment-modal {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); z-index: 1000; overflow-y: auto;
+    }
+    .assessment-modal.active {
+      display: flex; align-items: center;
+      justify-content: center; padding: 2rem;
+    }
+    .assessment-content {
+      background: var(--color-surface); border-radius: 12px;
+      width: 100%; max-width: 700px; max-height: 90vh;
+      overflow-y: auto; position: relative;
+      overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+    }
+    .assessment-header {
+      padding: 2rem 2rem 1rem; border-bottom: 2px solid var(--color-border);
+      position: sticky; top: 0; background: var(--color-surface); z-index: 10;
+    }
+    .assessment-header h2 { margin: 0 0 0.5rem 0; color: var(--color-primary); }
+    .assessment-header p { margin: 0; color: var(--color-text-light); }
+    .assessment-close {
+      position: absolute; top: 1rem; right: 1.5rem;
+      background: none; border: none; font-size: 1.5rem;
+      color: var(--color-text-light); cursor: pointer;
+      width: 2rem; height: 2rem; display: flex;
+      align-items: center; justify-content: center;
+      border-radius: 4px; transition: all 0.2s; z-index: 20;
+    }
+    .assessment-close:hover { background: var(--color-border); color: var(--color-text); }
+    .assessment-body { padding: 2rem; }
+    .skill-section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--color-border); }
+    .skill-section:last-child { border-bottom: none; }
+    .skill-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .skill-name { font-size: 1.1rem; font-weight: 600; color: var(--color-text); }
+    .skill-icon { font-size: 1.5rem; margin-right: 0.5rem; }
+    .skill-scores { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--color-text-light); }
+    .skill-scores span { background: var(--color-bg); padding: 0.25rem 0.75rem; border-radius: 12px; }
+    .show-guide-btn {
+      background: var(--color-primary-light); color: var(--color-primary);
+      border: none; padding: 0.4rem 0.75rem; border-radius: 6px;
+      font-size: 0.85rem; cursor: pointer; transition: all 0.2s; font-weight: 600;
+    }
+    .show-guide-btn:hover { background: var(--color-primary); color: white; }
+    .slider-container { position: relative; margin: 1rem 0; }
+    .skill-slider {
+      width: 100%; height: 8px; border-radius: 4px;
+      background: var(--color-border); outline: none;
+      -webkit-appearance: none; cursor: pointer;
+    }
+    .skill-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 24px; height: 24px;
+      border-radius: 50%; background: var(--color-primary); cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.2s;
+    }
+    .skill-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    .skill-slider::-moz-range-thumb {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--color-primary); cursor: pointer;
+      border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .slider-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.5rem; }
+    .current-score { text-align: center; margin-top: 0.5rem; font-size: 1.5rem; font-weight: 700; color: var(--color-primary); }
+    .band-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--color-text-muted); margin-top: 0.25rem; padding: 0 0.5rem; }
+    .assessment-summary { background: var(--color-primary-light); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 1rem; }
+    .summary-item { text-align: center; }
+    .summary-value { font-size: 1.75rem; font-weight: 700; color: var(--color-primary); display: block; }
+    .summary-label { font-size: 0.85rem; color: var(--color-text-light); }
+    .notes-section { margin-bottom: 2rem; }
+    .notes-section label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--color-text); }
+    .notes-textarea {
+      width: 100%; min-height: 120px; padding: 1rem;
+      border: 1px solid var(--color-border); border-radius: 8px;
+      font-family: var(--font-primary); font-size: 0.95rem; resize: vertical;
+    }
+    .assessment-actions {
+      display: flex; gap: 1rem; padding: 1.5rem 2rem;
+      background: var(--color-bg); border-top: 1px solid var(--color-border);
+      position: sticky; bottom: 0;
+    }
+    .submit-assessment-btn {
+      flex: 1; background: var(--color-primary); color: white;
+      border: none; padding: 1rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .submit-assessment-btn:hover { background: var(--color-primary-dark); transform: translateY(-2px); }
+    .submit-assessment-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+    .cancel-assessment-btn {
+      background: var(--color-surface); color: var(--color-text);
+      border: 1px solid var(--color-border); padding: 1rem 2rem;
+      border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;
+    }
+    .guide-popup {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+      z-index: 2000; overflow-y: auto;
+    }
+    .guide-popup.active { display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .guide-content {
+      background: var(--color-surface); border-radius: 12px;
+      width: 100%; max-width: 600px; padding: 2rem;
+      position: relative; max-height: 80vh; overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .guide-close {
+      position: sticky; top: 1rem; right: 1rem; float: right;
+      margin-bottom: -1rem; background: none; border: none;
+      font-size: 1.5rem; color: var(--color-text-light); cursor: pointer;
+      z-index: 10; padding: 0.5rem;
+    }
+    .guide-close:hover { color: var(--color-text); background: var(--color-border); border-radius: 4px; }
+    .guide-content h3 { color: var(--color-primary); margin-top: 0; }
+    .guide-level { margin-bottom: 1.5rem; padding: 1rem; background: var(--color-bg); border-radius: 8px; }
+    .guide-level h4 { margin: 0 0 0.5rem 0; color: var(--color-accent); }
+    .guide-level p { margin: 0; color: var(--color-text); line-height: 1.6; }
+
+    /* ============================================
+       ADMIN BUTTON
+    ============================================ */
+    .admin-recordings-btn {
+      display: none;
+      background: #e65100; color: white;
+      padding: 0.5rem 1rem; border: none; border-radius: 4px;
+      cursor: pointer; font-weight: 600; font-size: 0.9rem;
+      text-decoration: none; align-items: center; gap: 0.4rem;
+    }
+    .admin-recordings-btn:hover { background: #bf360c; }
+
+    /* ============================================
+       MOBILE
+    ============================================ */
+    @media (max-width: 768px) {
+      .teacher-header h1 { font-size: 1.2rem; }
+      .teacher-info { flex-direction: column; align-items: flex-end; gap: 0.5rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+      .stat-card { padding: 1rem; }
+      .stat-card h3 { font-size: 1.5rem; }
+      .queue-section-body { padding: 1rem; }
+      .student-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      .student-actions { width: 100%; }
+      .btn-expand, .btn-assess, .btn-profile { flex: 1; text-align: center; justify-content: center; }
+      .filter-buttons-desktop { display: none; }
+      .filter-select-mobile { display: block; width: 100%; padding: 0.6rem; font-size: 0.95rem; border: 1px solid var(--color-border); border-radius: 4px; background: white; }
+      .action-buttons { flex-direction: column; }
+      .send-btn, .mark-done-btn { width: 100%; justify-content: center; }
+      .assessment-modal.active { padding: 0; }
+      .assessment-content { max-width: 100%; max-height: 100vh; border-radius: 0; }
+      .assessment-header, .assessment-body, .assessment-actions { padding: 1.25rem; }
+      .summary-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+      .assessment-actions { flex-direction: column; }
+      .skill-scores { flex-direction: column; gap: 0.5rem; }
+      .cancellation-header { flex-direction: column; }
+      .cancellation-actions { flex-direction: column; }
+      .cancellation-actions button { width: 100%; justify-content: center; }
+      .lesson-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      .lesson-actions { flex-direction: column; width: 100%; }
+      .add-link-btn, .join-meeting-btn { width: 100%; justify-content: center; }
+    }
+    @media (max-width: 380px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <!-- Header -->
+
+  <!-- ==================== HEADER ==================== -->
   <header class="teacher-header">
     <div class="container">
       <h1>📚 Prokaiwa Teacher Portal</h1>
       <div class="teacher-info">
         <span id="teacher-name">Loading...</span>
+        <a href="prompt-recordings.html" class="admin-recordings-btn" id="admin-recordings-btn">
+          <i class="fas fa-microphone-alt"></i> Manage Recordings
+        </a>
         <button class="logout-btn" id="logout-btn">
           <i class="fas fa-sign-out-alt"></i> Logout
         </button>
@@ -1078,1439 +702,1812 @@
   </header>
 
   <main class="container">
-    <!-- Stats Dashboard -->
+
+    <!-- ==================== STATS ==================== -->
     <div class="stats-grid" id="stats-grid">
       <div class="stat-card">
         <h3 id="total-students">-</h3>
         <p>Total Students</p>
       </div>
       <div class="stat-card">
-        <h3 id="today-feedback">-</h3>
-        <p>Need Feedback Today</p>
+        <h3 id="today-tasks">-</h3>
+        <p>Tasks Today</p>
       </div>
       <div class="stat-card">
         <h3 id="completed-today">-</h3>
-        <p>Completed Today</p>
+        <p>Completed</p>
       </div>
       <div class="stat-card">
         <h3 id="estimated-time">-</h3>
-        <p>Estimated Time</p>
+        <p>Est. Time Remaining</p>
       </div>
     </div>
-    
-    <!-- Pending Bookings Alert -->
-    <div id="pending-alert" style="display: none;">
-      <!-- Will be populated if there are pending bookings -->
-    </div>
 
-    <!-- Video Lessons Section -->
+    <!-- ==================== PENDING BOOKINGS ALERT ==================== -->
+    <div id="pending-alert" style="display:none;"></div>
+
+    <!-- ==================== VIDEO LESSONS ==================== -->
     <div class="video-lessons-section" id="video-lessons-section">
       <h2>📹 Upcoming Video Lessons</h2>
       <div id="video-lessons-list">
-        <p style="text-align: center; opacity: 0.8;">
+        <p style="text-align:center; color:var(--color-text-light);">
           <i class="fas fa-spinner fa-spin"></i> Loading lessons...
         </p>
       </div>
     </div>
 
-
-    <!-- Power Pro Section (C2) -->
-    <div class="feedback-section" id="plan-c2-section">
-      <h2>⚡ Power Pro - Daily Quick</h2>
-      <div id="plan-c2-students" class="loading">
-        <i class="fas fa-spinner fa-spin"></i> Loading students...
+    <!-- ==================== CANCELLATIONS ==================== -->
+    <div class="cancellations-section" id="cancellations-section" style="display:none;">
+      <h2>
+        <i class="fas fa-user-times"></i>
+        Recent Cancellations
+        <span class="cancellation-count-badge" id="cancellation-count">0</span>
+      </h2>
+      <div class="cancellation-list" id="cancellation-list"></div>
+      <div class="no-cancellations-message" id="no-cancellations">
+        <i class="fas fa-check-circle"></i>
+        <p>No recent cancellations. Great job! 🎉</p>
       </div>
     </div>
 
-    <!-- Power Lite Section (C1) -->
-    <div class="feedback-section" id="plan-c1-section">
-      <h2>💡 Power Lite - Bi-Weekly</h2>
-      <div id="plan-c1-students" class="loading">
-        <i class="fas fa-spinner fa-spin"></i> Loading students...
+    <!-- Message modal (cancellations) -->
+    <div class="message-modal" id="message-modal">
+      <div class="message-modal-content">
+        <div class="message-modal-header">
+          <h3>Send Message to Student</h3>
+          <button class="message-modal-close" onclick="closeMessageModal()">×</button>
+        </div>
+        <div class="message-template-selector">
+          <label>Choose a Template:</label>
+          <select id="template-select" onchange="loadMessageTemplate(this.value)">
+            <option value="">-- Select Template --</option>
+            <option value="expensive">Too Expensive</option>
+            <option value="not_using">Not Using Enough</option>
+            <option value="too_difficult">Too Difficult</option>
+            <option value="scheduling">Scheduling Issues</option>
+            <option value="technical">Technical Problems</option>
+            <option value="general">General Check-in</option>
+          </select>
+        </div>
+        <div class="message-editor">
+          <label>Message:</label>
+          <textarea id="message-text" placeholder="Write your message here..."></textarea>
+        </div>
+        <div class="message-modal-actions">
+          <button class="btn-cancel" onclick="closeMessageModal()">Cancel</button>
+          <button class="btn-send-now" onclick="sendMessageToStudent()">
+            <i class="fas fa-paper-plane"></i> Send via LINE
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- LINE Practice Section (A) -->
-    <div class="feedback-section" id="plan-a-section">
-      <h2>📱 LINE Practice - Weekly Comprehensive</h2>
-      <div id="plan-a-students" class="loading">
-        <i class="fas fa-spinner fa-spin"></i> Loading students...
+    <!-- ==================== DAY 5: QUIZ CORRECTIONS ==================== -->
+    <div class="queue-section" id="section-day5">
+      <div class="queue-section-header">
+        <h2 class="day5-color">✅ Day 5 — Quiz Corrections</h2>
+        <span class="task-count-badge badge-day5" id="badge-day5">0</span>
+      </div>
+      <div class="queue-section-body" id="body-day5">
+        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
       </div>
     </div>
-    <!-- Assessment Modal -->
-  <div id="assessment-modal" class="assessment-modal">
-    <div class="assessment-content">
-      <div class="assessment-header">
-        <h2>Assess Student Skills</h2>
-        <p id="assessment-student-name">Loading...</p>
-        <button class="assessment-close" onclick="closeAssessmentModal()">
-          <i class="fas fa-times"></i>
-        </button>
+
+    <!-- ==================== DAY 6: REAL TALK REPLIES ==================== -->
+    <div class="queue-section" id="section-day6">
+      <div class="queue-section-header">
+        <h2 class="day6-color">🎭 Day 6 — Real Talk Replies</h2>
+        <span class="task-count-badge badge-day6" id="badge-day6">0</span>
       </div>
-      
-      <div class="assessment-body">
-        <!-- Summary -->
-        <div class="assessment-summary">
-          <h3 style="margin: 0 0 0.5rem 0;">Overall Assessment</h3>
-          <div class="summary-grid">
-            <div class="summary-item">
-              <span class="summary-value" id="total-score">0</span>
-              <span class="summary-label">Total Score</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-value" id="overall-band">-</span>
-              <span class="summary-label">Level Band</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-value" id="score-change">-</span>
-              <span class="summary-label">Change</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Fluency -->
-        <div class="skill-section">
-          <div class="skill-header">
-            <div>
-              <span class="skill-icon">🌊</span>
-              <span class="skill-name">Fluency</span>
-            </div>
-            <div class="skill-scores">
-              <span>Previous: <strong id="fluency-prev">-</strong></span>
-              <span>Suggested: <strong id="fluency-suggested">-</strong></span>
-            </div>
-          </div>
-          <button class="show-guide-btn" onclick="showGuide('fluency')">
-            <i class="fas fa-book"></i> Show Guide
-          </button>
-          <div class="slider-container">
-            <input type="range" min="0" max="10" value="5" class="skill-slider" id="fluency-slider">
-            <div class="slider-labels">
-              <span>0</span>
-              <span>2</span>
-              <span>5</span>
-              <span>8</span>
-              <span>10</span>
-            </div>
-            <div class="band-labels">
-              <span>Super Beg</span>
-              <span>Beginner</span>
-              <span>Intermediate</span>
-              <span>Advanced</span>
-            </div>
-            <div class="current-score" id="fluency-score">5</div>
-          </div>
-        </div>
-
-        <!-- Grammar -->
-        <div class="skill-section">
-          <div class="skill-header">
-            <div>
-              <span class="skill-icon">📐</span>
-              <span class="skill-name">Grammar</span>
-            </div>
-            <div class="skill-scores">
-              <span>Previous: <strong id="grammar-prev">-</strong></span>
-              <span>Suggested: <strong id="grammar-suggested">-</strong></span>
-            </div>
-          </div>
-          <button class="show-guide-btn" onclick="showGuide('grammar')">
-            <i class="fas fa-book"></i> Show Guide
-          </button>
-          <div class="slider-container">
-            <input type="range" min="0" max="10" value="5" class="skill-slider" id="grammar-slider">
-            <div class="slider-labels">
-              <span>0</span>
-              <span>2</span>
-              <span>5</span>
-              <span>8</span>
-              <span>10</span>
-            </div>
-            <div class="band-labels">
-              <span>Super Beg</span>
-              <span>Beginner</span>
-              <span>Intermediate</span>
-              <span>Advanced</span>
-            </div>
-            <div class="current-score" id="grammar-score">5</div>
-          </div>
-        </div>
-
-        <!-- Comprehension -->
-        <div class="skill-section">
-          <div class="skill-header">
-            <div>
-              <span class="skill-icon">🧠</span>
-              <span class="skill-name">Comprehension</span>
-            </div>
-            <div class="skill-scores">
-              <span>Previous: <strong id="comprehension-prev">-</strong></span>
-              <span>Suggested: <strong id="comprehension-suggested">-</strong></span>
-            </div>
-          </div>
-          <button class="show-guide-btn" onclick="showGuide('comprehension')">
-            <i class="fas fa-book"></i> Show Guide
-          </button>
-          <div class="slider-container">
-            <input type="range" min="0" max="10" value="5" class="skill-slider" id="comprehension-slider">
-            <div class="slider-labels">
-              <span>0</span>
-              <span>2</span>
-              <span>5</span>
-              <span>8</span>
-              <span>10</span>
-            </div>
-            <div class="band-labels">
-              <span>Super Beg</span>
-              <span>Beginner</span>
-              <span>Intermediate</span>
-              <span>Advanced</span>
-            </div>
-            <div class="current-score" id="comprehension-score">5</div>
-          </div>
-        </div>
-
-        <!-- Vocabulary -->
-        <div class="skill-section">
-          <div class="skill-header">
-            <div>
-              <span class="skill-icon">💬</span>
-              <span class="skill-name">Vocabulary</span>
-            </div>
-            <div class="skill-scores">
-              <span>Previous: <strong id="vocabulary-prev">-</strong></span>
-              <span>Suggested: <strong id="vocabulary-suggested">-</strong></span>
-            </div>
-          </div>
-          <button class="show-guide-btn" onclick="showGuide('vocabulary')">
-            <i class="fas fa-book"></i> Show Guide
-          </button>
-          <div class="slider-container">
-            <input type="range" min="0" max="10" value="5" class="skill-slider" id="vocabulary-slider">
-            <div class="slider-labels">
-              <span>0</span>
-              <span>2</span>
-              <span>5</span>
-              <span>8</span>
-              <span>10</span>
-            </div>
-            <div class="band-labels">
-              <span>Super Beg</span>
-              <span>Beginner</span>
-              <span>Intermediate</span>
-              <span>Advanced</span>
-            </div>
-            <div class="current-score" id="vocabulary-score">5</div>
-          </div>
-        </div>
-
-        <!-- Pronunciation -->
-        <div class="skill-section">
-          <div class="skill-header">
-            <div>
-              <span class="skill-icon">🎤</span>
-              <span class="skill-name">Pronunciation</span>
-            </div>
-            <div class="skill-scores">
-              <span>Previous: <strong id="pronunciation-prev">-</strong></span>
-              <span>Suggested: <strong id="pronunciation-suggested">-</strong></span>
-            </div>
-          </div>
-          <button class="show-guide-btn" onclick="showGuide('pronunciation')">
-            <i class="fas fa-book"></i> Show Guide
-          </button>
-          <div class="slider-container">
-            <input type="range" min="0" max="10" value="5" class="skill-slider" id="pronunciation-slider">
-            <div class="slider-labels">
-              <span>0</span>
-              <span>2</span>
-              <span>5</span>
-              <span>8</span>
-              <span>10</span>
-            </div>
-            <div class="band-labels">
-              <span>Super Beg</span>
-              <span>Beginner</span>
-              <span>Intermediate</span>
-              <span>Advanced</span>
-            </div>
-            <div class="current-score" id="pronunciation-score">5</div>
-          </div>
-        </div>
-
-        <!-- Notes -->
-        <div class="notes-section">
-          <label for="assessment-notes">Teacher Notes (Optional)</label>
-          <textarea id="assessment-notes" class="notes-textarea" placeholder="Add any observations, strengths, or areas to focus on..."></textarea>
-        </div>
-      </div>
-
-      <div class="assessment-actions">
-        <button class="cancel-assessment-btn" onclick="closeAssessmentModal()">Cancel</button>
-        <button class="submit-assessment-btn" id="submit-assessment-btn" onclick="submitAssessment()">
-          <i class="fas fa-save"></i> Save Assessment
-        </button>
+      <div class="queue-section-body" id="body-day6">
+        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
       </div>
     </div>
-  </div>
 
-  <!-- Guide Popup -->
-  <div id="guide-popup" class="guide-popup">
-    <div class="guide-content">
-      <button class="guide-close" onclick="closeGuide()">
-        <i class="fas fa-times"></i>
-      </button>
-      <div id="guide-body">
-        <!-- Will be populated by JavaScript -->
+    <!-- ==================== DAY 7 / ASSESSMENTS ==================== -->
+    <div class="queue-section" id="section-day7">
+      <div class="queue-section-header">
+        <h2 class="day7-color">📋 Assessments & Check-ins</h2>
+        <span class="task-count-badge badge-day7" id="badge-day7">0</span>
+      </div>
+      <div class="queue-section-body" id="body-day7">
+        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
       </div>
     </div>
-  </div>
+
+    <!-- ==================== ALL STUDENTS ==================== -->
+    <div class="all-students-section">
+      <div class="all-students-header" id="all-students-toggle" onclick="toggleAllStudents()">
+        <h2>👥 All Students <span id="all-students-count" style="font-weight:400; color:var(--color-text-light);"></span></h2>
+        <i class="fas fa-chevron-down" id="all-students-chevron" style="color:var(--color-text-light); transition: transform 0.2s;"></i>
+      </div>
+      <div class="all-students-body" id="all-students-body">
+        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+      </div>
+    </div>
+
+    <!-- ==================== ASSESSMENT MODAL ==================== -->
+    <div id="assessment-modal" class="assessment-modal">
+      <div class="assessment-content">
+        <div class="assessment-header">
+          <h2>📊 Assess Student Skills</h2>
+          <p id="assessment-student-name">Loading...</p>
+          <button class="assessment-close" onclick="closeAssessmentModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="assessment-body">
+          <div class="assessment-summary">
+            <h3 style="margin:0 0 0.5rem 0;">Overall Assessment</h3>
+            <div class="summary-grid">
+              <div class="summary-item"><span class="summary-value" id="total-score">0</span><span class="summary-label">Total Score</span></div>
+              <div class="summary-item"><span class="summary-value" id="overall-band">-</span><span class="summary-label">Level Band</span></div>
+              <div class="summary-item"><span class="summary-value" id="score-change">-</span><span class="summary-label">Change</span></div>
+            </div>
+          </div>
+          <!-- Fluency -->
+          <div class="skill-section">
+            <div class="skill-header">
+              <div><span class="skill-icon">🌊</span><span class="skill-name">Fluency</span></div>
+              <div class="skill-scores">
+                <span>Previous: <strong id="fluency-prev">-</strong></span>
+                <span>Suggested: <strong id="fluency-suggested">-</strong></span>
+              </div>
+            </div>
+            <button class="show-guide-btn" onclick="showGuide('fluency')"><i class="fas fa-book"></i> Show Guide</button>
+            <div class="slider-container">
+              <input type="range" min="0" max="10" value="5" class="skill-slider" id="fluency-slider">
+              <div class="slider-labels"><span>0</span><span>2</span><span>5</span><span>8</span><span>10</span></div>
+              <div class="band-labels"><span>Super Beg</span><span>Beginner</span><span>Intermediate</span><span>Advanced</span></div>
+              <div class="current-score" id="fluency-score">5</div>
+            </div>
+          </div>
+          <!-- Grammar -->
+          <div class="skill-section">
+            <div class="skill-header">
+              <div><span class="skill-icon">📐</span><span class="skill-name">Grammar</span></div>
+              <div class="skill-scores">
+                <span>Previous: <strong id="grammar-prev">-</strong></span>
+                <span>Suggested: <strong id="grammar-suggested">-</strong></span>
+              </div>
+            </div>
+            <button class="show-guide-btn" onclick="showGuide('grammar')"><i class="fas fa-book"></i> Show Guide</button>
+            <div class="slider-container">
+              <input type="range" min="0" max="10" value="5" class="skill-slider" id="grammar-slider">
+              <div class="slider-labels"><span>0</span><span>2</span><span>5</span><span>8</span><span>10</span></div>
+              <div class="band-labels"><span>Super Beg</span><span>Beginner</span><span>Intermediate</span><span>Advanced</span></div>
+              <div class="current-score" id="grammar-score">5</div>
+            </div>
+          </div>
+          <!-- Comprehension -->
+          <div class="skill-section">
+            <div class="skill-header">
+              <div><span class="skill-icon">🧠</span><span class="skill-name">Comprehension</span></div>
+              <div class="skill-scores">
+                <span>Previous: <strong id="comprehension-prev">-</strong></span>
+                <span>Suggested: <strong id="comprehension-suggested">-</strong></span>
+              </div>
+            </div>
+            <button class="show-guide-btn" onclick="showGuide('comprehension')"><i class="fas fa-book"></i> Show Guide</button>
+            <div class="slider-container">
+              <input type="range" min="0" max="10" value="5" class="skill-slider" id="comprehension-slider">
+              <div class="slider-labels"><span>0</span><span>2</span><span>5</span><span>8</span><span>10</span></div>
+              <div class="band-labels"><span>Super Beg</span><span>Beginner</span><span>Intermediate</span><span>Advanced</span></div>
+              <div class="current-score" id="comprehension-score">5</div>
+            </div>
+          </div>
+          <!-- Vocabulary -->
+          <div class="skill-section">
+            <div class="skill-header">
+              <div><span class="skill-icon">💬</span><span class="skill-name">Vocabulary</span></div>
+              <div class="skill-scores">
+                <span>Previous: <strong id="vocabulary-prev">-</strong></span>
+                <span>Suggested: <strong id="vocabulary-suggested">-</strong></span>
+              </div>
+            </div>
+            <button class="show-guide-btn" onclick="showGuide('vocabulary')"><i class="fas fa-book"></i> Show Guide</button>
+            <div class="slider-container">
+              <input type="range" min="0" max="10" value="5" class="skill-slider" id="vocabulary-slider">
+              <div class="slider-labels"><span>0</span><span>2</span><span>5</span><span>8</span><span>10</span></div>
+              <div class="band-labels"><span>Super Beg</span><span>Beginner</span><span>Intermediate</span><span>Advanced</span></div>
+              <div class="current-score" id="vocabulary-score">5</div>
+            </div>
+          </div>
+          <!-- Pronunciation -->
+          <div class="skill-section">
+            <div class="skill-header">
+              <div><span class="skill-icon">🎤</span><span class="skill-name">Pronunciation</span></div>
+              <div class="skill-scores">
+                <span>Previous: <strong id="pronunciation-prev">-</strong></span>
+                <span>Suggested: <strong id="pronunciation-suggested">-</strong></span>
+              </div>
+            </div>
+            <button class="show-guide-btn" onclick="showGuide('pronunciation')"><i class="fas fa-book"></i> Show Guide</button>
+            <div class="slider-container">
+              <input type="range" min="0" max="10" value="5" class="skill-slider" id="pronunciation-slider">
+              <div class="slider-labels"><span>0</span><span>2</span><span>5</span><span>8</span><span>10</span></div>
+              <div class="band-labels"><span>Super Beg</span><span>Beginner</span><span>Intermediate</span><span>Advanced</span></div>
+              <div class="current-score" id="pronunciation-score">5</div>
+            </div>
+          </div>
+          <div class="notes-section">
+            <label for="assessment-notes">Teacher Notes (Optional)</label>
+            <textarea id="assessment-notes" class="notes-textarea" placeholder="Add any observations, strengths, or areas to focus on..."></textarea>
+          </div>
+        </div>
+        <div class="assessment-actions">
+          <button class="cancel-assessment-btn" onclick="closeAssessmentModal()">Cancel</button>
+          <button class="submit-assessment-btn" id="submit-assessment-btn" onclick="submitAssessment()">
+            <i class="fas fa-save"></i> Save Assessment
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guide popup -->
+    <div id="guide-popup" class="guide-popup">
+      <div class="guide-content">
+        <button class="guide-close" onclick="closeGuide()"><i class="fas fa-times"></i></button>
+        <div id="guide-body"></div>
+      </div>
+    </div>
+
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Initialize Supabase client
-    const supabaseClient = supabase.createClient(
-      'https://luyzyzefgintksydmwoh.supabase.co', 
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg'
-    );
+  // ============================================================
+  // SUPABASE INIT
+  // ============================================================
+  const supabaseClient = supabase.createClient(
+    'https://luyzyzefgintksydmwoh.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg'
+  );
 
-    let currentTeacher = null;
-    let feedbackQueue = { planA: [], planC1: [], planC2: [] };
-    let completedToday = new Set();
-    let currentFilters = {}; // Track filter per student
+  // ============================================================
+  // STATE
+  // ============================================================
+  let currentTeacher   = null;
+  let allStudentsData  = [];
+  let dayQueues        = { day6: [], day5: [], day7other: [] };
+  let completedToday   = new Set();
+  let queueItemsMap    = new Map();
+  let currentFilters   = {};
+  let currentAssessmentStudent = null;
+  let currentCancellationStudent = null;
+  let mediaRecorder    = null;
+  let audioChunks      = [];
+  let recordingStudentId = null;
+  let draftStore = {};
 
-    // Feedback Templates
-    const templates = {
-      weekly: `Week [X] Review - Comprehensive Feedback 🌟
-
-📊 WEEKLY OVERVIEW:
-Completed [X]/7 prompts this week
-Overall improvement: [Brief summary of progress]
-
-🎯 MAJOR STRENGTHS THIS WEEK:
-1. [Specific example with day/prompt reference]
-2. [Another strength - be specific]
-3. [Another strength - be specific]
-
-📝 PATTERNS TO IMPROVE:
-1. [Common error/pattern across multiple days]
-   → Example: [Specific instance from Day X]
-   → Practice tip: [How to fix it]
-   
-2. [Another pattern]
-   → Example: [Specific instance]
-   → Practice tip: [How to fix it]
-
-🔍 SKILL BREAKDOWN:
-
-💬 Fluency & Natural Speaking:
-[Observations about speaking flow, hesitation, conversation pace]
-
-📐 Grammar & Sentence Structure:
-[Common mistakes, improvements, patterns to watch]
-
-🎯 Vocabulary Range:
-[New words used well, vocabulary gaps, suggestions]
-
-🎤 Pronunciation & Clarity:
-[Specific sounds/words to practice, accent patterns]
-
-🧠 Comprehension & Responses:
-[How well you understood prompts, response appropriateness]
-
-💡 THIS WEEK'S FOCUS REVIEW:
-[What we worked on this week: _____ ]
-[Results: _____ ]
-
-🎯 ACTION ITEMS FOR NEXT WEEK:
-1. [Specific, actionable practice goal]
-2. [Specific, actionable practice goal]
-3. [Specific, actionable practice goal]
-
-🔮 NEXT WEEK'S THEME:
-Topic: [Preview of next week's conversation focus]
-Goal: [What we'll practice]
-
-Excellent work this week! Your consistency is paying off! 💪✨`,
-
-      biweekly: `Day [X] Check-in ✨
-
-Quick review of your last [X] responses:
-
-✅ GOING WELL:
-- [Highlight 1-2 wins]
-
-⚠️ WATCH FOR:
-- [1 pattern to improve]
-
-💡 PRACTICE TIP: [Quick actionable advice]`,
-
-      daily: `Great work today! 👏
-
-✅ [Specific thing they did well]
-
-💡 Quick tip: [One correction/suggestion]
-
-Keep practicing! 🌟`
-    };
-
-    // ============================================
-    // AUTHENTICATION & INITIALIZATION
-    // ============================================
-
-    async function checkAuth() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      
-      if (!session) {
-        window.location.href = '/teacher-login.html';
-        return;
-      }
-      
-// Get teacher info
-      const { data: teacher, error } = await supabaseClient
-        .from('teachers')
-        .select('*')
-        .eq('auth_user_id', session.user.id)
-        .single();
-      
-      if (error || !teacher || !teacher.is_active) {
-        await supabaseClient.auth.signOut();
-        window.location.href = '/teacher-login.html';
-        return;
-      }
-      
-      currentTeacher = teacher;
-      document.getElementById('teacher-name').textContent = teacher.full_name;
-      
-      // Load completed feedback from today
-      await loadCompletedToday();
-      
-      // Load feedback queue
-      await loadFeedbackQueue();
-      
-      // Load video lessons
-      await loadVideoLessons();
-    }
-    
-    // ============================================
-    // LOAD COMPLETED FEEDBACK FROM TODAY
-    // ============================================
-    async function loadCompletedToday() {
-      try {
-        const todayStart = new Date();
-        todayStart.setHours(0, 0, 0, 0);
-        
-        const { data: todaysFeedback, error } = await supabaseClient
-          .from('feedback_log')
-          .select('student_id')
-          .eq('teacher_id', currentTeacher.id)
-          .gte('sent_at', todayStart.toISOString());
-        
-        if (error) throw error;
-        
-        // Populate completedToday Set
-        completedToday = new Set(todaysFeedback.map(f => f.student_id));
-        
-      } catch (err) {
-        console.error('Error loading completed feedback:', err);
-      }
-    }
-
-    // ============================================
-    // LOAD FEEDBACK QUEUE
-    // ============================================
-
-    async function loadFeedbackQueue() {
-      try {
-        // Get all assigned students with their progress
-        const { data: assignments, error: assignError } = await supabaseClient
-          .from('student_teacher_assignments')
-          .select(`
-            student_id,
-            questionnaire_responses (
-              id,
-              user_id,
-              given_name_romaji,
-              name,
-              line_id,
-              plan
-            )
-          `)
-          .eq('teacher_id', currentTeacher.id);
-
-        if (assignError) throw assignError;
-
-        const students = assignments.map(a => a.questionnaire_responses).filter(Boolean);
-
-        // Get progress for all students using user_id
-        const userIds = students.map(s => s.user_id).filter(Boolean);
-        const { data: progressData, error: progressError } = await supabaseClient
-          .from('student_progress')
-          .select('*')
-          .in('user_id', userIds);
-
-        if (progressError) throw progressError;
-
-        // Categorize by plan and feedback need
-        feedbackQueue = { planA: [], planC1: [], planC2: [] };
-
-        for (const student of students) {
-          const progress = progressData.find(p => p.user_id === student.user_id);
-          if (!progress) continue;
-
-          const studentData = {
-  ...student,
-  ...progress,
-  needsFeedback: await checkIfNeedsFeedback(student.plan, progress, student.user_id)
-};
-
-          if (studentData.needsFeedback) {
-            if (student.plan === 'A') feedbackQueue.planA.push(studentData);
-            else if (student.plan === 'C1') feedbackQueue.planC1.push(studentData);
-            else if (student.plan === 'C2') feedbackQueue.planC2.push(studentData);
-          }
-        }
-
-        // Render the queue
-        renderFeedbackQueue();
-        updateStats();
-
-      } catch (err) {
-        console.error('Error loading feedback queue:', err);
-        alert('Error loading students. Please refresh the page.');
-      }
-    }
-
-    // ============================================
-    // CHECK IF STUDENT NEEDS FEEDBACK
-    // ============================================
-
-    async function checkIfNeedsFeedback(plan, progress, userId) {
-  const { current_day, total_prompts_sent } = progress;
-
-  if (plan === 'A') {
-    // Weekly: Day 7, 14, 21, 28
-    return total_prompts_sent % 7 === 0 && current_day === 7;
-  } else if (plan === 'C1') {
-    // Bi-weekly: Days 3 and 7
-    return current_day === 3 || current_day === 7;
-  } else if (plan === 'C2') {
-    // Daily - but only if they responded today
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    
-    const { data: todayResponse, error: responseError } = await supabaseClient
-  .from('message_log')
-  .select('id')
-  .eq('user_id', userId)
-  .eq('message_type', 'student_response')
-  .gte('created_at', todayStart.toISOString())
-  .maybeSingle();
-
-if (responseError && responseError.code !== 'PGRST116') {
-  console.error('Error checking student response:', responseError);
-}
-    
-    return !!todayResponse; // True only if they responded today
+  // ============================================================
+  // XSS PROTECTION — escapes user-provided strings before innerHTML
+  // ============================================================
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
-  return false;
-}
+    
+  // ============================================================
+  // FEEDBACK TEMPLATES
+  // ============================================================
+  const feedbackTemplates = {
 
-    // ============================================
-    // RENDER FEEDBACK QUEUE
-    // ============================================
+    day6_reply: `Great effort on today's Real Talk! 🎭
 
-    function renderFeedbackQueue() {
-      renderPlanSection('plan-c2-students', feedbackQueue.planC2, 'daily');
-      renderPlanSection('plan-c1-students', feedbackQueue.planC1, 'biweekly');
-      renderPlanSection('plan-a-students', feedbackQueue.planA, 'weekly');
+[One specific thing they did well — mention the reaction or follow-up they used]
+
+💡 Tip: [One small improvement — e.g. "Try adding a follow-up question after your reaction!"]
+
+Keep it up! 🌟`,
+
+    quiz_correction: `Good work on today's quiz! ✅
+
+The answer was [A or B] — [brief reason why, e.g. "because 'Oh really?!' sounds natural as a genuine surprise reaction, while option A was too flat"].
+
+Your written version was great too. Nice effort! 💪`,
+
+    weekly: `Week [X] Review 🌟
+
+📊 This week you completed [X]/7 prompts. 
+
+🎯 Strengths:
+1. [Specific example — mention the day and what they did well]
+2. [Another strength]
+
+📝 One thing to work on:
+[Common pattern you noticed — give a specific example and a tip]
+
+🔍 Skill notes:
+💬 Speaking flow: [brief observation]
+📐 Grammar: [brief observation]
+🎯 Vocabulary: [brief observation]
+🎤 Pronunciation: [brief observation]
+
+🔮 Next week's focus: [Preview theme]
+
+Excellent consistency this week! 💪✨`,
+
+    biweekly: `Quick check-in ✨
+
+Nice work on your last few responses!
+
+✅ Going well: [1-2 specific wins]
+⚠️ Watch for: [1 pattern to improve]
+💡 Tip: [One quick actionable piece of advice]
+
+Keep going! 🌟`,
+
+    daily: `Great work today! 👏
+
+✅ [Specific thing they did well]
+💡 Quick tip: [One small correction or suggestion]
+
+Keep it up! 🌟`,
+
+    great_effort: `Really appreciate your effort today! 💪
+
+I can see you're working hard, and that consistency matters more than perfection at this stage.
+
+[Optional: one encouraging observation about what you noticed in their response]
+
+Keep showing up every day — that's how real progress happens! 🌱`,
+
+    pronunciation_focus: `Great listening today! 🎤
+
+This week's pronunciation focus was [sound/word]. 
+
+[Observation on how they did — were they close? What to keep practicing?]
+
+💡 Practice tip: [Specific advice for this sound, e.g. "Try saying it slowly in front of a mirror"]
+
+You're making progress! 🎯`,
+
+    milestone: `🎉 Congratulations on completing [Week 8 / Week 16]!
+
+This is a real milestone. Look how far you've come since Week [1/9]:
+✅ [Achievement 1 — something specific you noticed]
+✅ [Achievement 2]
+✅ [Achievement 3]
+
+[If Week 16 — full competency complete]: You've completed the "[competency name]" competency! That's a huge deal.
+
+Next up: [brief preview of what's coming]
+
+I'm proud of your dedication. Let's keep building! 🚀`
+  };
+
+  // Cancellation outreach templates
+  const messageTemplates = {
+    expensive: { body: `Hi [Student Name],\n\nI noticed you cancelled your subscription and wanted to reach out personally. I've really enjoyed working with you.\n\nIf cost was a factor, I'd love to chat about options that might work better for your budget.\n\nBest regards,\n[Teacher Name]` },
+    not_using: { body: `Hi [Student Name],\n\nI saw that finding time for practice has been challenging — totally understandable!\n\nEven 5-10 minutes a day makes a big difference. Would you be open to adjusting your practice routine to fit your schedule better?\n\nBest regards,\n[Teacher Name]` },
+    too_difficult: { body: `Hi [Student Name],\n\nI heard the content felt challenging. That feedback really helps!\n\nFeeling challenged is normal — it means you're learning. I'd love to adjust things to better match your level.\n\nBest regards,\n[Teacher Name]` },
+    scheduling: { body: `Hi [Student Name],\n\nScheduling is tough, I completely understand.\n\nWe have flexible options including pausing your subscription until things settle. Happy to help find something that works.\n\nBest regards,\n[Teacher Name]` },
+    technical: { body: `Hi [Student Name],\n\nI'm sorry you ran into technical issues — that's so frustrating!\n\nI'd love to help fix them and get you back on track. Can we jump on a quick call to sort it out?\n\nBest regards,\n[Teacher Name]` },
+    general: { body: `Hi [Student Name],\n\nI noticed you cancelled and wanted to reach out personally.\n\nWhatever your reasons, I completely respect your decision. If there's anything I can do to help, I'm always here.\n\nWarm regards,\n[Teacher Name]` }
+  };
+
+  // ============================================================
+  // AUTH & INIT
+  // ============================================================
+  async function checkAuth() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = '/teacher-login.html'; return; }
+
+    const { data: teacher, error } = await supabaseClient
+      .from('teachers').select('*')
+      .eq('auth_user_id', session.user.id).single();
+
+    if (error || !teacher || !teacher.is_active) {
+      await supabaseClient.auth.signOut();
+      window.location.href = '/teacher-login.html';
+      return;
     }
 
-    function renderPlanSection(containerId, students, templateType) {
-      const container = document.getElementById(containerId);
-      
-      if (students.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-check-circle"></i>
-            <p>No students need feedback today!</p>
-          </div>
-        `;
-        return;
+    currentTeacher = teacher;
+    document.getElementById('teacher-name').textContent = teacher.full_name;
+
+    // Show admin button only for admin-role teachers
+    if (teacher.role === 'admin') {
+      const adminBtn = document.getElementById('admin-recordings-btn');
+      adminBtn.style.display = 'inline-flex';
+    }
+
+    await loadCompletedToday();
+    await loadDayTypeQueue();
+    await loadVideoLessons();
+    loadCancellationNotifications();
+  }
+
+  async function loadCompletedToday() {
+    try {
+      const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+      const { data, error } = await supabaseClient
+        .from('feedback_log').select('student_id')
+        .eq('teacher_id', currentTeacher.id)
+        .gte('sent_at', todayStart.toISOString());
+      if (error) throw error;
+      completedToday = new Set(data.map(f => f.student_id));
+    } catch(err) { console.error('loadCompletedToday:', err); }
+  }
+
+  // ============================================================
+  // LOAD ALL STUDENTS + BUILD DAY QUEUES
+  // ============================================================
+  async function loadDayTypeQueue() {
+    try {
+      const { data: assignments, error: assignError } = await supabaseClient
+        .from('student_teacher_assignments')
+        .select(`student_id, questionnaire_responses(id, user_id, given_name_romaji, name, line_id, plan)`)
+        .eq('teacher_id', currentTeacher.id);
+      if (assignError) throw assignError;
+
+      const students  = assignments.map(a => a.questionnaire_responses).filter(Boolean);
+      const userIds   = students.map(s => s.user_id).filter(Boolean);
+      const studentIds = students.map(s => s.id).filter(Boolean);
+
+      const { data: progressData } = await supabaseClient
+        .from('student_progress').select('*').in('user_id', userIds);
+
+      allStudentsData = students.map(s => {
+        const progress = (progressData || []).find(p => p.user_id === s.user_id) || {};
+        return { ...s, ...progress };
+      });
+
+      const { data: allResponses, error: respError } = await supabaseClient
+        .from('message_log')
+        .select('id, user_id, prompt_id, message_text, media_type, message_id, line_message_id, created_at')
+        .in('user_id', userIds)
+        .eq('message_type', 'student_response')
+        .order('created_at', { ascending: false });
+      if (respError) throw respError;
+
+      const { data: allFeedback } = await supabaseClient
+        .from('feedback_log')
+        .select('student_id, sent_at')
+        .in('student_id', studentIds);
+
+      const feedbackMap = {};
+      for (const fb of allFeedback || []) {
+        if (!feedbackMap[fb.student_id]) feedbackMap[fb.student_id] = [];
+        feedbackMap[fb.student_id].push(new Date(fb.sent_at).getTime());
       }
 
-      container.innerHTML = students.map(student => createStudentCard(student, templateType)).join('');
+      const unreviewedResponses = (allResponses || []).filter(r => {
+        const student = allStudentsData.find(s => s.user_id === r.user_id);
+        if (!student) return false;
+        const feedbackTimes  = feedbackMap[student.id] || [];
+        const responseTime   = new Date(r.created_at).getTime();
+        return !feedbackTimes.some(ft => ft > responseTime);
+      });
 
-      // Add event listeners ONLY for buttons that DON'T have inline onclick
-      students.forEach(student => {
-        const card = document.getElementById(`student-${student.id}`);
-        const sendBtn = card.querySelector('.send-btn');
-        const markDoneBtn = card.querySelector('.mark-done-btn');
-        const templateBtns = card.querySelectorAll('.template-btn');
+      const promptIds = [...new Set(
+        unreviewedResponses.map(r => r.prompt_id).filter(Boolean)
+      )];
 
-        // NOTE: expandBtn now uses inline onclick="toggleCard()", so we don't add a listener here
-        sendBtn.addEventListener('click', () => sendFeedback(student.id));
-        markDoneBtn.addEventListener('click', () => markComplete(student.id));
-        
-        templateBtns.forEach(btn => {
-          btn.addEventListener('click', () => loadTemplate(student.id, btn.dataset.template));
-        });
+      let promptMap = {};
+      if (promptIds.length > 0) {
+        const { data: promptData } = await supabaseClient
+          .from('prompts')
+          .select('id, day_number, type, prompt_text')
+          .in('id', promptIds);
+        for (const p of promptData || []) promptMap[p.id] = p;
+      }
+
+      // Route by prompt type / day number — no plan-based filtering
+      dayQueues  = { day6: [], day5: [], day7other: [] };
+      queueItemsMap.clear();
+
+      for (const response of unreviewedResponses) {
+        const student = allStudentsData.find(s => s.user_id === response.user_id);
+        if (!student) continue;
+
+        const prompt     = response.prompt_id ? promptMap[response.prompt_id] : null;
+        const dayNumber  = prompt?.day_number ?? student.current_day ?? 0;
+        const promptType = prompt?.type ?? null;
+
+        const qi = {
+          responseId:        response.id,
+          studentId:         student.id,
+          studentUserId:     student.user_id,
+          name:              student.given_name_romaji || student.name,
+          plan:              student.plan,
+          lineId:            student.line_id,
+          currentWeek:       student.current_week,
+          currentDay:        student.current_day,
+          responseText:      response.message_text,
+          mediaType:         response.media_type || 'text',
+          responseMessageId: response.message_id || response.line_message_id,
+          responseCreatedAt: response.created_at,
+          promptId:          response.prompt_id,
+          promptDayNumber:   dayNumber,
+          promptType:        promptType,
+          promptText:        prompt?.prompt_text || null,
+        };
+
+        queueItemsMap.set(response.id, qi);
+
+        if (promptType === 'Real Talk' || dayNumber === 6) {
+          dayQueues.day6.push(qi);
+        } else if (promptType === 'Quiz' || dayNumber === 5) {
+          dayQueues.day5.push(qi);
+        } else {
+          dayQueues.day7other.push(qi);
+        }
+      }
+
+      renderDayQueues();
+      renderAllStudents();
+      updateStats();
+
+    } catch(err) {
+      console.error('loadDayTypeQueue:', err);
+      ['body-day6','body-day5','body-day7'].forEach(id => {
+        document.getElementById(id).innerHTML = '<p style="color:red;">Error loading students. Please refresh.</p>';
       });
     }
+  }
 
-    function createStudentCard(student, templateType) {
-      const isDone = completedToday.has(student.id);
-      const isPriority = student.current_day === 7 && student.current_week === 1;
+  // ============================================================
+  // RENDER FUNCTIONS
+  // ============================================================
+  function renderDayQueues() {
+    renderDay6Section();
+    renderDay5Section();
+    renderDay7Section();
+  }
 
+  function renderDay6Section() {
+    const body  = document.getElementById('body-day6');
+    const badge = document.getElementById('badge-day6');
+    const items   = dayQueues.day6;
+    const pending = items.filter(qi => !completedToday.has(qi.responseId));
+    badge.textContent = pending.length;
+    if (pending.length === 0 && items.length > 0) {
+      badge.className = 'task-count-badge badge-done'; badge.textContent = '✓';
+    } else if (items.length === 0) {
+      badge.className = 'task-count-badge badge-day6'; badge.textContent = '0';
+    }
+    if (items.length === 0) {
+      body.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle"></i><p>No Day 6 responses awaiting reply.</p></div>`;
+      return;
+    }
+    body.innerHTML = items.map(qi => createDay6Card(qi)).join('');
+    addCardListeners(items);
+  }
+
+  function renderDay5Section() {
+    const body  = document.getElementById('body-day5');
+    const badge = document.getElementById('badge-day5');
+    const items   = dayQueues.day5;
+    const pending = items.filter(qi => !completedToday.has(qi.responseId));
+    badge.textContent = pending.length;
+    if (pending.length === 0 && items.length > 0) {
+      badge.className = 'task-count-badge badge-done'; badge.textContent = '✓';
+    } else if (items.length === 0) {
+      badge.className = 'task-count-badge badge-day5'; badge.textContent = '0';
+    }
+    if (items.length === 0) {
+      body.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle"></i><p>No Day 5 quiz responses awaiting correction.</p></div>`;
+      return;
+    }
+    body.innerHTML = items.map(qi => createDay5Card(qi)).join('');
+    addCardListeners(items);
+  }
+
+  function renderDay7Section() {
+    const body  = document.getElementById('body-day7');
+    const badge = document.getElementById('badge-day7');
+    const items   = dayQueues.day7other;
+    const pending = items.filter(qi => !completedToday.has(qi.responseId));
+    badge.textContent = pending.length;
+    if (pending.length === 0 && items.length > 0) {
+      badge.className = 'task-count-badge badge-done'; badge.textContent = '✓';
+    } else if (items.length === 0) {
+      badge.className = 'task-count-badge badge-day7'; badge.textContent = '0';
+    }
+    if (items.length === 0) {
+      body.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle"></i><p>No assessments or check-ins awaiting feedback.</p></div>`;
+      return;
+    }
+    body.innerHTML = items.map(qi => createDay7Card(qi)).join('');
+    addCardListeners(items);
+  }
+
+  function renderAllStudents() {
+    const body    = document.getElementById('all-students-body');
+    const countEl = document.getElementById('all-students-count');
+    countEl.textContent = `(${allStudentsData.length})`;
+    if (allStudentsData.length === 0) {
+      body.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><p>No students assigned yet.</p></div>`;
+      return;
+    }
+    body.innerHTML = allStudentsData.map(s => {
+      const name       = s.given_name_romaji || s.name;
+      const planClass  = `plan-${s.plan}`;
+      const planLabel  = formatPlanName(s.plan);
       return `
-        <div class="student-card" id="student-${student.id}">
-          <div class="student-header">
-            <div>
-              <div class="student-name">
-                ${student.given_name_romaji || student.name}
-                ${isPriority ? '<span class="priority-badge">⭐ NEW</span>' : ''}
-                ${isDone ? '<span class="priority-badge" style="background:#4caf50;">✓ DONE</span>' : ''}
-              </div>
-              <div class="student-meta">
-                Day ${student.current_day}/Week ${student.current_week} | 
-                Total prompts: ${student.total_prompts_sent}
-              </div>
-            </div>
-<div style="display: flex; gap: 0.5rem;">
-  <button class="expand-btn" onclick="toggleCard(${student.id})">
-    ${isDone ? 'View' : 'Send Feedback'} ▼
-  </button>
-  <button class="expand-btn" onclick="event.stopPropagation(); openAssessmentModal(${student.id})" style="background: var(--color-gold);">
-    📊 Assess Skills
-  </button>
-</div>
-         </div> 
-          <div class="student-details">
-            <!-- Filter Bar -->
-<div class="filter-bar" id="filter-bar-${student.id}">
-  <span class="filter-label">Show:</span>
-  
-  <!-- Desktop: Buttons -->
-  <div class="filter-buttons-desktop">
-    <button class="filter-btn active" data-filter="recent" data-student="${student.id}">
-      Since Last Feedback
-    </button>
-    <button class="filter-btn" data-filter="3" data-student="${student.id}">
-      3 Days
-    </button>
-    <button class="filter-btn" data-filter="7" data-student="${student.id}">
-      7 Days
-    </button>
-    <button class="filter-btn" data-filter="14" data-student="${student.id}">
-      14 Days
-    </button>
-    <button class="filter-btn" data-filter="30" data-student="${student.id}">
-      30 Days
-    </button>
-    <button class="filter-btn" data-filter="all" data-student="${student.id}">
-      All
-    </button>
-  </div>
-  
-  <!-- Mobile: Dropdown -->
-<select class="filter-select-mobile" id="filter-${student.id}" data-student="${student.id}">
-    <option value="recent" selected>Since Last Feedback</option>
-    <option value="3">Last 3 Days</option>
-    <option value="7">Last 7 Days</option>
-    <option value="14">Last 14 Days</option>
-    <option value="30">Last 30 Days</option>
-    <option value="all">All Messages</option>
-  </select>
-  
-  <span class="message-count" id="msg-count-${student.id}"></span>
-</div>
-            
-            <div id="responses-${student.id}">
-              <p>Loading conversation...</p>
-            </div>
-            
-            <div class="feedback-box">
-              <h3>Send Feedback</h3>
-              <div class="template-selector">
-                <button class="template-btn active" data-template="${templateType}">
-                  Load Template
-                </button>
-                <button class="template-btn" data-template="blank">
-                  Start Blank
-                </button>
-              </div>
-              
-              <textarea 
-                class="feedback-textarea" 
-                id="feedback-${student.id}"
-                placeholder="Write your feedback here..."
-              >${templates[templateType]}</textarea>
-              
-              <div class="action-buttons">
-                <button class="send-btn" ${isDone ? 'disabled' : ''}>
-                  <i class="fas fa-paper-plane"></i> Send to LINE
-                </button>
-                <button class="mark-done-btn" ${isDone ? 'disabled' : ''}>
-                  <i class="fas fa-check"></i> Mark Complete
-                </button>
-              </div>
-            </div>
+        <div class="roster-card">
+          <div class="roster-info">
+            <div class="roster-name">${name} <span class="plan-badge ${planClass}">${planLabel}</span></div>
+            <div class="roster-meta">Week ${s.current_week || 1} · Day ${s.current_day || 1} · ${s.total_prompts_sent || 0} prompts sent</div>
+          </div>
+          <div class="roster-actions">
+            <button class="roster-btn" onclick="window.location.href='student-detail.html?id=${s.id}'">
+              <i class="fas fa-user"></i> View Profile
+            </button>
+            <button class="roster-btn secondary" onclick="event.stopPropagation(); openAssessmentModal(${s.id})">
+              📊 Assess
+            </button>
           </div>
         </div>
       `;
+    }).join('');
+  }
+
+  function toggleAllStudents() {
+    const body    = document.getElementById('all-students-body');
+    const header  = document.getElementById('all-students-toggle');
+    const chevron = document.getElementById('all-students-chevron');
+    const isOpen  = body.classList.contains('open');
+    body.classList.toggle('open');
+    header.classList.toggle('open');
+    chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+
+  // ============================================================
+  // CARD TEMPLATES
+  // ============================================================
+  function planBadgeHtml(plan) {
+    return `<span class="plan-badge plan-${plan}">${formatPlanName(plan)}</span>`;
+  }
+
+  function responsePreviewHtml(qi) {
+    const when = new Date(qi.responseCreatedAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    let html = `<div style="background:#f8f8f8; border:1px solid #e0e0e0; border-radius:6px; padding:0.75rem 1rem; margin-bottom:1rem; font-size:0.88rem;">
+      <div style="font-size:0.75rem; color:#888; margin-bottom:0.35rem;">📬 Student response · ${when}</div>`;
+    if (qi.responseText) html += `<p style="margin:0; color:#333;">"${qi.responseText}"</p>`;
+    if (qi.mediaType === 'audio') html += `<audio controls style="width:100%; max-width:360px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${qi.responseMessageId}">Audio not supported.</audio>`;
+    if (qi.mediaType === 'video') html += `<video controls style="width:100%; max-width:360px; border-radius:4px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${qi.responseMessageId}">Video not supported.</video>`;
+    if (qi.mediaType === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${qi.responseMessageId}" style="max-width:100%; max-height:200px; border-radius:4px; margin-top:0.4rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
+    html += `</div>`;
+    return html;
+  }
+
+  function filterBarHtml(studentId, cardKey) {
+    return `
+      <div class="filter-bar" id="filter-bar-${cardKey}">
+        <span class="filter-label">Full history:</span>
+        <div class="filter-buttons-desktop">
+          <button class="filter-btn active" data-filter="recent" data-student="${studentId}" data-card="${cardKey}">Since Last Feedback</button>
+          <button class="filter-btn" data-filter="7"   data-student="${studentId}" data-card="${cardKey}">7 Days</button>
+          <button class="filter-btn" data-filter="14"  data-student="${studentId}" data-card="${cardKey}">14 Days</button>
+          <button class="filter-btn" data-filter="all" data-student="${studentId}" data-card="${cardKey}">All</button>
+        </div>
+        <select class="filter-select-mobile" id="filter-${cardKey}" data-student="${studentId}" data-card="${cardKey}">
+          <option value="recent" selected>Since Last Feedback</option>
+          <option value="7">Last 7 Days</option>
+          <option value="14">Last 14 Days</option>
+          <option value="all">All Messages</option>
+        </select>
+        <span class="message-count" id="msg-count-${cardKey}"></span>
+      </div>
+    `;
+  }
+
+  // ============================================================
+  // DAY 6 CARD
+  // ============================================================
+  function createDay6Card(qi) {
+    const isDone = completedToday.has(qi.responseId);
+    const ck = qi.responseId;
+    return `
+      <div class="student-card" id="card-${ck}">
+        <div class="student-header" onclick="toggleCard('${ck}')">
+          <div>
+            <div class="student-name">
+              ${qi.name} ${planBadgeHtml(qi.plan)}
+              ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ''}
+            </div>
+            <div class="student-meta">Week ${qi.currentWeek || 1} · Day 6 · Real Talk response received</div>
+          </div>
+          <div class="student-actions">
+            <button class="btn-expand" onclick="event.stopPropagation(); toggleCard('${ck}')">
+              ${isDone ? 'View' : 'Reply'} ▼
+            </button>
+            <button class="btn-assess"  onclick="event.stopPropagation(); openAssessmentModal(${qi.studentId})">📊</button>
+            <button class="btn-profile" onclick="event.stopPropagation(); window.location.href='student-detail.html?id=${qi.studentId}'"><i class="fas fa-user"></i></button>
+          </div>
+        </div>
+        <div class="student-details">
+          ${responsePreviewHtml(qi)}
+          ${filterBarHtml(qi.studentId, ck)}
+          <div id="responses-${ck}" class="response-area"><p style="color:#999;">Loading...</p></div>
+          <div class="feedback-box">
+            <h3>🎭 Day 6 Quick Reply</h3>
+
+            <!-- Text / Voice toggle -->
+            <div class="template-toggle" style="margin-bottom:1rem;">
+              <button class="toggle-pill active" id="pill-text-${ck}"  onclick="setReplyMode('${ck}','text')">💬 Text Reply</button>
+              <button class="toggle-pill"        id="pill-voice-${ck}" onclick="setReplyMode('${ck}','voice')">🎙 Voice Reply</button>
+            </div>
+
+            <!-- Text panel -->
+            <div id="text-panel-${ck}">
+              <p class="reply-tip">Keep it short and encouraging — 1 to 2 sentences. React to their response, give one tip if needed.</p>
+              <textarea class="feedback-textarea short" id="feedback-${ck}"
+                placeholder="e.g. Great reaction — that 'Oh no way!' sounded completely natural! 🎉 Try adding a follow-up question next time to keep the conversation going."></textarea>
+            </div>
+
+            <!-- Voice panel -->
+            <div id="voice-panel-${ck}" style="display:none;">
+              <p class="reply-tip">Record a short voice reply (aim for 10–30 seconds). Students hear your voice directly in LINE.</p>
+              <div class="voice-recorder" id="recorder-widget-${ck}">
+                <button class="rec-btn" id="rec-btn-${ck}" onclick="toggleRecording('${ck}')">
+                  <i class="fas fa-microphone"></i> Start Recording
+                </button>
+                <span class="rec-status" id="rec-status-${ck}">Ready</span>
+                <span id="rec-timer-${ck}" style="font-size:0.8rem; color:#c2185b; font-weight:700; min-width:36px;"></span>
+              </div>
+              <div id="rec-preview-${ck}" style="display:none; margin-top:0.75rem;">
+                <audio id="rec-audio-${ck}" controls style="width:100%; max-width:360px; border-radius:4px;"></audio>
+                <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--color-text-light);">
+                  <span id="rec-format-note-${ck}"></span>
+                </div>
+                <button onclick="discardRecording('${ck}')" style="margin-top:0.5rem; background:none; border:1px solid #ccc; padding:0.3rem 0.75rem; border-radius:4px; cursor:pointer; font-size:0.82rem; color:#666;">
+                  🗑 Discard &amp; Re-record
+                </button>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button class="send-btn day6-btn" id="send-btn-${ck}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard('${ck}', 'day6')">
+                <i class="fas fa-paper-plane"></i> Send to LINE
+              </button>
+              <button class="mark-done-btn" ${isDone ? 'disabled' : ''} onclick="markComplete('${ck}')">
+                <i class="fas fa-check"></i> Mark Complete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ============================================================
+  // DAY 5 CARD
+  // ============================================================
+  function createDay5Card(qi) {
+    const isDone = completedToday.has(qi.responseId);
+    const ck = qi.responseId;
+    return `
+      <div class="student-card" id="card-${ck}">
+        <div class="student-header" onclick="toggleCard('${ck}')">
+          <div>
+            <div class="student-name">
+              ${qi.name} ${planBadgeHtml(qi.plan)}
+              ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ''}
+            </div>
+            <div class="student-meta">Week ${qi.currentWeek || 1} · Day 5 · Quiz response received</div>
+          </div>
+          <div class="student-actions">
+            <button class="btn-expand" onclick="event.stopPropagation(); toggleCard('${ck}')">
+              ${isDone ? 'View' : 'Correct Quiz'} ▼
+            </button>
+            <button class="btn-assess"  onclick="event.stopPropagation(); openAssessmentModal(${qi.studentId})">📊</button>
+            <button class="btn-profile" onclick="event.stopPropagation(); window.location.href='student-detail.html?id=${qi.studentId}'"><i class="fas fa-user"></i></button>
+          </div>
+        </div>
+        <div class="student-details">
+          ${responsePreviewHtml(qi)}
+          ${filterBarHtml(qi.studentId, ck)}
+          <div id="responses-${ck}" class="response-area"><p style="color:#999;">Loading...</p></div>
+          <div class="feedback-box">
+            <h3>✅ Quiz Correction</h3>
+
+            <!-- Text / Voice toggle -->
+            <div class="template-toggle" style="margin-bottom:1rem;">
+              <button class="toggle-pill active" id="pill-text-${ck}"  onclick="setReplyMode('${ck}','text')">💬 Text Reply</button>
+              <button class="toggle-pill"        id="pill-voice-${ck}" onclick="setReplyMode('${ck}','voice')">🎙 Voice Reply</button>
+            </div>
+
+            <!-- Text panel -->
+            <div id="text-panel-${ck}">
+              <textarea class="feedback-textarea" id="feedback-${ck}" style="min-height:160px;">${feedbackTemplates.quiz_correction}</textarea>
+            </div>
+
+            <!-- Voice panel -->
+            <div id="voice-panel-${ck}" style="display:none;">
+              <p class="reply-tip">Record a voice correction — great for explaining the nuance behind the answer in a natural, encouraging way.</p>
+              <div class="voice-recorder" id="recorder-widget-${ck}">
+                <button class="rec-btn" id="rec-btn-${ck}" onclick="toggleRecording('${ck}')">
+                  <i class="fas fa-microphone"></i> Start Recording
+                </button>
+                <span class="rec-status" id="rec-status-${ck}">Ready</span>
+                <span id="rec-timer-${ck}" style="font-size:0.8rem; color:#c2185b; font-weight:700; min-width:36px;"></span>
+              </div>
+              <div id="rec-preview-${ck}" style="display:none; margin-top:0.75rem;">
+                <audio id="rec-audio-${ck}" controls style="width:100%; max-width:360px; border-radius:4px;"></audio>
+                <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--color-text-light);">
+                  <span id="rec-format-note-${ck}"></span>
+                </div>
+                <button onclick="discardRecording('${ck}')" style="margin-top:0.5rem; background:none; border:1px solid #ccc; padding:0.3rem 0.75rem; border-radius:4px; cursor:pointer; font-size:0.82rem; color:#666;">
+                  🗑 Discard &amp; Re-record
+                </button>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button class="send-btn day5-btn" id="send-btn-${ck}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard('${ck}', 'day5')">
+                <i class="fas fa-paper-plane"></i> Send to LINE
+              </button>
+              <button class="mark-done-btn" ${isDone ? 'disabled' : ''} onclick="markComplete('${ck}')">
+                <i class="fas fa-check"></i> Mark Complete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ============================================================
+  // DAY 7 / OTHER CARD
+  // ============================================================
+  function createDay7Card(qi) {
+    const isDone     = completedToday.has(qi.responseId);
+    const ck         = qi.responseId;
+    const isWeekEnd  = qi.promptDayNumber === 7;
+    const defaultTpl = isWeekEnd ? 'weekly' : 'biweekly';
+    const dayLabel   = qi.promptType || `Day ${qi.promptDayNumber}`;
+    const sectionLabel = isWeekEnd ? '📋 Weekly Assessment' : `✨ Check-in (${dayLabel})`;
+
+    if (!draftStore[ck]) {
+      draftStore[ck] = { templateText: feedbackTemplates[defaultTpl], freeText: '' };
     }
 
-    // ============================================
-    // CARD INTERACTIONS
-    // ============================================
+    return `
+      <div class="student-card" id="card-${ck}">
+        <div class="student-header" onclick="toggleCard('${ck}')">
+          <div>
+            <div class="student-name">
+              ${qi.name} ${planBadgeHtml(qi.plan)}
+              ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ''}
+            </div>
+            <div class="student-meta">Week ${qi.currentWeek || 1} · ${dayLabel} · ${sectionLabel}</div>
+          </div>
+          <div class="student-actions">
+            <button class="btn-expand" onclick="event.stopPropagation(); toggleCard('${ck}')">
+              ${isDone ? 'View' : 'Write Feedback'} ▼
+            </button>
+            <button class="btn-assess"  onclick="event.stopPropagation(); openAssessmentModal(${qi.studentId})">📊</button>
+            <button class="btn-profile" onclick="event.stopPropagation(); window.location.href='student-detail.html?id=${qi.studentId}'"><i class="fas fa-user"></i></button>
+          </div>
+        </div>
+        <div class="student-details">
+          ${responsePreviewHtml(qi)}
+          ${filterBarHtml(qi.studentId, ck)}
+          <div id="responses-${ck}" class="response-area"><p style="color:#999;">Loading...</p></div>
+          <div class="feedback-box">
+            <h3>${sectionLabel}</h3>
 
-    async function toggleCard(studentId) {
-      const card = document.getElementById(`student-${studentId}`);
-      const isExpanded = card.classList.contains('expanded');
+            <!-- Text / Voice top-level toggle -->
+            <div class="template-toggle" style="margin-bottom:1rem;">
+              <button class="toggle-pill active" id="pill-text-${ck}"  onclick="setReplyMode('${ck}','text')">💬 Text</button>
+              <button class="toggle-pill"        id="pill-voice-${ck}" onclick="setReplyMode('${ck}','voice')">🎙 Voice</button>
+            </div>
 
-      // Close all other cards
-      document.querySelectorAll('.student-card').forEach(c => c.classList.remove('expanded'));
+            <!-- TEXT PANEL: template selector + free-write toggle + textarea + skills -->
+            <div id="text-panel-${ck}">
+              <div style="margin-bottom:0.75rem;">
+                <label style="font-size:0.85rem; font-weight:600; color:var(--color-text-light); margin-right:0.5rem;">Template:</label>
+                <select id="tpl-select-${ck}" onchange="onTemplateSelect('${ck}', this.value)" style="padding:0.35rem 0.6rem; border:1px solid var(--color-border); border-radius:4px; font-size:0.85rem;">
+                  <option value="weekly"              ${defaultTpl==='weekly'   ?'selected':''}>Weekly Assessment (Day 7)</option>
+                  <option value="biweekly"            ${defaultTpl==='biweekly' ?'selected':''}>Check-in</option>
+                  <option value="daily"               >Daily Quick Reply</option>
+                  <option value="great_effort">Great Effort</option>
+                  <option value="milestone">Milestone 🎉</option>
+                  <option value="pronunciation_focus">Pronunciation Focus</option>
+                </select>
+              </div>
+              <div class="template-toggle" id="toggle-${ck}">
+                <button class="toggle-pill active" id="pill-template-${ck}" onclick="switchMode('${ck}','template')">📋 Template</button>
+                <button class="toggle-pill"        id="pill-free-${ck}"     onclick="switchMode('${ck}','free')">✏️ Free Write</button>
+              </div>
+              <textarea class="feedback-textarea" id="feedback-${ck}" placeholder="Write your assessment here...">${feedbackTemplates[defaultTpl]}</textarea>
+              <div class="skills-accordion" id="skills-accordion-${ck}">
+                <div class="skills-accordion-header" onclick="toggleSkillsAccordion('${ck}')">
+                  <span>⚙️ Update skill scores (optional)</span>
+                  <i class="fas fa-chevron-down" id="skills-chevron-${ck}" style="transition:transform 0.2s;"></i>
+                </div>
+                <div class="skills-accordion-body" id="skills-body-${ck}">
+                  ${['Fluency','Grammar','Comprehension','Vocabulary','Pronunciation'].map(skill => `
+                    <div class="mini-skill-row">
+                      <span class="mini-skill-label">${skill}</span>
+                      <input type="range" min="0" max="10" value="5" class="mini-skill-slider"
+                        id="mini-${skill.toLowerCase()}-${ck}"
+                        oninput="document.getElementById('mini-score-${skill.toLowerCase()}-${ck}').textContent=this.value">
+                      <span class="mini-skill-score" id="mini-score-${skill.toLowerCase()}-${ck}">5</span>
+                    </div>
+                  `).join('')}
+                  <button onclick="saveSkillScores('${ck}')" style="margin-top:0.5rem; padding:0.4rem 1rem; background:var(--color-primary); color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.85rem;">
+                    Save Scores
+                  </button>
+                </div>
+              </div>
+            </div><!-- /text-panel -->
 
-      if (!isExpanded) {
-        card.classList.add('expanded');
-        
-        // Initialize filter to 'recent' if not set
-        if (!currentFilters[studentId]) {
-          currentFilters[studentId] = 'recent';
-        }
-        
-        await loadStudentResponses(studentId, currentFilters[studentId]);
-        
-        // Add filter button listeners (desktop)
-const filterBtns = card.querySelectorAll('.filter-btn');
-filterBtns.forEach(btn => {
-  btn.addEventListener('click', async (e) => {
-    const filter = e.target.dataset.filter;
-    const sid = parseInt(e.target.dataset.student);
-    
-    // Update active state
-    filterBtns.forEach(b => b.classList.remove('active'));
-    e.target.classList.add('active');
-    
-    // Update current filter and reload
-    currentFilters[sid] = filter;
-    await loadStudentResponses(sid, filter);
-  });
-});
+            <!-- VOICE PANEL -->
+            <div id="voice-panel-${ck}" style="display:none;">
+              <p class="reply-tip">Record a voice message — great for weekly reviews that feel warm and personal.</p>
+              <div class="voice-recorder" id="recorder-widget-${ck}">
+                <button class="rec-btn" id="rec-btn-${ck}" onclick="toggleRecording('${ck}')">
+                  <i class="fas fa-microphone"></i> Start Recording
+                </button>
+                <span class="rec-status" id="rec-status-${ck}">Ready</span>
+                <span id="rec-timer-${ck}" style="font-size:0.8rem; color:#c2185b; font-weight:700; min-width:36px;"></span>
+              </div>
+              <div id="rec-preview-${ck}" style="display:none; margin-top:0.75rem;">
+                <audio id="rec-audio-${ck}" controls style="width:100%; max-width:360px; border-radius:4px;"></audio>
+                <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--color-text-light);">
+                  <span id="rec-format-note-${ck}"></span>
+                </div>
+                <button onclick="discardRecording('${ck}')" style="margin-top:0.5rem; background:none; border:1px solid #ccc; padding:0.3rem 0.75rem; border-radius:4px; cursor:pointer; font-size:0.82rem; color:#666;">
+                  🗑 Discard &amp; Re-record
+                </button>
+              </div>
+            </div>
 
-// Add dropdown listener (mobile)
-const filterSelect = card.querySelector('.filter-select-mobile');
-if (filterSelect) {
-  filterSelect.addEventListener('change', async (e) => {
-    const filter = e.target.value;
-    const sid = parseInt(e.target.dataset.student);
-    
-    // Update current filter and reload
-    currentFilters[sid] = filter;
-    await loadStudentResponses(sid, filter);
-  });
-}
+            <div class="action-buttons">
+              <button class="send-btn day7-btn" id="send-btn-${ck}" ${isDone ? 'disabled' : ''} onclick="sendFeedbackFromCard('${ck}', 'day7')">
+                <i class="fas fa-paper-plane"></i> Send to LINE
+              </button>
+              <button class="mark-done-btn" ${isDone ? 'disabled' : ''} onclick="markComplete('${ck}')">
+                <i class="fas fa-check"></i> Mark Complete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ============================================================
+  // CARD INTERACTION HELPERS
+  // ============================================================
+  function addCardListeners(queueItems) {
+    queueItems.forEach(qi => {
+      const ck   = qi.responseId;
+      const card = document.getElementById(`card-${ck}`);
+      if (!card) return;
+
+      card.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const filter    = e.target.dataset.filter;
+          const studentId = parseInt(e.target.dataset.student);
+          const cardKey   = e.target.dataset.card;
+          card.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          e.target.classList.add('active');
+          currentFilters[cardKey] = filter;
+          await loadStudentResponses(studentId, filter, cardKey);
+        });
+      });
+
+      const sel = card.querySelector('.filter-select-mobile');
+      if (sel) {
+        sel.addEventListener('change', async (e) => {
+          const studentId = parseInt(e.target.dataset.student);
+          const cardKey   = e.target.dataset.card;
+          currentFilters[cardKey] = e.target.value;
+          await loadStudentResponses(studentId, e.target.value, cardKey);
+        });
       }
+    });
+  }
+
+  async function toggleCard(cardKey) {
+    const card       = document.getElementById(`card-${cardKey}`);
+    const isExpanded = card.classList.contains('expanded');
+    document.querySelectorAll('.student-card').forEach(c => c.classList.remove('expanded'));
+    if (!isExpanded) {
+      card.classList.add('expanded');
+      const qi = queueItemsMap.get(cardKey);
+      if (!currentFilters[cardKey]) currentFilters[cardKey] = 'recent';
+      await loadStudentResponses(qi ? qi.studentId : null, currentFilters[cardKey], cardKey);
     }
+  }
 
-    // ============================================
-    // LOAD STUDENT RESPONSES WITH FILTER
-    // ============================================
+  function switchMode(cardKey, mode) {
+    const textarea  = document.getElementById(`feedback-${cardKey}`);
+    const pillTpl   = document.getElementById(`pill-template-${cardKey}`);
+    const pillFree  = document.getElementById(`pill-free-${cardKey}`);
+    const tplSelect = document.getElementById(`tpl-select-${cardKey}`);
 
-    async function loadStudentResponses(studentId, daysFilter = 'recent') {
-      const container = document.getElementById(`responses-${studentId}`);
-      const msgCountEl = document.getElementById(`msg-count-${studentId}`);
-      container.innerHTML = '<p style="text-align:center; padding:1rem; color:#999;"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
+    if (!draftStore[cardKey]) draftStore[cardKey] = { templateText: '', freeText: '' };
 
-      try {
-        const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
-          .find(s => s.id === studentId);
-        
-        if (!student || !student.user_id) {
-          container.innerHTML = '<p>Error: Could not find student data.</p>';
-          return;
-        }
+    if (mode === 'template') {
+      draftStore[cardKey].freeText = textarea.value;
+      textarea.value = draftStore[cardKey].templateText;
+      if (tplSelect) tplSelect.style.display = '';
+      pillTpl.classList.add('active'); pillFree.classList.remove('active');
+    } else {
+      draftStore[cardKey].templateText = textarea.value;
+      textarea.value = draftStore[cardKey].freeText;
+      if (tplSelect) tplSelect.style.display = 'none';
+      pillFree.classList.add('active'); pillTpl.classList.remove('active');
+    }
+  }
 
-        // Calculate date range based on filter
-        let startDate;
-        
-        if (daysFilter === 'recent') {
-          // Get last feedback date
-          const { data: lastFeedback } = await supabaseClient
-            .from('feedback_log')
-            .select('sent_at')
-            .eq('student_id', studentId)
-            .order('sent_at', { ascending: false })
-            .limit(1)
-            .single();
-          
-          if (lastFeedback) {
-            // Show the entire day of the last feedback (start of that day)
-            const feedbackDate = new Date(lastFeedback.sent_at);
-            feedbackDate.setHours(0, 0, 0, 0);
-            startDate = feedbackDate;
-          } else {
-            // No feedback yet, show last 3 days
-            startDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-          }
-        } else if (daysFilter === 'all') {
-          startDate = new Date('2000-01-01'); // Very old date
-        } else {
-          // Specific number of days
-          const days = parseInt(daysFilter);
-          startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-        }
+  function onTemplateSelect(cardKey, tplKey) {
+    const textarea = document.getElementById(`feedback-${cardKey}`);
+    if (!draftStore[cardKey]) draftStore[cardKey] = { templateText: '', freeText: '' };
+    const newTpl = feedbackTemplates[tplKey] || '';
+    if (textarea.value && textarea.value !== draftStore[cardKey].templateText) {
+      if (!confirm('Replace your current text with the template?')) return;
+    }
+    textarea.value = newTpl;
+    draftStore[cardKey].templateText = newTpl;
+  }
 
-        // Get messages
-        const { data: messages, error } = await supabaseClient
-          .from('message_log')
-          .select('*')
-          .eq('user_id', student.user_id)
-          .in('message_type', ['prompt', 'student_response'])
-          .gte('created_at', startDate.toISOString())
-          .order('created_at', { ascending: true });
+  function toggleSkillsAccordion(cardKey) {
+    const body    = document.getElementById(`skills-body-${cardKey}`);
+    const chevron = document.getElementById(`skills-chevron-${cardKey}`);
+    const isOpen  = body.classList.contains('open');
+    body.classList.toggle('open');
+    chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
 
-        if (error) throw error;
+  // ============================================================
+  // LOAD STUDENT RESPONSES (CONVERSATION HISTORY)
+  // ============================================================
+  async function loadStudentResponses(studentId, daysFilter = 'recent', cardKey = null) {
+    const containerId = cardKey ? `responses-${cardKey}` : `responses-${studentId}`;
+    const msgCountId  = cardKey ? `msg-count-${cardKey}` : `msg-count-${studentId}`;
+    const container   = document.getElementById(containerId);
+    const msgCountEl  = document.getElementById(msgCountId);
+    if (!container) return;
+    container.innerHTML = '<p style="text-align:center; padding:1rem; color:#999;"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
 
-        // Get teacher feedback
-        const { data: teacherFeedback, error: feedbackError } = await supabaseClient
-          .from('feedback_log')
-          .select('*')
+    try {
+      const student = allStudentsData.find(s => s.id === studentId);
+      if (!student || !student.user_id) { container.innerHTML = '<p>Error: could not find student.</p>'; return; }
+
+      let startDate;
+      if (daysFilter === 'recent') {
+        const { data: lastFeedback } = await supabaseClient
+          .from('feedback_log').select('sent_at')
           .eq('student_id', studentId)
-          .gte('sent_at', startDate.toISOString())
-          .order('sent_at', { ascending: true });
-
-        if (feedbackError) console.error('Error loading feedback:', feedbackError);
-
-        // Combine messages and feedback
-        const allMessages = [
-          ...messages.map(m => ({ ...m, type: 'message', created_at: m.created_at })),
-          ...(teacherFeedback || []).map(f => ({ ...f, type: 'feedback', created_at: f.sent_at }))
-        ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-
-        // Update message count
-        if (msgCountEl) {
-          msgCountEl.textContent = `Showing ${allMessages.length} message${allMessages.length !== 1 ? 's' : ''}`;
+          .order('sent_at', { ascending: false }).limit(1).single();
+        if (lastFeedback) {
+          const d = new Date(lastFeedback.sent_at); d.setHours(0,0,0,0); startDate = d;
+        } else {
+          startDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
         }
-
-        if (allMessages.length === 0) {
-          container.innerHTML = '<p style="text-align:center; padding:2rem; color:#999;">No conversation history in this time range.</p>';
-          return;
-        }
-
-        // Group messages by date
-        const messagesByDate = {};
-        allMessages.forEach(msg => {
-          const date = new Date(msg.created_at).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          });
-          if (!messagesByDate[date]) messagesByDate[date] = [];
-          messagesByDate[date].push(msg);
-        });
-
-        // Render as conversation
-        let html = '';
-        Object.entries(messagesByDate).reverse().forEach(([date, msgs]) => {
-          html += `<div style="margin-bottom: 2rem;">
-            <h4 style="color: #666; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem;">
-              📅 ${date}
-            </h4>`;
-          
-          msgs.forEach(msg => {
-            const time = new Date(msg.created_at).toLocaleTimeString('en-US', { 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            });
-            
-            if (msg.type === 'message' && msg.message_type === 'prompt') {
-              // Prompt from bot
-              html += `
-                <div style="margin: 1rem 0; padding: 1rem; background: #f0f8ff; border-left: 3px solid #4A90E2; border-radius: 4px;">
-                  <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
-                    [${time}] 🤖 <strong>Prompt:</strong>
-                  </div>
-                  <p style="margin: 0; color: #333;">"${msg.message_text}"</p>
-                </div>`;
-            } else if (msg.type === 'message' && msg.message_type === 'student_response') {
-              // Student response
-              html += `
-                <div style="margin: 1rem 0; padding: 1rem; background: #fff; border: 1px solid #e0e0e0; border-radius: 4px;">
-                  <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
-                    [${time}] 👤 <strong>${student.given_name_romaji || student.name}:</strong>
-                  </div>`;
-              
-              if (msg.message_text) {
-                html += `<p style="margin: 0.5rem 0; color: #333;">"${msg.message_text}"</p>`;
-              }
-              
-              if (msg.media_type === 'audio') {
-                html += `
-                  <div style="margin-top: 0.5rem;">
-                    <audio controls style="width: 100%; max-width: 400px;">
-                      <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
-                      Your browser does not support audio playback.
-                    </audio>
-                  </div>`;
-              }
-              
-              if (msg.media_type === 'video') {
-                html += `
-                  <div style="margin-top: 0.5rem;">
-                    <video controls style="width: 100%; max-width: 400px; border-radius: 8px;">
-                      <source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}">
-                      Your browser does not support video playback.
-                    </video>
-                  </div>`;
-              }
-              
-              if (msg.media_type === 'image') {
-                html += `
-                  <div style="margin-top: 0.5rem;">
-                    <img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${msg.message_id}" 
-                         style="max-width: 100%; border-radius: 8px; cursor: pointer;"
-                         onclick="window.open(this.src, '_blank')"
-                         alt="Student response image">
-                  </div>`;
-              }
-              
-              html += `</div>`;
-            } else if (msg.type === 'feedback') {
-              // Teacher feedback
-              html += `
-                <div style="margin: 1rem 0; padding: 1rem; background: #f0fff0; border-left: 3px solid #4caf50; border-radius: 4px;">
-                  <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
-                    [${time}] 👨‍🏫 <strong>Teacher Feedback:</strong>
-                  </div>
-                  <p style="margin: 0; color: #333; white-space: pre-wrap;">${msg.feedback_text}</p>
-                </div>`;
-            }
-          });
-          
-          html += `</div>`;
-        });
-
-        container.innerHTML = html;
-
-      } catch (err) {
-        console.error('Error loading conversation:', err);
-        container.innerHTML = '<p style="color:red;">Error loading conversation history.</p>';
-      }
-    }
-
-    function loadTemplate(studentId, templateType) {
-      const textarea = document.getElementById(`feedback-${studentId}`);
-      const card = document.getElementById(`student-${studentId}`);
-      const templateBtns = card.querySelectorAll('.template-btn');
-
-      templateBtns.forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-
-      if (templateType === 'blank') {
-        textarea.value = '';
+      } else if (daysFilter === 'all') {
+        startDate = new Date('2000-01-01');
       } else {
-        textarea.value = templates[templateType];
+        startDate = new Date(Date.now() - parseInt(daysFilter) * 24 * 60 * 60 * 1000);
       }
+
+      const { data: messages, error } = await supabaseClient
+        .from('message_log').select('*')
+        .eq('user_id', student.user_id)
+        .in('message_type', ['prompt','student_response'])
+        .gte('created_at', startDate.toISOString())
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+
+      const { data: teacherFeedback } = await supabaseClient
+        .from('feedback_log').select('*')
+        .eq('student_id', studentId)
+        .gte('sent_at', startDate.toISOString())
+        .order('sent_at', { ascending: true });
+
+      const allMsgs = [
+        ...(messages || []).map(m => ({ ...m, _type: 'message' })),
+        ...(teacherFeedback || []).map(f => ({ ...f, _type: 'feedback', created_at: f.sent_at }))
+      ].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+
+      if (msgCountEl) msgCountEl.textContent = `${allMsgs.length} message${allMsgs.length !== 1 ? 's' : ''}`;
+
+      if (allMsgs.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:2rem; color:#999;">No messages in this time range.</p>';
+        return;
+      }
+
+      const byDate = {};
+      allMsgs.forEach(m => {
+        const d = new Date(m.created_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+        if (!byDate[d]) byDate[d] = [];
+        byDate[d].push(m);
+      });
+
+      let html = '';
+      Object.entries(byDate).reverse().forEach(([date, msgs]) => {
+        html += `<div style="margin-bottom:1.5rem;">
+          <h4 style="color:#666; border-bottom:1px solid #ddd; padding-bottom:0.4rem; font-size:0.9rem;">📅 ${escapeHtml(date)}</h4>`;
+        msgs.forEach(msg => {
+          const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+          if (msg._type === 'message' && msg.message_type === 'prompt') {
+            html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#f0f8ff; border-left:3px solid #4A90E2; border-radius:4px; font-size:0.9rem;">
+              <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 🤖 Prompt</div>
+              <p style="margin:0; color:#333;">"${escapeHtml(msg.message_text)}"</p>
+            </div>`;
+          } else if (msg._type === 'message' && msg.message_type === 'student_response') {
+            const sName = escapeHtml(student.given_name_romaji || student.name);
+            html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#fff; border:1px solid #e0e0e0; border-radius:4px; font-size:0.9rem;">
+              <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 👤 ${sName}</div>`;
+            if (msg.message_text) html += `<p style="margin:0.25rem 0; color:#333;">"${escapeHtml(msg.message_text)}"</p>`;
+            if (msg.media_type === 'audio') html += `<audio controls style="width:100%; max-width:380px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}">Audio not supported.</audio>`;
+            if (msg.media_type === 'video') html += `<video controls style="width:100%; max-width:380px; border-radius:6px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}">Video not supported.</video>`;
+            if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}" style="max-width:100%; border-radius:6px; margin-top:0.4rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
+            html += `</div>`;
+          } else if (msg._type === 'feedback') {
+            html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#f0fff0; border-left:3px solid #4caf50; border-radius:4px; font-size:0.9rem;">
+              <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 👨‍🏫 Teacher Feedback</div>
+              <p style="margin:0; color:#333; white-space:pre-wrap;">${escapeHtml(msg.feedback_text)}</p>
+            </div>`;
+          }
+        });
+        html += `</div>`;
+      });
+
+      
+      container.innerHTML = html;
+    } catch(err) {
+      console.error('loadStudentResponses:', err);
+      container.innerHTML = '<p style="color:red;">Error loading conversation history.</p>';
+    }
+  }
+
+  // ============================================================
+  // SEND FEEDBACK
+  // ============================================================
+  async function sendFeedbackFromCard(cardKey, sectionType) {
+    const sendBtn = document.getElementById(`send-btn-${cardKey}`);
+    const qi      = queueItemsMap.get(cardKey);
+    if (!qi) { alert('Error: could not find this response. Please refresh.'); return; }
+
+    const voicePillActive = document.getElementById(`pill-voice-${cardKey}`)?.classList.contains('active');
+    const rs = recState[cardKey];
+    const isVoiceMode = voicePillActive && rs?.audioBlob;
+
+    if (isVoiceMode) {
+      if (!confirm('Send this voice message to the student via LINE?')) return;
+    } else {
+      const textarea     = document.getElementById(`feedback-${cardKey}`);
+      const feedbackText = textarea?.value.trim();
+      if (!feedbackText) { alert('Please write some feedback first!'); return; }
+      if (!confirm('Send this feedback to the student via LINE?')) return;
     }
 
-    // ============================================
-    // SEND FEEDBACK
-    // ============================================
+    const originalHTML = sendBtn.innerHTML;
+    sendBtn.disabled   = true;
+    sendBtn.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
-    async function sendFeedback(studentId) {
-      const textarea = document.getElementById(`feedback-${studentId}`);
-      const feedbackText = textarea.value.trim();
+    try {
+      let body;
 
-      if (!feedbackText) {
-        alert('Please write some feedback first!');
-        return;
+      if (isVoiceMode) {
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading audio...';
+        const upload = await uploadAudioToStorage(cardKey);
+
+        if (upload.isM4A) {
+          body = {
+            studentId:     qi.studentId,
+            teacherId:     currentTeacher.id,
+            audioUrl:      upload.url,
+            audioDuration: upload.duration
+          };
+        } else {
+          body = {
+            studentId:    qi.studentId,
+            teacherId:    currentTeacher.id,
+            feedbackText: `🎙 Voice message from your teacher:\n${upload.url}\n\n(Tap the link to listen)`
+          };
+        }
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+      } else {
+        const feedbackText = document.getElementById(`feedback-${cardKey}`).value.trim();
+        body = { studentId: qi.studentId, teacherId: currentTeacher.id, feedbackText };
       }
 
-      if (!confirm('Send this feedback to the student via LINE?')) {
-        return;
-      }
-
-      const sendBtn = event.target;
-      const originalHTML = sendBtn.innerHTML;
-      sendBtn.disabled = true;
-      sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-
-      try {
-        // Call Edge Function to send to LINE
-        const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/send-teacher-feedback', {
+      const response = await fetch(
+        'https://luyzyzefgintksydmwoh.supabase.co/functions/v1/send-teacher-feedback',
+        {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
           },
-          body: JSON.stringify({
-            studentId,
-            feedbackText,
-            teacherId: currentTeacher.id
-          })
+          body: JSON.stringify(body)
+        }
+      );
+      if (!response.ok) throw new Error('Failed to send feedback');
+
+      completedToday.add(cardKey);
+
+      if (isVoiceMode) {
+        discardRecording(cardKey);
+        setReplyMode(cardKey, 'text');
+      }
+
+      const sendBtn2 = document.getElementById(`send-btn-${cardKey}`);
+      if (sendBtn2) { sendBtn2.innerHTML = '<i class="fas fa-check"></i> Sent! ✅'; }
+      setTimeout(async () => { await loadDayTypeQueue(); }, 1200);
+
+    } catch(err) {
+      console.error('sendFeedbackFromCard:', err);
+      alert('Error sending feedback: ' + err.message);
+      sendBtn.disabled  = false;
+      sendBtn.innerHTML = originalHTML;
+    }
+  }
+
+  async function markComplete(cardKey) {
+    completedToday.add(cardKey);
+    await loadDayTypeQueue();
+  }
+
+  async function saveSkillScores(cardKey) {
+    const qi = queueItemsMap.get(cardKey);
+    if (!qi) return;
+    const skills = ['fluency','grammar','comprehension','vocabulary','pronunciation'];
+    const scores = {};
+    skills.forEach(sk => {
+      const el = document.getElementById(`mini-${sk}-${cardKey}`);
+      if (el) scores[sk] = parseInt(el.value);
+    });
+    try {
+      const { error } = await supabaseClient
+        .from('student_assessments')
+        .insert({
+          user_id:         qi.studentUserId,
+          student_id:      qi.studentId,
+          assessed_by:     currentTeacher.id,
+          ...scores,
+          assessment_type: 'weekly_checkin'
         });
-
-        if (!response.ok) throw new Error('Failed to send feedback');
-
-        // Auto-mark as complete
-        completedToday.add(studentId);
-        
-        alert('Feedback sent successfully!');
-        
-        // Reload the queue to update UI
-        await loadFeedbackQueue();
-
-      } catch (err) {
-        console.error('Error sending feedback:', err);
-        alert('Error sending feedback. Please try again.');
-        sendBtn.disabled = false;
-        sendBtn.innerHTML = originalHTML;
-      }
+      if (error) throw error;
+      alert('Skill scores saved! ✅');
+    } catch(err) {
+      console.error('saveSkillScores:', err);
+      alert('Error saving scores: ' + err.message);
     }
-
-    async function markComplete(studentId) {
-      completedToday.add(studentId);
-      await loadFeedbackQueue();
-      updateStats();
-    }
-
-    // ============================================
-    // UPDATE STATS
-    // ============================================
-
-    function updateStats() {
-      const totalStudents = feedbackQueue.planA.length + feedbackQueue.planC1.length + feedbackQueue.planC2.length;
-      const completed = completedToday.size;
-      
-      // Estimate time: 12 min for weekly, 5 min for biweekly, 3 min for daily
-      const remainingA = feedbackQueue.planA.filter(s => !completedToday.has(s.id)).length;
-      const remainingC1 = feedbackQueue.planC1.filter(s => !completedToday.has(s.id)).length;
-      const remainingC2 = feedbackQueue.planC2.filter(s => !completedToday.has(s.id)).length;
-      
-      const estimatedMinutes = 
-        (remainingA * 12) +
-        (remainingC1 * 5) +
-        (remainingC2 * 3);
-      
-      const hours = Math.floor(estimatedMinutes / 60);
-      const minutes = estimatedMinutes % 60;
-
-      document.getElementById('total-students').textContent = totalStudents;
-      document.getElementById('today-feedback').textContent = totalStudents;
-      document.getElementById('completed-today').textContent = `${completed}/${totalStudents}`;
-      document.getElementById('estimated-time').textContent = estimatedMinutes > 0 
-        ? (hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`)
-        : '0m';
-    }
-
-    // ============================================
-    // LOGOUT
-    // ============================================
-
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-      if (confirm('Are you sure you want to logout?')) {
-        await supabaseClient.auth.signOut();
-        window.location.href = '/teacher-login.html';
-      }
-    });
-
-    // ============================================
-    // INITIALIZE
-    // ============================================
-
-    checkAuth();
-
-    // Auto-refresh every 5 minutes
-    setInterval(() => {
-      loadFeedbackQueue();
-      loadVideoLessons();  // 🆕 ADD THIS LINE
-    }, 5 * 60 * 1000);
-    // ============================================
-// ASSESSMENT MODAL FUNCTIONS
-// ============================================
-
-let currentAssessmentStudent = null;
-
-// Skill guides
-const skillGuides = {
-  fluency: {
-    title: '🌊 Fluency Scoring Guide',
-    levels: [
-      { score: '0-2', desc: 'Cannot make sentences / constant stopping' },
-      { score: '3-5', desc: 'Simple sentences with lots of pauses. Example: "I... uh... go to... restaurant"' },
-      { score: '6-8', desc: 'Smooth simple sentences, hesitates on complex ideas. Example: "Yesterday I went to a new restaurant downtown. The food was really good."' },
-      { score: '9-10', desc: 'Sounds natural, occasional pause for complex thoughts. Example: "I\'ve been meaning to try that place for ages! How was the ambiance?"' }
-    ]
-  },
-  grammar: {
-    title: '📐 Grammar Scoring Guide',
-    levels: [
-      { score: '0-2', desc: 'No grammar structure visible' },
-      { score: '3-5', desc: 'Basic errors in simple sentences. Example: "I go yesterday" / "She very happy"' },
-      { score: '6-8', desc: 'Simple sentences mostly correct, complex attempts have errors. Example: "I went yesterday" ✓ but "If I would have..." ✗' },
-      { score: '9-10', desc: 'Near-perfect, maybe misses a preposition occasionally' }
-    ]
-  },
-  comprehension: {
-    title: '🧠 Comprehension Scoring Guide',
-    levels: [
-      { score: '0-2', desc: 'Cannot understand basic prompts' },
-      { score: '3-5', desc: 'Understands "What did you eat?" but not "How did the meal make you feel?"' },
-      { score: '6-8', desc: 'Gets general meaning, misses some subtleties' },
-      { score: '9-10', desc: 'Catches everything, including implied meanings' }
-    ]
-  },
-  vocabulary: {
-    title: '💬 Vocabulary Scoring Guide',
-    levels: [
-      { score: '0-2', desc: 'Only knows a few words ("hello", "yes", "no")' },
-      { score: '3-5', desc: '"Good", "bad", "like", "not like" - very basic' },
-      { score: '6-8', desc: 'Can describe daily life but struggles with abstract concepts' },
-      { score: '9-10', desc: 'Uses "grab a bite", "catch up", "on the fence" naturally' }
-    ]
-  },
-  pronunciation: {
-    title: '🎤 Pronunciation Scoring Guide',
-    levels: [
-      { score: '0-2', desc: 'Incomprehensible' },
-      { score: '3-5', desc: 'Very heavy accent affecting understanding. Example: "My name is..." sounds like "Mai naim ee..."' },
-      { score: '6-8', desc: 'Accent present but understandable, misses word stress sometimes' },
-      { score: '9-10', desc: 'Could be mistaken for native speaker' }
-    ]
   }
-};
 
-async function openAssessmentModal(studentId) {
-  currentAssessmentStudent = studentId;
-  
-  // Find student data
-  const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
-    .find(s => s.id === studentId);
-  
-  if (!student) {
-    alert('Error: Student not found');
-    return;
-  }
-  
-  // Update modal header
-  document.getElementById('assessment-student-name').textContent = 
-    `${student.given_name_romaji || student.name} - ${student.level || 'Not set'}`;
-  
-  // Load previous assessment
-  try {
-    const { data: prevAssessment, error } = await supabaseClient
-      .from('student_assessments')
-      .select('*')
-      .eq('student_id', studentId)
-      .order('assessed_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error loading previous assessment:', error);
-    }
-    
-    // Set previous scores or defaults
-    const skills = ['fluency', 'grammar', 'comprehension', 'vocabulary', 'pronunciation'];
-    skills.forEach(skill => {
-      const prevScore = prevAssessment ? prevAssessment[skill] : '-';
-      document.getElementById(`${skill}-prev`).textContent = prevScore;
-      
-      // Set suggested score (previous + 1 if exists, else based on level)
-      let suggested = 5; // default
-      if (prevAssessment) {
-        suggested = Math.min(prevAssessment[skill] + 1, 10);
-      } else {
-        // Initial assessment based on student level
-        const levelMap = {
-          'Super Beginner': 2,
-          'Beginner': 4,
-          'Intermediate': 7,
-          'Advanced': 9
-        };
-        suggested = levelMap[student.level] || 5;
-      }
-      
-      document.getElementById(`${skill}-suggested`).textContent = suggested;
-      document.getElementById(`${skill}-slider`).value = suggested;
-      document.getElementById(`${skill}-score`).textContent = suggested;
-    });
-    
-  } catch (err) {
-    console.error('Error loading assessment data:', err);
-  }
-  
-  // Set up slider listeners
-  const skills = ['fluency', 'grammar', 'comprehension', 'vocabulary', 'pronunciation'];
-  skills.forEach(skill => {
-    const slider = document.getElementById(`${skill}-slider`);
-    slider.oninput = () => {
-      document.getElementById(`${skill}-score`).textContent = slider.value;
-      updateAssessmentSummary();
-    };
-  });
-  
-  // Initial summary calculation
-  updateAssessmentSummary();
-  
-  // Show modal
-  document.getElementById('assessment-modal').classList.add('active');
-}
+  // ============================================================
+  // VOICE RECORDING — DAY 6 CARDS
+  // ============================================================
+  const recState = {};
 
-function closeAssessmentModal() {
-  document.getElementById('assessment-modal').classList.remove('active');
-  currentAssessmentStudent = null;
-}
-
-function updateAssessmentSummary() {
-  const skills = ['fluency', 'grammar', 'comprehension', 'vocabulary', 'pronunciation'];
-  let total = 0;
-  
-  skills.forEach(skill => {
-    const value = parseInt(document.getElementById(`${skill}-slider`).value);
-    total += value;
-  });
-  
-  document.getElementById('total-score').textContent = `${total}/50`;
-  
-  // Determine band
-  let band = 'Super Beginner';
-  if (total >= 39) band = 'Advanced';
-  else if (total >= 26) band = 'Intermediate';
-  else if (total >= 13) band = 'Beginner';
-  
-  document.getElementById('overall-band').textContent = band;
-  
-  // Calculate change (if previous scores exist)
-  const prevTotal = skills.reduce((sum, skill) => {
-    const prev = document.getElementById(`${skill}-prev`).textContent;
-    return sum + (prev !== '-' ? parseInt(prev) : 0);
-  }, 0);
-  
-  if (prevTotal > 0) {
-    const change = total - prevTotal;
-    const changeEl = document.getElementById('score-change');
-    changeEl.textContent = change >= 0 ? `+${change}` : change;
-    changeEl.style.color = change >= 0 ? 'var(--color-success)' : 'var(--color-error)';
-  } else {
-    document.getElementById('score-change').textContent = 'Initial';
-  }
-}
-
-async function submitAssessment() {
-  if (!currentAssessmentStudent) {
-    alert('Error: No student selected');
-    return;
-  }
-  
-  const submitBtn = document.getElementById('submit-assessment-btn');
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-  
-  try {
-    // Get student data
-    const student = [...feedbackQueue.planA, ...feedbackQueue.planC1, ...feedbackQueue.planC2]
-      .find(s => s.id === currentAssessmentStudent);
-    
-    if (!student || !student.user_id) {
-      throw new Error('Student user_id not found');
-    }
-    
-    // Collect scores
-    const assessment = {
-      user_id: student.user_id,
-      student_id: currentAssessmentStudent,
-      assessed_by: currentTeacher.id,
-      fluency: parseInt(document.getElementById('fluency-slider').value),
-      grammar: parseInt(document.getElementById('grammar-slider').value),
-      comprehension: parseInt(document.getElementById('comprehension-slider').value),
-      vocabulary: parseInt(document.getElementById('vocabulary-slider').value),
-      pronunciation: parseInt(document.getElementById('pronunciation-slider').value),
-      teacher_notes: document.getElementById('assessment-notes').value.trim() || null,
-      assessment_type: 'monthly'
-    };
-    
-    // Save to database
-    const { data, error } = await supabaseClient
-      .from('student_assessments')
-      .insert([assessment])
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    alert('Assessment saved successfully! ✅');
-    closeAssessmentModal();
-    
-  } catch (err) {
-    console.error('Error saving assessment:', err);
-    alert('Error saving assessment. Please try again.');
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Assessment';
-  }
-}
-
-function showGuide(skillName) {
-  const guide = skillGuides[skillName];
-  if (!guide) return;
-  
-  let html = `<h3>${guide.title}</h3>`;
-  guide.levels.forEach(level => {
-    html += `
-      <div class="guide-level">
-        <h4>Score ${level.score}</h4>
-        <p>${level.desc}</p>
-      </div>
-    `;
-  });
-  
-  document.getElementById('guide-body').innerHTML = html;
-  document.getElementById('guide-popup').classList.add('active');
-}
-
-function closeGuide() {
-  document.getElementById('guide-popup').classList.remove('active');
-}
-
-// Close modals on outside click
-document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('assessment-modal')) {
-    closeAssessmentModal();
-  }
-  if (e.target.classList.contains('guide-popup')) {
-    closeGuide();
-  }
-});
-    // ============================================
-// VIDEO LESSONS FUNCTIONS
-// ============================================
-
-let currentBooking = null;
-
-async function loadVideoLessons() {
-  try {
-    const now = new Date().toISOString();
-    
-    // Get all upcoming lessons
-    const { data: bookings, error } = await supabaseClient
-      .from('lesson_bookings')
-      .select(`
-        *,
-        questionnaire_responses (
-          given_name_romaji,
-          name
-        )
-      `)
-      .eq('status', 'scheduled')
-      .gte('scheduled_at', now)
-      .order('scheduled_at', { ascending: true });
-    
-    if (error) throw error;
-    
-    const container = document.getElementById('video-lessons-list');
-    const alertContainer = document.getElementById('pending-alert');
-    
-    if (!bookings || bookings.length === 0) {
-      container.innerHTML = '<p style="text-align: center; opacity: 0.8;">No upcoming video lessons scheduled.</p>';
-      alertContainer.style.display = 'none';
-      return;
-    }
-    
-    // Count bookings without Meet links
-    const pendingCount = bookings.filter(b => !b.google_meet_link).length;
-    
-    // Show alert if there are pending bookings
-    if (pendingCount > 0) {
-      alertContainer.innerHTML = `
-        <div class="pending-alert" onclick="document.getElementById('video-lessons-section').scrollIntoView({ behavior: 'smooth' })">
-          <div style="display: flex; align-items: center;">
-            <i class="fas fa-exclamation-triangle"></i>
-            <div>
-              <strong>${pendingCount} booking${pendingCount > 1 ? 's' : ''} need${pendingCount === 1 ? 's' : ''} a Google Meet link!</strong>
-              <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem;">
-                Click to view and add meeting links
-              </div>
-            </div>
-          </div>
-          <i class="fas fa-chevron-down"></i>
-        </div>
-      `;
-      alertContainer.style.display = 'block';
+  function setReplyMode(ck, mode) {
+    const textPanel  = document.getElementById(`text-panel-${ck}`);
+    const voicePanel = document.getElementById(`voice-panel-${ck}`);
+    const pillText   = document.getElementById(`pill-text-${ck}`);
+    const pillVoice  = document.getElementById(`pill-voice-${ck}`);
+    if (mode === 'text') {
+      textPanel.style.display  = 'block';
+      voicePanel.style.display = 'none';
+      pillText.classList.add('active'); pillVoice.classList.remove('active');
     } else {
-      alertContainer.style.display = 'none';
+      textPanel.style.display  = 'none';
+      voicePanel.style.display = 'block';
+      pillText.classList.remove('active'); pillVoice.classList.add('active');
     }
-    
-    // Render lesson cards
-    const html = bookings.map(booking => {
-      const student = booking.questionnaire_responses;
-      const studentName = student?.given_name_romaji || student?.name || 'Unknown Student';
-      const date = new Date(booking.scheduled_at);
-      const hasLink = !!booking.google_meet_link;
-      const isToday = date.toDateString() === new Date().toDateString();
-      const isWithin24h = (date - new Date()) < 24 * 60 * 60 * 1000;
-      
+  }
+
+  async function toggleRecording(ck) {
+    if (!recState[ck]) recState[ck] = { mediaRecorder: null, audioChunks: [], audioBlob: null, audioUrl: null, mimeType: '', duration: 0, timerInterval: null, timerSeconds: 0 };
+    const rs = recState[ck];
+    if (rs.mediaRecorder && rs.mediaRecorder.state === 'recording') {
+      rs.mediaRecorder.stop();
+    } else {
+      await startRecording(ck);
+    }
+  }
+
+  async function startRecording(ck) {
+    const rs      = recState[ck];
+    const btn     = document.getElementById(`rec-btn-${ck}`);
+    const status  = document.getElementById(`rec-status-${ck}`);
+    const widget  = document.getElementById(`recorder-widget-${ck}`);
+    const preview = document.getElementById(`rec-preview-${ck}`);
+
+    rs.audioChunks = [];
+    rs.audioBlob   = null;
+    rs.audioUrl    = null;
+    preview.style.display = 'none';
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const preferredTypes = ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg'];
+      rs.mimeType = preferredTypes.find(t => MediaRecorder.isTypeSupported(t)) || '';
+      rs.mediaRecorder = new MediaRecorder(stream, rs.mimeType ? { mimeType: rs.mimeType } : {});
+
+      rs.mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) rs.audioChunks.push(e.data);
+      };
+
+      rs.mediaRecorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        clearInterval(rs.timerInterval);
+        rs.duration = rs.timerSeconds * 1000;
+        const actualMime = rs.mediaRecorder.mimeType || rs.mimeType || 'audio/webm';
+        rs.audioBlob = new Blob(rs.audioChunks, { type: actualMime });
+        const blobUrl = URL.createObjectURL(rs.audioBlob);
+        document.getElementById(`rec-audio-${ck}`).src = blobUrl;
+        preview.style.display = 'block';
+        const formatNote = document.getElementById(`rec-format-note-${ck}`);
+        const isLineCompatible = actualMime.includes('mp4') || actualMime.includes('aac');
+        formatNote.innerHTML = isLineCompatible
+          ? `<span style="color:#4caf50;">✓ M4A format — will play natively in LINE</span>`
+          : `<span style="color:#ff9800;">⚠ ${actualMime.split(';')[0]} format — will send as audio link (Chrome limitation)</span>`;
+        btn.innerHTML = '<i class="fas fa-microphone"></i> Re-record';
+        btn.className = 'rec-btn';
+        widget.classList.remove('recording');
+        status.textContent = `Recorded (${rs.timerSeconds}s)`;
+        document.getElementById(`rec-timer-${ck}`).textContent = '';
+      };
+
+      rs.mediaRecorder.start(100);
+      rs.timerSeconds = 0;
+      widget.classList.add('recording');
+      btn.innerHTML  = '<i class="fas fa-stop"></i> Stop';
+      btn.className  = 'rec-btn recording';
+      status.textContent = 'Recording...';
+
+      rs.timerInterval = setInterval(() => {
+        rs.timerSeconds++;
+        document.getElementById(`rec-timer-${ck}`).textContent = `${rs.timerSeconds}s`;
+        if (rs.timerSeconds >= 120) rs.mediaRecorder.stop();
+      }, 1000);
+
+    } catch(err) {
+      console.error('Microphone error:', err);
+      if (err.name === 'NotAllowedError') {
+        alert('Microphone access denied. Please allow microphone access in your browser settings.');
+      } else {
+        alert('Could not start recording: ' + err.message);
+      }
+    }
+  }
+
+  function discardRecording(ck) {
+    const rs = recState[ck];
+    if (!rs) return;
+    rs.audioBlob = null; rs.audioUrl = null; rs.audioChunks = []; rs.timerSeconds = 0;
+    document.getElementById(`rec-preview-${ck}`).style.display = 'none';
+    const btn = document.getElementById(`rec-btn-${ck}`);
+    btn.innerHTML = '<i class="fas fa-microphone"></i> Start Recording';
+    btn.className = 'rec-btn';
+    document.getElementById(`rec-status-${ck}`).textContent = 'Ready';
+    document.getElementById(`rec-timer-${ck}`).textContent  = '';
+  }
+
+  async function uploadAudioToStorage(ck) {
+    const rs = recState[ck];
+    if (!rs?.audioBlob) return null;
+    const ext      = rs.audioBlob.type.includes('mp4') || rs.audioBlob.type.includes('aac') ? 'm4a' : 'webm';
+    const filename = `teacher-audio/${currentTeacher.id}/${Date.now()}.${ext}`;
+    const { data, error } = await supabaseClient.storage
+      .from('teacher-feedback-audio')
+      .upload(filename, rs.audioBlob, { contentType: rs.audioBlob.type, upsert: false });
+    if (error) throw new Error('Upload failed: ' + error.message);
+    const { data: urlData } = supabaseClient.storage
+      .from('teacher-feedback-audio')
+      .getPublicUrl(filename);
+    return { url: urlData.publicUrl, duration: rs.duration, isM4A: ext === 'm4a' };
+  }
+
+  // ============================================================
+  // STATS
+  // ============================================================
+  function updateStats() {
+    const total      = allStudentsData.length;
+    const allItems   = [...dayQueues.day6, ...dayQueues.day5, ...dayQueues.day7other];
+    const totalTasks = allItems.length;
+    const completed  = allItems.filter(qi => completedToday.has(qi.responseId)).length;
+
+    const d6Rem        = dayQueues.day6.filter(qi => !completedToday.has(qi.responseId)).length;
+    const d5Rem        = dayQueues.day5.filter(qi => !completedToday.has(qi.responseId)).length;
+    const d7WeeklyRem  = dayQueues.day7other.filter(qi => !completedToday.has(qi.responseId) && qi.promptDayNumber === 7).length;
+    const d7OtherRem   = dayQueues.day7other.filter(qi => !completedToday.has(qi.responseId) && qi.promptDayNumber !== 7).length;
+
+    const etaMinutes = (d6Rem * 2) + (d5Rem * 1.5) + (d7WeeklyRem * 10) + (d7OtherRem * 4);
+    const hrs = Math.floor(etaMinutes / 60);
+    const min = Math.round(etaMinutes % 60);
+
+    document.getElementById('total-students').textContent  = total;
+    document.getElementById('today-tasks').textContent     = totalTasks;
+    document.getElementById('completed-today').textContent = `${completed}/${totalTasks}`;
+    document.getElementById('estimated-time').textContent  = etaMinutes > 0
+      ? (hrs > 0 ? `${hrs}h ${min}m` : `${min}m`) : '0m';
+  }
+
+  // ============================================================
+  // LOGOUT
+  // ============================================================
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    if (confirm('Log out?')) {
+      await supabaseClient.auth.signOut();
+      window.location.href = '/teacher-login.html';
+    }
+  });
+
+  // ============================================================
+  // AUTO-REFRESH
+  // ============================================================
+  checkAuth();
+  setInterval(() => { loadDayTypeQueue(); loadVideoLessons(); }, 5 * 60 * 1000);
+
+  // ============================================================
+  // ASSESSMENT MODAL
+  // ============================================================
+  const skillGuides = {
+    fluency: {
+      title: '🌊 Fluency Scoring Guide',
+      levels: [
+        { score:'0-2', desc:'Cannot make sentences / constant stopping' },
+        { score:'3-5', desc:'Simple sentences with lots of pauses. "I... uh... go to... restaurant"' },
+        { score:'6-8', desc:'Smooth simple sentences, hesitates on complex ideas.' },
+        { score:'9-10', desc:'Sounds natural, occasional pause for complex thoughts.' }
+      ]
+    },
+    grammar: {
+      title: '📐 Grammar Scoring Guide',
+      levels: [
+        { score:'0-2', desc:'No grammar structure visible' },
+        { score:'3-5', desc:'Basic errors in simple sentences. "I go yesterday" / "She very happy"' },
+        { score:'6-8', desc:'Simple sentences mostly correct, complex attempts have errors.' },
+        { score:'9-10', desc:'Near-perfect, may miss a preposition occasionally' }
+      ]
+    },
+    comprehension: {
+      title: '🧠 Comprehension Scoring Guide',
+      levels: [
+        { score:'0-2', desc:'Cannot understand basic prompts' },
+        { score:'3-5', desc:'Understands "What did you eat?" but not nuanced questions' },
+        { score:'6-8', desc:'Gets general meaning, misses some subtleties' },
+        { score:'9-10', desc:'Catches everything, including implied meanings' }
+      ]
+    },
+    vocabulary: {
+      title: '💬 Vocabulary Scoring Guide',
+      levels: [
+        { score:'0-2', desc:'Only knows a few words ("hello", "yes", "no")' },
+        { score:'3-5', desc:'"Good", "bad", "like", "not like" — very basic' },
+        { score:'6-8', desc:'Can describe daily life, struggles with abstract concepts' },
+        { score:'9-10', desc:'Uses "grab a bite", "catch up", "on the fence" naturally' }
+      ]
+    },
+    pronunciation: {
+      title: '🎤 Pronunciation Scoring Guide',
+      levels: [
+        { score:'0-2', desc:'Incomprehensible' },
+        { score:'3-5', desc:'Very heavy accent affecting understanding' },
+        { score:'6-8', desc:'Accent present but understandable, misses word stress sometimes' },
+        { score:'9-10', desc:'Could be mistaken for a native speaker' }
+      ]
+    }
+  };
+
+  async function openAssessmentModal(studentId) {
+    currentAssessmentStudent = studentId;
+    const student = allStudentsData.find(s => s.id === studentId);
+    if (!student) { alert('Student not found'); return; }
+    document.getElementById('assessment-student-name').textContent =
+      `${student.given_name_romaji || student.name} — ${student.level || 'Not set'}`;
+    try {
+      const { data: prev } = await supabaseClient
+        .from('student_assessments').select('*')
+        .eq('student_id', studentId)
+        .order('assessed_at', { ascending: false }).limit(1).maybeSingle();
+      const skills = ['fluency','grammar','comprehension','vocabulary','pronunciation'];
+      skills.forEach(sk => {
+        const prevScore = prev ? prev[sk] : '-';
+        document.getElementById(`${sk}-prev`).textContent = prevScore;
+        let suggested = 5;
+        if (prev) { suggested = Math.min(prev[sk] + 1, 10); }
+        else {
+          const lm = { 'Super Beginner':2, 'Beginner':4, 'Intermediate':7, 'Advanced':9 };
+          suggested = lm[student.level] || 5;
+        }
+        document.getElementById(`${sk}-suggested`).textContent = suggested;
+        document.getElementById(`${sk}-slider`).value = suggested;
+        document.getElementById(`${sk}-score`).textContent = suggested;
+      });
+    } catch(err) { console.error('openAssessmentModal:', err); }
+    const skills = ['fluency','grammar','comprehension','vocabulary','pronunciation'];
+    skills.forEach(sk => {
+      const slider = document.getElementById(`${sk}-slider`);
+      slider.oninput = () => {
+        document.getElementById(`${sk}-score`).textContent = slider.value;
+        updateAssessmentSummary();
+      };
+    });
+    updateAssessmentSummary();
+    document.getElementById('assessment-modal').classList.add('active');
+  }
+
+  function closeAssessmentModal() {
+    document.getElementById('assessment-modal').classList.remove('active');
+    currentAssessmentStudent = null;
+  }
+
+  function updateAssessmentSummary() {
+    const skills = ['fluency','grammar','comprehension','vocabulary','pronunciation'];
+    let total = 0;
+    skills.forEach(sk => { total += parseInt(document.getElementById(`${sk}-slider`).value); });
+    document.getElementById('total-score').textContent = `${total}/50`;
+    let band = 'Super Beginner';
+    if (total >= 39) band = 'Advanced';
+    else if (total >= 26) band = 'Intermediate';
+    else if (total >= 13) band = 'Beginner';
+    document.getElementById('overall-band').textContent = band;
+    const prevTotal = skills.reduce((sum, sk) => {
+      const p = document.getElementById(`${sk}-prev`).textContent;
+      return sum + (p !== '-' ? parseInt(p) : 0);
+    }, 0);
+    if (prevTotal > 0) {
+      const chg = total - prevTotal;
+      const el  = document.getElementById('score-change');
+      el.textContent = chg >= 0 ? `+${chg}` : chg;
+      el.style.color = chg >= 0 ? 'var(--color-success)' : 'var(--color-error)';
+    } else {
+      document.getElementById('score-change').textContent = 'Initial';
+    }
+  }
+
+  async function submitAssessment() {
+    if (!currentAssessmentStudent) { alert('No student selected'); return; }
+    const btn = document.getElementById('submit-assessment-btn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    try {
+      const student = allStudentsData.find(s => s.id === currentAssessmentStudent);
+      if (!student?.user_id) throw new Error('Student user_id not found');
+      const { error } = await supabaseClient.from('student_assessments').insert({
+        user_id:     student.user_id,
+        student_id:  currentAssessmentStudent,
+        assessed_by: currentTeacher.id,
+        fluency:        parseInt(document.getElementById('fluency-slider').value),
+        grammar:        parseInt(document.getElementById('grammar-slider').value),
+        comprehension:  parseInt(document.getElementById('comprehension-slider').value),
+        vocabulary:     parseInt(document.getElementById('vocabulary-slider').value),
+        pronunciation:  parseInt(document.getElementById('pronunciation-slider').value),
+        teacher_notes:  document.getElementById('assessment-notes').value.trim() || null,
+        assessment_type: 'monthly'
+      });
+      if (error) throw error;
+      alert('Assessment saved! ✅');
+      closeAssessmentModal();
+    } catch(err) {
+      console.error('submitAssessment:', err);
+      alert('Error saving assessment: ' + err.message);
+      btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save Assessment';
+    }
+  }
+
+  function showGuide(skillName) {
+    const guide = skillGuides[skillName]; if (!guide) return;
+    let html = `<h3>${guide.title}</h3>`;
+    guide.levels.forEach(l => { html += `<div class="guide-level"><h4>Score ${l.score}</h4><p>${l.desc}</p></div>`; });
+    document.getElementById('guide-body').innerHTML = html;
+    document.getElementById('guide-popup').classList.add('active');
+  }
+  function closeGuide() { document.getElementById('guide-popup').classList.remove('active'); }
+
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('assessment-modal')) closeAssessmentModal();
+    if (e.target.classList.contains('guide-popup')) closeGuide();
+  });
+
+  // ============================================================
+  // CANCELLATIONS
+  // ============================================================
+  async function loadCancellationNotifications() {
+    try {
+      const { data: cancellations, error } = await supabaseClient
+        .from('questionnaire_responses').select('*')
+        .eq('subscription_status', 'cancelled')
+        .not('cancelled_at', 'is', null)
+        .order('cancelled_at', { ascending: false }).limit(10);
+      if (error) throw error;
+      const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const recent = (cancellations || []).filter(c => new Date(c.cancelled_at) >= thirtyDaysAgo);
+      renderCancellationNotifications(recent);
+    } catch(err) { console.error('loadCancellationNotifications:', err); }
+  }
+
+  function renderCancellationNotifications(cancellations) {
+    const section = document.getElementById('cancellations-section');
+    const list    = document.getElementById('cancellation-list');
+    const noMsg   = document.getElementById('no-cancellations');
+    const badge   = document.getElementById('cancellation-count');
+    if (!cancellations || cancellations.length === 0) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    badge.textContent = cancellations.length;
+    list.style.display = 'flex'; noMsg.style.display = 'none';
+    list.innerHTML = cancellations.map(s => {
+      const cancelDate  = new Date(s.cancelled_at);
+      const accessUntil = new Date(s.dashboard_access_expires_at);
+      const daysRem = Math.ceil((accessUntil - new Date()) / (1000*60*60*24));
+      const isContacted = s.teacher_contacted || false;
+      let reasonDetails = '';
+      try {
+        const d = typeof s.cancellation_reason_details === 'string'
+          ? JSON.parse(s.cancellation_reason_details) : s.cancellation_reason_details;
+        reasonDetails = d?.reason_text || d?.additional_comments || '';
+      } catch(e) { reasonDetails = s.cancellation_reason_details || ''; }
       return `
-        <div class="lesson-card ${!hasLink ? 'needs-link' : ''}">
-          <div class="lesson-header">
-            <div>
-              <div class="lesson-student">${studentName}</div>
-              <div class="lesson-datetime">
-                <div>
-                  <i class="fas fa-calendar"></i>
-                  ${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                </div>
-                <div>
-                  <i class="fas fa-clock"></i>
-                  ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                </div>
-                <div>
-                  <i class="fas fa-hourglass-half"></i>
-                  ${booking.duration_minutes} min
-                </div>
+        <div class="cancellation-card">
+          <div class="cancellation-header">
+            <div class="cancellation-student-info">
+              <h4 class="cancellation-student-name">${s.given_name_romaji || s.name}</h4>
+              <div>
+                <span class="cancellation-plan-badge">${formatPlanName(s.plan)}</span>
+                <span class="cancellation-date">Cancelled ${cancelDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
               </div>
-              ${isToday ? '<div style="color: #ff9800; font-weight: 600; margin-top: 0.5rem;"><i class="fas fa-bell"></i> Today!</div>' : ''}
-              ${isWithin24h && !isToday ? '<div style="color: #2196f3; font-weight: 600; margin-top: 0.5rem;"><i class="fas fa-info-circle"></i> Within 24 hours</div>' : ''}
             </div>
-            <span class="lesson-status ${hasLink ? 'has-link' : 'no-link'}">
-              ${hasLink ? '✓ Meet Link Added' : '⚠ No Meet Link'}
-            </span>
+            <div class="cancellation-status-badge ${isContacted ? 'contacted' : 'needs-attention'}">
+              ${isContacted ? '✓ Contacted' : 'Needs Attention'}
+            </div>
           </div>
-          
-          <div class="lesson-actions">
-  <a href="https://calendar.google.com/calendar/r" 
-     target="_blank" 
-     class="add-link-btn"
-     title="Open in Google Calendar at ${date.toLocaleDateString()} ${date.toLocaleTimeString()}">
-    <i class="fas fa-calendar-plus"></i>
-    ${hasLink ? 'Edit Event in Calendar' : 'Open Calendar to Add Link'}
-  </a>
-  ${hasLink ? `
-    <a href="${booking.google_meet_link}" target="_blank" class="join-meeting-btn">
-      <svg width="16" height="16" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-        <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
-        <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
-        <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
-        <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
-      </svg>
-      Join with Google Meet
-    </a>
-  ` : ''}
-</div>
+          <div class="cancellation-details">
+            <div class="cancellation-detail-row"><span class="cancellation-detail-label">Reason:</span><span class="cancellation-detail-value">${formatReason(s.cancellation_reason_category)}</span></div>
+            <div class="cancellation-detail-row"><span class="cancellation-detail-label">Access Until:</span><span class="cancellation-detail-value">${accessUntil.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})} (${daysRem} days)</span></div>
+            <div class="cancellation-detail-row"><span class="cancellation-detail-label">Email:</span><span class="cancellation-detail-value">${s.email}</span></div>
+            ${reasonDetails ? `<div class="cancellation-reason-highlight">"${reasonDetails}"</div>` : ''}
+          </div>
+          <div class="cancellation-actions">
+            <button class="btn-view-details" onclick="window.location.href='student-detail.html?id=${s.id}'"><i class="fas fa-eye"></i> View Details</button>
+            <button class="btn-send-message" onclick="openMessageModal('${s.id}','${s.cancellation_reason_category}')"><i class="fas fa-envelope"></i> Send Message</button>
+            ${!isContacted ? `<button class="btn-mark-contacted" onclick="markAsContacted('${s.id}')"><i class="fas fa-check"></i> Mark Contacted</button>` : ''}
+          </div>
         </div>
       `;
     }).join('');
-    
-    container.innerHTML = html;
-    
-  } catch (err) {
-    console.error('Error loading video lessons:', err);
-    document.getElementById('video-lessons-list').innerHTML = 
-      '<p style="text-align: center; color: #f44336;">Error loading lessons. Please refresh the page.</p>';
   }
-}
+
+  function formatReason(r) {
+    const m = { expensive:'Too Expensive', not_using:'Not Using Enough', too_difficult:'Too Difficult', too_easy:'Too Easy', scheduling:'Scheduling Issues', technical:'Technical Problems', goals_met:'Goals Achieved', switching:'Switching Services', circumstances:'Personal Circumstances', other:'Other' };
+    return m[r] || r;
+  }
+  function formatPlanName(p) {
+    const m = { line:'LINE Practice', power_pro:'Power Pro', power_lite:'Power Lite', video:'Video Lessons' };
+    return m[p] || p;
+  }
+
+  function openMessageModal(studentId, reason) {
+    currentCancellationStudent = studentId;
+    const tplSelect = document.getElementById('template-select');
+    if (messageTemplates[reason]) { tplSelect.value = reason; loadMessageTemplate(reason); }
+    else { tplSelect.value = 'general'; loadMessageTemplate('general'); }
+    document.getElementById('message-modal').classList.add('show');
+  }
+  function closeMessageModal() {
+    document.getElementById('message-modal').classList.remove('show');
+    currentCancellationStudent = null;
+  }
+  function loadMessageTemplate(key) {
+    const t = messageTemplates[key];
+    document.getElementById('message-text').value = t ? t.body : '';
+  }
+
+  async function sendMessageToStudent() {
+    const text = document.getElementById('message-text').value;
+    if (!text.trim()) { alert('Please enter a message'); return; }
+    if (!currentCancellationStudent) { alert('Error: no student selected'); return; }
+    try {
+      const { data: student, error: fe } = await supabaseClient
+        .from('questionnaire_responses').select('line_id, given_name_romaji, name')
+        .eq('id', currentCancellationStudent).single();
+      if (fe || !student.line_id) throw new Error('Student LINE ID not found');
+      const { error } = await supabaseClient.functions.invoke('send-line-message', {
+        body: { userId: student.line_id, message: text }
+      });
+      if (error) throw error;
+      await markAsContacted(currentCancellationStudent);
+      alert('Message sent! ✅');
+      closeMessageModal();
+      await loadCancellationNotifications();
+    } catch(err) { console.error('sendMessageToStudent:', err); alert('Error: ' + err.message); }
+  }
+
+  async function markAsContacted(studentId) {
+    try {
+      await supabaseClient.from('questionnaire_responses')
+        .update({ teacher_contacted: true, teacher_contacted_at: new Date().toISOString() })
+        .eq('id', studentId);
+      await loadCancellationNotifications();
+    } catch(err) { console.error('markAsContacted:', err); alert('Error updating status'); }
+  }
+
+  // ============================================================
+  // VIDEO LESSONS
+  // ============================================================
+  async function loadVideoLessons() {
+    try {
+      const { data: bookings, error } = await supabaseClient
+        .from('lesson_bookings')
+        .select(`*, questionnaire_responses(given_name_romaji, name)`)
+        .eq('status','scheduled').gte('scheduled_at', new Date().toISOString())
+        .order('scheduled_at', { ascending: true });
+      if (error) throw error;
+
+      const container      = document.getElementById('video-lessons-list');
+      const alertContainer = document.getElementById('pending-alert');
+
+      if (!bookings || bookings.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:var(--color-text-light);">No upcoming video lessons scheduled.</p>';
+        alertContainer.style.display = 'none';
+        return;
+      }
+
+      const pendingCount = bookings.filter(b => !b.google_meet_link).length;
+      if (pendingCount > 0) {
+        alertContainer.innerHTML = `
+          <div class="pending-alert" onclick="document.getElementById('video-lessons-section').scrollIntoView({behavior:'smooth'})">
+            <div style="display:flex; align-items:center;">
+              <i class="fas fa-exclamation-triangle" style="margin-right:1rem; font-size:1.5rem;"></i>
+              <div>
+                <strong>${pendingCount} booking${pendingCount>1?'s':''} need${pendingCount===1?'s':''} a Google Meet link!</strong>
+                <div style="font-size:0.9rem; opacity:0.9; margin-top:0.25rem;">Click to view and add meeting links</div>
+              </div>
+            </div>
+            <i class="fas fa-chevron-down"></i>
+          </div>`;
+        alertContainer.style.display = 'block';
+      } else { alertContainer.style.display = 'none'; }
+
+      container.innerHTML = bookings.map(booking => {
+        const s = booking.questionnaire_responses;
+        const sName = s?.given_name_romaji || s?.name || 'Unknown';
+        const date  = new Date(booking.scheduled_at);
+        const hasLink = !!booking.google_meet_link;
+        const isToday = date.toDateString() === new Date().toDateString();
+        const isWithin24h = (date - new Date()) < 24*60*60*1000;
+        return `
+          <div class="lesson-card ${!hasLink ? 'needs-link' : ''}">
+            <div class="lesson-header">
+              <div>
+                <div class="lesson-student">${sName}</div>
+                <div class="lesson-datetime">
+                  <div><i class="fas fa-calendar"></i> ${date.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</div>
+                  <div><i class="fas fa-clock"></i> ${date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</div>
+                  <div><i class="fas fa-hourglass-half"></i> ${booking.duration_minutes} min</div>
+                </div>
+                ${isToday ? '<div style="color:#ff9800; font-weight:600; margin-top:0.5rem;"><i class="fas fa-bell"></i> Today!</div>' : ''}
+                ${isWithin24h && !isToday ? '<div style="color:#2196f3; font-weight:600; margin-top:0.5rem;"><i class="fas fa-info-circle"></i> Within 24 hours</div>' : ''}
+              </div>
+              <span class="lesson-status ${hasLink ? 'has-link' : 'no-link'}">${hasLink ? '✓ Meet Link Added' : '⚠ No Meet Link'}</span>
+            </div>
+            <div class="lesson-actions">
+              <a href="https://calendar.google.com/calendar/r" target="_blank" class="add-link-btn">
+                <i class="fas fa-calendar-plus"></i> ${hasLink ? 'Edit in Calendar' : 'Open Calendar to Add Link'}
+              </a>
+              ${hasLink ? `<a href="${booking.google_meet_link}" target="_blank" class="join-meeting-btn">
+                <svg width="16" height="16" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                  <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+                  <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+                  <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
+                  <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7z"/>
+                </svg>
+                Join Google Meet
+              </a>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch(err) {
+      console.error('loadVideoLessons:', err);
+      document.getElementById('video-lessons-list').innerHTML = '<p style="color:#f44336;">Error loading lessons.</p>';
+    }
+  }
 
   </script>
 </body>

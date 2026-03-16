@@ -10,6 +10,7 @@
   gtag('config', 'G-KLVF2ZG1WX');
 </script>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://api.qrserver.com; connect-src 'self' https://*.supabase.co https://cdn.jsdelivr.net https://www.google-analytics.com https://region1.google-analytics.com; media-src 'self' blob: https://*.supabase.co; frame-src 'none'; object-src 'none';">
   <title>Prokaiwa | Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Your Prokaiwa learning dashboard - track progress, access resources, and manage your English learning journey.">
@@ -581,6 +582,161 @@
     .plan-badge.has-addon {
       background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-gold) 100%);
     }
+    /* Cancellation Status Banner */
+.cancellation-banner {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 0 0 2rem 0;
+    display: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.cancellation-banner.expired {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    border-color: #dc3545;
+}
+
+.cancellation-banner-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.cancellation-banner-icon {
+    font-size: 2.5rem;
+}
+
+.cancellation-banner-content h3 {
+    margin: 0 0 0.5rem 0;
+    color: #856404;
+    font-size: 1.3rem;
+}
+
+.cancellation-banner.expired .cancellation-banner-content h3 {
+    color: #721c24;
+}
+
+.cancellation-banner-content p {
+    margin: 0.25rem 0;
+    color: #856404;
+    font-size: 0.95rem;
+}
+
+.cancellation-banner.expired .cancellation-banner-content p {
+    color: #721c24;
+}
+
+.countdown-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    margin-top: 0.75rem;
+    font-weight: 600;
+    color: #856404;
+}
+
+.cancellation-banner.expired .countdown-timer {
+    color: #721c24;
+}
+
+.countdown-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffc107;
+}
+
+.cancellation-banner.expired .countdown-number {
+    color: #dc3545;
+}
+
+.cancellation-banner-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-reactivate {
+    background: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-reactivate:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+}
+
+.btn-contact-support {
+    background: white;
+    color: var(--color-text);
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-contact-support:hover {
+    border-color: var(--color-text-light);
+    background: var(--color-bg);
+}
+
+/* Status badge updates */
+.plan-badge.cancelled {
+    background: var(--color-primary);  /* Teal instead of yellow */
+    color: white;
+}
+
+.plan-badge.expired {
+    background: #dc3545;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .cancellation-banner-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .cancellation-banner-icon {
+        font-size: 2rem;
+    }
+    
+    .cancellation-banner-actions {
+        flex-direction: column;
+    }
+    
+    .btn-reactivate,
+    .btn-contact-support {
+        width: 100%;
+        justify-content: center;
+    }
+}
     .addon-badge {
       display: inline-block;
       padding: 0.15rem 0.5rem;
@@ -1047,6 +1203,19 @@
   opacity: 0.3;
 }
 
+    /* Next month available dates - more specific selector */
+.calendar-day.available {
+    color: var(--color-primary);
+    opacity: 0.7;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.calendar-day.available:hover {
+    opacity: 1;
+    background: var(--color-primary-light);
+    transform: scale(1.05);
+}
 .calendar-day.today {
   border-color: var(--color-gold);
   font-weight: 700;
@@ -1948,9 +2117,56 @@
                         </a>
                     </div>
 
+                  <!-- Cancellation Banner -->
+        <div class="cancellation-banner" id="ja-cancellation-banner" style="display: none;">
+            <div class="cancellation-banner-header">
+                <div class="cancellation-banner-icon">⚠️</div>
+                <div class="cancellation-banner-content">
+                    <h3 id="ja-cancellation-title">サブスクリプションがキャンセルされました</h3>
+                    <p id="ja-cancellation-message">アクセスは継続されます</p>
+                    <div class="countdown-timer" id="ja-countdown-timer">
+                        <i class="fas fa-clock"></i>
+                        <span>残り <span class="countdown-number" id="ja-days-remaining">0</span> 日</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cancellation-banner-actions">
+                <a href="questionnaire.html" class="btn-reactivate">
+                    <i class="fas fa-redo"></i> サブスクリプションを再開
+                </a>
+                <a href="contact.html?subject=reactivation" class="btn-contact-support">
+                    <i class="fas fa-envelope"></i> サポートに連絡
+                </a>
+            </div>
+        </div>
+
+
                     <!-- Dashboard Grid -->
                     <div class="dashboard-grid">
-                        
+
+                      <!-- Cancellation Status Banner (Japanese) -->
+<div class="cancellation-banner" id="ja-cancellation-banner" style="display: none;">
+    <div class="cancellation-banner-header">
+        <div class="cancellation-banner-icon">⚠️</div>
+        <div class="cancellation-banner-content">
+            <h3 id="ja-cancellation-title">サブスクリプションがキャンセルされました</h3>
+            <p id="ja-cancellation-message">アクセスは継続されます</p>
+            <div class="countdown-timer" id="ja-countdown-timer">
+                <i class="fas fa-clock"></i>
+                <span>残り <span class="countdown-number" id="ja-days-remaining">0</span> 日</span>
+            </div>
+        </div>
+    </div>
+    <div class="cancellation-banner-actions">
+        <a href="questionnaire.html" class="btn-reactivate">
+            <i class="fas fa-redo"></i> サブスクリプションを再開
+        </a>
+        <a href="contact.html?subject=reactivation" class="btn-contact-support">
+            <i class="fas fa-envelope"></i> サポートに連絡
+        </a>
+    </div>
+</div>
+                      
                         <!-- Skills Assessment Card -->
                         <div class="dashboard-card card-skills">
                             <h3><i class="fas fa-chart-radar"></i>スキル評価</h3>
@@ -2186,9 +2402,55 @@
                         </a>
                     </div>
 
+                  <!-- Cancellation Banner -->
+        <div class="cancellation-banner" id="en-cancellation-banner" style="display: none;">
+            <div class="cancellation-banner-header">
+                <div class="cancellation-banner-icon">⚠️</div>
+                <div class="cancellation-banner-content">
+                    <h3 id="en-cancellation-title">Subscription Cancelled</h3>
+                    <p id="en-cancellation-message">Your access continues</p>
+                    <div class="countdown-timer" id="en-countdown-timer">
+                        <i class="fas fa-clock"></i>
+                        <span><span class="countdown-number" id="en-days-remaining">0</span> days remaining</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cancellation-banner-actions">
+                <a href="questionnaire.html" class="btn-reactivate">
+                    <i class="fas fa-redo"></i> Reactivate Subscription
+                </a>
+                <a href="contact.html?subject=reactivation" class="btn-contact-support">
+                    <i class="fas fa-envelope"></i> Contact Support
+                </a>
+            </div>
+        </div>
+
+
                     <!-- Dashboard Grid -->
                     <div class="dashboard-grid">
-                        
+<!-- Cancellation Status Banner (English) -->
+<div class="cancellation-banner" id="en-cancellation-banner" style="display: none;">
+    <div class="cancellation-banner-header">
+        <div class="cancellation-banner-icon">⚠️</div>
+        <div class="cancellation-banner-content">
+            <h3 id="en-cancellation-title">Subscription Cancelled</h3>
+            <p id="en-cancellation-message">Your access continues</p>
+            <div class="countdown-timer" id="en-countdown-timer">
+                <i class="fas fa-clock"></i>
+                <span><span class="countdown-number" id="en-days-remaining">0</span> days remaining</span>
+            </div>
+        </div>
+    </div>
+    <div class="cancellation-banner-actions">
+        <a href="questionnaire.html" class="btn-reactivate">
+            <i class="fas fa-redo"></i> Reactivate Subscription
+        </a>
+        <a href="contact.html?subject=reactivation" class="btn-contact-support">
+            <i class="fas fa-envelope"></i> Contact Support
+        </a>
+    </div>
+</div>
+                      
                         <!-- Skills Assessment Card -->
                         <div class="dashboard-card card-skills">
                             <h3><i class="fas fa-chart-radar"></i>Skills Assessment</h3>
@@ -2395,9 +2657,10 @@
     </footer>
 
     <script type="module">
-        console.log('🚀 DASHBOARD SCRIPT STARTING...');
+
         
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
+              console.log('🚀 DASHBOARD SCRIPT STARTING...');
 
         // =============================================
         // CONFIGURATION
@@ -2646,21 +2909,19 @@
         }
 
         const planNames = {
-            ja: { 
-                'A': 'LINEプラクティスプラン', 
-                'B45': 'ビデオレッスン（45分）',
-                'B60': 'ビデオレッスン（60分）',
-                'C1': 'パワーパック・ライト', 
-                'C2': 'パワーパック・プロ' 
-            },
-            en: { 
-                'A': 'LINE Practice Plan', 
-                'B45': 'Video Lesson (45min)',
-                'B60': 'Video Lesson (60min)',
-                'C1': 'Power Pack Lite', 
-                'C2': 'Power Pack Pro' 
-            }
-        };
+    ja: { 
+        'line': 'LINEプラクティスプラン', 
+        'video': 'ビデオレッスン（50分）',
+        'power_lite': 'パワーパック・ライト', 
+        'power_pro': 'パワーパック・プロ' 
+    },
+    en: { 
+        'line': 'LINE Practice Plan', 
+        'video': 'Video Lesson (50min)',
+        'power_lite': 'Power Pack Lite', 
+        'power_pro': 'Power Pack Pro' 
+    }
+};
 
         const statusNames = {
             ja: { paid: '有効', pending: '支払い待ち' },
@@ -3322,10 +3583,15 @@
                 
                 const progressPercent = Math.min((stats.thisMonth / MONTHLY_GOAL) * 100, 100);
 
-                const hasVideoAddon = profile.addons?.includes('B45') || profile.addons?.includes('B60') || false;
-                const hasVideoAccess = profile.plan !== 'A' || hasVideoAddon;
+                const hasVideoAddon = profile.addons?.includes('video') || false;
+                const hasVideoAccess = profile.had_video_access || hasVideoAddon;
 
                 ['ja', 'en'].forEach(l => {
+    const isCancelled = profile.subscription_status === 'cancelled';
+    const cancelledAt = profile.cancelled_at ? new Date(profile.cancelled_at) : null;
+    const dashboardExpiresAt = profile.dashboard_access_expires_at ? new Date(profile.dashboard_access_expires_at) : null;
+    const now = new Date();
+    const isExpired = dashboardExpiresAt && dashboardExpiresAt < now;
                     const welcomeText = l === 'ja' 
                         ? `${profile.given_name_romaji || profile.name}さん、おかえりなさい！`
                         : `Welcome back, ${profile.given_name_romaji || profile.name}!`;
@@ -3335,19 +3601,96 @@
                     document.getElementById(`${l}-stat-total`).textContent = stats.total;
                     document.getElementById(`${l}-stat-month`).textContent = stats.thisMonth;
 
-                    document.getElementById(`${l}-profile-name`).textContent = profile.name;
+document.getElementById(`${l}-profile-name`).textContent = profile.name;
                     document.getElementById(`${l}-profile-email`).textContent = profile.email;
                     document.getElementById(`${l}-profile-level`).textContent = levelNames[l][profile.level] || profile.level;
                     
-                    const isPaid = profile.payment_status === 'paid';
-                    document.getElementById(`${l}-profile-status`).textContent = isPaid 
-                        ? statusNames[l].paid 
-                        : statusNames[l].pending;
-
+                    // Get status element
+                    const statusEl = document.getElementById(`${l}-profile-status`);
+                    
+                    // Update status text based on subscription state
+                    let statusText = '';
+                    if (isExpired) {
+                        statusText = l === 'ja' ? '期限切れ' : 'Expired';
+                        statusEl.style.color = '#dc3545';
+                        statusEl.style.fontWeight = '600';
+                    } else if (isCancelled && dashboardExpiresAt) {
+                        const expiryDate = dashboardExpiresAt.toLocaleDateString(
+                            l === 'ja' ? 'ja-JP' : 'en-US',
+                            { year: 'numeric', month: 'long', day: 'numeric' }
+                        );
+                        statusText = l === 'ja' 
+                            ? `キャンセル済 - ${expiryDate}まで利用可能`
+                            : `Cancelled - Access Until ${expiryDate}`;
+                        
+                        // Yellow styling for cancelled status
+                        statusEl.style.color = '#856404';
+                        statusEl.style.fontWeight = '600';
+                        statusEl.style.backgroundColor = '#fff3cd';
+                        statusEl.style.padding = '0.5rem 1rem';
+                        statusEl.style.borderRadius = '6px';
+                        statusEl.style.display = 'inline-block';
+                    } else if (profile.subscription_status === 'trialing') {
+                        statusText = l === 'ja' ? '無料トライアル中' : 'Free Trial';
+                    } else if (profile.subscription_status === 'active') {
+                        statusText = l === 'ja' ? '有効' : 'Active';
+                    } else {
+                        statusText = l === 'ja' ? '支払い待ち' : 'Payment Pending';
+                    }
+                    
+                    statusEl.textContent = statusText;
+                    
+                    // Update plan badge
                     const planBadge = document.getElementById(`${l}-plan-badge`);
                     planBadge.textContent = planNames[l][profile.plan] || profile.plan;
-                    if (!isPaid) planBadge.classList.add('pending');
+                    if (profile.payment_status !== 'paid') planBadge.classList.add('pending');
+                    if (isExpired) planBadge.classList.add('expired');
                     if (hasVideoAddon) planBadge.classList.add('has-addon');
+                    
+                    // Show cancellation banner if applicable
+                    if (isCancelled && !isExpired && dashboardExpiresAt) {
+                        const banner = document.getElementById(`${l}-cancellation-banner`);
+                        const titleEl = document.getElementById(`${l}-cancellation-title`);
+                        const messageEl = document.getElementById(`${l}-cancellation-message`);
+                        const daysEl = document.getElementById(`${l}-days-remaining`);
+                        const timerEl = document.getElementById(`${l}-countdown-timer`);
+                        
+                        if (banner) {
+                            const daysRemaining = Math.ceil((dashboardExpiresAt - now) / (1000 * 60 * 60 * 24));
+                            
+                            if (l === 'ja') {
+                                titleEl.textContent = 'サブスクリプションがキャンセルされました';
+                                messageEl.textContent = `${dashboardExpiresAt.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}までアクセス可能です`;
+                            } else {
+                                titleEl.textContent = 'Subscription Cancelled';
+                                messageEl.textContent = `Your access continues until ${dashboardExpiresAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+                            }
+                            
+                            daysEl.textContent = daysRemaining;
+                            timerEl.style.display = daysRemaining <= 0 ? 'none' : 'inline-flex';
+                            banner.style.display = 'block';
+                        }
+                    } else if (isExpired) {
+                        const banner = document.getElementById(`${l}-cancellation-banner`);
+                        const titleEl = document.getElementById(`${l}-cancellation-title`);
+                        const messageEl = document.getElementById(`${l}-cancellation-message`);
+                        const timerEl = document.getElementById(`${l}-countdown-timer`);
+                        
+                        if (banner) {
+                            banner.classList.add('expired');
+                            
+                            if (l === 'ja') {
+                                titleEl.textContent = 'アクセス期限が切れました';
+                                messageEl.textContent = '再度サブスクリプションを開始するには、下のボタンをクリックしてください';
+                            } else {
+                                titleEl.textContent = 'Access Expired';
+                                messageEl.textContent = 'Reactivate your subscription to continue learning';
+                            }
+                            
+                            timerEl.style.display = 'none';
+                            banner.style.display = 'block';
+                        }
+                    }
 
                     if (hasVideoAddon) {
                         const badgeContainer = document.getElementById(`${l}-plan-badges`);
@@ -3786,22 +4129,63 @@ monthLabel.textContent =
                     day.classList.add('has-booking');
                 }
                 
-                if (!day.classList.contains('disabled')) {
-                    day.addEventListener('click', () => selectDate(day.dataset.date, lang));
-                }
-                
-                calendarGrid.appendChild(day);
+if (!day.classList.contains('disabled')) {
+                day.addEventListener('click', () => selectDate(day.dataset.date, lang));
             }
             
-            const totalCells = calendarGrid.children.length - 7;
-            const remainingCells = 42 - totalCells;
-            for (let date = 1; date <= remainingCells; date++) {
-                const day = document.createElement('div');
-                day.className = 'calendar-day other-month';
-                day.textContent = date;
-                calendarGrid.appendChild(day);
-            }
-            
+            calendarGrid.appendChild(day);
+        } 
+        
+        // SHOW NEXT MONTH'S AVAILABLE DATES
+        const totalCells = calendarGrid.children.length - 7;
+const remainingCells = 42 - totalCells; // 6 rows x 7 days = 42 total
+
+for (let date = 1; date <= remainingCells; date++) {
+    const nextMonthDate = new Date(year, monthIndex + 1, date);
+    nextMonthDate.setHours(0, 0, 0, 0);
+    
+    const day = document.createElement('div');
+    day.className = 'calendar-day other-month';
+    day.textContent = date;
+    
+    // Format date as YYYY-MM-DD
+    const nextMonth = monthIndex + 1; // JavaScript months are 0-indexed
+    const nextMonthFormatted = nextMonth === 12 ? 0 : nextMonth + 1;
+    const yearFormatted = nextMonth === 12 ? year + 1 : year;
+    day.dataset.date = `${yearFormatted}-${String(nextMonthFormatted + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+    
+    // Check if it's a weekend (Fri=5, Sat=6, Sun=0)
+    const dayOfWeek = nextMonthDate.getDay();
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    
+    // Check if it's in the future
+    const isFuture = nextMonthDate >= today;
+    
+    // Only make it clickable if it's a weekend AND in the future
+    if (isWeekend && isFuture) {
+        day.classList.remove('other-month'); // Remove grey styling
+        day.classList.add('available');
+        day.style.color = 'var(--color-primary)';
+        day.style.opacity = '0.7';
+        day.style.fontWeight = '500';
+        
+        // Check if this date has a booking
+        const hasBooking = bookingState.userBookings.some(booking => {
+            const bookingDate = new Date(booking.scheduled_at);
+            return bookingDate.toISOString().split('T')[0] === day.dataset.date;
+        });
+        
+        if (hasBooking) {
+            day.classList.add('has-booking');
+        }
+        
+        day.addEventListener('click', () => selectDate(day.dataset.date, lang));
+    } else {
+        day.classList.add('disabled');
+    }
+    
+    calendarGrid.appendChild(day);
+}          
             const prevBtn = document.getElementById(`${lang}-calendar-prev`);
             if (prevBtn) {
                 const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -4727,30 +5111,6 @@ const meetLinkRefresh = {
     }
 };
 
-// Update the bookLesson function to start auto-refresh
-// ADD THIS CODE INSIDE YOUR EXISTING bookLesson function, right after the booking succeeds:
-
-/*
-FIND THIS CODE IN bookLesson():
-        if (!result.success) {
-            throw new Error(result.error || 'Booking failed');
-        }
-        
-        alert(...);
-
-AND ADD THIS AFTER THE ALERT:
-
-        // Start auto-refresh for Meet link
-        if (result.booking && result.booking.google_calendar_event_id) {
-            console.log('🔄 Starting auto-refresh for Meet link...');
-            meetLinkRefresh.start(
-                result.booking.id,
-                result.booking.google_calendar_event_id
-            );
-        }
-
-*/
-
 // Update renderLessonCard to show "Meeting link loading" status
 
 function renderLessonCard(lesson, isFirst = false, lang = 'en') { 
@@ -4846,31 +5206,6 @@ function renderLessonCard(lesson, isFirst = false, lang = 'en') {
         </div>
     `;
 }
-
-// Start auto-refresh for existing bookings on page load
-// ADD THIS TO initializeEnhancedLessonsCard():
-/*
-FIND THIS CODE:
-function initializeEnhancedLessonsCard() {
-    renderUpcomingLessonsCard(bookingState.userBookings || []);
-    
-    if (bookingState.userBookings && bookingState.userBookings.length > 0) {
-        startCountdownUpdates();
-    }
-}
-
-AND ADD THIS BEFORE THE CLOSING }:
-
-    // Start auto-refresh for bookings without Meet links
-    if (bookingState.userBookings) {
-        bookingState.userBookings.forEach(booking => {
-            if (!booking.google_meet_link && booking.google_calendar_event_id) {
-                console.log(`🔄 Starting auto-refresh for existing booking ${booking.id}`);
-                meetLinkRefresh.start(booking.id, booking.google_calendar_event_id);
-            }
-        });
-    }
-*/
 
 // Clean up intervals when user leaves page
 window.addEventListener('beforeunload', () => {

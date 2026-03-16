@@ -10,6 +10,7 @@
       gtag('config', 'G-KLVF2ZG1WX');
     </script>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://api.qrserver.com; connect-src 'self' https://*.supabase.co https://cdn.jsdelivr.net https://www.google-analytics.com https://region1.google-analytics.com; media-src 'self' blob: https://*.supabase.co; frame-src 'none'; object-src 'none';">
 <title>Prokaiwa | Account Settings</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Manage your Prokaiwa account settings, subscription, and preferences.">
@@ -855,21 +856,19 @@
     console.log('✅ Supabase client created');
 
     const planNames = {
-        ja: { 
-            'A': 'LINEプラクティスプラン', 
-            'B45': 'ビデオレッスン（45分）',
-            'B60': 'ビデオレッスン（60分）',
-            'C1': 'パワーパック・ライト', 
-            'C2': 'パワーパック・プロ' 
-        },
-        en: { 
-            'A': 'LINE Practice Plan', 
-            'B45': 'Video Lesson (45min)',
-            'B60': 'Video Lesson (60min)',
-            'C1': 'Power Pack Lite', 
-            'C2': 'Power Pack Pro' 
-        }
-    };
+    ja: { 
+        'line': 'LINEプラクティスプラン', 
+        'video': 'ビデオレッスン（50分）',
+        'power_lite': 'パワーパック・ライト', 
+        'power_pro': 'パワーパック・プロ' 
+    },
+    en: { 
+        'line': 'LINE Practice Plan', 
+        'video': 'Video Lesson (50min)',
+        'power_lite': 'Power Pack Lite', 
+        'power_pro': 'Power Pack Pro' 
+    }
+};
 
     const statusNames = {
         ja: { paid: '有効', pending: '支払い待ち', cancelled: 'キャンセル済み' },

@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://api.qrserver.com; connect-src 'self' https://*.supabase.co https://cdn.jsdelivr.net https://www.google-analytics.com https://region1.google-analytics.com; media-src 'self' blob: https://*.supabase.co; frame-src 'none'; object-src 'none';">
+  <title>Student Profile | Prokaiwa Teacher Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ================================================================
+       PAGE RESETS
+       ================================================================ */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    /* Universal overflow safety net for iOS Safari and all mobile browsers.
+       No block element can exceed its parent's width.
+       Charts/calendars that need to scroll use overflow-x:auto on their wrapper. */
+    img, video, canvas, audio, iframe, embed, object { max-width: 100%; }
+    div, section, article, aside, header, footer, main, nav { max-width: 100%; }
+
+    html { overflow-x: hidden; }
+    body { background: #f5f5f5; overflow-x: hidden; position: relative; }
+
+    /* Let global style.css handle .container sizing (width:95%, padding:0 2rem).
+       Only strip the card visual styling — this page uses its own card system. */
+    main.container {
+      background: none;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
+    }
+
+    /* ================================================================
+       HEADER
+       ================================================================ */
+    .detail-header {
+      background: var(--color-surface);
+      padding: 0.85rem 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    .detail-header .container { display: flex; align-items: center; gap: 0.75rem; overflow: hidden; min-width: 0; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--color-primary); color: white;
+      border: none; border-radius: 8px; padding: 0.55rem 1.1rem;
+      font-size: 0.88rem; font-weight: 700; cursor: pointer;
+      text-decoration: none; transition: all 0.2s; white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .back-btn:hover {
+      background: var(--color-primary-dark, #0077aa);
+      transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .back-btn i { font-size: 0.8rem; }
+    .detail-header h1 { margin: 0; font-size: 1.3rem; color: var(--color-primary); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ================================================================
+       LAYOUT
+       ================================================================ */
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    /* ================================================================
+       SIDEBAR
+       ================================================================ */
+    .sidebar-card {
+      background: var(--color-surface);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 1.5rem; margin-bottom: 1.5rem;
+    }
+    .sidebar-card h3 {
+      margin: 0 0 1rem; font-size: 0.95rem;
+      color: var(--color-text-light); text-transform: uppercase;
+      letter-spacing: 0.05em; font-weight: 700;
+      padding-bottom: 0.5rem; border-bottom: 1px solid var(--color-border);
+    }
+    .student-avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--color-primary); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.75rem; font-weight: 700; margin: 0 auto 1rem;
+    }
+    .student-full-name {
+      text-align: center; font-size: 1.2rem; font-weight: 700;
+      color: var(--color-text); margin-bottom: 0.25rem;
+    }
+    .student-sub-name { text-align: center; color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 1rem; }
+    .info-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: var(--color-text-light); }
+    .info-value  { font-weight: 600; color: var(--color-text); }
+    .plan-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.8rem; font-weight: 600; }
+    .plan-line       { background: #e3f2fd; color: #1565c0; }
+    .plan-power_lite { background: #f3e5f5; color: #7b2d8b; }
+    .plan-power_pro  { background: #fff3e0; color: #e65100; }
+    .line-status { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; font-weight: 600; }
+    .line-connected    { color: #4caf50; }
+    .line-disconnected { color: #f44336; }
+    .quick-actions { display: flex; flex-direction: column; gap: 0.6rem; }
+    .qa-btn {
+      width: 100%; padding: 0.65rem 1rem;
+      border: none; border-radius: 6px; cursor: pointer;
+      font-weight: 600; font-size: 0.9rem;
+      display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;
+    }
+    .qa-btn-primary   { background: var(--color-primary); color: white; }
+    .qa-btn-primary:hover { background: var(--color-primary-dark); }
+    .qa-btn-purple    { background: #7b2d8b; color: white; }
+    .qa-btn-purple:hover { background: #6a1f78; }
+    .qa-btn-blue      { background: #1565c0; color: white; }
+    .qa-btn-blue:hover { background: #0d47a1; }
+    .qa-btn-orange    { background: #e65100; color: white; }
+    .qa-btn-orange:hover { background: #bf360c; }
+    .qa-btn-secondary { background: #f5f5f5; color: var(--color-text); border: 1px solid var(--color-border); }
+    .qa-btn-secondary:hover { background: #eeeeee; }
+    .assessment-entry {
+      padding: 0.75rem; background: #f9f9f9;
+      border-radius: 6px; margin-bottom: 0.75rem;
+      border-left: 3px solid var(--color-primary); font-size: 0.85rem;
+    }
+    .assessment-entry:last-child { margin-bottom: 0; }
+    .assessment-date { font-weight: 600; color: var(--color-text); margin-bottom: 0.35rem; }
+    .assessment-scores { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+    .score-chip {
+      background: white; border: 1px solid var(--color-border);
+      padding: 0.15rem 0.5rem; border-radius: 10px;
+      font-size: 0.75rem; color: var(--color-text);
+    }
+    .score-chip strong { color: var(--color-primary); }
+
+    /* ================================================================
+       MAIN CONTENT CARDS
+       ================================================================ */
+    .main-card {
+      background: var(--color-surface);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem; overflow: hidden;
+    }
+    .main-card-header {
+      padding: 1.1rem 1.5rem;
+      border-bottom: 2px solid var(--color-border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .main-card-header h2 { margin: 0; font-size: 1rem; color: var(--color-text); }
+    .main-card-body { padding: 1.5rem; }
+
+    /* ================================================================
+       CONVERSATION FILTERS
+       ================================================================ */
+    .conv-filters { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .conv-filter-btn {
+      padding: 0.35rem 0.75rem; border: 1px solid var(--color-border);
+      background: white; border-radius: 4px; cursor: pointer;
+      font-size: 0.82rem; transition: all 0.2s;
+    }
+    .conv-filter-btn:hover  { background: #f5f5f5; }
+    .conv-filter-btn.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+
+    /* ================================================================
+       MESSAGE COMPOSER
+       ================================================================ */
+    .composer-tabs { display: flex; border-bottom: 2px solid var(--color-border); margin-bottom: 1rem; }
+    .composer-tab {
+      padding: 0.6rem 1.2rem; background: none;
+      border: none; cursor: pointer; font-size: 0.9rem;
+      font-weight: 600; color: var(--color-text-light);
+      border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s;
+    }
+    .composer-tab.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+    .composer-panel        { display: none; }
+    .composer-panel.active { display: block; }
+    .tpl-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem; margin-bottom: 1rem;
+    }
+    .tpl-chip {
+      padding: 0.4rem 0.6rem; border: 1px solid var(--color-border);
+      background: transparent; border-radius: 18px; cursor: pointer;
+      font-size: 0.78rem; text-align: center; transition: all 0.2s;
+      color: #888;
+    }
+    .tpl-chip:hover  { color: var(--color-primary); border-color: var(--color-primary); }
+    .tpl-chip.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+    .compose-textarea {
+      width: 100%; min-height: 140px; padding: 0.9rem;
+      border: 1px solid var(--color-border); border-radius: 6px;
+      font-family: inherit; font-size: 0.9rem; resize: vertical;
+      transition: border-color 0.2s;
+    }
+    .compose-textarea:focus { outline: none; border-color: var(--color-primary); }
+    .compose-actions { display: flex; gap: 0.75rem; margin-top: 0.9rem; justify-content: flex-end; }
+    .btn-send-line {
+      background: #06c755; color: white; border: none;
+      padding: 0.65rem 1.5rem; border-radius: 6px;
+      cursor: pointer; font-weight: 700; font-size: 0.95rem;
+      display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s;
+    }
+    .btn-send-line:hover    { background: #05a847; transform: translateY(-1px); }
+    .btn-send-line:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      background: white; color: #333;
+      border: 1.5px solid #888;
+      padding: 0.65rem 1.2rem; border-radius: 6px;
+      cursor: pointer; font-weight: 700; font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: #f0f0f0; border-color: #444; }
+
+    /* ================================================================
+       TOAST NOTIFICATION
+       ================================================================ */
+    .sent-flash {
+      display: none; position: fixed; bottom: 1.5rem; left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: #2e7d32; color: white;
+      padding: 0.85rem 1.75rem; border-radius: 8px;
+      font-weight: 700; font-size: 0.95rem; z-index: 9999;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      transition: opacity 0.3s, transform 0.3s; opacity: 0; white-space: nowrap;
+    }
+    .sent-flash.show { display: block; opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ================================================================
+       TEXT / VOICE TOGGLE PILLS
+       Light-mode base first — dark override must come AFTER
+       ================================================================ */
+    .template-toggle {
+      display: inline-flex; background: #f0f0f0;
+      border-radius: 20px; padding: 3px; margin-bottom: 1rem; gap: 2px;
+    }
+    .toggle-pill {
+      padding: 0.4rem 1.1rem; border-radius: 18px;
+      border: none; cursor: pointer; font-size: 0.88rem;
+      font-weight: 600; background: transparent;
+      color: #888; transition: all 0.2s;
+    }
+    .toggle-pill:hover  { color: var(--color-primary); }
+    .toggle-pill.active { background: white; color: var(--color-primary); box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+
+    /* ================================================================
+       STUDIO RECORDER
+       ================================================================ */
+    .studio-recorder {
+      width: 100%; border-radius: 14px; padding: 1.2rem 1.4rem 1.1rem;
+      margin-bottom: 1rem; position: relative; overflow: hidden;
+      background: #141414; border: 1px solid #252525;
+      box-shadow: 0 0 0 1px #222, 0 6px 24px rgba(0,0,0,0.5), inset 0 1px 0 #1e1e1e;
+    }
+    .studio-recorder::before {
+      content: ''; position: absolute; inset: 0; border-radius: 14px;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.014) 2px, rgba(255,255,255,0.014) 4px);
+      pointer-events: none; z-index: 0;
+    }
+    .studio-recorder > * { position: relative; z-index: 1; }
+    /* Single-column layout: display panel on top, transport buttons below */
+    .sr-body  { display: flex; flex-direction: column; gap: 0.75rem; }
+    .sr-left  { min-width: 0; }
+    .sr-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.55rem; }
+    .sr-header-left { display: flex; align-items: center; gap: 0.5rem; }
+    .sr-rec-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #333; box-shadow: 0 0 0 2px #222; transition: all 0.3s;
+    }
+    .sr-rec-dot.armed     { background: #00ff6a; box-shadow: 0 0 8px #00ff6a, 0 0 18px rgba(0,255,106,0.4); }
+    .sr-rec-dot.recording { background: #ff3b3b; box-shadow: 0 0 8px #ff3b3b, 0 0 20px rgba(255,59,59,0.5); animation: dot-pulse 0.8s infinite; }
+    .sr-rec-dot.done      { background: #44aaff; box-shadow: 0 0 8px #44aaff, 0 0 16px rgba(68,170,255,0.4); }
+    @keyframes dot-pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+    .sr-label {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.14em; color: #555; text-transform: uppercase; transition: color 0.3s;
+    }
+    .sr-label.armed     { color: #00cc55; }
+    .sr-label.recording { color: #ff3b3b; }
+    .sr-label.done      { color: #44aaff; }
+    .sr-format-badge {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em;
+      color: #444; border: 1px solid #2a2a2a; padding: 0.12rem 0.4rem;
+      border-radius: 3px; background: rgba(0,0,0,0.35);
+    }
+    .sr-format-badge.m4a  { color: #00ff6a; border-color: rgba(0,255,106,0.35); }
+    .sr-format-badge.webm { color: #ffaa00; border-color: rgba(255,170,0,0.35); }
+    .sr-timer-display { display: flex; align-items: baseline; gap: 0.4rem; margin-bottom: 0.7rem; }
+    .sr-timer {
+      font-family: 'Orbitron', sans-serif; font-size: 2.4rem; font-weight: 700; line-height: 1;
+      color: #00ff6a; letter-spacing: 0.05em;
+      text-shadow: 0 0 10px rgba(0,255,106,0.5), 0 0 22px rgba(0,255,106,0.2);
+      transition: color 0.3s, text-shadow 0.3s;
+    }
+    .sr-timer.recording { color: #ff5555; text-shadow: 0 0 10px rgba(255,85,85,0.5); }
+    .sr-timer.done      { color: #44aaff; text-shadow: 0 0 10px rgba(68,170,255,0.4); }
+    .sr-timer-max { font-family: 'Share Tech Mono', monospace; font-size: 0.73rem; color: #444; letter-spacing: 0.05em; }
+    .sr-vu-section { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.65rem; }
+    .sr-vu-label { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: #555; width: 14px; text-align: right; }
+    .sr-vu-track { flex: 1; height: 8px; background: #0a0a0a; border-radius: 4px; border: 1px solid #222; position: relative; overflow: hidden; min-width: 0; }
+    .sr-vu-fill {
+      height: 100%; width: 0%; border-radius: 4px;
+      background: linear-gradient(90deg, #00ff6a 0%, #aaff00 60%, #ffcc00 80%, #ff4444 100%);
+      transition: width 0.05s linear; box-shadow: 0 0 5px rgba(0,255,106,0.3);
+    }
+    .sr-vu-peak { position: absolute; top: 0; bottom: 0; width: 2px; background: white; border-radius: 1px; left: 0; opacity: 0; transition: opacity 0.4s; }
+    .sr-vu-peak.show { opacity: 0.65; }
+    .sr-vu-val { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: #555; width: 32px; text-align: right; }
+    .sr-waveform { width: 100%; display: block; border-radius: 5px; background: #060606; border: 1px solid #1e1e1e; margin-bottom: 0.65rem; }
+    .sr-progress-bar { height: 4px; background: #111; border-radius: 2px; overflow: hidden; cursor: pointer; }
+    .sr-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #0055cc, #44aaff); border-radius: 2px; transition: width 0.1s linear; }
+    /* Transport: full-width row below waveform, always */
+    .sr-transport     { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .sr-transport-row { display: contents; } /* children participate directly in the flex row */
+    .sr-btn           { flex: 1 1 auto; min-width: 0; }
+    .sr-btn-record    { flex: 1 1 100%; } /* REC always full width */
+    .sr-btn {
+      background: #0e0e0e; border: 1px solid #2e2e2e; color: #777;
+      padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
+      letter-spacing: 0.05em; min-width: 0; transition: all 0.18s;
+    }
+    .sr-btn:hover { color: #00ff6a; border-color: rgba(0,255,106,0.35); background: #141414; }
+    .sr-btn-record {
+      background: #180404; border-color: #4a1010; color: #ff5555;
+      font-size: 0.95rem; padding: 0.85rem 1.3rem; letter-spacing: 0;
+    }
+    .sr-btn-record:hover { background: #220808; border-color: #882020; color: #ff2222; box-shadow: 0 0 10px rgba(255,40,40,0.2); }
+    .sr-btn-record.recording { background: #dd2222; border-color: #ff1111; color: white; animation: rec-glow 0.8s infinite; }
+    @keyframes rec-glow { 0%,100%{box-shadow:0 0 8px rgba(255,40,40,0.4);} 50%{box-shadow:0 0 20px rgba(255,40,40,0.7);} }
+    .sr-btn-send { background: #000d1a; border-color: #002855; color: #44aaff; }
+    .sr-btn-send:hover { background: #001428; border-color: #004488; color: #66ccff; box-shadow: 0 0 8px rgba(68,170,255,0.2); }
+    .sr-btn-trash:hover { color: #ff4444; border-color: rgba(255,68,68,0.35); }
+
+    /* ================================================================
+       FEEDBACK / LOADING STATES
+       ================================================================ */
+    .empty-state   { text-align: center; padding: 2.5rem; color: var(--color-text-light); }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; color: var(--color-border); }
+    .loading-state { text-align: center; padding: 2rem; color: var(--color-text-light); }
+
+    /* ================================================================
+       DATA VISUALISATION
+       ================================================================ */
+    .viz-panel { min-height: 160px; }
+    /* Scrollable containers — prevent wide content from pushing page width */
+    #chart-streak, #chart-rate, #chart-skills, .bar-chart, .streak-grid { max-width: 100%; overflow-x: auto; }
+
+    .bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 120px; padding-bottom: 24px; position: relative; }
+    .bar-col   { display: flex; flex-direction: column; align-items: center; flex: 1 1 0%; min-width: 0; }
+    .bar-rect  { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.4s ease; cursor: default; position: relative; }
+    .bar-rect:hover::after {
+      content: attr(data-tip); position: absolute; bottom: calc(100% + 4px);
+      left: 50%; transform: translateX(-50%); background: #333; color: white;
+      padding: 3px 7px; border-radius: 4px; font-size: 0.72rem; white-space: nowrap;
+      pointer-events: none; z-index: 10;
+    }
+    .bar-label { font-size: 0.65rem; color: var(--color-text-light); margin-top: 4px; white-space: nowrap; overflow: hidden; width: 100%; text-align: center; }
+    .streak-grid  { display: flex; gap: 3px; }
+    .streak-week  { display: flex; flex-direction: column; gap: 3px; }
+    .streak-cell  { width: 14px; height: 14px; border-radius: 3px; cursor: default; position: relative; }
+    .streak-cell:hover::after {
+      content: attr(data-tip); position: absolute; bottom: calc(100% + 4px);
+      left: 50%; transform: translateX(-50%); background: #333; color: white;
+      padding: 3px 7px; border-radius: 4px; font-size: 0.72rem; white-space: nowrap;
+      pointer-events: none; z-index: 10;
+    }
+    .streak-month-labels { display: flex; gap: 3px; margin-bottom: 4px; overflow: hidden; }
+    .streak-month-label  { font-size: 0.65rem; color: var(--color-text-light); }
+    .skill-chart-svg { overflow: hidden; max-width: 100%; }
+
+    /* ================================================================
+       RESPONSIVE BREAKPOINTS
+       ================================================================ */
+    @media (max-width: 900px) {
+      .detail-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Override global style.css .container (width:95% + padding:0 2rem).
+       Those 32px-per-side paddings eat too much of a 375px screen. */
+    @media (max-width: 768px) {
+      main.container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0.75rem;
+      }
+      .detail-header .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      main.container              { padding: 0.4rem; }
+      .detail-header .container   { padding-left: 0.5rem; padding-right: 0.5rem; }
+      .main-card-body             { padding: 1rem; }
+      .studio-recorder            { padding: 0.9rem 0.85rem; }
+      .sr-btn                     { padding: 0.7rem 0.4rem; font-size: 0.7rem; }
+      .sr-btn-record              { padding: 0.8rem; font-size: 0.85rem; }
+      .sr-timer                   { font-size: 1.8rem; }
+      .tpl-grid                   { grid-template-columns: repeat(2, 1fr); }
+      .compose-actions            { flex-direction: column; }
+      .btn-send-line,
+      .btn-secondary              { width: 100%; justify-content: center; }
+      .streak-cell                { width: 10px; height: 10px; }
+      .bar-label                  { font-size: 0.58rem; }
+    }
+
+    /* ================================================================
+       LIGHT MODE — studio recorder silver brushed metal
+       ================================================================ */
+    @media (prefers-color-scheme: light) {
+      .studio-recorder {
+        background: linear-gradient(160deg, #cdd2d8 0%, #b0b6be 50%, #c0c6ce 100%);
+        border: 1px solid #909aa5;
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.6) inset, 0 2px 0 #6a7580, 0 6px 20px rgba(0,0,0,0.2);
+      }
+      .sr-rec-dot   { background: #8a9099; box-shadow: 0 0 0 2px #a0a8b0; }
+      .sr-label     { color: #6a7580; }
+      .sr-label.armed     { color: #009944; }
+      .sr-label.recording { color: #cc2200; }
+      .sr-label.done      { color: #0066cc; }
+      .sr-format-badge    { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.18); color: #6a7580; }
+      .sr-format-badge.m4a  { color: #009944; border-color: rgba(0,153,68,0.4); }
+      .sr-format-badge.webm { color: #cc7700; border-color: rgba(204,119,0,0.4); }
+      .sr-timer     { color: #00aa44; text-shadow: 0 0 8px rgba(0,170,68,0.4); }
+      .sr-timer.recording { color: #cc2200; text-shadow: 0 0 8px rgba(204,34,0,0.4); }
+      .sr-timer.done      { color: #0066cc; text-shadow: 0 0 8px rgba(0,102,204,0.35); }
+      .sr-timer-max { color: #7a8590; }
+      .sr-vu-label  { color: #7a8590; }
+      .sr-vu-track  { background: #8a9099; border-color: #7a8090; }
+      .sr-vu-val    { color: #7a8590; }
+      .sr-waveform  { background: #1a1a1a; border-color: #8a9099; }
+      .sr-progress-bar { background: rgba(0,0,0,0.2); }
+      .sr-btn {
+        background: rgba(0,0,0,0.09); border-color: rgba(0,0,0,0.2); color: #6a7580;
+      }
+      .sr-btn:hover { background: rgba(0,0,0,0.15); color: #009944; border-color: rgba(0,153,68,0.35); }
+      .sr-btn-record { background: rgba(160,20,0,0.1); border-color: rgba(160,20,0,0.3); color: #cc2200; }
+      .sr-btn-record:hover { background: rgba(160,20,0,0.18); color: #aa1800; }
+      .sr-btn-record.recording { background: #cc2200; border-color: #991800; color: white; }
+      .sr-btn-send { background: rgba(0,60,160,0.08); border-color: rgba(0,60,160,0.22); color: #0055cc; }
+      .sr-btn-send:hover { background: rgba(0,60,160,0.15); color: #0033aa; }
+    }
+
+    /* ================================================================
+       DARK MODE — all overrides in one block, after all base rules
+       ================================================================ */
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a1a; }
+      .btn-secondary { background: #444; color: #ddd; border-color: #555; }
+      .btn-secondary:hover { background: #2a2a2a; border-color: #777; color: #fff; }
+      .template-toggle { background: #252525; border: 1px solid #333; }
+      .toggle-pill { color: #777; }
+      .toggle-pill.active { background: #333; color: var(--color-primary); box-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+    }
+</style>
+</head>
+<body>
+
+  <header class="detail-header">
+    <div class="container">
+      <a href="teacher-portal.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to Portal
+      </a>
+      <h1 id="page-title">Student Profile</h1>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="loading-state" class="loading-state">
+      <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:var(--color-primary);"></i>
+      <p>Loading student profile...</p>
+    </div>
+
+    <div id="main-content" style="display:none;">
+      <div class="detail-layout">
+
+        <!-- ===== SIDEBAR ===== -->
+        <div id="sidebar">
+
+          <!-- Profile card -->
+          <div class="sidebar-card">
+            <div class="student-avatar" id="avatar-initials">?</div>
+            <div class="student-full-name" id="sidebar-name">-</div>
+            <div class="student-sub-name" id="sidebar-sub">-</div>
+
+            <div id="info-rows">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Quick actions -->
+          <div class="sidebar-card">
+            <h3>Quick Actions</h3>
+            <div class="quick-actions">
+              <button class="qa-btn qa-btn-purple" onclick="scrollToComposer(); setComposerTab('day6')">
+                🎭 Send Day 6 Reply
+              </button>
+              <button class="qa-btn qa-btn-blue" onclick="scrollToComposer(); setComposerTab('quiz')">
+                ✅ Send Quiz Correction
+              </button>
+              <button class="qa-btn qa-btn-primary" onclick="scrollToComposer(); setComposerTab('adhoc')">
+                <i class="fas fa-paper-plane"></i> Send Ad-hoc Message
+              </button>
+              <button class="qa-btn qa-btn-orange" onclick="openAssessmentFromDetail()">
+                📊 Run Full Assessment
+              </button>
+            </div>
+          </div>
+
+          <!-- Assessment history -->
+          <div class="sidebar-card">
+            <h3>Assessment History</h3>
+            <div id="assessment-history">
+              <div class="loading-state" style="padding:1rem;">
+                <i class="fas fa-spinner fa-spin"></i>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ===== MAIN COLUMN ===== -->
+        <div id="main-col">
+
+          <!-- Full conversation history -->
+          <div class="main-card">
+            <div class="main-card-header">
+              <h2>💬 Conversation History</h2>
+              <span id="conv-count" style="font-size:0.85rem; color:var(--color-text-light);"></span>
+            </div>
+            <div class="main-card-body">
+              <div class="conv-filters">
+                <button class="conv-filter-btn active" data-filter="7"   onclick="changeConvFilter(this,'7')">Last 7 days</button>
+                <button class="conv-filter-btn"        data-filter="14"  onclick="changeConvFilter(this,'14')">14 days</button>
+                <button class="conv-filter-btn"        data-filter="30"  onclick="changeConvFilter(this,'30')">30 days</button>
+                <button class="conv-filter-btn"        data-filter="all" onclick="changeConvFilter(this,'all')">All time</button>
+              </div>
+              <div id="conversation-timeline" style="overflow:hidden; word-break:break-word;">
+                <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== DATA VISUALIZATION ===== -->
+          <div class="main-card" id="dataviz-card">
+            <div class="main-card-header">
+              <h2>📊 Progress Insights</h2>
+              <span id="dataviz-period" style="font-size:0.85rem; color:var(--color-text-light);"></span>
+            </div>
+            <div class="main-card-body" style="padding-bottom:0.5rem;">
+              <!-- Viz tabs -->
+              <div style="display:flex; gap:0; border-bottom:2px solid var(--color-border); margin-bottom:1.5rem; overflow-x:auto;">
+                <button class="composer-tab active" id="viz-tab-rate"   onclick="switchVizTab('rate')">📅 Response Rate</button>
+                <button class="composer-tab"        id="viz-tab-streak" onclick="switchVizTab('streak')">🔥 Streak</button>
+                <button class="composer-tab"        id="viz-tab-skills" onclick="switchVizTab('skills')">📈 Skill Growth</button>
+                <button class="composer-tab"        id="viz-tab-types"  onclick="switchVizTab('types')">🎙 Response Types</button>
+              </div>
+
+              <!-- Response Rate chart -->
+              <div id="viz-rate" class="viz-panel">
+                <p style="font-size:0.82rem; color:var(--color-text-light); margin:0 0 1rem 0;">% of prompts answered per week</p>
+                <div id="chart-rate" style="width:100%; overflow-x:auto;"></div>
+              </div>
+
+              <!-- Streak calendar -->
+              <div id="viz-streak" class="viz-panel" style="display:none;">
+                <p style="font-size:0.82rem; color:var(--color-text-light); margin:0 0 1rem 0;">Days with at least one response (last 12 weeks)</p>
+                <div id="chart-streak" style="overflow-x:auto;"></div>
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.75rem; font-size:0.78rem; color:var(--color-text-light);">
+                  <span>No response</span>
+                  <div style="width:14px;height:14px;background:#eee;border-radius:3px;"></div>
+                  <div style="width:14px;height:14px;background:#c6e48b;border-radius:3px;"></div>
+                  <div style="width:14px;height:14px;background:#40c463;border-radius:3px;"></div>
+                  <div style="width:14px;height:14px;background:#216e39;border-radius:3px;"></div>
+                  <span>More responses</span>
+                </div>
+              </div>
+
+              <!-- Skill growth line chart -->
+              <div id="viz-skills" class="viz-panel" style="display:none;">
+                <p style="font-size:0.82rem; color:var(--color-text-light); margin:0 0 1rem 0;">Score per skill over assessment dates (0–10)</p>
+                <div id="chart-skills" style="overflow-x:auto;"></div>
+                <div id="chart-skills-legend" style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:0.75rem; font-size:0.78rem;"></div>
+              </div>
+
+              <!-- Response types donut -->
+              <div id="viz-types" class="viz-panel" style="display:none;">
+                <p style="font-size:0.82rem; color:var(--color-text-light); margin:0 0 1rem 0;">Breakdown of how the student responds</p>
+                <div style="display:flex; align-items:center; gap:2rem; flex-wrap:wrap;">
+                  <canvas id="chart-types" width="160" height="160" style="flex-shrink:0;"></canvas>
+                  <div id="chart-types-legend" style="font-size:0.85rem;"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="main-card" id="composer-card">
+            <div class="main-card-header">
+              <h2>✉️ Send Message</h2>
+            </div>
+            <div class="main-card-body">
+              <div class="composer-tabs">
+                <button class="composer-tab active" id="tab-adhoc" onclick="setComposerTab('adhoc')">Ad-hoc</button>
+                <button class="composer-tab"        id="tab-day6"  onclick="setComposerTab('day6')">Day 6 Reply</button>
+                <button class="composer-tab"        id="tab-quiz"  onclick="setComposerTab('quiz')">Quiz Correction</button>
+                <button class="composer-tab"        id="tab-weekly" onclick="setComposerTab('weekly')">Weekly Assessment</button>
+              </div>
+
+              <!-- Ad-hoc panel -->
+              <div class="composer-panel active" id="panel-adhoc">
+                <p style="font-size:0.85rem; color:var(--color-text-light); margin-bottom:1rem;">
+                  Send a free-form message directly to this student on LINE. Not tied to any specific day or template.
+                </p>
+
+                <!-- Text / Voice toggle -->
+                <div class="template-toggle" style="margin-bottom:1rem;">
+                  <button class="toggle-pill active" id="pill-text-adhoc"  onclick="setDetailReplyMode('adhoc','text')">💬 Text</button>
+                  <button class="toggle-pill"        id="pill-voice-adhoc" onclick="setDetailReplyMode('adhoc','voice')">🎙 Voice</button>
+                </div>
+
+                <!-- Text panel -->
+                <div id="detail-text-panel-adhoc">
+                  <div class="tpl-grid">
+                    <div class="tpl-chip" onclick="applyTpl(this,'adhoc','great_effort')">💪 Great Effort</div>
+                    <div class="tpl-chip" onclick="applyTpl(this,'adhoc','pronunciation_focus')">🎤 Pronunciation</div>
+                    <div class="tpl-chip" onclick="applyTpl(this,'adhoc','milestone')">🎉 Milestone</div>
+                    <div class="tpl-chip" onclick="applyTpl(this,'adhoc','daily')">⚡ Quick Note</div>
+                    <div class="tpl-chip active" onclick="applyTpl(this,'adhoc','blank')">✏️ Blank</div>
+                  </div>
+                  <textarea class="compose-textarea" id="compose-adhoc" placeholder="Write your message to the student..."></textarea>
+                </div>
+
+                <!-- Voice panel -->
+                <div id="detail-voice-panel-adhoc" style="display:none;">
+                  <div class="studio-recorder" id="studio-adhoc">
+                    <div class="sr-header">
+                      <div class="sr-header-left">
+                        <span class="sr-rec-dot armed" id="sr-dot-adhoc"></span>
+                        <span class="sr-label armed" id="sr-label-adhoc">READY</span>
+                      </div>
+                      <div class="sr-format-badge" id="sr-format-adhoc"></div>
+                    </div>
+                    <div class="sr-body">
+                      <div class="sr-left">
+                        <div class="sr-timer-display">
+                          <span class="sr-timer" id="sr-timer-adhoc">00:00</span>
+                          <span class="sr-timer-max">/02:00</span>
+                        </div>
+                        <div class="sr-vu-section">
+                          <span class="sr-vu-label">dB</span>
+                          <div class="sr-vu-track">
+                            <div class="sr-vu-fill" id="sr-vu-adhoc"></div>
+                            <div class="sr-vu-peak" id="sr-peak-adhoc"></div>
+                          </div>
+                          <span class="sr-vu-val" id="sr-vu-val-adhoc">–∞</span>
+                        </div>
+                        <canvas class="sr-waveform" id="sr-wave-adhoc" height="52"></canvas>
+                        <div class="sr-progress-bar" id="sr-progress-adhoc" style="display:none;">
+                          <div class="sr-progress-fill" id="sr-progress-fill-adhoc"></div>
+                        </div>
+                      </div>
+                      <div class="sr-transport">
+                        <button class="sr-btn sr-btn-record" id="sr-center-adhoc" onclick="toggleDetailRecording('adhoc')">
+                          <i class="fas fa-microphone" id="sr-center-icon-adhoc"></i>
+                          <span id="sr-btn-label-adhoc">REC</span>
+                        </button>
+                        <div class="sr-transport-row">
+                          <button class="sr-btn" onclick="srWheelAction('adhoc','rerecord')" title="Re-record">
+                            <i class="fas fa-rotate-left"></i> REDO
+                          </button>
+                          <button class="sr-btn sr-btn-trash" onclick="srWheelAction('adhoc','trash')" title="Discard">
+                            <i class="fas fa-trash"></i> TRASH
+                          </button>
+                          <button class="sr-btn sr-btn-send" onclick="srWheelAction('adhoc','send')" title="Send">
+                            <i class="fas fa-paper-plane"></i> SEND
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <audio id="detail-rec-audio-adhoc" style="display:none;"></audio>
+                  </div>
+                </div>
+                <div class="compose-actions">
+                  <button class="btn-secondary" onclick="clearCompose('adhoc')">Clear</button>
+                  <button class="btn-send-line" id="send-adhoc-btn" onclick="sendAdHocMessage()">
+                    <i class="fab fa-line"></i> Send via LINE
+                  </button>
+                </div>
+                <div class="sent-flash" id="flash-adhoc">✅ Message sent!</div>
+              </div>
+
+              <!-- Day 6 panel -->
+              <div class="composer-panel" id="panel-day6">
+                <p class="reply-tip" style="font-size:0.85rem; color:var(--color-text-light); margin-bottom:1rem; font-style:italic;">
+                  Keep it short and encouraging — 1 to 2 sentences. React to their response, give one tip if needed.
+                </p>
+
+                <!-- Text / Voice toggle -->
+                <div class="template-toggle" style="margin-bottom:1rem;">
+                  <button class="toggle-pill active" id="pill-text-day6"  onclick="setDetailReplyMode('day6','text')">💬 Text</button>
+                  <button class="toggle-pill"        id="pill-voice-day6" onclick="setDetailReplyMode('day6','voice')">🎙 Voice</button>
+                </div>
+
+                <!-- Text panel -->
+                <div id="detail-text-panel-day6">
+                  <textarea class="compose-textarea" id="compose-day6"
+                    placeholder="e.g. Great reaction — that 'Oh no way!' sounded completely natural! 🎉 Try adding a follow-up question next time to keep the conversation going."></textarea>
+                </div>
+
+                <!-- Voice panel -->
+                <div id="detail-voice-panel-day6" style="display:none;">
+                  <div class="studio-recorder" id="studio-day6">
+                    <div class="sr-header">
+                      <div class="sr-header-left">
+                        <span class="sr-rec-dot armed" id="sr-dot-day6"></span>
+                        <span class="sr-label armed" id="sr-label-day6">READY</span>
+                      </div>
+                      <div class="sr-format-badge" id="sr-format-day6"></div>
+                    </div>
+                    <div class="sr-body">
+                      <div class="sr-left">
+                        <div class="sr-timer-display">
+                          <span class="sr-timer" id="sr-timer-day6">00:00</span>
+                          <span class="sr-timer-max">/02:00</span>
+                        </div>
+                        <div class="sr-vu-section">
+                          <span class="sr-vu-label">dB</span>
+                          <div class="sr-vu-track">
+                            <div class="sr-vu-fill" id="sr-vu-day6"></div>
+                            <div class="sr-vu-peak" id="sr-peak-day6"></div>
+                          </div>
+                          <span class="sr-vu-val" id="sr-vu-val-day6">–∞</span>
+                        </div>
+                        <canvas class="sr-waveform" id="sr-wave-day6" height="52"></canvas>
+                        <div class="sr-progress-bar" id="sr-progress-day6" style="display:none;">
+                          <div class="sr-progress-fill" id="sr-progress-fill-day6"></div>
+                        </div>
+                      </div>
+                      <div class="sr-transport">
+                        <button class="sr-btn sr-btn-record" id="sr-center-day6" onclick="toggleDetailRecording('day6')">
+                          <i class="fas fa-microphone" id="sr-center-icon-day6"></i>
+                          <span id="sr-btn-label-day6">REC</span>
+                        </button>
+                        <div class="sr-transport-row">
+                          <button class="sr-btn" onclick="srWheelAction('day6','rerecord')" title="Re-record">
+                            <i class="fas fa-rotate-left"></i> REDO
+                          </button>
+                          <button class="sr-btn sr-btn-trash" onclick="srWheelAction('day6','trash')" title="Discard">
+                            <i class="fas fa-trash"></i> TRASH
+                          </button>
+                          <button class="sr-btn sr-btn-send" onclick="srWheelAction('day6','send')" title="Send">
+                            <i class="fas fa-paper-plane"></i> SEND
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <audio id="detail-rec-audio-day6" style="display:none;"></audio>
+                  </div>
+                </div>
+                <div class="compose-actions">
+                  <button class="btn-secondary" onclick="clearCompose('day6')">Clear</button>
+                  <button class="btn-send-line" id="send-day6-btn" onclick="sendComposerMessage('day6')">
+                    <i class="fab fa-line"></i> Send via LINE
+                  </button>
+                </div>
+                <div class="sent-flash" id="flash-day6">✅ Day 6 reply sent!</div>
+              </div>
+
+              <!-- Quiz correction panel -->
+              <div class="composer-panel" id="panel-quiz">
+                <textarea class="compose-textarea" id="compose-quiz"
+                  style="min-height:160px;"
+                >Good work on today's quiz! ✅
+
+The answer was [A or B] — [brief reason why].
+
+Your written version was great too. Nice effort! 💪</textarea>
+                <div class="compose-actions">
+                  <button class="btn-secondary" onclick="clearCompose('quiz')">Reset Template</button>
+                  <button class="btn-send-line" id="send-quiz-btn" onclick="sendComposerMessage('quiz')">
+                    <i class="fab fa-line"></i> Send via LINE
+                  </button>
+                </div>
+                <div class="sent-flash" id="flash-quiz">✅ Quiz correction sent!</div>
+              </div>
+
+              <!-- Weekly assessment panel -->
+              <div class="composer-panel" id="panel-weekly">
+                <div class="tpl-grid" style="grid-template-columns: repeat(3,1fr);">
+                  <div class="tpl-chip" onclick="applyTpl(this,'weekly','weekly')">📋 Weekly (LINE)</div>
+                  <div class="tpl-chip" onclick="applyTpl(this,'weekly','biweekly')">✨ Bi-weekly</div>
+                  <div class="tpl-chip active" onclick="applyTpl(this,'weekly','daily')">⚡ Daily (Pro)</div>
+                </div>
+                <textarea class="compose-textarea" id="compose-weekly" style="min-height:260px;">Great work today! 👏
+
+✅ [Specific thing they did well]
+💡 Quick tip: [One small correction or suggestion]
+
+Keep it up! 🌟</textarea>
+                <div class="compose-actions">
+                  <button class="btn-secondary" onclick="clearCompose('weekly')">Clear</button>
+                  <button class="btn-send-line" id="send-weekly-btn" onclick="sendComposerMessage('weekly')">
+                    <i class="fab fa-line"></i> Send via LINE
+                  </button>
+                </div>
+                <div class="sent-flash" id="flash-weekly">✅ Assessment sent!</div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div id="error-state" style="display:none; text-align:center; padding:3rem;">
+      <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:#f44336; margin-bottom:1rem; display:block;"></i>
+      <h2 style="color:#f44336;">Student not found</h2>
+      <p style="color:var(--color-text-light);">This student may have been removed or you may not have permission to view them.</p>
+      <a href="teacher-portal.html" class="back-btn" style="display:inline-flex; margin-top:1.5rem;">
+        <i class="fas fa-arrow-left"></i> Back to Portal
+      </a>
+    </div>
+
+  </main>
+
+  <!-- ===== Assessment Modal (same as portal) ===== -->
+  <div id="assessment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; overflow-y:auto;">
+    <div style="display:flex; align-items:center; justify-content:center; padding:2rem; min-height:100%;">
+      <div style="background:var(--color-surface); border-radius:12px; width:100%; max-width:500px; padding:2rem; position:relative;">
+        <button onclick="closeDetailAssessment()" style="position:absolute; top:1rem; right:1rem; background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--color-text-light);">×</button>
+        <h2 style="color:var(--color-primary); margin-top:0;">📊 Run Full Assessment</h2>
+        <p style="color:var(--color-text-light);">Use the full assessment tool in the main teacher portal for detailed scoring, guides, and history.</p>
+        <a href="teacher-portal.html" class="qa-btn qa-btn-primary" style="display:inline-flex; text-decoration:none; margin-top:1rem;">
+          <i class="fas fa-external-link-alt"></i> Open in Teacher Portal
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  const supabaseClient = supabase.createClient(
+    'https://luyzyzefgintksydmwoh.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg'
+  );
+
+  let currentTeacher  = null;
+  let currentStudent  = null;
+  let currentConvFilter = '7';
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  const feedbackTemplates = {
+    blank: '',
+    daily: `Great work today! 👏\n\n✅ [Specific thing they did well]\n💡 Quick tip: [One small correction or suggestion]\n\nKeep it up! 🌟`,
+    great_effort: `Really appreciate your effort today! 💪\n\nI can see you're working hard, and that consistency matters more than perfection at this stage.\n\nKeep showing up every day — that's how real progress happens! 🌱`,
+    pronunciation_focus: `Great listening today! 🎤\n\nThis week's pronunciation focus was [sound/word]. [Observation on how they did.]\n\n💡 Practice tip: [Specific advice for this sound]\n\nYou're making progress! 🎯`,
+    milestone: `🎉 Congratulations on completing [Week 8 / Week 16]!\n\nThis is a real milestone. Look how far you've come:\n✅ [Achievement 1]\n✅ [Achievement 2]\n✅ [Achievement 3]\n\nI'm proud of your dedication. Let's keep building! 🚀`,
+    weekly: `Week [X] Review 🌟\n\n📊 This week you completed [X]/7 prompts.\n\n🎯 Strengths:\n1. [Specific example]\n2. [Another strength]\n\n📝 One thing to work on:\n[Common pattern + tip]\n\n🔮 Next week's focus: [Preview theme]\n\nExcellent consistency! 💪✨`,
+    biweekly: `Quick check-in ✨\n\nNice work on your last few responses!\n\n✅ Going well: [1-2 wins]\n⚠️ Watch for: [1 pattern]\n💡 Tip: [Quick actionable advice]\n\nKeep going! 🌟`,
+    quiz_correction: `Good work on today's quiz! ✅\n\nThe answer was [A or B] — [brief reason why].\n\nYour written version was great too. Nice effort! 💪`
+  };
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = '/teacher-login.html'; return; }
+
+    const { data: teacher } = await supabaseClient
+      .from('teachers').select('*').eq('auth_user_id', session.user.id).single();
+    if (!teacher || !teacher.is_active) { window.location.href = '/teacher-login.html'; return; }
+    currentTeacher = teacher;
+
+    // Get student ID from URL
+    const params    = new URLSearchParams(window.location.search);
+    const studentId = params.get('id');
+    if (!studentId) { showError(); return; }
+
+    await loadStudentProfile(studentId);
+  }
+
+  async function loadStudentProfile(studentId) {
+    try {
+      // Fetch student record
+      const { data: student, error: sErr } = await supabaseClient
+        .from('questionnaire_responses').select('*').eq('id', studentId).single();
+      if (sErr || !student) { showError(); return; }
+      currentStudent = student;
+
+      // Fetch progress
+      const { data: progress } = await supabaseClient
+        .from('student_progress').select('*').eq('user_id', student.user_id).single();
+      if (progress) currentStudent = { ...currentStudent, ...progress };
+
+      renderSidebar();
+      await loadConversationHistory('7');
+      await loadAssessmentHistory();
+      await initViz();
+
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('main-content').style.display  = 'block';
+
+      const name = student.given_name_romaji || student.name;
+      document.getElementById('page-title').textContent = name;
+      document.title = `${name} | Prokaiwa Teacher Portal`;
+
+    } catch(err) {
+      console.error('loadStudentProfile:', err);
+      showError();
+    }
+  }
+
+  function showError() {
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('error-state').style.display   = 'block';
+  }
+
+  // ============================================================
+  // SIDEBAR
+  // ============================================================
+  function renderSidebar() {
+    const s    = currentStudent;
+    const name = s.given_name_romaji || s.name;
+    const initial = name.charAt(0).toUpperCase();
+
+    document.getElementById('avatar-initials').textContent = initial;
+    document.getElementById('sidebar-name').textContent = name;
+    document.getElementById('sidebar-sub').textContent = s.email || '';
+
+    const planClass = `plan-${s.plan}`;
+    const planLabel = formatPlanName(s.plan);
+    const lineStatus = s.line_id
+      ? `<span class="line-status line-connected"><i class="fab fa-line"></i> Connected</span>`
+      : `<span class="line-status line-disconnected"><i class="fas fa-times-circle"></i> Not connected</span>`;
+
+    document.getElementById('info-rows').innerHTML = `
+      <div class="info-row">
+        <span class="info-label">Plan</span>
+        <span class="info-value"><span class="plan-badge ${escapeHtml(planClass)}">${escapeHtml(planLabel)}</span></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Level</span>
+        <span class="info-value">${escapeHtml(s.level || 'Not set')}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Purpose</span>
+        <span class="info-value">${escapeHtml(parsePurpose(s))}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Current week</span>
+        <span class="info-value">Week ${s.current_week || 1}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Current day</span>
+        <span class="info-value">Day ${s.current_day || 1}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Total prompts</span>
+        <span class="info-value">${s.total_prompts_sent || 0}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">LINE status</span>
+        <span class="info-value">${lineStatus}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Subscription</span>
+        <span class="info-value" style="color:${s.subscription_status === 'active' ? '#4caf50' : '#f44336'}">
+          ${escapeHtml(s.subscription_status || 'Unknown')}
+        </span>
+      </div>
+      ${s.started_at ? `
+      <div class="info-row">
+        <span class="info-label">Started</span>
+        <span class="info-value">${new Date(s.started_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+      </div>` : ''}
+    `;
+  }
+
+  // ============================================================
+  // CONVERSATION HISTORY
+  // ============================================================
+  async function loadConversationHistory(daysFilter) {
+    const container = document.getElementById('conversation-timeline');
+    const countEl   = document.getElementById('conv-count');
+
+    // Preserve scroll position so the page doesn't jump on reload
+    const scrollY = window.scrollY;
+
+    container.innerHTML = '<div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+    try {
+      let startDate;
+      if (daysFilter === 'all') {
+        startDate = new Date('2000-01-01');
+      } else {
+        startDate = new Date(Date.now() - parseInt(daysFilter) * 24 * 60 * 60 * 1000);
+      }
+
+      const { data: messages } = await supabaseClient
+        .from('message_log').select('*')
+        .eq('user_id', currentStudent.user_id)
+        .in('message_type', ['prompt','student_response'])
+        .gte('created_at', startDate.toISOString())
+        .order('created_at', { ascending: true });
+
+      const { data: feedback } = await supabaseClient
+        .from('feedback_log').select('*')
+        .eq('student_id', currentStudent.id)
+        .gte('sent_at', startDate.toISOString())
+        .order('sent_at', { ascending: true });
+
+      const all = [
+        ...(messages || []).map(m => ({ ...m, _type: 'message' })),
+        ...(feedback  || []).map(f => ({ ...f, _type: 'feedback', created_at: f.sent_at }))
+      ].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+
+      if (countEl) countEl.textContent = `${all.length} messages`;
+
+      if (all.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-comment-slash"></i><p>No messages in this time range.</p></div>';
+        return;
+      }
+
+      // Group by date
+      const byDate = {};
+      all.forEach(m => {
+        const d = new Date(m.created_at).toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+        if (!byDate[d]) byDate[d] = [];
+        byDate[d].push(m);
+      });
+
+      let html = '';
+      const sName = escapeHtml(currentStudent.given_name_romaji || currentStudent.name);
+
+      Object.entries(byDate).forEach(([date, msgs]) => {
+        html += `<div style="margin-bottom:2rem;">
+          <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+            <div style="flex:1; height:1px; background:var(--color-border);"></div>
+            <span style="font-size:0.8rem; color:var(--color-text-light); white-space:nowrap; font-weight:600;">${escapeHtml(date)}</span>
+            <div style="flex:1; height:1px; background:var(--color-border);"></div>
+          </div>`;
+
+        msgs.forEach(msg => {
+          const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+
+          if (msg._type === 'message' && msg.message_type === 'prompt') {
+            html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:#eef7ff; border-left:3px solid #4A90E2; border-radius:0 6px 6px 0; font-size:0.88rem; overflow:hidden; word-break:break-word;">
+              <div style="font-size:0.75rem; color:#666; margin-bottom:0.3rem;">${time} · 🤖 Daily Prompt</div>
+              <p style="margin:0; color:#333;">"${escapeHtml(msg.message_text || '')}"</p>
+            </div>`;
+          } else if (msg._type === 'message' && msg.message_type === 'student_response') {
+            html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:white; border:1px solid #e8e8e8; border-radius:6px; font-size:0.88rem; overflow:hidden; word-break:break-word;">
+              <div style="font-size:0.75rem; color:#666; margin-bottom:0.3rem;">${time} · 👤 ${sName}</div>`;
+            if (msg.message_text) html += `<p style="margin:0.25rem 0; color:#333;">"${escapeHtml(msg.message_text)}"</p>`;
+            if (msg.media_type === 'audio') html += `<audio controls style="width:100%; max-width:340px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}">Audio not supported.</audio>`;
+            if (msg.media_type === 'video') html += `<video controls style="width:100%; max-width:340px; border-radius:4px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}">Video not supported.</video>`;
+            if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}" style="max-width:100%; max-height:240px; border-radius:4px; margin-top:0.35rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
+            html += `</div>`;
+          } else if (msg._type === 'feedback') {
+            // Detect voice messages — stored as "[Voice message] https://..."
+            const isVoice   = msg.feedback_text && msg.feedback_text.startsWith('[Voice message]');
+            const audioUrl  = isVoice ? msg.feedback_text.replace('[Voice message] ', '').trim() : null;
+            html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:#f0fff4; border-left:3px solid #4caf50; border-radius:0 6px 6px 0; font-size:0.88rem; overflow:hidden; word-break:break-word;">
+              <div style="font-size:0.75rem; color:#666; margin-bottom:0.4rem;">${time} · 👨‍🏫 Teacher Feedback</div>
+              ${isVoice
+                ? `<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                     <span style="font-size:0.8rem;color:#666;">🎙 Voice message</span>
+                     <audio controls style="height:36px; max-width:100%; border-radius:4px;">
+                       <source src="${escapeHtml(audioUrl)}">
+                     </audio>
+                   </div>`
+                : `<p style="margin:0; color:#333; white-space:pre-wrap;">${escapeHtml(msg.feedback_text)}</p>`
+              }
+            </div>`;
+          }
+        });
+        html += `</div>`;
+      });
+      
+      container.innerHTML = html;
+
+      // Restore scroll position — prevents page jumping to top on reload
+      window.scrollTo({ top: scrollY, behavior: 'instant' });
+
+    } catch(err) {
+      console.error('loadConversationHistory:', err);
+      container.innerHTML = '<p style="color:red;">Error loading conversation.</p>';
+    }
+  }
+
+  function changeConvFilter(btn, filter) {
+    document.querySelectorAll('.conv-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentConvFilter = filter;
+    loadConversationHistory(filter);
+  }
+
+  // ============================================================
+  // ASSESSMENT HISTORY
+  // ============================================================
+  async function loadAssessmentHistory() {
+    const container = document.getElementById('assessment-history');
+    try {
+      const { data: assessments } = await supabaseClient
+        .from('student_assessments').select('*')
+        .eq('student_id', currentStudent.id)
+        .order('assessed_at', { ascending: false }).limit(5);
+
+      if (!assessments || assessments.length === 0) {
+        container.innerHTML = '<p style="font-size:0.85rem; color:var(--color-text-light); text-align:center; padding:0.5rem;">No assessments yet.</p>';
+        return;
+      }
+
+      container.innerHTML = assessments.map(a => {
+        const date  = new Date(a.assessed_at || a.created_at).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+        const total = (a.fluency||0) + (a.grammar||0) + (a.comprehension||0) + (a.vocabulary||0) + (a.pronunciation||0);
+        return `
+          <div class="assessment-entry">
+            <div class="assessment-date">${date} <span style="font-weight:400; color:var(--color-text-light);">· ${total}/50</span></div>
+            <div class="assessment-scores">
+              <span class="score-chip">🌊 <strong>${a.fluency || 0}</strong></span>
+              <span class="score-chip">📐 <strong>${a.grammar || 0}</strong></span>
+              <span class="score-chip">🧠 <strong>${a.comprehension || 0}</strong></span>
+              <span class="score-chip">💬 <strong>${a.vocabulary || 0}</strong></span>
+              <span class="score-chip">🎤 <strong>${a.pronunciation || 0}</strong></span>
+            </div>
+            ${a.teacher_notes ? `<p style="font-size:0.78rem; color:var(--color-text-light); margin:0.4rem 0 0; font-style:italic;">"${escapeHtml(a.teacher_notes)}"</p>` : ''}
+          </div>
+        `;
+      }).join('');
+    } catch(err) {
+      console.error('loadAssessmentHistory:', err);
+      container.innerHTML = '<p style="color:red; font-size:0.85rem;">Error loading assessments.</p>';
+    }
+  }
+
+  // ============================================================
+  // COMPOSER
+  // ============================================================
+  function setComposerTab(tabName) {
+    document.querySelectorAll('.composer-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.composer-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+    document.getElementById(`panel-${tabName}`).classList.add('active');
+  }
+
+  function scrollToComposer() {
+    document.getElementById('composer-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function applyTpl(chip, panel, tplKey) {
+    // Mark chip active
+    chip.closest('.tpl-grid').querySelectorAll('.tpl-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    const ta = document.getElementById(`compose-${panel}`);
+    ta.value = feedbackTemplates[tplKey] || '';
+  }
+
+  function clearCompose(panel) {
+    document.getElementById(`compose-${panel}`).value = '';
+  }
+
+  // ============================================================
+  // STUDIO RECORDER — STUDENT DETAIL
+  // ============================================================
+  const detailRecState = {};
+  // State per panel: mediaRecorder, audioChunks, audioBlob, audioUrl,
+  //   mimeType, duration, timerInterval, timerSeconds,
+  //   audioCtx, analyser, animFrame, wavePoints[]
+
+  function srSetState(panel, state) {
+    const dot      = document.getElementById(`sr-dot-${panel}`);
+    const label    = document.getElementById(`sr-label-${panel}`);
+    const timer    = document.getElementById(`sr-timer-${panel}`);
+    const centerD  = document.getElementById(`sr-center-${panel}`);
+    const iconD    = document.getElementById(`sr-center-icon-${panel}`);
+    const btnLabel = document.getElementById(`sr-btn-label-${panel}`);
+    if (!dot) return;
+
+    dot.className     = 'sr-rec-dot ' + (state === 'done' ? 'done' : state === 'recording' ? 'recording' : 'armed');
+    label.textContent = state === 'recording' ? 'REC' : state === 'done' ? 'READY TO SEND' : 'READY';
+    label.className   = 'sr-label ' + (state === 'done' ? 'done' : state === 'recording' ? 'recording' : 'armed');
+    timer.className   = 'sr-timer ' + (state === 'recording' ? 'recording' : state === 'done' ? 'done' : '');
+    if (centerD)   centerD.className    = 'sr-btn sr-btn-record' + (state === 'recording' ? ' recording' : '');
+    if (iconD)     iconD.className      = state === 'recording' ? 'fas fa-stop' : state === 'done' ? 'fas fa-play' : 'fas fa-microphone';
+    if (btnLabel)  btnLabel.textContent = state === 'recording' ? 'STOP' : state === 'done' ? 'PLAY' : 'REC';
+    const prog = document.getElementById(`sr-progress-${panel}`);
+    if (prog) prog.style.display = state === 'done' ? 'block' : 'none';
+  }
+
+  function srFormatTime(seconds) {
+    const m = Math.floor(seconds / 60).toString().padStart(2,'0');
+    const s = (seconds % 60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  function srDrawWaveform(panel, points, isLive) {
+    const canvas = document.getElementById(`sr-wave-${panel}`);
+    if (!canvas) return;
+    const W = canvas.offsetWidth || 400;
+    canvas.width = W;
+    const ctx    = canvas.getContext('2d');
+    const H      = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    if (points.length === 0) {
+      // Draw flat idle line
+      ctx.strokeStyle = '#1e1e1e';
+      ctx.lineWidth   = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, H / 2);
+      ctx.lineTo(W, H / 2);
+      ctx.stroke();
+      return;
+    }
+
+    const step = W / Math.max(points.length, 1);
+    const mid  = H / 2;
+    ctx.lineWidth = 1.5;
+
+    if (isLive) {
+      // Green gradient for live recording
+      const grad = ctx.createLinearGradient(0, 0, W, 0);
+      grad.addColorStop(0,   '#004d1a');
+      grad.addColorStop(0.5, '#00ff6a');
+      grad.addColorStop(1,   '#aaff44');
+      ctx.strokeStyle = grad;
+    } else {
+      // Blue for playback mode
+      ctx.strokeStyle = '#2266aa';
+    }
+
+    ctx.beginPath();
+    points.forEach((v, i) => {
+      const x = i * step;
+      const y = mid - (v * mid * 0.85);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    // Mirror bottom half
+    for (let i = points.length - 1; i >= 0; i--) {
+      const x = i * step;
+      const y = mid + (points[i] * mid * 0.85);
+      ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = isLive ? 'rgba(0,255,106,0.08)' : 'rgba(34,102,170,0.08)';
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  function srAnimateLive(panel) {
+    const rs = detailRecState[panel];
+    if (!rs?.analyser) return;
+
+    const data = new Uint8Array(rs.analyser.frequencyBinCount);
+    rs.analyser.getByteTimeDomainData(data);
+
+    // VU meter from frequency data
+    rs.analyser.getByteFrequencyData(data);
+    const avg = data.reduce((a,b) => a+b, 0) / data.length;
+    const pct = Math.min(avg / 128 * 100, 100);
+    const vu  = document.getElementById(`sr-vu-${panel}`);
+    const peak = document.getElementById(`sr-peak-${panel}`);
+    const vuVal = document.getElementById(`sr-vu-val-${panel}`);
+    if (vu)  { vu.style.width = pct + '%'; }
+    if (peak && pct > 0) {
+      peak.style.left  = pct + '%';
+      peak.classList.add('show');
+    }
+    if (vuVal) {
+      const db = pct > 0 ? (20 * Math.log10(pct / 100)).toFixed(1) : '–∞';
+      vuVal.textContent = db;
+    }
+
+    // Waveform points — push normalised amplitude
+    rs.analyser.getByteTimeDomainData(data);
+    const amplitude = Math.max(...Array.from(data).map(v => Math.abs(v - 128))) / 128;
+    rs.wavePoints.push(amplitude);
+    if (rs.wavePoints.length > 120) rs.wavePoints.shift();
+    srDrawWaveform(panel, rs.wavePoints, true);
+
+    rs.animFrame = requestAnimationFrame(() => srAnimateLive(panel));
+  }
+
+  function setDetailReplyMode(panel, mode) {
+    document.getElementById(`detail-text-panel-${panel}`).style.display  = mode === 'text'  ? 'block' : 'none';
+    document.getElementById(`detail-voice-panel-${panel}`).style.display = mode === 'voice' ? 'block' : 'none';
+    document.getElementById(`pill-text-${panel}`).classList.toggle('active',  mode === 'text');
+    document.getElementById(`pill-voice-${panel}`).classList.toggle('active', mode === 'voice');
+    if (mode === 'voice') {
+      srSetState(panel, 'ready');
+      // Canvas needs to be visible before we can read offsetWidth
+      requestAnimationFrame(() => srDrawWaveform(panel, [], true));
+    }
+  }
+
+  async function toggleDetailRecording(panel) {
+    if (!detailRecState[panel]) {
+      detailRecState[panel] = { mediaRecorder:null, audioChunks:[], audioBlob:null, audioUrl:null, mimeType:'', duration:0, timerInterval:null, timerSeconds:0, audioCtx:null, analyser:null, animFrame:null, wavePoints:[], playbackEl:null };
+    }
+    const rs = detailRecState[panel];
+
+    if (rs.audioBlob) {
+      // Done state — center button toggles playback
+      const audio = document.getElementById(`detail-rec-audio-${panel}`);
+      if (audio.paused) { audio.play(); } else { audio.pause(); }
+      return;
+    }
+
+    if (rs.mediaRecorder && rs.mediaRecorder.state === 'recording') {
+      rs.mediaRecorder.stop();
+    } else {
+      await startDetailRecording(panel);
+    }
+  }
+
+  async function startDetailRecording(panel) {
+    const rs = detailRecState[panel];
+    rs.audioChunks = []; rs.audioBlob = null; rs.audioUrl = null; rs.wavePoints = [];
+    srSetState(panel, 'recording');
+    srDrawWaveform(panel, [], true);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // Web Audio API for live visualisation
+      rs.audioCtx  = new (window.AudioContext || window.webkitAudioContext)();
+      rs.analyser  = rs.audioCtx.createAnalyser();
+      rs.analyser.fftSize = 256;
+      rs.audioCtx.createMediaStreamSource(stream).connect(rs.analyser);
+
+      const preferredTypes = ['audio/mp4','audio/aac','audio/webm;codecs=opus','audio/webm','audio/ogg'];
+      rs.mimeType = preferredTypes.find(t => MediaRecorder.isTypeSupported(t)) || '';
+      rs.mediaRecorder = new MediaRecorder(stream, rs.mimeType ? { mimeType: rs.mimeType } : {});
+      rs.mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) rs.audioChunks.push(e.data); };
+
+      rs.mediaRecorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        cancelAnimationFrame(rs.animFrame);
+        rs.audioCtx?.close();
+        clearInterval(rs.timerInterval);
+        rs.duration = rs.timerSeconds * 1000;
+
+        const actualMime = rs.mediaRecorder.mimeType || rs.mimeType || 'audio/webm';
+        rs.audioBlob = new Blob(rs.audioChunks, { type: actualMime });
+
+        // Show waveform frozen in blue
+        srDrawWaveform(panel, rs.wavePoints, false);
+
+        // Wire up audio element for playback
+        const audio = document.getElementById(`detail-rec-audio-${panel}`);
+        audio.src = URL.createObjectURL(rs.audioBlob);
+        audio.ontimeupdate = () => {
+          const fill = document.getElementById(`sr-progress-fill-${panel}`);
+          if (fill && audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+        };
+        audio.onended = () => {
+          const icon = document.getElementById(`sr-center-icon-${panel}`);
+          if (icon) icon.className = 'fas fa-play';
+        };
+        audio.onplay = () => {
+          const icon = document.getElementById(`sr-center-icon-${panel}`);
+          if (icon) icon.className = 'fas fa-pause';
+        };
+
+        // Format badge
+        const isM4A = actualMime.includes('mp4') || actualMime.includes('aac');
+        const badge = document.getElementById(`sr-format-${panel}`);
+        if (badge) {
+          badge.textContent = isM4A ? 'M4A · LINE ✓' : 'WEBM · LINK';
+          badge.className   = 'sr-format-badge ' + (isM4A ? 'm4a' : 'webm');
+        }
+
+        // Reset VU meter
+        const vu = document.getElementById(`sr-vu-${panel}`);
+        if (vu) vu.style.width = '0%';
+        const vuVal = document.getElementById(`sr-vu-val-${panel}`);
+        if (vuVal) vuVal.textContent = '–∞';
+
+        srSetState(panel, 'done');
+        document.getElementById(`sr-timer-${panel}`).textContent = srFormatTime(rs.timerSeconds);
+      };
+
+      rs.mediaRecorder.start(100);
+      rs.timerSeconds = 0;
+      srAnimateLive(panel);
+
+      rs.timerInterval = setInterval(() => {
+        rs.timerSeconds++;
+        document.getElementById(`sr-timer-${panel}`).textContent = srFormatTime(rs.timerSeconds);
+        if (rs.timerSeconds >= 120) rs.mediaRecorder.stop();
+      }, 1000);
+
+    } catch(err) {
+      srSetState(panel, 'ready');
+      if (err.name === 'NotAllowedError') {
+        alert('Microphone access denied. Please allow microphone access in your browser settings.');
+      } else {
+        alert('Could not start recording: ' + err.message);
+      }
+    }
+  }
+
+  function discardDetailRecording(panel) {
+    const rs = detailRecState[panel];
+    if (!rs) return;
+    cancelAnimationFrame(rs.animFrame);
+    rs.audioCtx?.close();
+    clearInterval(rs.timerInterval);
+    rs.audioBlob = null; rs.audioUrl = null; rs.audioChunks = [];
+    rs.timerSeconds = 0; rs.wavePoints = [];
+    const audio = document.getElementById(`detail-rec-audio-${panel}`);
+    if (audio) { audio.pause(); audio.src = ''; }
+    const badge = document.getElementById(`sr-format-${panel}`);
+    if (badge) { badge.textContent = ''; badge.className = 'sr-format-badge'; }
+    const vu = document.getElementById(`sr-vu-${panel}`);
+    if (vu) vu.style.width = '0%';
+    srSetState(panel, 'ready');
+    srDrawWaveform(panel, [], true);
+    document.getElementById(`sr-timer-${panel}`).textContent = '00:00';
+  }
+
+  function srWheelAction(panel, action) {
+    const rs    = detailRecState[panel];
+    const audio = document.getElementById(`detail-rec-audio-${panel}`);
+    if (action === 'rerecord' || action === 'trash') {
+      if (rs?.mediaRecorder?.state === 'recording') {
+        rs.mediaRecorder.stop();
+        setTimeout(() => discardDetailRecording(panel), 150);
+      } else {
+        discardDetailRecording(panel);
+      }
+    } else if (action === 'send') {
+      if (!rs?.audioBlob) { alert('Record something first!'); return; }
+      sendComposerMessage(panel);
+    }
+  }
+
+  async function uploadDetailAudio(panel) {
+    const rs  = detailRecState[panel];
+    if (!rs?.audioBlob) return null;
+    const ext      = rs.audioBlob.type.includes('mp4') || rs.audioBlob.type.includes('aac') ? 'm4a' : 'webm';
+    const filename = `teacher-audio/${currentTeacher.id}/${Date.now()}.${ext}`;
+    const { error } = await supabaseClient.storage
+      .from('teacher-feedback-audio')
+      .upload(filename, rs.audioBlob, { contentType: rs.audioBlob.type, upsert: false });
+    if (error) throw new Error('Upload failed: ' + error.message);
+    const { data: urlData } = supabaseClient.storage.from('teacher-feedback-audio').getPublicUrl(filename);
+    return { url: urlData.publicUrl, duration: rs.duration, isM4A: ext === 'm4a' };
+  }
+
+  // ============================================================
+  // SEND FUNCTIONS
+  // ============================================================
+  async function sendAdHocMessage() {
+    await sendComposerMessage('adhoc');
+  }
+
+  async function sendComposerMessage(panel) {
+    const sendBtn = document.getElementById(`send-${panel}-btn`);
+    if (!currentStudent.line_id) { alert('This student has no LINE ID connected.'); return; }
+
+    // Check if voice mode is active for panels that support it
+    const voicePanels    = ['adhoc', 'day6'];
+    const isVoiceCapable = voicePanels.includes(panel);
+    const voicePillActive = isVoiceCapable && document.getElementById(`pill-voice-${panel}`)?.classList.contains('active');
+    const rs = detailRecState[panel];
+    const isVoiceMode = voicePillActive && rs?.audioBlob;
+
+    // Validate
+    if (isVoiceMode) {
+      if (!confirm('Send this voice message to the student via LINE?')) return;
+    } else {
+      const text = document.getElementById(`compose-${panel}`)?.value.trim();
+      if (!text) { alert('Please write a message first.'); return; }
+      if (!confirm('Send this message to the student via LINE?')) return;
+    }
+
+    const orig = sendBtn.innerHTML;
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+    try {
+      let body;
+
+      if (isVoiceMode) {
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading audio...';
+        const upload = await uploadDetailAudio(panel);
+
+        if (upload.isM4A) {
+          body = { studentId: currentStudent.id, teacherId: currentTeacher.id, audioUrl: upload.url, audioDuration: upload.duration };
+        } else {
+          body = { studentId: currentStudent.id, teacherId: currentTeacher.id, feedbackText: `🎙 Voice message from your teacher:\n${upload.url}\n\n(Tap the link to listen)` };
+        }
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+      } else {
+        body = { studentId: currentStudent.id, teacherId: currentTeacher.id, feedbackText: document.getElementById(`compose-${panel}`).value.trim() };
+      }
+
+      const response = await fetch(
+        'https://luyzyzefgintksydmwoh.supabase.co/functions/v1/send-teacher-feedback',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
+          },
+          body: JSON.stringify(body)
+        }
+      );
+      if (!response.ok) throw new Error('Failed to send message');
+
+      const flash = document.getElementById(`flash-${panel}`);
+      if (flash) { flash.classList.add('show'); setTimeout(() => flash.classList.remove('show'), 3000); }
+
+      // Reset voice state and switch back to text mode
+      if (isVoiceMode) {
+        discardDetailRecording(panel);
+        setDetailReplyMode(panel, 'text');
+      }
+
+      await loadConversationHistory(currentConvFilter);
+
+    } catch(err) {
+      console.error('sendComposerMessage:', err);
+      alert('Error sending message: ' + err.message);
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = orig;
+    }
+  }
+
+  function openAssessmentFromDetail() {
+    document.getElementById('assessment-modal').style.display = 'block';
+  }
+  function closeDetailAssessment() {
+    document.getElementById('assessment-modal').style.display = 'none';
+  }
+
+  function parsePurpose(s) {
+    // Try learning_purpose first (flat string)
+    if (s.learning_purpose) return s.learning_purpose;
+    // goals is stored as JSON string: '{"purpose": "Hobby"}'
+    if (s.goals) {
+      try {
+        const parsed = typeof s.goals === 'string' ? JSON.parse(s.goals) : s.goals;
+        return parsed.purpose || JSON.stringify(parsed);
+      } catch(e) {
+        return s.goals;  // Fall back to raw value if not valid JSON
+      }
+    }
+    return 'Not set';
+  }
+
+  function formatPlanName(p) {
+    const m = { line:'LINE Practice', power_pro:'Power Pro', power_lite:'Power Lite', video:'Video Lessons' };
+    return m[p] || p;
+  }
+
+
+  // ============================================================
+  // DATA VISUALIZATION
+  // ============================================================
+  let vizDataCache = null;
+
+  async function loadVizData() {
+    if (vizDataCache) return vizDataCache;
+
+    const s = currentStudent;
+
+    // Fetch all responses (no limit — full history)
+    const { data: responses } = await supabaseClient
+      .from('message_log')
+      .select('id, created_at, media_type, message_type, prompt_id')
+      .eq('user_id', s.user_id)
+      .eq('message_type', 'student_response')
+      .order('created_at', { ascending: true });
+
+    // Fetch all prompts sent (to calculate response rate)
+    const { data: prompts } = await supabaseClient
+      .from('message_log')
+      .select('id, created_at, prompt_id')
+      .eq('user_id', s.user_id)
+      .eq('message_type', 'prompt')
+      .order('created_at', { ascending: true });
+
+    // Fetch all assessments
+    const { data: assessments } = await supabaseClient
+      .from('student_assessments')
+      .select('*')
+      .eq('student_id', s.id)
+      .order('assessed_at', { ascending: true });
+
+    vizDataCache = { responses: responses || [], prompts: prompts || [], assessments: assessments || [] };
+    return vizDataCache;
+  }
+
+  function switchVizTab(tab) {
+    ['rate','streak','skills','types'].forEach(t => {
+      document.getElementById(`viz-tab-${t}`).classList.toggle('active', t === tab);
+      document.getElementById(`viz-${t}`).style.display = t === tab ? 'block' : 'none';
+    });
+    renderVizTab(tab);
+  }
+
+  async function renderVizTab(tab) {
+    const data = await loadVizData();
+    if (tab === 'rate')   renderResponseRate(data);
+    if (tab === 'streak') renderStreakCalendar(data);
+    if (tab === 'skills') renderSkillGrowth(data);
+    if (tab === 'types')  renderResponseTypes(data);
+  }
+
+  async function initViz() {
+    const data = await loadVizData();
+    const total    = data.prompts.length;
+    const answered = data.responses.length;
+    const pct      = total > 0 ? Math.round((answered / total) * 100) : 0;
+    document.getElementById('dataviz-period').textContent =
+      `${answered}/${total} prompts answered (${pct}%)`;
+    renderResponseRate(data);  // Render first tab immediately
+  }
+
+  // ── 1. RESPONSE RATE BAR CHART ─────────────────────────────────────────
+  function renderResponseRate(data) {
+    const container = document.getElementById('chart-rate');
+    if (!container) return;
+
+    // Group prompts by ISO week (Mon–Sun), count how many had a response
+    const weekMap = {};  // 'YYYY-Www' → { sent: 0, answered: 0 }
+
+    for (const p of data.prompts) {
+      const wk = getISOWeekKey(new Date(p.created_at));
+      if (!weekMap[wk]) weekMap[wk] = { sent: 0, answered: 0, label: weekLabel(new Date(p.created_at)) };
+      weekMap[wk].sent++;
+    }
+
+    // Mark a week's responses — link by proximity (response within 7 days of prompt)
+    for (const r of data.responses) {
+      const rDate = new Date(r.created_at);
+      const wk    = getISOWeekKey(rDate);
+      if (weekMap[wk]) weekMap[wk].answered = Math.min(weekMap[wk].answered + 1, weekMap[wk].sent);
+    }
+
+    const weeks = Object.entries(weekMap).sort(([a],[b]) => a.localeCompare(b)).slice(-12);
+    if (weeks.length === 0) { container.innerHTML = '<p style="color:#999; font-size:0.85rem;">No data yet.</p>'; return; }
+
+    const maxSent = Math.max(...weeks.map(([,w]) => w.sent), 1);
+
+    const bars = weeks.map(([key, w]) => {
+      const pct = w.sent > 0 ? Math.round((w.answered / w.sent) * 100) : 0;
+      const barH = Math.round((w.answered / maxSent) * 100);
+      const color = pct >= 80 ? '#4caf50' : pct >= 50 ? '#ff9800' : '#f44336';
+      return `
+        <div class="bar-col">
+          <div class="bar-rect" style="height:${barH}px; background:${color};" data-tip="${w.answered}/${w.sent} · ${pct}%"></div>
+          <div class="bar-label">${w.label}</div>
+        </div>`;
+    }).join('');
+
+    container.innerHTML = `<div class="bar-chart">${bars}</div>
+      <div style="display:flex;gap:1rem;margin-top:0.5rem;font-size:0.75rem;color:var(--color-text-light);">
+        <span style="color:#4caf50;">■</span> ≥80% &nbsp;
+        <span style="color:#ff9800;">■</span> 50–79% &nbsp;
+        <span style="color:#f44336;">■</span> &lt;50%
+      </div>`;
+  }
+
+  // ── 2. STREAK CALENDAR ─────────────────────────────────────────────────
+  function renderStreakCalendar(data) {
+    const container = document.getElementById('chart-streak');
+    if (!container) return;
+
+    // Build a date → count map from responses
+    const dateMap = {};
+    for (const r of data.responses) {
+      const d = new Date(r.created_at).toISOString().slice(0, 10);
+      dateMap[d] = (dateMap[d] || 0) + 1;
+    }
+
+    // Build 12 weeks back from today, Mon–Sun columns
+    const today     = new Date(); today.setHours(0,0,0,0);
+    const monday    = new Date(today);
+    monday.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
+
+    const weeks = [];
+    for (let w = 11; w >= 0; w--) {
+      const weekDays = [];
+      for (let d = 0; d < 7; d++) {
+        const day = new Date(monday);
+        day.setDate(monday.getDate() - w * 7 + d);
+        const key   = day.toISOString().slice(0, 10);
+        const count = dateMap[key] || 0;
+        const isFuture = day > today;
+        weekDays.push({ key, count, day, isFuture });
+      }
+      weeks.push(weekDays);
+    }
+
+    // Color scale
+    function cellColor(count, isFuture) {
+      if (isFuture) return '#f9f9f9';
+      if (count === 0) return '#eee';
+      if (count === 1) return '#c6e48b';
+      if (count === 2) return '#40c463';
+      return '#216e39';
+    }
+
+    // Month labels
+    const monthLabels = weeks.map(week => {
+      const firstDay = week[0].day;
+      if (firstDay.getDate() <= 7) {
+        return firstDay.toLocaleDateString('en-US', { month: 'short' });
+      }
+      return '';
+    });
+
+    const labelRow = `<div class="streak-month-labels">
+      ${monthLabels.map(l => `<div class="streak-month-label" style="width:14px; margin-right:3px;">${l}</div>`).join('')}
+    </div>`;
+
+    const grid = weeks.map(week =>
+      `<div class="streak-week">
+        ${week.map(d => `<div class="streak-cell"
+          style="background:${cellColor(d.count, d.isFuture)};"
+          data-tip="${d.key}${d.count > 0 ? ' · '+d.count+' response'+(d.count>1?'s':'') : ' · No response'}">
+        </div>`).join('')}
+      </div>`
+    ).join('');
+
+    container.innerHTML = labelRow + `<div class="streak-grid">${grid}</div>`;
+  }
+
+  // ── 3. SKILL GROWTH LINE CHART ─────────────────────────────────────────
+  function renderSkillGrowth(data) {
+    const container = document.getElementById('chart-skills');
+    const legend    = document.getElementById('chart-skills-legend');
+    if (!container) return;
+
+    if (data.assessments.length === 0) {
+      container.innerHTML = '<p style="color:#999; font-size:0.85rem;">No assessments recorded yet.</p>';
+      if (legend) legend.innerHTML = '';
+      return;
+    }
+
+    const skills = [
+      { key:'fluency',       label:'Fluency',       color:'#4A90E2' },
+      { key:'grammar',       label:'Grammar',       color:'#7b2d8b' },
+      { key:'comprehension', label:'Comprehension', color:'#2e7d32' },
+      { key:'vocabulary',    label:'Vocabulary',    color:'#e65100' },
+      { key:'pronunciation', label:'Pronunciation', color:'#c62828' },
+    ];
+
+    const W = 480, H = 140, PAD = { top:10, right:10, bottom:30, left:24 };
+    const innerW = W - PAD.left - PAD.right;
+    const innerH = H - PAD.top  - PAD.bottom;
+    const pts    = data.assessments;
+    const n      = pts.length;
+
+    function xPos(i)     { return PAD.left + (n === 1 ? innerW / 2 : (i / (n - 1)) * innerW); }
+    function yPos(score) { return PAD.top  + innerH - (score / 10) * innerH; }
+
+    // Grid lines at 0, 5, 10
+    let svgLines = [0, 5, 10].map(v => {
+      const y = yPos(v);
+      return `<line x1="${PAD.left}" y1="${y}" x2="${W-PAD.right}" y2="${y}" stroke="#eee" stroke-width="1"/>
+              <text x="${PAD.left - 4}" y="${y+4}" font-size="9" fill="#999" text-anchor="end">${v}</text>`;
+    }).join('');
+
+    // X-axis date labels
+    const dateLabels = pts.map((a, i) => {
+      const d   = new Date(a.assessed_at || a.created_at);
+      const lbl = d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+      return `<text x="${xPos(i)}" y="${H - 4}" font-size="9" fill="#999" text-anchor="middle">${lbl}</text>`;
+    }).join('');
+
+    // Lines + dots per skill
+    let svgSkills = '';
+    skills.forEach(sk => {
+      const values = pts.map(a => a[sk.key] ?? null);
+      // Polyline
+      const validPts = values.map((v,i) => v !== null ? `${xPos(i)},${yPos(v)}` : null).filter(Boolean);
+      if (validPts.length > 1) {
+        svgSkills += `<polyline points="${validPts.join(' ')}" fill="none" stroke="${sk.color}" stroke-width="2" stroke-linejoin="round"/>`;
+      }
+      // Dots
+      values.forEach((v,i) => {
+        if (v !== null) {
+          svgSkills += `<circle cx="${xPos(i)}" cy="${yPos(v)}" r="4" fill="${sk.color}" stroke="white" stroke-width="1.5">
+            <title>${sk.label}: ${v}/10</title></circle>`;
+        }
+      });
+    });
+
+    container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="skill-chart-svg" style="width:100%; max-width:${W}px; height:auto;">
+      ${svgLines}${svgSkills}${dateLabels}
+    </svg>`;
+
+    if (legend) {
+      legend.innerHTML = skills.map(sk =>
+        `<span style="display:flex;align-items:center;gap:4px;">
+          <span style="width:14px;height:3px;background:${sk.color};display:inline-block;border-radius:2px;"></span>
+          ${sk.label}
+        </span>`
+      ).join('');
+    }
+  }
+
+  // ── 4. RESPONSE TYPES DONUT ────────────────────────────────────────────
+  function renderResponseTypes(data) {
+    const canvas  = document.getElementById('chart-types');
+    const legend  = document.getElementById('chart-types-legend');
+    if (!canvas) return;
+
+    const counts = { Text: 0, Audio: 0, Video: 0, Image: 0, Skipped: 0 };
+    for (const r of data.responses) {
+      const t = r.media_type || 'text';
+      if (t === 'audio')  counts.Audio++;
+      else if (t === 'video')  counts.Video++;
+      else if (t === 'image')  counts.Image++;
+      else counts.Text++;
+    }
+
+    // Skipped = prompts with no matching response within 7 days
+    const respondedDates = new Set(data.responses.map(r => new Date(r.created_at).toISOString().slice(0,10)));
+    for (const p of data.prompts) {
+      const pDate    = new Date(p.created_at);
+      const sevenLater = new Date(pDate.getTime() + 7 * 86400000);
+      if (sevenLater < new Date()) {  // Only count as skipped if window has passed
+        const hasResponse = data.responses.some(r => {
+          const rDate = new Date(r.created_at);
+          return rDate >= pDate && rDate <= sevenLater;
+        });
+        if (!hasResponse) counts.Skipped++;
+      }
+    }
+
+    const colors = { Text:'#4A90E2', Audio:'#7b2d8b', Video:'#2e7d32', Image:'#e65100', Skipped:'#e0e0e0' };
+    const total  = Object.values(counts).reduce((a,b) => a+b, 0);
+    if (total === 0) { canvas.style.display = 'none'; if (legend) legend.innerHTML = '<p style="color:#999; font-size:0.85rem;">No data yet.</p>'; return; }
+
+    // Draw donut
+    const ctx = canvas.getContext('2d');
+    const cx  = 80, cy = 80, ro = 70, ri = 42;
+    let angle = -Math.PI / 2;
+
+    ctx.clearRect(0, 0, 160, 160);
+    for (const [label, count] of Object.entries(counts)) {
+      if (count === 0) continue;
+      const slice = (count / total) * 2 * Math.PI;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, ro, angle, angle + slice);
+      ctx.closePath();
+      ctx.fillStyle = colors[label];
+      ctx.fill();
+      angle += slice;
+    }
+    // Inner circle cutout
+    ctx.beginPath();
+    ctx.arc(cx, cy, ri, 0, 2 * Math.PI);
+    ctx.fillStyle = 'white';
+    ctx.fill();
+    // Center text
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(total, cx, cy + 4);
+    ctx.font = '10px sans-serif';
+    ctx.fillStyle = '#999';
+    ctx.fillText('total', cx, cy + 16);
+
+    if (legend) {
+      legend.innerHTML = Object.entries(counts)
+        .filter(([,c]) => c > 0)
+        .map(([label, count]) => {
+          const pct = Math.round((count / total) * 100);
+          return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+            <div style="width:12px;height:12px;border-radius:3px;background:${colors[label]};flex-shrink:0;"></div>
+            <span>${label}</span>
+            <span style="margin-left:auto;font-weight:700;color:var(--color-primary);">${count}</span>
+            <span style="color:var(--color-text-light);font-size:0.8rem;">${pct}%</span>
+          </div>`;
+        }).join('');
+    }
+  }
+
+  // ── HELPERS ────────────────────────────────────────────────────────────
+  function getISOWeekKey(date) {
+    const d = new Date(date);
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+    const yearStart = new Date(d.getFullYear(), 0, 1);
+    const wk = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+    return `${d.getFullYear()}-W${String(wk).padStart(2,'0')}`;
+  }
+
+  function weekLabel(date) {
+    return date.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+  }
+
+  // Start
+  init();
+  </script>
+</body>
+</html>
