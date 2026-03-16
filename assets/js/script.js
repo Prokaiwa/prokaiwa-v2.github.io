@@ -318,11 +318,11 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
             if (loginLink) {
                 if (session) {
                     // User is logged in
-                    loginLink.href = 'dashboard.html';
+                    loginLink.href = '/dashboard.html';
                     loginLink.textContent = 'Dashboard';
                 } else {
                     // User is not logged in
-                    loginLink.href = 'login.html';
+                    loginLink.href = '/login.html';
                     loginLink.textContent = 'Log In';
                 }
                 // Reveal the link after decision is made
@@ -333,7 +333,7 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
             // On error, default to Log In and show it
             const loginLink = document.querySelector('#auth-nav-link');
             if (loginLink) {
-                loginLink.href = 'login.html';
+                loginLink.href = '/login.html';
                 loginLink.textContent = 'Log In';
                 loginLink.style.visibility = 'visible';
             }
