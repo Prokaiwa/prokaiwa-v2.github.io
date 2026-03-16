@@ -3765,7 +3765,7 @@ if (hasVideoAccess) {
 
         loadDashboard();
         
-        document.getElementById('year').textContent = new Date().getFullYear();
+        const yearEl = document.getElementById('year'); if (yearEl) yearEl.textContent = new Date().getFullYear();
         
         const burgerMenu = document.querySelector('.burger-menu');
         const mainNav = document.querySelector('.main-nav');
@@ -3779,7 +3779,7 @@ if (hasVideoAccess) {
         // BOOKING WIDGET - MODAL VERSION
         // =============================================
 
-        let bookingState = {
+        var bookingState = {
             selectedDate: null,
             selectedTime: null,
             selectedLessonType: 'standard',
