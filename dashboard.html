@@ -3743,12 +3743,15 @@ if (hasVideoAccess) {
             window.location.href = 'index.html';
         }
 
-        document.getElementById('logout-button-nav').addEventListener('click', (e) => {
+        const logoutNavBtn = document.getElementById('logout-button-nav');
+        if (logoutNavBtn) logoutNavBtn.addEventListener('click', (e) => {
             e.preventDefault();
             handleLogout();
         });
-        document.getElementById('ja-logout-btn').addEventListener('click', handleLogout);
-        document.getElementById('en-logout-btn').addEventListener('click', handleLogout);
+        const jaLogoutBtn = document.getElementById('ja-logout-btn');
+        if (jaLogoutBtn) jaLogoutBtn.addEventListener('click', handleLogout);
+        const enLogoutBtn = document.getElementById('en-logout-btn');
+        if (enLogoutBtn) enLogoutBtn.addEventListener('click', handleLogout);
 
         supabase.auth.onAuthStateChange((event, session) => {
             console.log('Auth state changed:', event);
