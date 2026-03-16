@@ -15,33 +15,12 @@
     <title>Prokaiwa | 利用規約 / Terms of Service</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Prokaiwa Terms of Service - English conversation lessons via LINE and video calls for Japanese learners.">
-    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-    <header class="site-header">
-        <div class="container">
-            <a href="index.html"><img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa Logo" class="logo" /></a>
-            <button class="burger-menu" aria-label="Toggle navigation">
-                <i class="fas fa-bars"></i>
-            </button>
-            <nav class="main-nav">
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                    <li><a href="login.html" id="auth-nav-link" style="visibility: hidden;">Log In</a></li>
-                    <li>
-                        <div class="nav-lang-toggle">
-                            <button data-lang="ja" aria-label="日本語に切り替え">日本語</button>
-                            <button data-lang="en" aria-label="Switch to English">English</button>
-                        </div>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <div id="nav-placeholder"></div>
 
     <main>
         <div class="container legal-page-container">
@@ -272,7 +251,7 @@
                 </ul>
 
                 <p style="margin-top: 2rem; padding: 1rem; background: var(--color-bg); border-radius: 8px; text-align: center;">
-                    <strong>特定商取引法に基づく表記については、<a href="commerce-disclosure.html" style="color: var(--color-primary);">特定商取引法に基づく表記</a>をご覧ください。</strong>
+                    <strong>特定商取引法に基づく表記については、<a href="/commerce-disclosure" style="color: var(--color-primary);">特定商取引法に基づく表記</a>をご覧ください。</strong>
                 </p>
             </section>
 
@@ -490,44 +469,15 @@
                 </ul>
 
                 <p style="margin-top: 2rem; padding: 1rem; background: var(--color-bg); border-radius: 8px; text-align: center;">
-                    <strong>For commerce disclosure information required by Japanese law, please see our <a href="commerce-disclosure.html" style="color: var(--color-primary);">Commerce Disclosure</a> page.</strong>
+                    <strong>For commerce disclosure information required by Japanese law, please see our <a href="/commerce-disclosure" style="color: var(--color-primary);">Commerce Disclosure</a> page.</strong>
                 </p>
             </section>
         </div>
     </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-column">
-                    <h3>Company</h3>
-                    <ul>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Legal</h3>
-                    <ul>
-                        <li><a href="commerce-disclosure.html">Commerce Disclosure</a></li>
-                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                        <li><a href="terms-of-service.html">Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Connect</h3>
-                    <div class="footer-social-icons">
-                        <a href="https://page.line.me/845irjbc" class="social-icon" target="_blank" aria-label="LINE"><i class="fab fa-line"></i></a>
-                        <a href="https://www.instagram.com/prokaiwa.english/" class="social-icon" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="https://x.com/ProkaiwaEnglish" class="social-icon" target="_blank" aria-label="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
-                    </div>
-                    <a href="mailto:prokaiwa.english@gmail.com" class="footer-email">prokaiwa.english@gmail.com</a>
-                </div>
-            </div>
-            <p>© <span id="year"></span> Prokaiwa. All rights reserved.</p>
-        </div>
-    </footer>
+    <div id="footer-placeholder"></div>
 
-    <script src="assets/js/script.js"></script>
+    <script src="/assets/js/components.js"></script>
+    <script src="/assets/js/script.js"></script>
 </body>
 </html>
