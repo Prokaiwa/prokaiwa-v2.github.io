@@ -15,7 +15,7 @@
   if (footerEl) { footerEl.outerHTML = footerHTML; }
 })();
 
-// Auth nav: show Dashboard or Log In depending on session
+// Auth nav: show Log Out on dashboard/account pages, Dashboard if logged in elsewhere, Log In if not
 (function() {
   import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm').then(({ createClient }) => {
     const supabase = createClient(
@@ -26,14 +26,26 @@
     supabase.auth.getSession().then(({ data: { session } }) => {
       const loginLink = document.querySelector('#auth-nav-link');
       if (loginLink) {
-        if (session) {
+        const isAuthPage = window.location.pathname.includes('dashboard') || 
+                           window.location.pathname.includes('account-settings');
+        if (session && isAuthPage) {
+          loginLink.textContent = 'Log Out';
+          loginLink.href = '#';
+          loginLink.style.visibility = 'visible';
+          loginLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = '/login.html';
+          });
+        } else if (session) {
           loginLink.href = '/dashboard.html';
           loginLink.textContent = 'Dashboard';
+          loginLink.style.visibility = 'visible';
         } else {
           loginLink.href = '/login.html';
           loginLink.textContent = 'Log In';
+          loginLink.style.visibility = 'visible';
         }
-        loginLink.style.visibility = 'visible';
       }
     });
   });
