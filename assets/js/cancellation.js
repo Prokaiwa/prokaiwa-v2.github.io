@@ -2,7 +2,7 @@
 // ENHANCED CANCELLATION RETENTION SYSTEM
 // =====================================================
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
 
 const supabase = createClient(
     'https://luyzyzefgintksydmwoh.supabase.co',
