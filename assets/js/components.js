@@ -14,3 +14,27 @@
   if (navEl)    { navEl.outerHTML = navHTML; }
   if (footerEl) { footerEl.outerHTML = footerHTML; }
 })();
+
+// Auth nav: show Dashboard or Log In depending on session
+(function() {
+  import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm').then(({ createClient }) => {
+    const supabase = createClient(
+      'https://luyzyzefgintksydmwoh.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg',
+      { auth: { persistSession: true, storageKey: 'prokaiwa-supabase-auth', storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: true } }
+    );
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const loginLink = document.querySelector('#auth-nav-link');
+      if (loginLink) {
+        if (session) {
+          loginLink.href = '/dashboard.html';
+          loginLink.textContent = 'Dashboard';
+        } else {
+          loginLink.href = '/login.html';
+          loginLink.textContent = 'Log In';
+        }
+        loginLink.style.visibility = 'visible';
+      }
+    });
+  });
+})();
