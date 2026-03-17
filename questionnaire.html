@@ -701,7 +701,8 @@ if (selectedPurpose === 'Other') {
 
                     if (error) {
                         setButtonLoading(submitBtn, false);
-                        showMessage(`${localMessages.saveError}${error.message}`);
+                        console.error('Questionnaire save error:', error.message);
+                        showMessage(localMessages.genericError);
                     } else {
                         const baseUrl = baseStripeLinks[selectedPlan];
                         
