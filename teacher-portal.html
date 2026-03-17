@@ -1099,7 +1099,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
     if (!session) { window.location.href = '/teacher-login.html'; return; }
 
     const { data: teacher, error } = await supabaseClient
-      .from('teachers').select('*')
+      .from('teachers').select('id, is_active, role, full_name')
       .eq('auth_user_id', session.user.id).single();
 
     if (error || !teacher || !teacher.is_active) {

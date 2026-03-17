@@ -3154,7 +3154,7 @@
                 debugLog('Fetching student_progress...');
                 const { data: progress, error } = await supabase
                     .from('student_progress')
-                    .select('*')
+                    .select('current_day, current_week, total_prompts_sent')
                     
                     .single();
                 

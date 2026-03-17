@@ -892,7 +892,7 @@ Keep it up! 🌟</textarea>
     if (!session) { window.location.href = '/teacher-login.html'; return; }
 
     const { data: teacher } = await supabaseClient
-      .from('teachers').select('*').eq('auth_user_id', session.user.id).single();
+      .from('teachers').select('id, is_active').eq('auth_user_id', session.user.id).single();
     if (!teacher || !teacher.is_active) { window.location.href = '/teacher-login.html'; return; }
     currentTeacher = teacher;
 
