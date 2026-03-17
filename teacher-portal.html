@@ -2143,7 +2143,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // AUTO-REFRESH
   // ============================================================
   checkAuth();
-  setInterval(() => { loadDayTypeQueue(); loadVideoLessons(); }, 5 * 60 * 1000);
+  const autoRefreshInterval = setInterval(() => { loadDayTypeQueue(); loadVideoLessons(); }, 5 * 60 * 1000);
 
   // ============================================================
   // ASSESSMENT MODAL
