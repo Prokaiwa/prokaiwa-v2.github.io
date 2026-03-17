@@ -332,7 +332,27 @@
             }
             return messages.genericError;
         }
-        
+
+        // --- Rate Limiter (5 attempts per 15 min window) ---
+        const rateLimiter = {
+            attempts: [],
+            maxAttempts: 5,
+            windowMs: 15 * 60 * 1000,
+            check() {
+                const now = Date.now();
+                this.attempts = this.attempts.filter(t => now - t < this.windowMs);
+                return this.attempts.length < this.maxAttempts;
+            },
+            record() {
+                this.attempts.push(Date.now());
+            },
+            getWaitMinutes() {
+                if (this.attempts.length === 0) return 0;
+                const oldest = this.attempts[0];
+                return Math.ceil((this.windowMs - (Date.now() - oldest)) / 60000);
+            }
+        };
+
         // --- Event Listeners ---
         // Tab switching
         document.querySelectorAll('.auth-tab-button').forEach(button => {
@@ -355,6 +375,16 @@
                 const email = document.getElementById(`${lang}-signup-email`).value.trim();
                 const password = document.getElementById(`${lang}-signup-password`).value;
                 
+                // Rate limit check
+                if (!rateLimiter.check()) {
+                    const mins = rateLimiter.getWaitMinutes();
+                    const msg = lang === 'ja'
+                        ? `試行回数が多すぎます。${mins}分後にもう一度お試しください。`
+                        : `Too many attempts. Please try again in ${mins} minutes.`;
+                    showMessage(msg);
+                    return;
+                }
+                
                 setButtonLoading(submitBtn, true);
                 
                 try {
@@ -373,6 +403,7 @@
                     
                     if (error) {
                         console.error('Signup error:', error);
+                        rateLimiter.record();
                         showMessage(getLocalizedError(error.message));
                     } else if (data.user) {
                         console.log('Signup successful, user:', data.user.id);
@@ -399,6 +430,16 @@
                 const email = document.getElementById(`${lang}-login-email`).value.trim();
                 const password = document.getElementById(`${lang}-login-password`).value;
                 
+                // Rate limit check
+                if (!rateLimiter.check()) {
+                    const mins = rateLimiter.getWaitMinutes();
+                    const msg = lang === 'ja'
+                        ? `試行回数が多すぎます。${mins}分後にもう一度お試しください。`
+                        : `Too many attempts. Please try again in ${mins} minutes.`;
+                    showMessage(msg);
+                    return;
+                }
+                
                 setButtonLoading(submitBtn, true);
                 
                 try {
@@ -411,6 +452,7 @@
                     
                     if (error) {
                         console.error('Login error:', error);
+                        rateLimiter.record();
                         setButtonLoading(submitBtn, false);
                         showMessage(getLocalizedError(error.message));
                     } else if (data.session) {
