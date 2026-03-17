@@ -1011,7 +1011,8 @@ if (creditsError) {
     });
 
     // Logout
-    document.getElementById('logout-button-nav').addEventListener('click', async (e) => {
+    const logoutNavBtn = document.getElementById('logout-button-nav');
+    if (logoutNavBtn) logoutNavBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         await supabase.auth.signOut();
         window.location.href = 'index.html';
