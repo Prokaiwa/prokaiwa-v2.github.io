@@ -202,6 +202,8 @@
 
         // --- Language Detection ---
         function getCurrentLang() {
+            const visible = document.querySelector('.lang-section.show');
+            if (visible) return visible.getAttribute('lang') || 'ja';
             return localStorage.getItem('prokaiwa-lang') || 'ja';
         }
 
