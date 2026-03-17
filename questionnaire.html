@@ -495,6 +495,10 @@
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
 
         // --- Supabase Setup - MUST MATCH login.html and dashboard.html ---
+        const PROKAIWA_DEBUG = false;
+        const debugLog = PROKAIWA_DEBUG ? console.log.bind(console) : () => {};
+
+        // --- Supabase Setup - MUST MATCH login.html and dashboard.html ---
         const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
         
@@ -725,7 +729,7 @@ if (selectedPurpose === 'Other') {
 
         // --- Initial Setup ---
         async function initializePage() {
-            console.log('Initializing questionnaire page...');
+            debugLog('Initializing questionnaire page...');
             
             try {
                 // FIX: Use getSession() instead of getUser()
@@ -737,7 +741,7 @@ if (selectedPurpose === 'Other') {
                 
                 if (session && session.user) {
                     const user = session.user;
-                    console.log('User authenticated:', user.email);
+                    debugLog('User authenticated:', user.email);
                     
                     // Fill in user ID and email for both language forms
                     ['ja', 'en'].forEach(lang => {
@@ -748,7 +752,7 @@ if (selectedPurpose === 'Other') {
                     hidePageLoading();
                 } else {
                     // Redirect to login if not authenticated
-                    console.log('No session found, redirecting to login');
+                    debugLog('No session found, redirecting to login');
                     window.location.href = 'login.html';
                 }
             } catch (err) {
@@ -759,7 +763,7 @@ if (selectedPurpose === 'Other') {
         
         // FIX: Listen for auth state changes
         supabase.auth.onAuthStateChange((event, session) => {
-            console.log('Auth state changed:', event);
+            debugLog('Auth state changed:', event);
             
             if (event === 'SIGNED_OUT') {
                 window.location.href = 'login.html';

@@ -785,7 +785,9 @@
 <div id="footer-placeholder"></div>
 
 <script type="module">
-    console.log('🔧 Account Settings: Script started');
+    const PROKAIWA_DEBUG = false;
+    const debugLog = PROKAIWA_DEBUG ? console.log.bind(console) : () => {};
+    debugLog('🔧 Account Settings: Script started');
     
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
 
@@ -802,7 +804,7 @@
         }
     });
     
-    console.log('✅ Supabase client created');
+    debugLog('✅ Supabase client created');
 
     const planNames = {
     ja: { 
@@ -834,14 +836,14 @@
         // 1. Check localStorage first (user preference)
         const stored = localStorage.getItem('prokaiwaLang');
         if (stored) {
-            console.log('📱 Language from localStorage:', stored);
+            debugLog('📱 Language from localStorage:', stored);
             return stored;
         }
         
         // 2. Fall back to browser/system language
         const browserLang = navigator.language || navigator.userLanguage;
         const detectedLang = browserLang.startsWith('ja') ? 'ja' : 'en';
-        console.log('🌐 Language from browser:', detectedLang);
+        debugLog('🌐 Language from browser:', detectedLang);
         
         // Save this preference
         localStorage.setItem('prokaiwa-lang', detectedLang);
@@ -849,7 +851,7 @@
     }
 
     function setLanguage(lang) {
-    console.log('🔄 Setting language to:', lang);
+    debugLog('🔄 Setting language to:', lang);
     
     // Save to localStorage
     localStorage.setItem('prokaiwaLang', lang);
@@ -875,12 +877,12 @@
 }
 
     async function loadAccountSettings() {
-        console.log('📊 Loading account settings...');
+        debugLog('📊 Loading account settings...');
         const loading = document.getElementById('settings-loading');
         
         try {
             // Check authentication
-            console.log('🔐 Checking authentication...');
+            debugLog('🔐 Checking authentication...');
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             
             if (sessionError) {
@@ -889,15 +891,15 @@
             }
             
             if (!session) {
-                console.log('🚫 No session found, redirecting to login');
+                debugLog('🚫 No session found, redirecting to login');
                 window.location.href = 'login.html';
                 return;
             }
             
-            console.log('✅ User authenticated:', session.user.email);
+            debugLog('✅ User authenticated:', session.user.email);
 
             // Load profile
-            console.log('👤 Loading profile...');
+            debugLog('👤 Loading profile...');
             const { data: profile, error: profileError } = await supabase
                 .from('questionnaire_responses')
                 .select('*')
@@ -909,11 +911,11 @@
                 throw profileError;
             }
             
-            console.log('✅ Profile loaded:', profile);
+            debugLog('✅ Profile loaded:', profile);
 
             // Populate profile information for both languages
 ['ja', 'en'].forEach(lang => {
-    console.log(`📝 Populating ${lang} fields...`);
+    debugLog(`📝 Populating ${lang} fields...`);
     
     document.getElementById(`${lang}-profile-name`).textContent = profile.name;
     document.getElementById(`${lang}-profile-email`).textContent = profile.email;
@@ -939,7 +941,7 @@
 });
 
 // Load lesson credits from lesson_credits table (after profile loop)
-console.log('💳 Loading lesson credits...');
+debugLog('💳 Loading lesson credits...');
 const { data: creditsData, error: creditsError } = await supabase
     .from('lesson_credits')
     .select('*')
@@ -950,7 +952,7 @@ const { data: creditsData, error: creditsError } = await supabase
 if (creditsError) {
     console.error('❌ Credits error:', creditsError);
 } else {
-    console.log('✅ Credits loaded:', creditsData);
+    debugLog('✅ Credits loaded:', creditsData);
     
     // Calculate total available credits
     let totalAvailable = 0;
@@ -984,13 +986,13 @@ if (creditsError) {
 }
 
             // Hide loading, show content
-            console.log('✅ Hiding loading, showing content');
+            debugLog('✅ Hiding loading, showing content');
             loading.style.display = 'none';
             
             const lang = getCurrentLang();
             setLanguage(lang);
 
-            console.log('✅ Account settings fully loaded!');
+            debugLog('✅ Account settings fully loaded!');
 
         } catch (error) {
             console.error('❌ Account settings error:', error);
@@ -1031,7 +1033,7 @@ if (creditsError) {
     document.getElementById('year').textContent = new Date().getFullYear();
 
     // Initialize
-    console.log('🚀 Initializing account settings...');
+    debugLog('🚀 Initializing account settings...');
     loadAccountSettings();
 </script>
    <script src="assets/js/components.js"></script>

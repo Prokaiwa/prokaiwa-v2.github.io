@@ -186,6 +186,10 @@
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
 
         // --- Supabase Setup with EXPLICIT session configuration ---
+        const PROKAIWA_DEBUG = false;
+        const debugLog = PROKAIWA_DEBUG ? console.log.bind(console) : () => {};
+
+        // --- Supabase Setup with EXPLICIT session configuration ---
         const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
         
@@ -258,7 +262,7 @@
         }
 
         async function handleRedirect(user) {
-            console.log('Handling redirect for user:', user.id);
+            debugLog('Handling redirect for user:', user.id);
             
             try {
                 const { data, error } = await supabase
@@ -267,20 +271,20 @@
                     .eq('user_id', user.id)
                     .single();
 
-                console.log('Questionnaire check result:', { data, error });
+                debugLog('Questionnaire check result:', { data, error });
 
                 if (error) {
                     // No questionnaire response found - new user
-                    console.log('No questionnaire found, redirecting to questionnaire');
+                    debugLog('No questionnaire found, redirecting to questionnaire');
                     window.location.href = 'questionnaire.html';
                     return;
                 }
 
                 if (data && data.payment_status === 'paid') {
-                    console.log('Paid user, redirecting to dashboard');
+                    debugLog('Paid user, redirecting to dashboard');
                     window.location.href = 'dashboard.html';
                 } else {
-                    console.log('Unpaid user, redirecting to questionnaire');
+                    debugLog('Unpaid user, redirecting to questionnaire');
                     window.location.href = 'questionnaire.html';
                 }
             } catch (err) {
@@ -390,7 +394,7 @@
                 setButtonLoading(submitBtn, true);
                 
                 try {
-                    console.log('Attempting signup for:', email);
+                    debugLog('Attempting signup for:', email);
                     
                     const { data, error } = await supabase.auth.signUp({ 
                         email, 
@@ -408,7 +412,7 @@
                         rateLimiter.record();
                         showMessage(getLocalizedError(error.message));
                     } else if (data.user) {
-                        console.log('Signup successful, user:', data.user.id);
+                        debugLog('Signup successful, user:', data.user.id);
                         // FIX: Wait a moment for session to be stored
                         await new Promise(resolve => setTimeout(resolve, 500));
                         window.location.href = 'questionnaire.html';
@@ -445,7 +449,7 @@
                 setButtonLoading(submitBtn, true);
                 
                 try {
-                    console.log('Attempting login for:', email);
+                    debugLog('Attempting login for:', email);
                     
                     const { data, error } = await supabase.auth.signInWithPassword({ 
                         email, 
@@ -458,11 +462,11 @@
                         setButtonLoading(submitBtn, false);
                         showMessage(getLocalizedError(error.message));
                     } else if (data.session) {
-                        console.log('Login successful, session established');
+                        debugLog('Login successful, session established');
                         // FIX: Verify session was stored before redirecting
                         const { data: verifySession } = await supabase.auth.getSession();
                         if (verifySession.session) {
-                            console.log('Session verified, proceeding with redirect');
+                            debugLog('Session verified, proceeding with redirect');
                             await handleRedirect(data.user);
                         } else {
                             console.error('Session not stored properly');
@@ -565,11 +569,11 @@
         
         // --- Initial Setup ---
         async function initializePage() {
-            console.log('Initializing login page...');
+            debugLog('Initializing login page...');
             
             // Failsafe: Always hide loading after 3 seconds max
             const failsafeTimeout = setTimeout(() => {
-                console.log('Failsafe timeout triggered - showing login form');
+                debugLog('Failsafe timeout triggered - showing login form');
                 hidePageLoading();
             }, 3000);
             
@@ -586,12 +590,12 @@
                 }
                 
                 if (session) {
-                    console.log('Existing session found, redirecting...');
+                    debugLog('Existing session found, redirecting...');
                     await handleRedirect(session.user);
                     return; // Don't hide loading if redirecting
                 }
                 
-                console.log('No existing session, showing login form');
+                debugLog('No existing session, showing login form');
                 
                 // Check for #signup hash
                 if (window.location.hash === '#signup') {
@@ -612,7 +616,7 @@
         
         // FIX: Listen for auth state changes
         supabase.auth.onAuthStateChange((event, session) => {
-            console.log('Auth state changed:', event);
+            debugLog('Auth state changed:', event);
             
             if (event === 'SIGNED_IN' && session) {
                 // User just signed in, redirect

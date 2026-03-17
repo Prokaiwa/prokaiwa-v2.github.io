@@ -2609,7 +2609,9 @@
 
         
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
-              console.log('🚀 DASHBOARD SCRIPT STARTING...');
+        const PROKAIWA_DEBUG = false;
+        const debugLog = PROKAIWA_DEBUG ? console.log.bind(console) : () => {};
+              debugLog('🚀 DASHBOARD SCRIPT STARTING...');
 
         // =============================================
         // CONFIGURATION
@@ -2627,7 +2629,7 @@
             }
         });
         
-        console.log('✅ Supabase client created successfully');
+        debugLog('✅ Supabase client created successfully');
         
         const MONTHLY_GOAL = 20;
 
@@ -2894,14 +2896,14 @@
         // =============================================
         
         function getLearningArchetype(skillsData) {
-            console.log('🎯 Determining learning archetype for:', skillsData);
+            debugLog('🎯 Determining learning archetype for:', skillsData);
             for (const archetype of learningArchetypes) {
                 if (archetype.condition(skillsData)) {
-                    console.log('✅ Matched archetype:', archetype.code);
+                    debugLog('✅ Matched archetype:', archetype.code);
                     return archetype;
                 }
             }
-            console.log('⚠️ No match, using fallback: balanced_learner');
+            debugLog('⚠️ No match, using fallback: balanced_learner');
             return learningArchetypes[learningArchetypes.length - 1];
         }
 
@@ -2939,7 +2941,7 @@
                 pronunciation: assessment.pronunciation || 0
             };
             
-            console.log('Rendering skills chart:', skillsData, 'All perfect:', allPerfect);
+            debugLog('Rendering skills chart:', skillsData, 'All perfect:', allPerfect);
             
             const skillColors = {
                 fluency: '#4A90E2',
@@ -3093,8 +3095,8 @@
             const todayStart = new Date();
             todayStart.setHours(0, 0, 0, 0);
             
-            console.log(`[${lang}] Checking today's practice for user:`, userId);
-            console.log(`[${lang}] Today start:`, todayStart.toISOString());
+            debugLog(`[${lang}] Checking today's practice for user:`, userId);
+            debugLog(`[${lang}] Today start:`, todayStart.toISOString());
             
             try {
                 const { data: todayResponse, error } = await supabase
@@ -3106,7 +3108,7 @@
                     .limit(1)
                     .maybeSingle();
                 
-                console.log(`[${lang}] Today's response query result:`, { data: todayResponse, error });
+                debugLog(`[${lang}] Today's response query result:`, { data: todayResponse, error });
                 
                 if (error && error.code !== 'PGRST116') {
                     console.error('Error checking today\'s practice:', error);
@@ -3114,7 +3116,7 @@
                 }
                 
                 const practicedToday = !!todayResponse;
-                console.log(`[${lang}] Practiced today:`, practicedToday);
+                debugLog(`[${lang}] Practiced today:`, practicedToday);
                 
                 if (practicedToday) {
                     statusCard.classList.add('completed');
@@ -3145,25 +3147,25 @@
         // =============================================
 
         async function loadRealProgress(userId, lang) {
-            console.log('=== loadRealProgress START ===');
-            console.log('User ID:', userId);
+            debugLog('=== loadRealProgress START ===');
+            debugLog('User ID:', userId);
             
             try {
-                console.log('Fetching student_progress...');
+                debugLog('Fetching student_progress...');
                 const { data: progress, error } = await supabase
                     .from('student_progress')
                     .select('*')
                     
                     .single();
                 
-                console.log('student_progress result:', { data: progress, error });
+                debugLog('student_progress result:', { data: progress, error });
                 
                 if (error) {
                     console.error('❌ Error loading progress:', error);
                     return null;
                 }
                 
-                console.log('Fetching message_log...');
+                debugLog('Fetching message_log...');
                 const { data: messages, error: msgError } = await supabase
                     .from('message_log')
                     .select('created_at')
@@ -3171,7 +3173,7 @@
                     .eq('message_type', 'student_response')
                     .order('created_at', { ascending: false });
                 
-                console.log('message_log result:', { 
+                debugLog('message_log result:', { 
                     count: messages?.length || 0, 
                     error: msgError,
                     sample: messages?.slice(0, 3)
@@ -3185,19 +3187,19 @@
                     ? [...new Set(messages.map(m => m.created_at.split('T')[0]))]
                     : [];
                 
-                console.log('Practice dates extracted:', practiceDates.length, 'unique dates');
-                console.log('Sample dates:', practiceDates.slice(0, 5));
+                debugLog('Practice dates extracted:', practiceDates.length, 'unique dates');
+                debugLog('Sample dates:', practiceDates.slice(0, 5));
                 
                 const monthStart = getMonthStart();
-                console.log('Month start:', monthStart);
+                debugLog('Month start:', monthStart);
                 
                 const thisMonthDates = practiceDates.filter(d => d >= monthStart);
                 const thisMonthCount = thisMonthDates.length;
                 
-                console.log('This month count:', thisMonthCount, 'days');
+                debugLog('This month count:', thisMonthCount, 'days');
                 
                 const streakData = calculateStreak(practiceDates);
-                console.log('Streak calculated:', streakData);
+                debugLog('Streak calculated:', streakData);
                 
                 const result = {
                     current_day: progress.current_day,
@@ -3209,8 +3211,8 @@
                     practiceDates: practiceDates
                 };
                 
-                console.log('✅ Final result:', result);
-                console.log('=== loadRealProgress END ===');
+                debugLog('✅ Final result:', result);
+                debugLog('=== loadRealProgress END ===');
                 
                 return result;
                 
@@ -3225,8 +3227,8 @@
         // =============================================
 
         async function loadLatestAssessment(userId) {
-            console.log('=== loadLatestAssessment START ===');
-            console.log('User ID:', userId);
+            debugLog('=== loadLatestAssessment START ===');
+            debugLog('User ID:', userId);
             
             try {
                 const { data: assessment, error } = await supabase
@@ -3237,7 +3239,7 @@
                     .limit(1)
                     .maybeSingle();
                 
-                console.log('student_assessments result:', { data: assessment, error });
+                debugLog('student_assessments result:', { data: assessment, error });
                 
                 if (error && error.code !== 'PGRST116') {
                     console.error('❌ Error loading assessment:', error);
@@ -3245,16 +3247,16 @@
                 }
                 
                 if (assessment) {
-                    console.log('✅ Assessment found:', {
+                    debugLog('✅ Assessment found:', {
                         assessed_at: assessment.assessed_at,
                         band_level: assessment.band_level,
                         total_score: assessment.total_score
                     });
                 } else {
-                    console.log('ℹ️ No assessment found yet');
+                    debugLog('ℹ️ No assessment found yet');
                 }
                 
-                console.log('=== loadLatestAssessment END ===');
+                debugLog('=== loadLatestAssessment END ===');
                 return assessment;
                 
             } catch (err) {
@@ -3464,7 +3466,7 @@
             const loadingDiv = document.getElementById(`${lang}-dashboard-loading`);
             const contentDiv = document.getElementById(`${lang}-dashboard-content`);
 
-            console.log('Loading dashboard with Phase 1 features...');
+            debugLog('Loading dashboard with Phase 1 features...');
 
             try {
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -3474,13 +3476,13 @@
                 }
                 
                 if (!session) {
-                    console.log('No session found, redirecting to login');
+                    debugLog('No session found, redirecting to login');
                     window.location.href = 'login.html';
                     return;
                 }
                 
                 const user = session.user;
-                console.log('User authenticated:', user.email);
+                debugLog('User authenticated:', user.email);
 
                 const { data: profile, error: profileError } = await supabase
                     .from('questionnaire_responses')
@@ -3492,7 +3494,7 @@
                     console.error('Profile error:', profileError);
                     
                     if (profileError.code === 'PGRST116') {
-                        console.log('No profile found, redirecting to questionnaire');
+                        debugLog('No profile found, redirecting to questionnaire');
                         window.location.href = 'questionnaire.html';
                         return;
                     }
@@ -3694,7 +3696,7 @@ if (hasVideoAccess) {
                 // Initialize booking widget
                 await initializeBookingWidget(profile.id, user.id);
                 
-                console.log('✅ Dashboard loaded with Phase 1 features!');
+                debugLog('✅ Dashboard loaded with Phase 1 features!');
                 
             } catch (error) {
                 console.error('Dashboard load error:', error);
@@ -3738,7 +3740,7 @@ if (hasVideoAccess) {
         // =============================================
         
         async function handleLogout() {
-            console.log('Logging out...');
+            debugLog('Logging out...');
             await supabase.auth.signOut();
             window.location.href = 'index.html';
         }
@@ -3754,12 +3756,12 @@ if (hasVideoAccess) {
         if (enLogoutBtn) enLogoutBtn.addEventListener('click', handleLogout);
 
         supabase.auth.onAuthStateChange((event, session) => {
-            console.log('Auth state changed:', event);
+            debugLog('Auth state changed:', event);
             
             if (event === 'SIGNED_OUT') {
                 window.location.href = 'login.html';
             } else if (event === 'TOKEN_REFRESHED') {
-                console.log('Token refreshed successfully');
+                debugLog('Token refreshed successfully');
             }
         });
 
@@ -3795,7 +3797,7 @@ if (hasVideoAccess) {
 
         // MODAL FUNCTIONS
         window.openBookingModal = async function(lang) {
-    console.log('📖 Opening booking modal for lang:', lang);
+    debugLog('📖 Opening booking modal for lang:', lang);
     bookingState.currentLang = lang;
     
     // Update modal title
@@ -3824,7 +3826,7 @@ if (hasVideoAccess) {
 };
 
         window.closeBookingModal = function() {
-            console.log('📕 Closing booking modal');
+            debugLog('📕 Closing booking modal');
             document.getElementById('booking-modal-overlay').classList.remove('show');
             document.getElementById('booking-modal').classList.remove('show');
         };
@@ -3908,7 +3910,7 @@ if (hasVideoAccess) {
 }
 
         async function initializeBookingWidget(studentId, userId) {
-    console.log('🎯 Initializing booking widget...', { studentId, userId });
+    debugLog('🎯 Initializing booking widget...', { studentId, userId });
     
     bookingState.studentId = studentId;
     bookingState.userId = userId;
@@ -3922,7 +3924,7 @@ if (hasVideoAccess) {
     // 🆕 Initialize lessons card on dashboard load
     initializeEnhancedLessonsCard();
 
-    console.log('✅ Booking widget initialized');
+    debugLog('✅ Booking widget initialized');
 }
 
         async function fetchBookingEligibility(studentId, lang) {
@@ -3938,8 +3940,8 @@ if (hasVideoAccess) {
         bookingState.availableCredits = data.availableCredits || 0;
         bookingState.eligibleForConsultation = data.eligibleForConsultation || false;
         
-        console.log('Credits:', bookingState.availableCredits);
-        console.log('Consultation eligible:', bookingState.eligibleForConsultation);
+        debugLog('Credits:', bookingState.availableCredits);
+        debugLog('Consultation eligible:', bookingState.eligibleForConsultation);
         
         // 🆕 UPDATE UI ELEMENTS
         const creditsElement = document.getElementById(`${lang}-credits-count`);
@@ -3958,7 +3960,7 @@ if (hasVideoAccess) {
 }
 
         async function fetchUserBookings(userId, lang) {
-    console.log(`📚 Fetching bookings for user: ${userId}`);
+    debugLog(`📚 Fetching bookings for user: ${userId}`);
     
     try {
         const { data: bookings, error } = await supabase
@@ -3980,8 +3982,8 @@ if (hasVideoAccess) {
 
         bookingState.userBookings = bookings || [];
         
-        console.log(`✅ Fetched ${bookingState.userBookings.length} bookings`);
-        console.log('📋 Bookings:', bookingState.userBookings);
+        debugLog(`✅ Fetched ${bookingState.userBookings.length} bookings`);
+        debugLog('📋 Bookings:', bookingState.userBookings);
 
         renderUserBookings(lang);
 
@@ -4146,7 +4148,7 @@ for (let date = 1; date <= remainingCells; date++) {
         }
 
         async function selectDate(dateStr, lang) {
-    console.log('📅 Selected date:', dateStr);
+    debugLog('📅 Selected date:', dateStr);
     
     bookingState.selectedDate = dateStr;
     bookingState.selectedTime = null;
@@ -4184,7 +4186,7 @@ for (let date = 1; date <= remainingCells; date++) {
             slotsContainer.innerHTML = '<div class="time-slots-loading"><i class="fas fa-spinner fa-spin"></i><p>読み込み中...</p></div>';
             
             try {
-                console.log('🔍 Fetching available slots for:', dateStr);
+                debugLog('🔍 Fetching available slots for:', dateStr);
                 
                 const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/lesson-booking', {
                     method: 'POST',
@@ -4201,7 +4203,7 @@ for (let date = 1; date <= remainingCells; date++) {
                 });
                 
                 const result = await response.json();
-                console.log('📥 Slots response:', result);
+                debugLog('📥 Slots response:', result);
                 
                 if (!result.success) {
                     throw new Error(result.error || 'Failed to fetch slots');
@@ -4304,7 +4306,7 @@ for (let date = 1; date <= remainingCells; date++) {
         }
 
         window.selectTimeSlot = function(timeStr, lang) {
-            console.log('⏰ Selected time:', timeStr);
+            debugLog('⏰ Selected time:', timeStr);
             
             bookingState.selectedTime = timeStr;
             
@@ -4389,7 +4391,7 @@ for (let date = 1; date <= remainingCells; date++) {
             try {
                 const lessonType = bookingState.selectedLessonType === 'consultation' ? 'first_time_free' : 'standard';
                 
-                console.log('📤 Booking lesson:', {
+                debugLog('📤 Booking lesson:', {
                     studentId: bookingState.studentId,
                     scheduledAt: bookingState.selectedTime,
                     lessonType: lessonType,
@@ -4414,7 +4416,7 @@ for (let date = 1; date <= remainingCells; date++) {
                 });
                 
                 const result = await response.json();
-                console.log('📥 Booking response:', result);
+                debugLog('📥 Booking response:', result);
                 
                 if (!result.success) {
                     throw new Error(result.error || 'Booking failed');
@@ -4425,7 +4427,7 @@ for (let date = 1; date <= remainingCells; date++) {
     : 'Booking confirmed! Your lesson appears in the Upcoming Lessons card below.');
                 // Start auto-refresh for Meet link
 if (result.booking && result.booking.google_calendar_event_id) {
-    console.log('🔄 Starting auto-refresh for Meet link...');
+    debugLog('🔄 Starting auto-refresh for Meet link...');
     meetLinkRefresh.start(
         result.booking.id,
         result.booking.google_calendar_event_id
@@ -4606,7 +4608,7 @@ closeBookingModal();
             }
         }
 
-        console.log('🎉 Phase 1 Dashboard Ready!');
+        debugLog('🎉 Phase 1 Dashboard Ready!');
       // ================================
 // ENHANCED UPCOMING LESSONS CARD
 // Features: Google Meet button, countdown timer, expand/collapse, cancel/reschedule
@@ -4948,7 +4950,7 @@ function initializeEnhancedLessonsCard() {
     if (bookingState.userBookings) {
         bookingState.userBookings.forEach(booking => {
             if (!booking.google_meet_link && booking.google_calendar_event_id) {
-                console.log(`🔄 Starting auto-refresh for existing booking ${booking.id}`);
+                debugLog(`🔄 Starting auto-refresh for existing booking ${booking.id}`);
                 meetLinkRefresh.start(booking.id, booking.google_calendar_event_id);
             }
         });
@@ -4970,10 +4972,10 @@ const meetLinkRefresh = {
     maxAttempts: 10,
     
     start(bookingId, eventId) {
-        console.log(`🔄 Starting Meet link refresh for booking ${bookingId}`);
+        debugLog(`🔄 Starting Meet link refresh for booking ${bookingId}`);
         
         if (this.intervals.has(bookingId)) {
-            console.log(`⚠️ Already polling for booking ${bookingId}`);
+            debugLog(`⚠️ Already polling for booking ${bookingId}`);
             return;
         }
         
@@ -4981,22 +4983,22 @@ const meetLinkRefresh = {
         
         const checkAndUpdate = async () => {
             attempts++;
-            console.log(`🔍 Checking for Meet link (attempt ${attempts}/${this.maxAttempts})...`);
+            debugLog(`🔍 Checking for Meet link (attempt ${attempts}/${this.maxAttempts})...`);
             
             try {
                 const hasLink = await this.checkForMeetLink(bookingId, eventId);
                 
                 if (hasLink) {
-                    console.log('✅ Meet link found! Stopping refresh.');
+                    debugLog('✅ Meet link found! Stopping refresh.');
                     this.stop(bookingId);
                     
-                    console.log('🔄 Refreshing UI...');
+                    debugLog('🔄 Refreshing UI...');
                     await fetchUserBookings(bookingState.userId, 'en');
-                    console.log('📊 Bookings refreshed:', bookingState.userBookings.length);
+                    debugLog('📊 Bookings refreshed:', bookingState.userBookings.length);
                     initializeEnhancedLessonsCard();
-                    console.log('✅ UI updated!');
+                    debugLog('✅ UI updated!');
                 } else if (attempts >= this.maxAttempts) {
-                    console.log('⏱️ Max attempts reached. Stopping refresh.');
+                    debugLog('⏱️ Max attempts reached. Stopping refresh.');
                     this.stop(bookingId);
                 }
             } catch (err) {
@@ -5007,7 +5009,7 @@ const meetLinkRefresh = {
         const intervalId = setInterval(checkAndUpdate, 30000);
         this.intervals.set(bookingId, intervalId);
         
-        console.log('⚡ Running immediate check...');
+        debugLog('⚡ Running immediate check...');
         checkAndUpdate();
     },
     
@@ -5016,20 +5018,20 @@ const meetLinkRefresh = {
         if (intervalId) {
             clearInterval(intervalId);
             this.intervals.delete(bookingId);
-            console.log(`🛑 Stopped polling for booking ${bookingId}`);
+            debugLog(`🛑 Stopped polling for booking ${bookingId}`);
         }
     },
     
     stopAll() {
         for (const [bookingId, intervalId] of this.intervals.entries()) {
             clearInterval(intervalId);
-            console.log(`🛑 Stopped polling for booking ${bookingId}`);
+            debugLog(`🛑 Stopped polling for booking ${bookingId}`);
         }
         this.intervals.clear();
     },
     
     async checkForMeetLink(bookingId, eventId) {
-        console.log(`📡 Fetching event ${eventId} for booking ${bookingId}...`);
+        debugLog(`📡 Fetching event ${eventId} for booking ${bookingId}...`);
         
         try {
             const response = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/google-calendar', {
@@ -5046,14 +5048,14 @@ const meetLinkRefresh = {
             });
             
             const result = await response.json();
-            console.log('📥 Event fetch result:', result);
+            debugLog('📥 Event fetch result:', result);
             
             if (result.success && result.meet_link) {
-                console.log('📍 Meet link found:', result.meet_link);
+                debugLog('📍 Meet link found:', result.meet_link);
                 return true;
             }
             
-            console.log('⚠️ No Meet link yet');
+            debugLog('⚠️ No Meet link yet');
             return false;
             
         } catch (err) {
@@ -5164,7 +5166,7 @@ window.addEventListener('beforeunload', () => {
     meetLinkRefresh.stopAll();
 });
 
-console.log('✅ Auto-refresh Meet link system loaded');
+debugLog('✅ Auto-refresh Meet link system loaded');
     </script>
 <script src="assets/js/components.js"></script>
 </body>
