@@ -7,7 +7,6 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-KLVF2ZG1WX');
 </script>
   <meta charset="UTF-8">
@@ -20,761 +19,1456 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    /* Loading spinner styles */
-    .btn-loading {
-      position: relative;
-      pointer-events: none;
-      opacity: 0.7;
-    }
-    .btn-loading::after {
-      content: "";
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      top: 50%;
-      left: 50%;
-      margin-left: -8px;
-      margin-top: -8px;
-      border: 2px solid transparent;
-      border-top-color: #ffffff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .btn-text { transition: opacity 0.2s; }
-    .btn-loading .btn-text { opacity: 0; }
-    
-    /* Helper text styles */
-    .field-hint {
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-      margin-top: 0.25rem;
-    }
-    .field-hint a {
-      color: var(--color-primary);
-    }
-    
-    /* Progress indicator (optional visual enhancement) */
-    .form-progress {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-    }
-    .form-progress-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background-color: var(--color-border);
-    }
-    .form-progress-dot.active {
-      background-color: var(--color-primary);
-    }
-    
-    /* Terms section styling */
-    .terms-intro {
-      font-size: 0.95rem;
-      color: var(--color-text-light);
-      margin-bottom: 1rem;
-      padding: 1rem;
-      background-color: var(--color-bg);
-      border-radius: 8px;
-      border-left: 3px solid var(--color-primary);
-    }
-    
+    /* =========================================================
+       WIZARD — Page-level overrides & scoped styles
+       Uses CSS vars from style.css for dark mode compatibility
+       ========================================================= */
+
     /* Page loading overlay */
     .page-loading-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      inset: 0;
       background: var(--color-bg, #fff);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 9999;
     }
-    .page-loading-overlay.hidden {
-      display: none;
-    }
+    .page-loading-overlay.hidden { display: none; }
     .page-loading-spinner {
       width: 40px;
       height: 40px;
       border: 3px solid var(--color-border, #e0e0e0);
-      border-top-color: var(--color-primary, #007bff);
+      border-top-color: var(--color-primary, #008080);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: wiz-spin 0.8s linear infinite;
+    }
+
+    /* ── Layout ── */
+    .wiz-outer {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .wiz-main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem 1rem 4rem;
+    }
+    .wiz-container {
+      width: 100%;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    /* ── Progress bar ── */
+    .wiz-progress {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 2.5rem;
+      padding: 0 1rem;
+    }
+    .wiz-progress-step {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      background: var(--color-bg);
+      border: 2px solid var(--color-border);
+      position: relative;
+      z-index: 1;
+      transition: all 0.4s ease;
+      flex-shrink: 0;
+    }
+    .wiz-progress-step.active {
+      color: #fff;
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px rgba(0, 128, 128, 0.15);
+    }
+    .wiz-progress-step.completed {
+      color: #fff;
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+    .wiz-progress-line {
+      flex: 1;
+      height: 2px;
+      background: var(--color-border);
+      transition: background 0.4s ease;
+      max-width: 60px;
+    }
+    .wiz-progress-line.completed {
+      background: var(--color-primary);
+    }
+
+    /* ── Steps ── */
+    .wiz-step {
+      display: none;
+      animation: wiz-fadeSlideIn 0.5s ease both;
+    }
+    .wiz-step.active { display: block; }
+
+    /* ── Step 1: Welcome ── */
+    .wiz-welcome {
+      text-align: center;
+      padding: 2rem 0 1rem;
+    }
+    .wiz-welcome-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      margin: 0 auto 1.5rem;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      animation: wiz-fadeIn 0.6s ease 0.2s forwards;
+    }
+    .wiz-welcome-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      animation: wiz-fadeSlideUp 0.6s ease 0.5s forwards;
+    }
+    .wiz-welcome-subtitle {
+      font-size: 1.05rem;
+      color: var(--color-text-light);
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: wiz-fadeSlideUp 0.6s ease 0.8s forwards;
+    }
+    .wiz-welcome-checklist {
+      text-align: left;
+      max-width: 360px;
+      margin: 0 auto 2.5rem;
+      opacity: 0;
+      animation: wiz-fadeSlideUp 0.6s ease 1.1s forwards;
+    }
+    .wiz-welcome-checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      font-size: 0.95rem;
+      color: var(--color-text-light);
+    }
+    .wiz-welcome-checklist-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .wiz-welcome-checklist-icon svg {
+      width: 14px;
+      height: 14px;
+      color: var(--color-primary);
+    }
+    .wiz-welcome-start {
+      opacity: 0;
+      animation: wiz-fadeSlideUp 0.6s ease 1.4s forwards;
+    }
+
+    /* ── Cards (Purpose & Plan) ── */
+    .wiz-card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .wiz-card {
+      position: relative;
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1.25rem 1rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-align: center;
+    }
+    .wiz-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+    .wiz-card.selected {
+      border-color: var(--color-primary);
+      background: rgba(0, 128, 128, 0.04);
+      box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.12);
+    }
+    .wiz-card input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .wiz-card-icon {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 0.75rem;
+      color: var(--color-primary);
+    }
+    .wiz-card-label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--color-text);
+      display: block;
+      line-height: 1.4;
+    }
+
+    /* ── Plan cards — single column, more detail ── */
+    .wiz-plan-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .wiz-plan-card {
+      position: relative;
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1.25rem 1.25rem 1.25rem 1.25rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .wiz-plan-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-hover);
+    }
+    .wiz-plan-card.selected {
+      border-color: var(--color-primary);
+      background: rgba(0, 128, 128, 0.04);
+      box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.12);
+    }
+    .wiz-plan-card input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .wiz-plan-radio-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--color-border);
+      flex-shrink: 0;
+      margin-top: 2px;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .wiz-plan-card.selected .wiz-plan-radio-dot {
+      border-color: var(--color-primary);
+    }
+    .wiz-plan-card.selected .wiz-plan-radio-dot::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--color-primary);
+    }
+    .wiz-plan-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .wiz-plan-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+      flex-wrap: wrap;
+    }
+    .wiz-plan-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--color-text);
+    }
+    .wiz-plan-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.15rem 0.5rem;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+    .wiz-badge-popular {
+      background: rgba(0, 128, 128, 0.1);
+      color: var(--color-primary);
+    }
+    .wiz-badge-recommended {
+      background: rgba(212, 160, 23, 0.12);
+      color: var(--color-gold);
+    }
+    .wiz-plan-price {
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+      margin-bottom: 0.4rem;
+    }
+    .wiz-plan-features {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    /* ── Section headings ── */
+    .wiz-step-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 0.35rem;
+      text-align: center;
+    }
+    .wiz-step-desc {
+      font-size: 0.95rem;
+      color: var(--color-text-light);
+      text-align: center;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    .wiz-step-highlight {
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+      text-align: center;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+      padding: 1rem 1.25rem;
+      background: rgba(0, 128, 128, 0.04);
+      border-left: 3px solid var(--color-primary);
+      border-radius: 0 8px 8px 0;
+    }
+
+    /* ── Form fields (inherits from style.css .form-group) ── */
+    .wiz-field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .wiz-field-hint {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .wiz-field-error {
+      font-size: 0.82rem;
+      color: var(--color-error);
+      margin-top: 0.25rem;
+      display: none;
+    }
+    .wiz-field-error.visible { display: block; }
+
+    /* ── Buttons ── */
+    .wiz-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      border: none;
+      border-radius: 10px;
+      font-family: var(--font-primary);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      min-width: 140px;
+    }
+    .wiz-btn-primary {
+      background: var(--color-primary);
+      color: #fff;
+    }
+    .wiz-btn-primary:hover:not(:disabled) {
+      background: var(--color-primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+    .wiz-btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .wiz-btn-secondary {
+      background: transparent;
+      color: var(--color-text-light);
+      border: 1px solid var(--color-border);
+    }
+    .wiz-btn-secondary:hover {
+      background: var(--color-bg);
+      color: var(--color-text);
+    }
+    .wiz-btn-full {
+      width: 100%;
+    }
+    .wiz-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      gap: 0.75rem;
+    }
+    .wiz-nav-single {
+      justify-content: center;
+    }
+
+    /* Button loading state */
+    .wiz-btn-loading {
+      position: relative;
+      pointer-events: none;
+    }
+    .wiz-btn-loading .wiz-btn-label { opacity: 0; }
+    .wiz-btn-loading::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border: 2px solid transparent;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: wiz-spin 0.7s linear infinite;
+    }
+
+    /* ── Checkboxes (Step 5) ── */
+    .wiz-checkbox-group {
+      margin-bottom: 1rem;
+    }
+    .wiz-checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      cursor: pointer;
+      font-size: 0.92rem;
+      color: var(--color-text-light);
+      line-height: 1.5;
+    }
+    .wiz-checkbox-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: var(--color-primary);
+    }
+
+    /* Conditional expand field */
+    .wiz-expand-field {
+      display: none;
+      padding-left: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .wiz-expand-field.visible { display: block; }
+
+    /* ── Terms box ── */
+    .wiz-terms-box {
+      background: var(--color-bg);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      border-left: 3px solid var(--color-primary);
+    }
+    .wiz-terms-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--color-text);
+      margin-bottom: 0.75rem;
+    }
+
+    /* ── Message box ── */
+    .wiz-message {
+      padding: 0.85rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    .wiz-message.error {
+      display: block;
+      background: rgba(220, 53, 69, 0.08);
+      color: var(--color-error);
+      border: 1px solid rgba(220, 53, 69, 0.2);
+    }
+
+    /* ── Divider ── */
+    .wiz-divider {
+      border: none;
+      border-top: 1px solid var(--color-border);
+      margin: 1.5rem 0;
+    }
+
+    /* ── Animations ── */
+    @keyframes wiz-spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes wiz-fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes wiz-fadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes wiz-fadeSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .wiz-main { padding: 1rem 0.75rem 3rem; }
+      .wiz-card-grid { grid-template-columns: 1fr; }
+      .wiz-field-row { grid-template-columns: 1fr; }
+      .wiz-welcome-title { font-size: 1.5rem; }
+      .wiz-progress-step { width: 28px; height: 28px; font-size: 0.7rem; }
+      .wiz-plan-card { padding: 1rem; }
+    }
+
+    /* ── Dark mode refinements ── */
+    @media (prefers-color-scheme: dark) {
+      .wiz-card.selected,
+      .wiz-plan-card.selected {
+        background: rgba(0, 168, 168, 0.06);
+        box-shadow: 0 0 0 3px rgba(0, 168, 168, 0.15);
+      }
+      .wiz-step-highlight {
+        background: rgba(0, 168, 168, 0.06);
+      }
+      .wiz-badge-popular {
+        background: rgba(0, 168, 168, 0.15);
+      }
+      .wiz-badge-recommended {
+        background: rgba(212, 160, 23, 0.15);
+      }
     }
   </style>
 </head>
 <body>
-    <!-- Page loading overlay - shown while checking auth -->
-    <div id="page-loading" class="page-loading-overlay">
-      <div class="page-loading-spinner"></div>
-    </div>
+  <!-- Page loading overlay -->
+  <div id="page-loading" class="page-loading-overlay">
+    <div class="page-loading-spinner"></div>
+  </div>
 
+  <div class="wiz-outer">
     <div id="nav-placeholder"></div>
 
-    <main>
-        <!-- JAPANESE VERSION -->
-        <section id="ja-questionnaire" class="lang-section" lang="ja">
-            <div class="questionnaire-container">
-                <h1 class="page-title">Prokaiwaへようこそ！</h1>
-                <p class="page-subtitle">レッスン開始前に、簡単なアンケートにお答えください。</p>
-                
-                <div id="ja-message-box" class="message-box"></div>
+    <main class="wiz-main">
+      <div class="wiz-container">
 
-                <form id="ja-questionnaire-form" data-lang="ja">
-                    <!-- Personal Info Section -->
-                    <fieldset>
-                        <legend class="section-heading" style="margin-top: 0;">基本情報</legend>
-                        
-                        <div class="form-group">
-                            <label for="ja-user-id">ユーザーID</label>
-                            <input type="text" id="ja-user-id" name="user-id" readonly placeholder="ログイン後に自動入力されます">
-                        </div>
-                        <div class="form-group">
-                            <label for="ja-full-name">氏名（日本語）</label>
-                            <input type="text" id="ja-full-name" name="full-name" required placeholder="例：山田 太郎">
-                        </div>
-                        <div class="form-group">
-                            <label for="ja-given-name-romaji">名前（ローマ字）</label>
-                            <input type="text" id="ja-given-name-romaji" name="given-name-romaji" required placeholder="例：Taro">
-                            <p class="field-hint">※レッスン中に使用するお名前です</p>
-                        </div>
-                        <div class="form-group">
-                            <label for="ja-email">メールアドレス</label>
-                            <input type="email" id="ja-email" name="email" required placeholder="example@email.com">
-                        </div>
-                        <div class="form-group">
-                            <label for="ja-line-id">LINE ID</label>
-                            <input type="text" id="ja-line-id" name="line-id" required placeholder="例：prokaiwa_user">
-                            <p class="field-hint">※LINE IDの確認方法：LINEアプリ → 設定 → プロフィール → ID</p>
-                        </div>
-                    </fieldset>
+        <!-- Progress bar (hidden on step 1) -->
+        <div class="wiz-progress" id="wiz-progress" style="display:none;">
+          <div class="wiz-progress-step active" data-step="2">1</div>
+          <div class="wiz-progress-line" data-line="2"></div>
+          <div class="wiz-progress-step" data-step="3">2</div>
+          <div class="wiz-progress-line" data-line="3"></div>
+          <div class="wiz-progress-step" data-step="4">3</div>
+          <div class="wiz-progress-line" data-line="4"></div>
+          <div class="wiz-progress-step" data-step="5">4</div>
+        </div>
 
-                    <!-- Plan Selection -->
-                    <fieldset class="form-group-radio">
-    <legend>プランを選択してください</legend>
-    <label class="radio-option">
-        <input type="radio" name="ja-plan" value="power_lite" required>
-        <strong>パワーパック・ライト</strong>
-        <span class="plan-details">月額10,000円 - LINE練習＋月2回のビデオレッスン</span>
-        <span class="checkmark"></span>
-    </label>
-    <label class="radio-option">
-        <input type="radio" name="ja-plan" value="line">
-        <strong>LINEプラクティスプラン</strong>
-        <span class="plan-details">月額6,000円 - LINEでの毎日の英会話練習</span>
-        <span class="checkmark"></span>
-    </label>
-    <label class="radio-option">
-        <input type="radio" name="ja-plan" value="power_pro">
-        <strong>パワーパック・プロ</strong>
-        <span class="plan-details">月額16,000円 - 最も充実した総合パッケージ</span>
-        <span class="checkmark"></span>
-    </label>
-    <label class="radio-option">
-        <input type="radio" name="ja-plan" value="video">
-        <strong>1対1ビデオレッスン（50分）</strong>
-        <span class="plan-details">1回4,000円 - 気軽に話せる個別レッスン</span>
-        <span class="checkmark"></span>
-    </label>
-</fieldset>
+        <!-- Error message area -->
+        <div class="wiz-message" id="wiz-message"></div>
 
-                    <!-- English Level -->
-                    <fieldset>
-                        <div class="form-group">
-                            <label for="ja-english-level">現在の英語レベル</label>
-                            <select id="ja-english-level" name="english-level" required>
-                                <option value="" disabled selected>レベルを選んでください...</option>
-                                <option value="Super Beginner">超初級 - これから英語を始める方</option>
-                                <option value="Beginner">初級 - 簡単な単語やフレーズが分かる</option>
-                                <option value="Intermediate">中級 - 日常会話ができる</option>
-                                <option value="Advanced">上級 - ほとんどの会話に不自由しない</option>
-                            </select>
-                        </div>
-                    </fieldset>
+        <!-- ============================================
+             STEP 1 — Welcome
+             ============================================ -->
+        <div class="wiz-step active" id="step-1">
+          <div class="wiz-welcome">
+            <img src="assets/images/prokaiwa-logo.jpg" alt="Prokaiwa" class="wiz-welcome-logo">
 
-                    <!-- Purpose -->
-                    <fieldset class="form-group-radio">
-                        <legend>英語を学ぶ目的は何ですか？</legend>
-                        <label class="radio-option">
-                            <input type="radio" name="ja-purpose" value="Fun / Hobby" required>
-                            楽しみ・趣味として
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="ja-purpose" value="Business / Work">
-                            仕事・ビジネスで使いたい
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="ja-purpose" value="Travel">
-                            旅行で使いたい
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="ja-purpose" value="Casual Conversation">
-                            外国の友達と話したい
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="ja-purpose" value="Other" id="ja-purpose-other-checkbox">
-                            その他
-                            <span class="checkmark"></span>
-                        </label>
-                        <div class="form-group" id="ja-purpose-other-container" style="display:none; margin-top: 1rem;">
-                            <label for="ja-purpose-other-text">具体的に教えてください：</label>
-                            <input type="text" id="ja-purpose-other-text" name="purpose-other-text">
-                        </div>
-                    </fieldset>
-                    
-                    <!-- How did you hear about us -->
-                    <fieldset class="form-group-checkbox">
-                        <legend>Prokaiwaをどこで知りましたか？（複数選択可）</legend>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="ja-source" value="Social Media"> SNS（Instagram、X など）
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="ja-source" value="Friend Recommendation" id="ja-source-friend-checkbox"> 友人・知人からの紹介
-                            <span class="checkmark"></span>
-                        </label>
-                        <div class="form-group" id="ja-source-friend-container" style="display:none; margin-top: 1rem;">
-                            <label for="ja-source-friend-text">紹介者のお名前（割引適用のため）：</label>
-                            <input type="text" id="ja-source-friend-text" name="source-friend-text" placeholder="例：山田さん">
-                        </div>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="ja-source" value="Advertisement"> 広告
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="ja-source" value="Search Engine"> Google検索
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="ja-source" value="Other" id="ja-source-other-checkbox"> その他
-                            <span class="checkmark"></span>
-                        </label>
-                        <div class="form-group" id="ja-source-other-container" style="display:none; margin-top: 1rem;">
-                            <label for="ja-source-other-text">具体的に教えてください：</label>
-                            <input type="text" id="ja-source-other-text" name="source-other-text">
-                        </div>
-                    </fieldset>
+            <h1 class="wiz-welcome-title" data-i18n="welcomeTitle">ようこそ、Prokaiwaへ</h1>
 
-                    <!-- Optional Social -->
-                    <fieldset>
-                        <div class="form-group">
-                            <label for="ja-instagram-x">Instagram または X のアカウント（任意）</label>
-                            <input type="text" id="ja-instagram-x" name="instagram-x" placeholder="@username">
-                        </div>
-                    </fieldset>
+            <p class="wiz-welcome-subtitle" data-i18n="welcomeSubtitle">英語の旅が、ここから始まります。<br>最初の一歩から丁寧にサポートします。</p>
 
-                    <!-- Terms Agreement -->
-                    <fieldset class="form-group-checkbox">
-                        <legend>以下の内容をご確認ください</legend>
-                        <div class="terms-intro">
-                            サービス開始前に、以下の項目への同意が必要です。
-                        </div>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="ja-agree-apps" required> 
-                            レッスンはLINEおよびZoom（ビデオ通話）で行われることを理解しました。
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="ja-agree-video-times" required> 
-                            ビデオレッスンは土曜・日曜（日本時間）のみ対応可能であることを理解しました。
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="ja-agree-terms" required>
-                            <strong>利用規約に同意します：</strong>プランA・C1・C2は月額自動更新制です。キャンセルは次回請求日の3日前までにLINE/メールでご連絡ください。お支払い後の返金はできません。
-                            <span class="checkmark"></span>
-                        </label>
-                    </fieldset>
-
-                    <button type="submit" class="cta-button form-submit-button">
-                        <span class="btn-text">お支払いへ進む</span>
-                    </button>
-                </form>
+            <div class="wiz-welcome-checklist">
+              <div class="wiz-welcome-checklist-item">
+                <div class="wiz-welcome-checklist-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <span data-i18n="welcomeCheck1">お名前と連絡先の登録</span>
+              </div>
+              <div class="wiz-welcome-checklist-item">
+                <div class="wiz-welcome-checklist-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <span data-i18n="welcomeCheck2">学習の目的を選択</span>
+              </div>
+              <div class="wiz-welcome-checklist-item">
+                <div class="wiz-welcome-checklist-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <span data-i18n="welcomeCheck3">プランの選択</span>
+              </div>
+              <div class="wiz-welcome-checklist-item">
+                <div class="wiz-welcome-checklist-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <span data-i18n="welcomeCheck4">お支払い設定で完了</span>
+              </div>
             </div>
-        </section>
 
-        <!-- ENGLISH VERSION -->
-        <section id="en-questionnaire" class="lang-section" lang="en">
-            <div class="questionnaire-container">
-                <h1 class="page-title">Welcome to Prokaiwa!</h1>
-                <p class="page-subtitle">Please tell us a bit about yourself to get started.</p>
-                
-                <div id="en-message-box" class="message-box"></div>
-
-                <form id="en-questionnaire-form" data-lang="en">
-                    <!-- Personal Info Section -->
-                    <fieldset>
-                        <legend class="section-heading" style="margin-top: 0;">Basic Information</legend>
-                        
-                        <div class="form-group">
-                            <label for="en-user-id">User ID</label>
-                            <input type="text" id="en-user-id" name="user-id" readonly placeholder="Auto-filled after login">
-                        </div>
-                        <div class="form-group">
-                            <label for="en-full-name">Full Name (Japanese)</label>
-                            <input type="text" id="en-full-name" name="full-name" required placeholder="e.g., 山田 太郎">
-                        </div>
-                        <div class="form-group">
-                            <label for="en-given-name-romaji">First Name (Romaji)</label>
-                            <input type="text" id="en-given-name-romaji" name="given-name-romaji" required placeholder="e.g., Taro">
-                            <p class="field-hint">This is what we'll call you during lessons</p>
-                        </div>
-                        <div class="form-group">
-                            <label for="en-email">Email</label>
-                            <input type="email" id="en-email" name="email" required placeholder="example@email.com">
-                        </div>
-                        <div class="form-group">
-                            <label for="en-line-id">LINE ID</label>
-                            <input type="text" id="en-line-id" name="line-id" required placeholder="e.g., prokaiwa_user">
-                            <p class="field-hint">Find your LINE ID: LINE app → Settings → Profile → ID</p>
-                        </div>
-                    </fieldset>
-
-                    <!-- Plan Selection -->
-                    <fieldset class="form-group-radio">
-    <legend>Choose your plan</legend>
-    <label class="radio-option">
-        <input type="radio" name="en-plan" value="power_lite" required>
-        <strong>Power Pack Lite</strong>
-        <span class="plan-details">¥10,000/month - LINE practice + 2 video lessons/month</span>
-        <span class="checkmark"></span>
-    </label>
-    <label class="radio-option">
-        <input type="radio" name="en-plan" value="line">
-        <strong>LINE Practice Plan</strong>
-        <span class="plan-details">¥6,000/month - Daily English conversation via LINE</span>
-        <span class="checkmark"></span>
-    </label>
-    <label class="radio-option">
-        <input type="radio" name="en-plan" value="power_pro">
-        <strong>Power Pack Pro</strong>
-        <span class="plan-details">¥16,000/month - Our most comprehensive package</span>
-        <span class="checkmark"></span>
-    </label>
-    <label class="radio-option">
-        <input type="radio" name="en-plan" value="video">
-        <strong>1-on-1 Video Lesson (50min)</strong>
-        <span class="plan-details">¥4,000/lesson - Casual or business English practice</span>
-        <span class="checkmark"></span>
-    </label>
-</fieldset>
-
-                    <!-- English Level -->
-                    <fieldset>
-                        <div class="form-group">
-                            <label for="en-english-level">Your English Level</label>
-                            <select id="en-english-level" name="english-level" required>
-                                <option value="" disabled selected>Select your level...</option>
-                                <option value="Super Beginner">Super Beginner - Just starting out</option>
-                                <option value="Beginner">Beginner - Know basic words and phrases</option>
-                                <option value="Intermediate">Intermediate - Can have simple conversations</option>
-                                <option value="Advanced">Advanced - Comfortable with most conversations</option>
-                            </select>
-                        </div>
-                    </fieldset>
-
-                    <!-- Purpose -->
-                    <fieldset class="form-group-radio">
-                        <legend>What is your purpose for learning English?</legend>
-                        <label class="radio-option">
-                            <input type="radio" name="en-purpose" value="Fun / Hobby" required>
-                            Fun / Hobby
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="en-purpose" value="Business / Work">
-                            Business / Work
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="en-purpose" value="Travel">
-                            Travel
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="en-purpose" value="Casual Conversation">
-                            Making friends / Casual conversation
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="en-purpose" value="Other" id="en-purpose-other-checkbox">
-                            Other
-                            <span class="checkmark"></span>
-                        </label>
-                        <div class="form-group" id="en-purpose-other-container" style="display:none; margin-top: 1rem;">
-                            <label for="en-purpose-other-text">Please specify:</label>
-                            <input type="text" id="en-purpose-other-text" name="purpose-other-text">
-                        </div>
-                    </fieldset>
-                    
-                    <!-- How did you hear about us -->
-                    <fieldset class="form-group-checkbox">
-                        <legend>How did you hear about Prokaiwa? (Select all that apply)</legend>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="en-source" value="Social Media"> Social Media (Instagram, X, etc.)
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="en-source" value="Friend Recommendation" id="en-source-friend-checkbox"> Friend Recommendation
-                            <span class="checkmark"></span>
-                        </label>
-                        <div class="form-group" id="en-source-friend-container" style="display:none; margin-top: 1rem;">
-                            <label for="en-source-friend-text">Friend's name (for referral discount):</label>
-                            <input type="text" id="en-source-friend-text" name="source-friend-text" placeholder="e.g., Yamada-san">
-                        </div>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="en-source" value="Advertisement"> Advertisement
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="en-source" value="Search Engine"> Google Search
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="en-source" value="Other" id="en-source-other-checkbox"> Other
-                            <span class="checkmark"></span>
-                        </label>
-                        <div class="form-group" id="en-source-other-container" style="display:none; margin-top: 1rem;">
-                            <label for="en-source-other-text">Please specify:</label>
-                            <input type="text" id="en-source-other-text" name="source-other-text">
-                        </div>
-                    </fieldset>
-
-                    <!-- Optional Social -->
-                    <fieldset>
-                        <div class="form-group">
-                            <label for="en-instagram-x">Instagram or X account (optional)</label>
-                            <input type="text" id="en-instagram-x" name="instagram-x" placeholder="@username">
-                        </div>
-                    </fieldset>
-
-                    <!-- Terms Agreement -->
-                    <fieldset class="form-group-checkbox">
-                        <legend>Please confirm the following</legend>
-                        <div class="terms-intro">
-                            Please agree to the following terms before proceeding.
-                        </div>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="en-agree-apps" required> 
-                            I understand that lessons will be conducted through LINE and/or Zoom video calls.
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="en-agree-video-times" required> 
-                            I understand that video lessons are only available on Saturdays and Sundays (JST).
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="checkbox-option">
-                            <input type="checkbox" name="en-agree-terms" required>
-                            <strong>I agree to the terms:</strong> Plans A, C1, & C2 are monthly auto-renewing subscriptions. Cancel via LINE/email at least 3 days before your next billing date. No refunds after payment.
-                            <span class="checkmark"></span>
-                        </label>
-                    </fieldset>
-
-                    <button type="submit" class="cta-button form-submit-button">
-                        <span class="btn-text">Continue to Payment</span>
-                    </button>
-                </form>
+            <div class="wiz-welcome-start">
+              <button type="button" class="wiz-btn wiz-btn-primary wiz-btn-full" id="btn-start">
+                <span class="wiz-btn-label" data-i18n="welcomeStart">はじめましょう</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
             </div>
-        </section>
+          </div>
+        </div>
+
+        <!-- ============================================
+             STEP 2 — About You
+             ============================================ -->
+        <div class="wiz-step" id="step-2">
+          <h2 class="wiz-step-title" data-i18n="aboutTitle">あなたについて教えてください</h2>
+          <p class="wiz-step-desc" data-i18n="aboutDesc">レッスンで使うお名前と連絡先を入力してください。</p>
+
+          <div class="wiz-field-row">
+            <div class="form-group">
+              <label for="field-family-name" data-i18n="labelFamilyName">姓</label>
+              <input type="text" id="field-family-name" required placeholder="">
+              <div class="wiz-field-hint" data-i18n="hintFamilyName">例：山田</div>
+              <div class="wiz-field-error" id="err-family-name" data-i18n="errRequired">入力してください</div>
+            </div>
+            <div class="form-group">
+              <label for="field-given-name" data-i18n="labelGivenName">名</label>
+              <input type="text" id="field-given-name" required placeholder="">
+              <div class="wiz-field-hint" data-i18n="hintGivenName">例：太郎</div>
+              <div class="wiz-field-error" id="err-given-name" data-i18n="errRequired">入力してください</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="field-romaji" data-i18n="labelRomaji">名前（ローマ字）</label>
+            <input type="text" id="field-romaji" required placeholder="">
+            <div class="wiz-field-hint" data-i18n="hintRomaji">レッスン中に先生が使うお名前です（例：Taro）</div>
+            <div class="wiz-field-error" id="err-romaji" data-i18n="errRequired">入力してください</div>
+          </div>
+
+          <div class="form-group">
+            <label for="field-email" data-i18n="labelEmail">メールアドレス</label>
+            <input type="email" id="field-email" required readonly>
+          </div>
+
+          <div class="form-group">
+            <label for="field-line-id" data-i18n="labelLineId">LINE ID</label>
+            <input type="text" id="field-line-id" required placeholder="">
+            <div class="wiz-field-hint" data-i18n="hintLineId">LINE IDの確認方法：LINEアプリ → 設定 → プロフィール → ID</div>
+            <div class="wiz-field-error" id="err-line-id" data-i18n="errRequired">入力してください</div>
+          </div>
+
+          <!-- Hidden user_id -->
+          <input type="hidden" id="field-user-id">
+
+          <div class="wiz-nav">
+            <button type="button" class="wiz-btn wiz-btn-secondary" data-goto="1" data-i18n="btnBack">戻る</button>
+            <button type="button" class="wiz-btn wiz-btn-primary" id="btn-step2-next" data-i18n="btnNext">次へ</button>
+          </div>
+        </div>
+
+        <!-- ============================================
+             STEP 3 — Your Goal (Purpose)
+             ============================================ -->
+        <div class="wiz-step" id="step-3">
+          <h2 class="wiz-step-title" data-i18n="goalTitle">あなたに合ったレッスンを選びましょう</h2>
+          <div class="wiz-step-highlight" data-i18n="goalHighlight">Prokaiwaでは、あなたの目的に合わせた1年分のカリキュラムをご用意しています。リスニング・文法・会話練習など、毎日違うタイプのレッスンで自然な英語力を身につけます。</div>
+
+          <div class="wiz-card-grid" id="purpose-grid">
+            <!-- Work -->
+            <label class="wiz-card" data-purpose="Work">
+              <input type="radio" name="purpose" value="Work">
+              <div class="wiz-card-icon">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="6" y="14" width="28" height="20" rx="3" stroke="currentColor" stroke-width="2"/>
+                  <path d="M14 14V10a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <line x1="6" y1="23" x2="34" y2="23" stroke="currentColor" stroke-width="2"/>
+                  <rect x="17" y="21" width="6" height="4" rx="1" fill="currentColor"/>
+                </svg>
+              </div>
+              <span class="wiz-card-label" data-i18n="purposeWork">仕事・ビジネス</span>
+            </label>
+
+            <!-- Hobby -->
+            <label class="wiz-card" data-purpose="Hobby">
+              <input type="radio" name="purpose" value="Hobby">
+              <div class="wiz-card-icon">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="15" cy="15" r="4" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="26" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="22" cy="25" r="5" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 32 l4-9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M18 34 l-1-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M30 30 l-3-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="wiz-card-label" data-i18n="purposeHobby">楽しみ・趣味</span>
+            </label>
+
+            <!-- Travel -->
+            <label class="wiz-card" data-purpose="Travel">
+              <input type="radio" name="purpose" value="Travel">
+              <div class="wiz-card-icon">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 4 L26 16 L34 16 L28 24 L30 36 L20 30 L10 36 L12 24 L6 16 L14 16 Z" stroke="currentColor" stroke-width="0" fill="none"/>
+                  <path d="M30 14 C30 14 34 8 28 4 C24 8 28 14 28 14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" transform="rotate(-30, 28, 10)"/>
+                  <path d="M8 30 Q12 26 20 26 Q28 26 32 30" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <path d="M6 34 Q12 30 20 30 Q28 30 34 34" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <circle cx="20" cy="16" r="7" stroke="currentColor" stroke-width="2"/>
+                  <line x1="20" y1="9" x2="20" y2="23" stroke="currentColor" stroke-width="1.5"/>
+                  <line x1="13" y1="16" x2="27" y2="16" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M13.5 12 Q20 14 26.5 12" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                  <path d="M13.5 20 Q20 18 26.5 20" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                </svg>
+              </div>
+              <span class="wiz-card-label" data-i18n="purposeTravel">旅行</span>
+            </label>
+
+            <!-- Casual -->
+            <label class="wiz-card" data-purpose="Casual">
+              <input type="radio" name="purpose" value="Casual">
+              <div class="wiz-card-icon">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="4" y="6" width="22" height="16" rx="4" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 26 L4 32" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <rect x="14" y="18" width="22" height="14" rx="4" stroke="currentColor" stroke-width="2"/>
+                  <path d="M32 32 L36 37" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="11" cy="14" r="1.5" fill="currentColor"/>
+                  <circle cx="15" cy="14" r="1.5" fill="currentColor"/>
+                  <circle cx="19" cy="14" r="1.5" fill="currentColor"/>
+                </svg>
+              </div>
+              <span class="wiz-card-label" data-i18n="purposeCasual">友達との会話</span>
+            </label>
+          </div>
+
+          <div class="wiz-field-error" id="err-purpose" data-i18n="errSelectOne" style="text-align:center;">一つ選択してください</div>
+
+          <div class="wiz-nav">
+            <button type="button" class="wiz-btn wiz-btn-secondary" data-goto="2" data-i18n="btnBack">戻る</button>
+            <button type="button" class="wiz-btn wiz-btn-primary" id="btn-step3-next" data-i18n="btnNext">次へ</button>
+          </div>
+        </div>
+
+        <!-- ============================================
+             STEP 4 — Choose Your Plan
+             ============================================ -->
+        <div class="wiz-step" id="step-4">
+          <h2 class="wiz-step-title" data-i18n="planTitle">プランを選択してください</h2>
+          <p class="wiz-step-desc" data-i18n="planDesc">すべてのプランでプロの先生からの個別フィードバックが含まれます。</p>
+
+          <div class="wiz-plan-grid" id="plan-grid">
+
+            <!-- Power Pack Lite -->
+            <label class="wiz-plan-card" data-plan="power_lite">
+              <input type="radio" name="plan" value="power_lite">
+              <div class="wiz-plan-radio-dot"></div>
+              <div class="wiz-plan-info">
+                <div class="wiz-plan-header">
+                  <span class="wiz-plan-name" data-i18n="planLiteName">パワーパック・ライト</span>
+                  <span class="wiz-plan-badge wiz-badge-popular" data-i18n="badgePopular">人気</span>
+                </div>
+                <div class="wiz-plan-price" data-i18n="planLitePrice">月額 ¥10,000</div>
+                <div class="wiz-plan-features" data-i18n="planLiteFeatures">毎日のLINE練習 ＋ 月2回のビデオレッスン</div>
+              </div>
+            </label>
+
+            <!-- LINE Practice -->
+            <label class="wiz-plan-card" data-plan="line">
+              <input type="radio" name="plan" value="line">
+              <div class="wiz-plan-radio-dot"></div>
+              <div class="wiz-plan-info">
+                <div class="wiz-plan-header">
+                  <span class="wiz-plan-name" data-i18n="planLineName">LINEプラクティスプラン</span>
+                </div>
+                <div class="wiz-plan-price" data-i18n="planLinePrice">月額 ¥6,000</div>
+                <div class="wiz-plan-features" data-i18n="planLineFeatures">LINEでの毎日の英会話練習＋先生からのフィードバック</div>
+              </div>
+            </label>
+
+            <!-- Power Pack Pro -->
+            <label class="wiz-plan-card" data-plan="power_pro">
+              <input type="radio" name="plan" value="power_pro">
+              <div class="wiz-plan-radio-dot"></div>
+              <div class="wiz-plan-info">
+                <div class="wiz-plan-header">
+                  <span class="wiz-plan-name" data-i18n="planProName">パワーパック・プロ</span>
+                  <span class="wiz-plan-badge wiz-badge-recommended" data-i18n="badgeRecommended">おすすめ</span>
+                </div>
+                <div class="wiz-plan-price" data-i18n="planProPrice">月額 ¥16,000</div>
+                <div class="wiz-plan-features" data-i18n="planProFeatures">LINE練習 ＋ 月4回のビデオレッスン — 最も充実したパッケージ</div>
+              </div>
+            </label>
+
+            <!-- Video only -->
+            <label class="wiz-plan-card" data-plan="video">
+              <input type="radio" name="plan" value="video">
+              <div class="wiz-plan-radio-dot"></div>
+              <div class="wiz-plan-info">
+                <div class="wiz-plan-header">
+                  <span class="wiz-plan-name" data-i18n="planVideoName">1対1ビデオレッスン（50分）</span>
+                </div>
+                <div class="wiz-plan-price" data-i18n="planVideoPrice">1回 ¥4,000</div>
+                <div class="wiz-plan-features" data-i18n="planVideoFeatures">気軽に話せる個別レッスン</div>
+              </div>
+            </label>
+
+          </div>
+
+          <div class="wiz-field-error" id="err-plan" data-i18n="errSelectOne" style="text-align:center;">一つ選択してください</div>
+
+          <div class="wiz-nav">
+            <button type="button" class="wiz-btn wiz-btn-secondary" data-goto="3" data-i18n="btnBack">戻る</button>
+            <button type="button" class="wiz-btn wiz-btn-primary" id="btn-step4-next" data-i18n="btnNext">次へ</button>
+          </div>
+        </div>
+
+        <!-- ============================================
+             STEP 5 — Final Details & Submit
+             ============================================ -->
+        <div class="wiz-step" id="step-5">
+          <h2 class="wiz-step-title" data-i18n="finalTitle">あと少しで完了です</h2>
+          <p class="wiz-step-desc" data-i18n="finalDesc">最後にいくつかお聞かせください。</p>
+
+          <!-- How did you hear about us -->
+          <fieldset style="border:none; padding:0; margin:0 0 1.5rem;">
+            <legend style="font-weight:600; font-size:0.95rem; color:var(--color-text); margin-bottom:0.75rem;" data-i18n="sourceTitle">Prokaiwaをどこで知りましたか？（複数選択可）</legend>
+
+            <div class="wiz-checkbox-group">
+              <label class="wiz-checkbox-label">
+                <input type="checkbox" name="source" value="Social Media">
+                <span data-i18n="sourceSocial">SNS（Instagram、Xなど）</span>
+              </label>
+              <label class="wiz-checkbox-label">
+                <input type="checkbox" name="source" value="Friend Recommendation" id="chk-source-friend">
+                <span data-i18n="sourceFriend">友人・知人からの紹介</span>
+              </label>
+              <div class="wiz-expand-field" id="expand-friend">
+                <div class="form-group">
+                  <label for="field-friend-name" data-i18n="sourceFriendLabel">紹介者のお名前（割引適用のため）：</label>
+                  <input type="text" id="field-friend-name" placeholder="">
+                </div>
+              </div>
+              <label class="wiz-checkbox-label">
+                <input type="checkbox" name="source" value="Advertisement">
+                <span data-i18n="sourceAd">広告</span>
+              </label>
+              <label class="wiz-checkbox-label">
+                <input type="checkbox" name="source" value="Search Engine">
+                <span data-i18n="sourceSearch">Google検索</span>
+              </label>
+              <label class="wiz-checkbox-label">
+                <input type="checkbox" name="source" value="Other" id="chk-source-other">
+                <span data-i18n="sourceOther">その他</span>
+              </label>
+              <div class="wiz-expand-field" id="expand-other">
+                <div class="form-group">
+                  <label for="field-other-source" data-i18n="sourceOtherLabel">具体的に教えてください：</label>
+                  <input type="text" id="field-other-source">
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Optional social -->
+          <div class="form-group">
+            <label for="field-social" data-i18n="labelSocial">Instagram または X のアカウント（任意）</label>
+            <input type="text" id="field-social" placeholder="@username">
+          </div>
+
+          <hr class="wiz-divider">
+
+          <!-- Terms -->
+          <div class="wiz-terms-box">
+            <div class="wiz-terms-title" data-i18n="termsTitle">ご利用にあたって</div>
+
+            <label class="wiz-checkbox-label">
+              <input type="checkbox" name="agree-apps" id="chk-agree-apps" required>
+              <span data-i18n="termsApps">レッスンはLINEおよびGoogle Meet（ビデオ通話）で行われることを理解しました。</span>
+            </label>
+            <label class="wiz-checkbox-label">
+              <input type="checkbox" name="agree-video-times" id="chk-agree-video" required>
+              <span data-i18n="termsVideoTimes">ビデオレッスンは土曜・日曜（日本時間）のみ対応可能であることを理解しました。</span>
+            </label>
+            <label class="wiz-checkbox-label">
+              <input type="checkbox" name="agree-terms" id="chk-agree-terms" required>
+              <span>
+                <strong data-i18n="termsAgreeLabel">利用規約に同意します：</strong>
+                <span data-i18n="termsAgreeText">LINEプラクティスプラン、パワーパック・ライト、パワーパック・プロは月額自動更新制です。キャンセルは次回請求日の3日前までにLINE/メールでご連絡ください。お支払い後の返金はできません。</span>
+              </span>
+            </label>
+          </div>
+
+          <div class="wiz-field-error" id="err-terms" data-i18n="errTerms" style="text-align:center;">すべての項目に同意してください</div>
+
+          <div class="wiz-nav">
+            <button type="button" class="wiz-btn wiz-btn-secondary" data-goto="4" data-i18n="btnBack">戻る</button>
+            <button type="button" class="wiz-btn wiz-btn-primary" id="btn-submit">
+              <span class="wiz-btn-label" data-i18n="btnSubmit">お支払いへ進む</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /wiz-container -->
     </main>
-    
+
     <div id="footer-placeholder"></div>
+  </div><!-- /wiz-outer -->
 
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
+  <!-- ============================================
+       SCRIPT
+       ============================================ -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
 
-        // --- Supabase Setup - MUST MATCH login.html and dashboard.html ---
-        const PROKAIWA_DEBUG = false;
-        const debugLog = PROKAIWA_DEBUG ? console.log.bind(console) : () => {};
+    // ── Supabase Setup — MUST MATCH login.html and dashboard.html ──
+    const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
 
-        // --- Supabase Setup - MUST MATCH login.html and dashboard.html ---
-        const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
-        
-        // FIX: Create client with SAME configuration as login and dashboard pages
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-                persistSession: true,
-                storageKey: 'prokaiwa-supabase-auth',  // MUST match all other pages
-                storage: window.localStorage,
-                autoRefreshToken: true,
-                detectSessionInUrl: true
-            }
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        storageKey: 'prokaiwa-supabase-auth',
+        storage: window.localStorage,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
+
+    // ── Stripe Links (Test mode) ──
+    const baseStripeLinks = {
+      'line':       'https://buy.stripe.com/test_00w3cu0EbgZ59NO3fVes006',
+      'video':      'https://buy.stripe.com/test_14A4gyev14cj2lm2bRes007',
+      'power_lite': 'https://buy.stripe.com/test_5kQaEW0EbcIP6BC5o3es008',
+      'power_pro':  'https://buy.stripe.com/test_00w9ASfz5bEL4tu8Afes005'
+    };
+
+    // ══════════════════════════════════════════════
+    //  i18n — All translatable strings
+    // ══════════════════════════════════════════════
+    const i18n = {
+      ja: {
+        // Step 1 — Welcome
+        welcomeTitle: 'ようこそ、Prokaiwaへ',
+        welcomeSubtitle: '英語の旅が、ここから始まります。\n最初の一歩から丁寧にサポートします。',
+        welcomeCheck1: 'お名前と連絡先の登録',
+        welcomeCheck2: '学習の目的を選択',
+        welcomeCheck3: 'プランの選択',
+        welcomeCheck4: 'お支払い設定で完了',
+        welcomeStart: 'はじめましょう',
+
+        // Step 2 — About You
+        aboutTitle: 'あなたについて教えてください',
+        aboutDesc: 'レッスンで使うお名前と連絡先を入力してください。',
+        labelFamilyName: '姓',
+        hintFamilyName: '例：山田',
+        labelGivenName: '名',
+        hintGivenName: '例：太郎',
+        labelRomaji: '名前（ローマ字）',
+        hintRomaji: 'レッスン中に先生が使うお名前です（例：Taro）',
+        labelEmail: 'メールアドレス',
+        labelLineId: 'LINE ID',
+        hintLineId: 'LINE IDの確認方法：LINEアプリ → 設定 → プロフィール → ID',
+
+        // Step 3 — Goal
+        goalTitle: 'あなたに合ったレッスンを選びましょう',
+        goalHighlight: 'Prokaiwaでは、あなたの目的に合わせた1年分のカリキュラムをご用意しています。リスニング・文法・会話練習など、毎日違うタイプのレッスンで自然な英語力を身につけます。',
+        purposeWork: '仕事・ビジネス',
+        purposeHobby: '楽しみ・趣味',
+        purposeTravel: '旅行',
+        purposeCasual: '友達との会話',
+
+        // Step 4 — Plan
+        planTitle: 'プランを選択してください',
+        planDesc: 'すべてのプランでプロの先生からの個別フィードバックが含まれます。',
+        planLiteName: 'パワーパック・ライト',
+        planLitePrice: '月額 ¥10,000',
+        planLiteFeatures: '毎日のLINE練習 ＋ 月2回のビデオレッスン',
+        planLineName: 'LINEプラクティスプラン',
+        planLinePrice: '月額 ¥6,000',
+        planLineFeatures: 'LINEでの毎日の英会話練習＋先生からのフィードバック',
+        planProName: 'パワーパック・プロ',
+        planProPrice: '月額 ¥16,000',
+        planProFeatures: 'LINE練習 ＋ 月4回のビデオレッスン — 最も充実したパッケージ',
+        planVideoName: '1対1ビデオレッスン（50分）',
+        planVideoPrice: '1回 ¥4,000',
+        planVideoFeatures: '気軽に話せる個別レッスン',
+        badgePopular: '人気',
+        badgeRecommended: 'おすすめ',
+
+        // Step 5 — Final
+        finalTitle: 'あと少しで完了です',
+        finalDesc: '最後にいくつかお聞かせください。',
+        sourceTitle: 'Prokaiwaをどこで知りましたか？（複数選択可）',
+        sourceSocial: 'SNS（Instagram、Xなど）',
+        sourceFriend: '友人・知人からの紹介',
+        sourceFriendLabel: '紹介者のお名前（割引適用のため）：',
+        sourceAd: '広告',
+        sourceSearch: 'Google検索',
+        sourceOther: 'その他',
+        sourceOtherLabel: '具体的に教えてください：',
+        labelSocial: 'Instagram または X のアカウント（任意）',
+        termsTitle: 'ご利用にあたって',
+        termsApps: 'レッスンはLINEおよびGoogle Meet（ビデオ通話）で行われることを理解しました。',
+        termsVideoTimes: 'ビデオレッスンは土曜・日曜（日本時間）のみ対応可能であることを理解しました。',
+        termsAgreeLabel: '利用規約に同意します：',
+        termsAgreeText: 'LINEプラクティスプラン、パワーパック・ライト、パワーパック・プロは月額自動更新制です。キャンセルは次回請求日の3日前までにLINE/メールでご連絡ください。お支払い後の返金はできません。',
+
+        // Buttons & Errors
+        btnBack: '戻る',
+        btnNext: '次へ',
+        btnSubmit: 'お支払いへ進む',
+        errRequired: '入力してください',
+        errSelectOne: '一つ選択してください',
+        errTerms: 'すべての項目に同意してください',
+        errNotLoggedIn: 'ログインが必要です。ログインページに戻ります。',
+        errPaymentLink: 'このプランの支払いリンクが設定されていません。',
+        errGeneric: 'エラーが発生しました。もう一度お試しください。'
+      },
+
+      en: {
+        welcomeTitle: 'Welcome to Prokaiwa',
+        welcomeSubtitle: 'Your English journey starts here.\nWe\'ll support you from the very first step.',
+        welcomeCheck1: 'Your name and contact details',
+        welcomeCheck2: 'Choose your learning goal',
+        welcomeCheck3: 'Pick a plan',
+        welcomeCheck4: 'Set up payment and you\'re done',
+        welcomeStart: 'Let\'s get started',
+
+        aboutTitle: 'Tell us about yourself',
+        aboutDesc: 'Enter your name and contact info for lessons.',
+        labelFamilyName: 'Family Name',
+        hintFamilyName: 'e.g. Yamada',
+        labelGivenName: 'Given Name',
+        hintGivenName: 'e.g. Taro',
+        labelRomaji: 'First Name (Romaji)',
+        hintRomaji: 'This is what your teacher will call you during lessons (e.g. Taro)',
+        labelEmail: 'Email',
+        labelLineId: 'LINE ID',
+        hintLineId: 'Find your LINE ID: LINE app → Settings → Profile → ID',
+
+        goalTitle: 'Choose your learning goal',
+        goalHighlight: 'Prokaiwa offers a full year of curriculum tailored to your goal. Each day brings a different type of practice — listening, grammar, conversation, and more — building natural English step by step.',
+        purposeWork: 'Work / Business',
+        purposeHobby: 'Fun / Hobby',
+        purposeTravel: 'Travel',
+        purposeCasual: 'Making Friends',
+
+        planTitle: 'Choose your plan',
+        planDesc: 'All plans include personal feedback from a professional teacher.',
+        planLiteName: 'Power Pack Lite',
+        planLitePrice: '¥10,000 / month',
+        planLiteFeatures: 'Daily LINE practice + 2 video lessons per month',
+        planLineName: 'LINE Practice Plan',
+        planLinePrice: '¥6,000 / month',
+        planLineFeatures: 'Daily English conversation via LINE + teacher feedback',
+        planProName: 'Power Pack Pro',
+        planProPrice: '¥16,000 / month',
+        planProFeatures: 'LINE practice + 4 video lessons per month — the full package',
+        planVideoName: '1-on-1 Video Lesson (50 min)',
+        planVideoPrice: '¥4,000 / lesson',
+        planVideoFeatures: 'Casual or business English practice',
+        badgePopular: 'Popular',
+        badgeRecommended: 'Recommended',
+
+        finalTitle: 'Almost done',
+        finalDesc: 'Just a few more things before you start.',
+        sourceTitle: 'How did you hear about Prokaiwa? (Select all that apply)',
+        sourceSocial: 'Social Media (Instagram, X, etc.)',
+        sourceFriend: 'Friend Recommendation',
+        sourceFriendLabel: 'Friend\'s name (for referral discount):',
+        sourceAd: 'Advertisement',
+        sourceSearch: 'Google Search',
+        sourceOther: 'Other',
+        sourceOtherLabel: 'Please specify:',
+        labelSocial: 'Instagram or X account (optional)',
+        termsTitle: 'Before you begin',
+        termsApps: 'I understand that lessons are conducted through LINE and Google Meet.',
+        termsVideoTimes: 'I understand that video lessons are available on Saturdays and Sundays (JST) only.',
+        termsAgreeLabel: 'I agree to the terms: ',
+        termsAgreeText: 'LINE Practice, Power Pack Lite, and Power Pack Pro are monthly auto-renewing subscriptions. Cancel via LINE or email at least 3 days before your next billing date. No refunds after payment.',
+
+        btnBack: 'Back',
+        btnNext: 'Next',
+        btnSubmit: 'Continue to Payment',
+        errRequired: 'This field is required',
+        errSelectOne: 'Please select one',
+        errTerms: 'Please agree to all terms',
+        errNotLoggedIn: 'You must be logged in. Redirecting to login page.',
+        errPaymentLink: 'Payment link is not configured for this plan.',
+        errGeneric: 'An error occurred. Please try again.'
+      }
+    };
+
+    // ══════════════════════════════════════════════
+    //  i18n engine
+    // ══════════════════════════════════════════════
+    function getCurrentLang() {
+      return localStorage.getItem('prokaiwaLang') || 'ja';
+    }
+
+    function applyLanguage(lang) {
+      const strings = i18n[lang];
+      if (!strings) return;
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (strings[key] !== undefined) {
+          // Handle newlines as <br> for display
+          el.innerHTML = escapeHtml(strings[key]).replace(/\n/g, '<br>');
+        }
+      });
+    }
+
+    // XSS-safe escape
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+
+
+    // Listen for storage changes from script.js
+window.addEventListener('storage', (e) => {
+  if (e.key === 'prokaiwaLang') {
+    applyLanguage(e.newValue);
+  }
+});
+
+// Also hook into script.js toggle via a MutationObserver on the lang attribute
+const langObserver = new MutationObserver(() => {
+  applyLanguage(document.documentElement.lang || 'ja');
+});
+langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+
+    // ══════════════════════════════════════════════
+    //  Wizard state & navigation
+    // ══════════════════════════════════════════════
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    function goToStep(n) {
+      if (n < 1 || n > totalSteps) return;
+
+      // Hide current step
+      const current = document.getElementById(`step-${currentStep}`);
+      if (current) current.classList.remove('active');
+
+      currentStep = n;
+
+      // Show target step
+      const target = document.getElementById(`step-${n}`);
+      if (target) target.classList.add('active');
+
+      // Show/hide progress bar (hidden on step 1)
+      const progressBar = document.getElementById('wiz-progress');
+      progressBar.style.display = n === 1 ? 'none' : 'flex';
+
+      // Update progress dots (steps 2-5 map to dots 1-4)
+      if (n > 1) {
+        document.querySelectorAll('.wiz-progress-step').forEach(dot => {
+          const dotStep = parseInt(dot.dataset.step);
+          dot.classList.remove('active', 'completed');
+          if (dotStep < n) dot.classList.add('completed');
+          else if (dotStep === n) dot.classList.add('active');
         });
-
-        // Update the Stripe links
-const baseStripeLinks = {
-    'line':       'https://buy.stripe.com/test_00w3cu0EbgZ59NO3fVes006', // Test
-    'video':      'https://buy.stripe.com/test_14A4gyev14cj2lm2bRes007', // Test
-    'power_lite': 'https://buy.stripe.com/test_5kQaEW0EbcIP6BC5o3es008', // Test
-    'power_pro':  'https://buy.stripe.com/test_00w9ASfz5bEL4tu8Afes005' // Test
-};
-
-const successUrls = {
-    'line':       `${window.location.origin}/thank-you-line.html`,
-    'video':      `${window.location.origin}/thank-you.html`,
-    'power_lite': `${window.location.origin}/thank-you-pro.html`,
-    'power_pro':  `${window.location.origin}/thank-you-pro.html`
-};
-
-        // --- Language Detection ---
-        function getCurrentLang() {
-            return localStorage.getItem('prokaiwa-lang') || 'ja';
-        }
-        
-        function hidePageLoading() {
-            const overlay = document.getElementById('page-loading');
-            if (overlay) {
-                overlay.classList.add('hidden');
-            }
-        }
-
-        // --- Helper Functions ---
-        function showMessage(message, type = 'error') {
-            const lang = getCurrentLang();
-            const messageBox = document.getElementById(`${lang}-message-box`);
-            messageBox.textContent = message;
-            messageBox.className = `message-box ${type}`;
-            messageBox.style.display = 'block';
-            window.scrollTo(0, 0);
-        }
-
-        function setButtonLoading(button, isLoading) {
-            if (isLoading) {
-                button.classList.add('btn-loading');
-                button.disabled = true;
-            } else {
-                button.classList.remove('btn-loading');
-                button.disabled = false;
-            }
-        }
-
-        // --- Error Messages (Localized) ---
-        const messages = {
-            ja: {
-                notLoggedIn: 'ログインが必要です。ログインページに戻ります。',
-                saveError: 'データの保存中にエラーが発生しました：',
-                paymentLinkError: 'このプランの支払いリンクが設定されていません。',
-                genericError: 'エラーが発生しました。もう一度お試しください。'
-            },
-            en: {
-                notLoggedIn: 'You must be logged in. Redirecting to login page.',
-                saveError: 'Error saving data: ',
-                paymentLinkError: 'Payment link is not configured for this plan.',
-                genericError: 'An error occurred. Please try again.'
-            }
-        };
-
-        // --- Toggle conditional fields ---
-        function setupConditionalFields(lang) {
-            // Purpose "Other" toggle
-            const purposeOther = document.getElementById(`${lang}-purpose-other-checkbox`);
-            const purposeOtherContainer = document.getElementById(`${lang}-purpose-other-container`);
-            
-            // For radio buttons, we need to listen to all options
-            document.querySelectorAll(`input[name="${lang}-purpose"]`).forEach(radio => {
-                radio.addEventListener('change', () => {
-                    purposeOtherContainer.style.display = 
-                        document.getElementById(`${lang}-purpose-other-checkbox`).checked ? 'block' : 'none';
-                });
-            });
-
-            // Source "Friend" toggle
-            const sourceFriend = document.getElementById(`${lang}-source-friend-checkbox`);
-            const sourceFriendContainer = document.getElementById(`${lang}-source-friend-container`);
-            sourceFriend.addEventListener('change', (e) => {
-                sourceFriendContainer.style.display = e.target.checked ? 'block' : 'none';
-            });
-
-            // Source "Other" toggle
-            const sourceOther = document.getElementById(`${lang}-source-other-checkbox`);
-            const sourceOtherContainer = document.getElementById(`${lang}-source-other-container`);
-            sourceOther.addEventListener('change', (e) => {
-                sourceOtherContainer.style.display = e.target.checked ? 'block' : 'none';
-            });
-        }
-
-        // Setup conditional fields for both languages
-        setupConditionalFields('ja');
-        setupConditionalFields('en');
-
-        // --- Form Submission ---
-        document.querySelectorAll('[id$="-questionnaire-form"]').forEach(form => {
-            form.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                
-                const lang = form.dataset.lang;
-                const localMessages = messages[lang];
-                const submitBtn = form.querySelector('button[type="submit"]');
-                
-                // FIX: Use getSession() instead of getUser()
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-                
-                if (sessionError || !session) {
-                    console.error('Session error:', sessionError);
-                    showMessage(localMessages.notLoggedIn);
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
-                    return;
-                }
-                
-                const user = session.user;
-
-                setButtonLoading(submitBtn, true);
-
-                // Collect form data
-                const selectedPlan = form.querySelector(`input[name="${lang}-plan"]:checked`)?.value;
-                const selectedPurpose = form.querySelector(`input[name="${lang}-purpose"]:checked`)?.value;
-                
-                // Handle purpose - normalize to simple values
-let purpose = selectedPurpose;
-
-// Map friendly names to simple database values
-const purposeMap = {
-    'Fun / Hobby': 'Hobby',
-    'Business / Work': 'Work',
-    'Travel': 'Travel',
-    'Casual Conversation': 'Casual',
-    'Other': 'Hobby'  // Default "Other" to Hobby prompts
-};
-
-if (selectedPurpose === 'Other') {
-    const otherText = document.getElementById(`${lang}-purpose-other-text`).value;
-    // Store their custom purpose in goals for your review later
-    // But send them Hobby prompts for now so they get SOMETHING
-    purpose = 'Hobby';
-} else {
-    purpose = purposeMap[selectedPurpose] || 'Hobby';
-}
-
-                // Collect source checkboxes
-                const sourceCheckboxes = form.querySelectorAll(`input[name="${lang}-source"]:checked`);
-                let sources = Array.from(sourceCheckboxes).map(cb => cb.value);
-                
-                // Handle friend referral
-                if (sources.includes('Friend Recommendation')) {
-                    const friendName = document.getElementById(`${lang}-source-friend-text`).value;
-                    sources = sources.filter(s => s !== 'Friend Recommendation');
-                    sources.push(friendName ? `Friend: ${friendName}` : 'Friend Recommendation');
-                }
-                
-                // Handle "Other" source
-                if (sources.includes('Other')) {
-                    const otherSourceText = document.getElementById(`${lang}-source-other-text`).value;
-                    sources = sources.filter(s => s !== 'Other');
-                    if (otherSourceText) sources.push(`Other: ${otherSourceText}`);
-                }
-                
-                const dataToSubmit = {
-                    user_id: user.id,
-                    name: document.getElementById(`${lang}-full-name`).value,
-                    given_name_romaji: document.getElementById(`${lang}-given-name-romaji`).value,
-                    email: document.getElementById(`${lang}-email`).value,
-                    line_id: document.getElementById(`${lang}-line-id`).value,
-                    plan: selectedPlan,
-                    level: document.getElementById(`${lang}-english-level`).value,
-                    goals: {
-                        purpose: purpose,
-                        how_heard: sources,
-                        social_account: document.getElementById(`${lang}-instagram-x`).value || 'N/A',
-                        agreed_to_terms: {
-                            apps: form.querySelector(`input[name="${lang}-agree-apps"]`).checked,
-                            video_times: form.querySelector(`input[name="${lang}-agree-video-times"]`).checked,
-                            subscriptions: form.querySelector(`input[name="${lang}-agree-terms"]`).checked
-                        }
-                    },
-                    updated_at: new Date().toISOString()
-                };
-
-                try {
-                    const { error } = await supabase
-                        .from('questionnaire_responses')
-                        .upsert(dataToSubmit, { onConflict: 'user_id' });
-
-                    if (error) {
-                        setButtonLoading(submitBtn, false);
-                        console.error('Questionnaire save error:', error.message);
-                        showMessage(localMessages.genericError);
-                    } else {
-                        const baseUrl = baseStripeLinks[selectedPlan];
-                        
-                        if (!baseUrl) {
-                            setButtonLoading(submitBtn, false);
-                            showMessage(localMessages.paymentLinkError);
-                            return;
-                        }
-
-                        const stripeLink = `${baseUrl}?client_reference_id=${user.id}`;
-                        window.location.href = stripeLink;
-                    }
-                } catch (err) {
-                    console.error('Form submission error:', err);
-                    setButtonLoading(submitBtn, false);
-                    showMessage(localMessages.genericError);
-                }
-            });
+        document.querySelectorAll('.wiz-progress-line').forEach(line => {
+          const lineStep = parseInt(line.dataset.line);
+          line.classList.toggle('completed', lineStep <= n);
         });
+      }
 
-        // --- Initial Setup ---
-        async function initializePage() {
-            debugLog('Initializing questionnaire page...');
-            
-            try {
-                // FIX: Use getSession() instead of getUser()
-                const { data: { session }, error } = await supabase.auth.getSession();
-                
-                if (error) {
-                    console.error('Session error:', error);
-                }
-                
-                if (session && session.user) {
-                    const user = session.user;
-                    debugLog('User authenticated:', user.email);
-                    
-                    // Fill in user ID and email for both language forms
-                    ['ja', 'en'].forEach(lang => {
-                        document.getElementById(`${lang}-user-id`).value = user.id;
-                        document.getElementById(`${lang}-email`).value = user.email;
-                    });
-                    
-                    hidePageLoading();
-                } else {
-                    // Redirect to login if not authenticated
-                    debugLog('No session found, redirecting to login');
-                    window.location.href = 'login.html';
-                }
-            } catch (err) {
-                console.error('Initialization error:', err);
-                window.location.href = 'login.html';
-            }
-        }
-        
-        // FIX: Listen for auth state changes
-        supabase.auth.onAuthStateChange((event, session) => {
-            debugLog('Auth state changed:', event);
-            
-            if (event === 'SIGNED_OUT') {
-                window.location.href = 'login.html';
-            }
+      // Hide any error message
+      hideMessage();
+
+      // Scroll to top smoothly
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── Back buttons ──
+    document.querySelectorAll('[data-goto]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        goToStep(parseInt(btn.dataset.goto));
+      });
+    });
+
+    // ── Start button ──
+    document.getElementById('btn-start').addEventListener('click', () => {
+      goToStep(2);
+    });
+
+    // ══════════════════════════════════════════════
+    //  Card selection behavior
+    // ══════════════════════════════════════════════
+    function setupCardSelection(gridId) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      grid.querySelectorAll('.wiz-card, .wiz-plan-card').forEach(card => {
+        card.addEventListener('click', () => {
+          grid.querySelectorAll('.wiz-card, .wiz-plan-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          const radio = card.querySelector('input[type="radio"]');
+          if (radio) radio.checked = true;
         });
-        
-        // Run initialization
-        initializePage();
-    </script>
-    <script src="assets/js/components.js"></script>
-    <script src="assets/js/script.js"></script>
+      });
+    }
+    setupCardSelection('purpose-grid');
+    setupCardSelection('plan-grid');
+
+    // ══════════════════════════════════════════════
+    //  Conditional expand fields
+    // ══════════════════════════════════════════════
+    document.getElementById('chk-source-friend').addEventListener('change', (e) => {
+      document.getElementById('expand-friend').classList.toggle('visible', e.target.checked);
+    });
+    document.getElementById('chk-source-other').addEventListener('change', (e) => {
+      document.getElementById('expand-other').classList.toggle('visible', e.target.checked);
+    });
+
+    // ══════════════════════════════════════════════
+    //  Validation
+    // ══════════════════════════════════════════════
+    function clearErrors() {
+      document.querySelectorAll('.wiz-field-error').forEach(el => el.classList.remove('visible'));
+    }
+
+    function showFieldError(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('visible');
+    }
+
+    function validateStep2() {
+      clearErrors();
+      let valid = true;
+      const fields = [
+        { id: 'field-family-name', err: 'err-family-name' },
+        { id: 'field-given-name', err: 'err-given-name' },
+        { id: 'field-romaji', err: 'err-romaji' },
+        { id: 'field-line-id', err: 'err-line-id' }
+      ];
+      fields.forEach(f => {
+        if (!document.getElementById(f.id).value.trim()) {
+          showFieldError(f.err);
+          valid = false;
+        }
+      });
+      return valid;
+    }
+
+    function validateStep3() {
+      clearErrors();
+      const selected = document.querySelector('input[name="purpose"]:checked');
+      if (!selected) {
+        showFieldError('err-purpose');
+        return false;
+      }
+      return true;
+    }
+
+    function validateStep4() {
+      clearErrors();
+      const selected = document.querySelector('input[name="plan"]:checked');
+      if (!selected) {
+        showFieldError('err-plan');
+        return false;
+      }
+      return true;
+    }
+
+    function validateStep5() {
+      clearErrors();
+      const apps = document.getElementById('chk-agree-apps').checked;
+      const video = document.getElementById('chk-agree-video').checked;
+      const terms = document.getElementById('chk-agree-terms').checked;
+      if (!apps || !video || !terms) {
+        showFieldError('err-terms');
+        return false;
+      }
+      return true;
+    }
+
+    // ── Step navigation with validation ──
+    document.getElementById('btn-step2-next').addEventListener('click', () => {
+      if (validateStep2()) goToStep(3);
+    });
+    document.getElementById('btn-step3-next').addEventListener('click', () => {
+      if (validateStep3()) goToStep(4);
+    });
+    document.getElementById('btn-step4-next').addEventListener('click', () => {
+      if (validateStep4()) goToStep(5);
+    });
+
+    // ══════════════════════════════════════════════
+    //  Messages
+    // ══════════════════════════════════════════════
+    function showMessage(text) {
+      const box = document.getElementById('wiz-message');
+      box.textContent = text;
+      box.classList.add('error');
+      box.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function hideMessage() {
+      const box = document.getElementById('wiz-message');
+      box.style.display = 'none';
+      box.classList.remove('error');
+    }
+
+    // ══════════════════════════════════════════════
+    //  Submit
+    // ══════════════════════════════════════════════
+    document.getElementById('btn-submit').addEventListener('click', async () => {
+      if (!validateStep5()) return;
+
+      const lang = getCurrentLang();
+      const strings = i18n[lang];
+      const submitBtn = document.getElementById('btn-submit');
+
+      // Get session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        showMessage(strings.errNotLoggedIn);
+        setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+        return;
+      }
+
+      const user = session.user;
+      submitBtn.classList.add('wiz-btn-loading');
+      submitBtn.disabled = true;
+
+      // Gather form data
+      const familyName = document.getElementById('field-family-name').value.trim();
+      const givenName = document.getElementById('field-given-name').value.trim();
+      const givenNameRomaji = document.getElementById('field-romaji').value.trim();
+      const email = document.getElementById('field-email').value.trim();
+      const lineId = document.getElementById('field-line-id').value.trim();
+      const selectedPurpose = document.querySelector('input[name="purpose"]:checked')?.value;
+      const selectedPlan = document.querySelector('input[name="plan"]:checked')?.value;
+
+      // Collect sources
+      const sourceCheckboxes = document.querySelectorAll('input[name="source"]:checked');
+      let sources = Array.from(sourceCheckboxes).map(cb => cb.value);
+
+      if (sources.includes('Friend Recommendation')) {
+        const friendName = document.getElementById('field-friend-name').value.trim();
+        sources = sources.filter(s => s !== 'Friend Recommendation');
+        sources.push(friendName ? `Friend: ${friendName}` : 'Friend Recommendation');
+      }
+      if (sources.includes('Other')) {
+        const otherText = document.getElementById('field-other-source').value.trim();
+        sources = sources.filter(s => s !== 'Other');
+        if (otherText) sources.push(`Other: ${otherText}`);
+      }
+
+      const dataToSubmit = {
+        user_id: user.id,
+        family_name: familyName,
+        given_name: givenName,
+        name: `${familyName} ${givenName}`,
+        given_name_romaji: givenNameRomaji,
+        email: email,
+        line_id: lineId,
+        plan: selectedPlan,
+        level: 'Super Beginner',
+        goals: {
+          purpose: selectedPurpose,
+          how_heard: sources,
+          social_account: document.getElementById('field-social').value.trim() || 'N/A',
+          agreed_to_terms: {
+            apps: document.getElementById('chk-agree-apps').checked,
+            video_times: document.getElementById('chk-agree-video').checked,
+            subscriptions: document.getElementById('chk-agree-terms').checked
+          }
+        },
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        const { error } = await supabase
+          .from('questionnaire_responses')
+          .upsert(dataToSubmit, { onConflict: 'user_id' });
+
+        if (error) {
+          submitBtn.classList.remove('wiz-btn-loading');
+          submitBtn.disabled = false;
+          showMessage(strings.errGeneric);
+          return;
+        }
+
+        // Redirect to Stripe
+        const baseUrl = baseStripeLinks[selectedPlan];
+        if (!baseUrl) {
+          submitBtn.classList.remove('wiz-btn-loading');
+          submitBtn.disabled = false;
+          showMessage(strings.errPaymentLink);
+          return;
+        }
+
+        window.location.href = `${baseUrl}?client_reference_id=${user.id}`;
+
+      } catch (err) {
+        submitBtn.classList.remove('wiz-btn-loading');
+        submitBtn.disabled = false;
+        showMessage(strings.errGeneric);
+      }
+    });
+
+    // ══════════════════════════════════════════════
+    //  Page Initialization
+    // ══════════════════════════════════════════════
+    function hidePageLoading() {
+      const overlay = document.getElementById('page-loading');
+      if (overlay) overlay.classList.add('hidden');
+    }
+
+    async function initializePage() {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (!session || !session.user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const user = session.user;
+        document.getElementById('field-user-id').value = user.id;
+        document.getElementById('field-email').value = user.email;
+
+        // Apply language
+        applyLanguage(getCurrentLang());
+
+        hidePageLoading();
+
+      } catch (err) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        window.location.href = 'login.html';
+      }
+    });
+
+    initializePage();
+  </script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
 </body>
 </html>
