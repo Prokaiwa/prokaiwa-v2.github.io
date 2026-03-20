@@ -888,9 +888,12 @@ Keep it up! 🌟</textarea>
   // ============================================================
   // INIT
   // ============================================================
+  let mediaAuthToken = "";
+
   async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) { window.location.href = '/teacher-login.html'; return; }
+    mediaAuthToken = session.access_token;
 
     const { data: teacher } = await supabaseClient
       .from('teachers').select('id, is_active').eq('auth_user_id', session.user.id).single();
@@ -1078,9 +1081,9 @@ Keep it up! 🌟</textarea>
             html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:white; border:1px solid #e8e8e8; border-radius:6px; font-size:0.88rem; overflow:hidden; word-break:break-word;">
               <div style="font-size:0.75rem; color:#666; margin-bottom:0.3rem;">${time} · 👤 ${sName}</div>`;
             if (msg.message_text) html += `<p style="margin:0.25rem 0; color:#333;">"${escapeHtml(msg.message_text)}"</p>`;
-            if (msg.media_type === 'audio') html += `<audio controls style="width:100%; max-width:340px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}">Audio not supported.</audio>`;
-            if (msg.media_type === 'video') html += `<video controls style="width:100%; max-width:340px; border-radius:4px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}">Video not supported.</video>`;
-            if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}" style="max-width:100%; max-height:240px; border-radius:4px; margin-top:0.35rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
+            if (msg.media_type === 'audio') html += `<audio controls style="width:100%; max-width:340px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}&token=${mediaAuthToken}">Audio not supported.</audio>`;
+            if (msg.media_type === 'video') html += `<video controls style="width:100%; max-width:340px; border-radius:4px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}&token=${mediaAuthToken}">Video not supported.</video>`;
+            if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}&token=${mediaAuthToken}" style="max-width:100%; max-height:240px; border-radius:4px; margin-top:0.35rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
             html += `</div>`;
           } else if (msg._type === 'feedback') {
             // Detect voice messages — stored as "[Voice message] https://..."
