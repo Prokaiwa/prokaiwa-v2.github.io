@@ -1946,7 +1946,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
 
     } catch(err) {
       console.error('sendFeedbackFromCard:', err);
-      alert('Error sending feedback: ' + err.message);
+      alert('Error sending feedback. Please try again.');
       sendBtn.disabled  = false;
       sendBtn.innerHTML = originalHTML;
     }
@@ -1980,7 +1980,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
       alert('Skill scores saved! ✅');
     } catch(err) {
       console.error('saveSkillScores:', err);
-      alert('Error saving scores: ' + err.message);
+      alert('Error saving scores. Please try again.');
     }
   }
 
@@ -2076,7 +2076,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
       if (err.name === 'NotAllowedError') {
         alert('Microphone access denied. Please allow microphone access in your browser settings.');
       } else {
-        alert('Could not start recording: ' + err.message);
+        alert('Could not start recording. Please check microphone permissions.');
       }
     }
   }
@@ -2291,7 +2291,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
       closeAssessmentModal();
     } catch(err) {
       console.error('submitAssessment:', err);
-      alert('Error saving assessment: ' + err.message);
+      alert('Error saving assessment. Please try again.');
       btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save Assessment';
     }
   }

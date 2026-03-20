@@ -1000,7 +1000,7 @@ if (creditsError) {
             loading.innerHTML = `
                 <i class="fas fa-exclamation-circle" style="color: #dc3545;"></i>
                 <p style="color: #dc3545;">Failed to load account settings</p>
-                <p style="font-size: 0.9rem; color: var(--color-text-light);">${error.message}</p>
+                <p style="font-size: 0.9rem; color: var(--color-text-light);">${"エラーが発生しました。" }</p>
                 <button onclick="location.reload()" class="cta-button" style="margin-top: 1rem;">Retry</button>
             `;
         }

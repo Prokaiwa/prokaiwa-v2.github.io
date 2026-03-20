@@ -1425,7 +1425,7 @@ Keep it up! 🌟</textarea>
       if (err.name === 'NotAllowedError') {
         alert('Microphone access denied. Please allow microphone access in your browser settings.');
       } else {
-        alert('Could not start recording: ' + err.message);
+        alert('Could not start recording. Please check microphone permissions.');
       }
     }
   }
@@ -1552,7 +1552,7 @@ Keep it up! 🌟</textarea>
 
     } catch(err) {
       console.error('sendComposerMessage:', err);
-      alert('Error sending message: ' + err.message);
+      alert('Error sending message. Please try again.');
     } finally {
       sendBtn.disabled = false;
       sendBtn.innerHTML = orig;

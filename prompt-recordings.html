@@ -1189,7 +1189,7 @@
         showToast('✅ Recording saved successfully!', 'success');
       } catch (err) {
         console.error('Save recording error:', err);
-        showToast('❌ Upload failed: ' + err.message, 'error');
+        showToast('❌ Upload failed. Please try again.', 'error');
         btn.disabled = false;
         btn.innerHTML = origHtml;
       }
@@ -1218,7 +1218,7 @@
         showToast('Recording removed.', 'success');
       } catch (err) {
         console.error('Remove audio error:', err);
-        showToast('❌ Error removing recording: ' + err.message, 'error');
+        showToast('❌ Error removing recording. Please try again.', 'error');
       }
     }
 

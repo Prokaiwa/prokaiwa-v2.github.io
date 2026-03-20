@@ -288,7 +288,7 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
     // ==========================================================================
     
     // Console message for debugging (can be removed in production)
-    console.log('✅ Prokaiwa script loaded successfully');
+    // console.log("Prokaiwa script loaded");
     
     // ==========================================================================
     // DYNAMIC NAV: Show Dashboard if logged in, Login if not

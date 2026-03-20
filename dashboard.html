@@ -4220,7 +4220,7 @@ for (let date = 1; date <= remainingCells; date++) {
                     <div class="no-slots-message">
                         <i class="fas fa-exclamation-circle"></i>
                         <p>${lang === 'ja' ? 'スロットの読み込みに失敗しました' : 'Failed to load time slots'}</p>
-                        <p style="font-size: 0.85rem; color: var(--color-text-muted);">${err.message}</p>
+                        <p style="font-size: 0.85rem; color: var(--color-text-muted);">${lang === "ja" ? "エラーが発生しました。ページを再読み込みしてください。" : "An error occurred. Please reload the page."}</p>
                     </div>
                 `;
             }
@@ -4447,7 +4447,7 @@ closeBookingModal();
                 
             } catch (err) {
                 console.error('❌ Booking error:', err);
-                alert(lang === 'ja' ? `予約エラー: ${err.message}` : `Booking error: ${err.message}`);
+                alert(lang === 'ja' ? '予約中にエラーが発生しました。もう一度お試しください。' : 'A booking error occurred. Please try again.');
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-calendar-check"></i> ' + (lang === 'ja' ? 'レッスンを予約' : 'Book Lesson');
             }
@@ -4571,7 +4571,7 @@ closeBookingModal();
                 
             } catch (err) {
                 console.error('Cancellation error:', err);
-                alert(lang === 'ja' ? `キャンセルエラー: ${err.message}` : `Cancellation error: ${err.message}`);
+                alert(lang === 'ja' ? 'キャンセル中にエラーが発生しました。もう一度お試しください。' : 'A cancellation error occurred. Please try again.');
             }
         };
 
@@ -4834,8 +4834,8 @@ async function cancelLesson(lessonId, lang = 'en') {  // ← ADD lang parameter 
     } catch (err) {
         console.error('Error cancelling lesson:', err);
         alert(lang === 'ja' 
-            ? `キャンセルエラー: ${err.message}`
-            : `Failed to cancel lesson: ${err.message}`);
+            ? 'キャンセル中にエラーが発生しました。もう一度お試しください。'
+            : 'Failed to cancel lesson. Please try again.');
     }
 }
 
@@ -4910,8 +4910,8 @@ async function rescheduleLesson(lessonId, lang = 'en') {  // ← ADD lang parame
     } catch (err) {
         console.error('Error rescheduling lesson:', err);
         alert(lang === 'ja'
-            ? `変更エラー: ${err.message}`
-            : `Failed to reschedule lesson: ${err.message}`);
+            ? '変更中にエラーが発生しました。もう一度お試しください。'
+            : 'Failed to reschedule lesson. Please try again.');
     }
 }
 

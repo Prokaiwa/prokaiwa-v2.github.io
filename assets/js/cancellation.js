@@ -1857,7 +1857,7 @@ const cancellationState = {
 // =====================================================
 
 function determineOffer(reason, answers, lang) {
-    console.log('🎯 Determining offer for:', { reason, answers });
+    // console.log('🎯 Determining offer for:', { reason, answers });
     
     switch(reason) {
         case 'expensive':
@@ -1961,7 +1961,7 @@ function determineOffer(reason, answers, lang) {
 // =====================================================
 
 async function initCancellationFlow() {
-    console.log('🎯 Initializing cancellation flow...');
+    // console.log('🎯 Initializing cancellation flow...');
     
     // Check authentication
     const { data: { user } } = await supabase.auth.getUser();
@@ -2001,7 +2001,7 @@ async function initCancellationFlow() {
         cancellationState.userData.currentPlan = userData.plan;
         cancellationState.userData.subscriptionId = userData.stripe_subscription_id;
         
-        console.log('✅ User data loaded:', cancellationState.userData);
+        // console.log('✅ User data loaded:', cancellationState.userData);
         
     } catch (error) {
         console.error('❌ Error loading user data:', error);
@@ -2042,7 +2042,7 @@ function renderCurrentStep() {
     const lang = cancellationState.currentLang;
     const step = cancellationState.currentStep;
     
-    console.log('🎨 Rendering step:', step, 'lang:', lang);
+    // console.log('🎨 Rendering step:', step, 'lang:', lang);
     
     // Update step indicators
     updateStepIndicators(lang, step);
@@ -2231,7 +2231,7 @@ function renderQuestion(question, lang) {
 }
 
 // CONTINUED IN NEXT MESSAGE...
-console.log('✅ Part 2A loaded: Universal questions, offers, state, render functions');
+// console.log('✅ Part 2A loaded: Universal questions, offers, state, render functions');
 // =====================================================
 // PART 2B: INPUT HANDLERS, NAVIGATION, VALIDATION, API
 // =====================================================
@@ -2241,7 +2241,7 @@ console.log('✅ Part 2A loaded: Universal questions, offers, state, render func
 // =====================================================
 
 function selectReason(lang, reasonId) {
-    console.log('📝 Reason selected:', reasonId);
+    // console.log('📝 Reason selected:', reasonId);
     
     // Remove selection from all reasons
     document.querySelectorAll(`#${lang}-reason-grid .reason-option`).forEach(el => {
@@ -2265,7 +2265,7 @@ function selectReason(lang, reasonId) {
 }
 
 function selectRadio(questionId, value) {
-    console.log('📝 Radio selected:', questionId, value);
+    // console.log('📝 Radio selected:', questionId, value);
     
     // Store in appropriate state object
     if (universalQuestions.ja.some(q => q.id === questionId) || 
@@ -2301,7 +2301,7 @@ function selectRadio(questionId, value) {
 }
 
 function toggleCheckbox(questionId, value) {
-    console.log('📝 Checkbox toggled:', questionId, value);
+    // console.log('📝 Checkbox toggled:', questionId, value);
     
     // Get current values
     let currentValues = cancellationState.questionAnswers[questionId] || [];
@@ -2375,7 +2375,7 @@ function handleTextInput(questionId, value, minLength) {
 }
 
 function setRating(questionId, stars) {
-    console.log('⭐ Rating set:', questionId, stars);
+    // console.log('⭐ Rating set:', questionId, stars);
     
     cancellationState.universalAnswers[questionId] = stars;
     
@@ -2406,7 +2406,7 @@ function setRating(questionId, stars) {
 // =====================================================
 
 function validateStep(step, lang) {
-    console.log('✓ Validating step:', step);
+    // console.log('✓ Validating step:', step);
     
     switch(step) {
         case 'reason':
@@ -2491,7 +2491,7 @@ function validateQuestions(lang) {
 // =====================================================
 
 function proceedToDetails(lang) {
-    console.log('➡️ Proceeding to details...');
+    // console.log('➡️ Proceeding to details...');
     
     if (!validateStep('reason', lang)) return;
     
@@ -2511,7 +2511,7 @@ function proceedToDetails(lang) {
 }
 
 function proceedToOfferOrConfirm(lang) {
-    console.log('➡️ Proceeding to offer or confirm...');
+    // console.log('➡️ Proceeding to offer or confirm...');
     
     if (!validateStep('details', lang)) return;
     
@@ -2529,7 +2529,7 @@ function proceedToOfferOrConfirm(lang) {
     );
     
     if (offerDecision) {
-    console.log('✨ Showing retention offer:', offerDecision.type);
+    // console.log('✨ Showing retention offer:', offerDecision.type);
     
     cancellationState.currentStep = 'offer';
     cancellationState.offerShown = offerDecision.type;
@@ -2544,7 +2544,7 @@ function proceedToOfferOrConfirm(lang) {
             reason: cancellationState.selectedReason
         });
     } else {
-        console.log('↪️ No offer, proceeding to confirmation');
+        // console.log('↪️ No offer, proceeding to confirmation');
         
         cancellationState.currentStep = 'confirm';
         renderCurrentStep();
@@ -2555,7 +2555,7 @@ function proceedToOfferOrConfirm(lang) {
 }
 
 function goBack(lang, from) {
-    console.log('⬅️ Going back from:', from);
+    // console.log('⬅️ Going back from:', from);
     
     if (from === 'details') {
         cancellationState.currentStep = 'reason';
@@ -2614,7 +2614,7 @@ function renderOffer(lang, offerDecision) {
 }
 
 async function acceptOffer(lang) {
-    console.log('✅ Offer accepted');
+    // console.log('✅ Offer accepted');
     
     const offerType = cancellationState.offerType;
     
@@ -2685,7 +2685,7 @@ async function acceptOffer(lang) {
 }
 
 function declineOffer(lang) {
-    console.log('❌ Offer declined');
+    // console.log('❌ Offer declined');
     
     // Track analytics
     trackEvent('retention_offer_declined', {
@@ -2749,7 +2749,7 @@ function renderConfirmation(lang) {
 }
 
 async function confirmCancellation(lang) {
-    console.log('🚨 Confirming cancellation...');
+    // console.log('🚨 Confirming cancellation...');
     
     // Double-check confirmation
     const confirmText = lang === 'ja' ?
@@ -2820,7 +2820,7 @@ window.location.href = 'dashboard.html';
 // =====================================================
 
 async function handleRetentionOffer(offerType, offerData) {
-    console.log('📡 Calling handle-retention-offer...', { offerType, offerData });
+    // console.log('📡 Calling handle-retention-offer...', { offerType, offerData });
     
     try {
         const { data, error } = await supabase.functions.invoke('handle-retention-offer', {
@@ -2841,12 +2841,12 @@ async function handleRetentionOffer(offerType, offerData) {
         
     } catch (error) {
         console.error('❌ Edge function error:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: 'An error occurred. Please try again.' };
     }
 }
 
 async function cancelSubscription(cancellationData) {
-    console.log('📡 Calling cancel-subscription...', cancellationData);
+    // console.log('📡 Calling cancel-subscription...', cancellationData);
     
     try {
         const { data, error } = await supabase.functions.invoke('cancel-subscription', {
@@ -2854,7 +2854,7 @@ async function cancelSubscription(cancellationData) {
         });
         
         // Log the response
-        console.log('📦 Response:', { data, error });
+        // console.log('📦 Response:', { data, error });
         
         if (error) {
             console.error('❌ Edge function error:', error);
@@ -2870,14 +2870,14 @@ async function cancelSubscription(cancellationData) {
             throw new Error(data.error || 'Cancellation failed');
         }
         
-        console.log('✅ Cancellation successful:', data);
+        // console.log('✅ Cancellation successful:', data);
         return { success: true, data };
         
     } catch (error) {
         console.error('❌ Cancellation error:', error);
         return { 
             success: false, 
-            error: error.message || 'An error occurred during cancellation'
+            error: 'An error occurred during cancellation. Please try again.'
         };
     }
 }
@@ -2906,7 +2906,7 @@ function trackEvent(eventName, eventData) {
     }
     
     // Console log for debugging
-    console.log('📊 Analytics:', eventName, eventData);
+    // console.log('📊 Analytics:', eventName, eventData);
 }
 
 // =====================================================
@@ -2914,7 +2914,7 @@ function trackEvent(eventName, eventData) {
 // =====================================================
 
 window.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Cancellation page loaded');
+    // console.log('🚀 Cancellation page loaded');
     initCancellationFlow();
 });
 
@@ -2928,4 +2928,4 @@ window.addEventListener('beforeunload', (e) => {
     }
 });
 
-console.log('✅ Part 2B loaded: Input handlers, navigation, validation, API calls');
+// console.log('✅ Part 2B loaded: Input handlers, navigation, validation, API calls');
