@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KLVF2ZG1WX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KLVF2ZG1WX');
+</script>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://*.supabase.co https://cdn.jsdelivr.net https://www.google-analytics.com https://region1.google-analytics.com; media-src 'self' blob: https://*.supabase.co; frame-src 'none'; object-src 'none';">
+  <title>Prokaiwa | Needs Survey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="Tell us about your English learning needs.">
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* ── Loading ── */
+    .srv-loading { position:fixed; inset:0; background:var(--color-bg); display:flex; justify-content:center; align-items:center; z-index:9999; }
+    .srv-loading.hidden { display:none; }
+    .srv-spinner { width:40px; height:40px; border:3px solid var(--color-border); border-top-color:var(--color-primary); border-radius:50%; animation:srv-spin .8s linear infinite; }
+
+    /* ── Error screen ── */
+    .srv-error-screen { display:none; text-align:center; padding:4rem 2rem; }
+    .srv-error-screen.visible { display:block; }
+    .srv-error-icon { font-size:3rem; color:var(--color-text-muted); margin-bottom:1.5rem; }
+    .srv-error-title { font-size:1.3rem; font-weight:700; color:var(--color-text); margin-bottom:0.75rem; }
+    .srv-error-msg { font-size:0.95rem; color:var(--color-text-light); line-height:1.7; }
+
+    /* ── Layout ── */
+    .srv-outer { min-height:100vh; display:flex; flex-direction:column; }
+    .srv-main { flex:1; display:flex; justify-content:center; align-items:flex-start; padding:2rem 1rem 4rem; }
+    .srv-container { width:100%; max-width:600px; margin:0 auto; }
+
+    /* ── Progress ── */
+    .srv-progress { display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:2rem; padding:0 0.5rem; }
+    .srv-progress-dot { width:28px; height:28px; border-radius:50%; font-size:0.7rem; font-weight:700; color:var(--color-text-muted); background:var(--color-bg); border:2px solid var(--color-border); display:flex; align-items:center; justify-content:center; transition:all .4s ease; flex-shrink:0; z-index:1; }
+    .srv-progress-dot.active { color:#fff; background:var(--color-primary); border-color:var(--color-primary); box-shadow:0 0 0 3px rgba(0,128,128,.15); }
+    .srv-progress-dot.completed { color:#fff; background:var(--color-primary); border-color:var(--color-primary); }
+    .srv-progress-line { flex:1; height:2px; background:var(--color-border); transition:background .4s ease; max-width:40px; }
+    .srv-progress-line.completed { background:var(--color-primary); }
+
+    /* ── Steps ── */
+    .srv-step { display:none; animation:srv-fadeIn .5s ease both; }
+    .srv-step.active { display:block; }
+
+    /* ── Section intros ── */
+    .srv-intro { text-align:center; padding:1rem 0 0; }
+    .srv-intro-icon { font-size:2rem; color:var(--color-primary); margin-bottom:1rem; opacity:0; animation:srv-fadeUp .5s ease .2s forwards; }
+    .srv-step-title { font-size:1.3rem; font-weight:700; color:var(--color-text); margin-bottom:.35rem; text-align:center; opacity:0; animation:srv-fadeUp .5s ease .3s forwards; }
+    .srv-step-desc { font-size:.92rem; color:var(--color-text-light); text-align:center; margin-bottom:2rem; line-height:1.7; opacity:0; animation:srv-fadeUp .5s ease .45s forwards; }
+    .srv-eta { display:inline-block; font-size:.8rem; color:var(--color-text-muted); background:var(--color-bg); padding:.3rem .8rem; border-radius:99px; margin-bottom:1.5rem; opacity:0; animation:srv-fadeUp .5s ease .55s forwards; }
+
+    /* ── Welcome (Step 1) ── */
+    .srv-welcome { text-align:center; padding:2rem 0 1rem; }
+    .srv-welcome-en { display:block; font-size:1.1rem; font-weight:500; color:var(--color-text-muted); letter-spacing:.02em; margin-bottom:.25rem; opacity:0; animation:srv-fadeUp .6s ease .2s forwards; }
+    .srv-welcome-ja { display:block; font-size:1.7rem; font-weight:700; color:var(--color-text); opacity:0; animation:srv-fadeUp .6s ease .5s forwards; }
+    .srv-welcome-sub { font-size:1rem; color:var(--color-text-light); line-height:1.7; margin:1.5rem 0 2rem; opacity:0; animation:srv-fadeUp .6s ease .8s forwards; }
+    .srv-welcome-parts { text-align:left; max-width:380px; margin:0 auto 2.5rem; opacity:0; animation:srv-fadeUp .6s ease 1s forwards; }
+    .srv-welcome-part { display:flex; align-items:center; gap:.75rem; padding:.6rem 0; font-size:.92rem; color:var(--color-text-light); }
+    .srv-welcome-part-icon { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.8rem; }
+    .srv-welcome-part-icon.part1 { background:rgba(0,128,128,.1); color:var(--color-primary); }
+    .srv-welcome-part-icon.part2 { background:rgba(212,160,23,.1); color:var(--color-gold); }
+    .srv-welcome-start { opacity:0; animation:srv-fadeUp .6s ease 1.2s forwards; }
+
+    /* ── Question blocks ── */
+    .srv-question { margin-bottom:2rem; }
+    .srv-q-label { font-weight:600; font-size:.95rem; color:var(--color-text); margin-bottom:.75rem; display:block; line-height:1.5; }
+    .srv-q-hint { font-size:.82rem; color:var(--color-text-muted); margin-bottom:.75rem; }
+
+    /* ── Single select cards ── */
+    .srv-options { display:flex; flex-direction:column; gap:.5rem; }
+    .srv-option { display:flex; align-items:center; gap:.75rem; padding:.75rem 1rem; background:var(--color-surface); border:2px solid var(--color-border); border-radius:10px; cursor:pointer; transition:all .2s ease; font-size:.92rem; color:var(--color-text-light); }
+    .srv-option:hover { border-color:var(--color-primary); }
+    .srv-option.selected { border-color:var(--color-primary); background:rgba(0,128,128,.04); color:var(--color-text); }
+    .srv-option input { display:none; }
+    .srv-option-dot { width:18px; height:18px; border-radius:50%; border:2px solid var(--color-border); flex-shrink:0; position:relative; transition:all .2s; }
+    .srv-option.selected .srv-option-dot { border-color:var(--color-primary); }
+    .srv-option.selected .srv-option-dot::after { content:''; position:absolute; inset:3px; border-radius:50%; background:var(--color-primary); }
+
+    /* ── Multi-select (checkboxes) ── */
+    .srv-check-option { display:flex; align-items:flex-start; gap:.75rem; padding:.7rem 1rem; background:var(--color-surface); border:2px solid var(--color-border); border-radius:10px; cursor:pointer; transition:all .2s ease; font-size:.92rem; color:var(--color-text-light); margin-bottom:.5rem; }
+    .srv-check-option:hover { border-color:var(--color-primary); }
+    .srv-check-option.selected { border-color:var(--color-primary); background:rgba(0,128,128,.04); color:var(--color-text); }
+    .srv-check-option input[type="checkbox"] { width:18px; height:18px; margin-top:1px; flex-shrink:0; accent-color:var(--color-primary); }
+
+    /* ── Expandable follow-up ── */
+    .srv-followup { display:none; padding:.75rem 1rem; margin:-0.25rem 0 .5rem 2.5rem; background:var(--color-bg); border-radius:8px; border-left:3px solid var(--color-primary); }
+    .srv-followup.visible { display:block; }
+    .srv-followup label { font-size:.85rem; font-weight:600; color:var(--color-text); display:block; margin-bottom:.4rem; }
+    .srv-followup textarea { width:100%; padding:.5rem .75rem; border:1px solid var(--color-border); border-radius:6px; font-family:var(--font-primary); font-size:.85rem; resize:vertical; min-height:50px; background:var(--color-surface); color:var(--color-text); }
+
+    /* ── Feeling scale ── */
+    .srv-scale { display:flex; gap:.4rem; justify-content:space-between; margin-bottom:.25rem; }
+    .srv-scale-btn { flex:1; padding:.65rem .25rem; border:2px solid var(--color-border); border-radius:10px; background:var(--color-surface); cursor:pointer; text-align:center; font-size:.85rem; font-weight:600; color:var(--color-text-muted); transition:all .2s; }
+    .srv-scale-btn:hover { border-color:var(--color-primary); }
+    .srv-scale-btn.selected { border-color:var(--color-primary); background:var(--color-primary); color:#fff; }
+    .srv-scale-labels { display:flex; justify-content:space-between; font-size:.75rem; color:var(--color-text-muted); padding:0 .25rem; }
+
+    /* ── Priority ranking ── */
+    .srv-rank-options { display:flex; flex-direction:column; gap:.5rem; }
+    .srv-rank-item { display:flex; align-items:center; gap:.75rem; padding:.75rem 1rem; background:var(--color-surface); border:2px solid var(--color-border); border-radius:10px; cursor:pointer; transition:all .2s; font-size:.92rem; color:var(--color-text-light); }
+    .srv-rank-item:hover { border-color:var(--color-primary); }
+    .srv-rank-item.ranked { border-color:var(--color-primary); background:rgba(0,128,128,.04); color:var(--color-text); }
+    .srv-rank-num { width:24px; height:24px; border-radius:50%; background:var(--color-border); color:var(--color-text-muted); display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700; flex-shrink:0; transition:all .2s; }
+    .srv-rank-item.ranked .srv-rank-num { background:var(--color-primary); color:#fff; }
+
+    /* ── Textareas ── */
+    .srv-textarea { width:100%; padding:.8rem 1rem; border:1px solid var(--color-border); border-radius:8px; font-family:var(--font-primary); font-size:.92rem; resize:vertical; min-height:80px; background:var(--color-surface); color:var(--color-text); transition:border-color .3s; }
+    .srv-textarea:focus { outline:none; border-color:var(--color-primary); box-shadow:0 0 0 3px var(--color-primary-light); }
+    .srv-textarea-hint { font-size:.8rem; color:var(--color-text-muted); margin-top:.35rem; }
+
+    /* ── Onboarding cards ── */
+    .srv-info-card { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--border-radius); padding:1.25rem; margin-bottom:1rem; }
+    .srv-info-card-title { font-weight:700; font-size:.95rem; color:var(--color-text); margin-bottom:.5rem; display:flex; align-items:center; gap:.5rem; }
+    .srv-info-card-title i { color:var(--color-primary); }
+    .srv-info-card p { font-size:.88rem; color:var(--color-text-light); line-height:1.6; margin:0; }
+
+    /* ── 7-day cycle grid ── */
+    .srv-cycle-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:.5rem; margin:1rem 0; }
+    .srv-cycle-day { background:var(--color-surface); border:1px solid var(--color-border); border-radius:10px; padding:.75rem; text-align:center; }
+    .srv-cycle-day i { font-size:1.1rem; color:var(--color-primary); display:block; margin-bottom:.35rem; }
+    .srv-cycle-day-label { font-size:.75rem; font-weight:700; color:var(--color-text); display:block; }
+    .srv-cycle-day-name { font-size:.7rem; color:var(--color-text-muted); }
+
+    /* ── Competency list ── */
+    .srv-comp-list { display:flex; flex-direction:column; gap:.5rem; margin:1rem 0; }
+    .srv-comp-item { display:flex; align-items:center; gap:.75rem; padding:.6rem .75rem; background:var(--color-surface); border-radius:8px; border:1px solid var(--color-border); }
+    .srv-comp-num { width:24px; height:24px; border-radius:50%; background:var(--color-primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:700; flex-shrink:0; }
+    .srv-comp-text { font-size:.88rem; color:var(--color-text); }
+    .srv-comp-ja { font-size:.8rem; color:var(--color-text-muted); margin-left:.25rem; }
+
+    /* ── Schedule box ── */
+    .srv-schedule-box { background:rgba(0,128,128,.04); border-left:3px solid var(--color-primary); border-radius:0 8px 8px 0; padding:1rem 1.25rem; margin:1rem 0; }
+    .srv-schedule-box p { font-size:.88rem; color:var(--color-text-light); line-height:1.6; margin:.25rem 0; }
+    .srv-schedule-box strong { color:var(--color-text); }
+
+    /* ── Confirmation checkbox ── */
+    .srv-confirm-box { background:var(--color-bg); border-radius:10px; padding:1rem 1.25rem; margin:1.5rem 0; border:2px solid var(--color-border); transition:border-color .2s; }
+    .srv-confirm-box.checked { border-color:var(--color-primary); }
+    .srv-confirm-label { display:flex; align-items:flex-start; gap:.75rem; cursor:pointer; font-size:.92rem; color:var(--color-text); line-height:1.5; }
+    .srv-confirm-label input { width:20px; height:20px; margin-top:2px; flex-shrink:0; accent-color:var(--color-primary); }
+
+    /* ── Celebration ── */
+    .srv-celebration { text-align:center; padding:2rem 0; }
+    .srv-celebration-icon { font-size:3rem; color:var(--color-primary); margin-bottom:1rem; opacity:0; animation:srv-fadeUp .6s ease .2s forwards; }
+    .srv-celebration-title { font-size:1.4rem; font-weight:700; color:var(--color-text); margin-bottom:.5rem; opacity:0; animation:srv-fadeUp .6s ease .4s forwards; }
+    .srv-celebration-msg { font-size:.95rem; color:var(--color-text-light); line-height:1.7; opacity:0; animation:srv-fadeUp .6s ease .6s forwards; }
+
+    /* ── Navigation ── */
+    .srv-nav { display:flex; justify-content:space-between; align-items:center; margin-top:2rem; gap:.75rem; }
+    .srv-btn { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.8rem 1.75rem; border:none; border-radius:10px; font-family:var(--font-primary); font-size:.95rem; font-weight:600; cursor:pointer; transition:all .25s; min-width:120px; }
+    .srv-btn-primary { background:var(--color-primary); color:#fff; }
+    .srv-btn-primary:hover:not(:disabled) { background:var(--color-primary-dark); transform:translateY(-1px); box-shadow:var(--shadow); }
+    .srv-btn-primary:disabled { opacity:.5; cursor:not-allowed; }
+    .srv-btn-secondary { background:transparent; color:var(--color-text-light); border:1px solid var(--color-border); }
+    .srv-btn-secondary:hover { background:var(--color-bg); }
+    .srv-btn-full { width:100%; }
+    .srv-btn-loading { position:relative; pointer-events:none; }
+    .srv-btn-loading .srv-btn-label { opacity:0; }
+    .srv-btn-loading::after { content:''; position:absolute; width:18px; height:18px; border:2px solid transparent; border-top-color:#fff; border-radius:50%; animation:srv-spin .7s linear infinite; }
+
+    /* ── Validation error ── */
+    .srv-field-error { font-size:.82rem; color:var(--color-error); margin-top:.35rem; display:none; text-align:center; }
+    .srv-field-error.visible { display:block; }
+
+    /* ── Animations ── */
+    @keyframes srv-spin { to { transform:rotate(360deg); } }
+    @keyframes srv-fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes srv-fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Responsive ── */
+    @media (max-width:480px) {
+      .srv-main { padding:1rem .75rem 3rem; }
+      .srv-cycle-grid { grid-template-columns:repeat(auto-fit, minmax(100px, 1fr)); }
+      .srv-scale { gap:.25rem; }
+      .srv-scale-btn { padding:.5rem .15rem; font-size:.78rem; }
+    }
+
+    /* ── Dark mode ── */
+    @media (prefers-color-scheme:dark) {
+      .srv-option.selected, .srv-check-option.selected, .srv-rank-item.ranked { background:rgba(0,168,168,.06); box-shadow:0 0 0 3px rgba(0,168,168,.15); }
+      .srv-schedule-box { background:rgba(0,168,168,.06); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading -->
+  <div id="srv-loading" class="srv-loading"><div class="srv-spinner"></div></div>
+
+  <div class="srv-outer">
+    <div id="nav-placeholder"></div>
+
+    <!-- Error screen (invalid/expired token) -->
+    <div class="srv-error-screen" id="srv-error">
+      <div class="srv-error-icon"><i class="fas fa-link-slash"></i></div>
+      <div class="srv-error-title" data-i18n="errorTitle">このリンクは無効です</div>
+      <div class="srv-error-msg" data-i18n="errorMsg">LINEで受け取ったリンクをお使いください。<br>リンクの有効期限が切れている可能性があります。</div>
+    </div>
+
+    <main class="srv-main" id="srv-main" style="display:none;">
+      <div class="srv-container">
+
+        <!-- Progress (hidden on step 1) -->
+        <div class="srv-progress" id="srv-progress" style="display:none;">
+          <div class="srv-progress-dot active" data-step="2">1</div>
+          <div class="srv-progress-line" data-line="2"></div>
+          <div class="srv-progress-dot" data-step="3">2</div>
+          <div class="srv-progress-line" data-line="3"></div>
+          <div class="srv-progress-dot" data-step="4">3</div>
+          <div class="srv-progress-line" data-line="4"></div>
+          <div class="srv-progress-dot" data-step="5">4</div>
+          <div class="srv-progress-line" data-line="5"></div>
+          <div class="srv-progress-dot" data-step="6">5</div>
+          <div class="srv-progress-line" data-line="6"></div>
+          <div class="srv-progress-dot" data-step="7">6</div>
+          <div class="srv-progress-line" data-line="7"></div>
+          <div class="srv-progress-dot" data-step="8">7</div>
+        </div>
+
+        <!-- ═══ STEP 1: Welcome ═══ -->
+        <div class="srv-step active" id="step-1">
+          <div class="srv-welcome">
+            <h1>
+              <span class="srv-welcome-en" data-i18n="welcomeEn">Your English Needs Survey</span>
+              <span class="srv-welcome-ja" data-i18n="welcomeJa">あなたの英語ニーズ調査</span>
+            </h1>
+            <p class="srv-welcome-sub" data-i18n="welcomeSub">あなたに最適なレッスンを提供するために、いくつかの質問にお答えください。その後、Prokaiwaの使い方をご案内します。</p>
+            <div class="srv-eta"><i class="fas fa-clock" style="margin-right:.4rem;"></i><span data-i18n="welcomeEta">所要時間：約8〜10分</span></div>
+            <div class="srv-welcome-parts">
+              <div class="srv-welcome-part">
+                <div class="srv-welcome-part-icon part1"><i class="fas fa-clipboard-list"></i></div>
+                <span data-i18n="welcomePart1">パート1：あなたの英語について（約5分）</span>
+              </div>
+              <div class="srv-welcome-part">
+                <div class="srv-welcome-part-icon part2"><i class="fas fa-rocket"></i></div>
+                <span data-i18n="welcomePart2">パート2：Prokaiwaの使い方ガイド（約3分）</span>
+              </div>
+            </div>
+            <div class="srv-welcome-start">
+              <button type="button" class="srv-btn srv-btn-primary srv-btn-full" id="btn-start">
+                <span class="srv-btn-label" data-i18n="btnStart">はじめる</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ STEP 2: Your English Now ═══ -->
+        <div class="srv-step" id="step-2">
+          <div class="srv-intro">
+            <div class="srv-intro-icon"><i class="fas fa-comments"></i></div>
+            <h2 class="srv-step-title" data-i18n="s2Title">あなたの今の英語について</h2>
+            <p class="srv-step-desc" data-i18n="s2Desc">正解・不正解はありません。素直にお答えください。</p>
+          </div>
+
+          <!-- Q: Frequency -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_freq">日常生活でどのくらい英語を使いますか？</span>
+            <div class="srv-options" data-name="english_frequency">
+              <label class="srv-option"><input type="radio" name="english_frequency" value="never"><span class="srv-option-dot"></span><span data-i18n="q_freq_1">まったく使わない</span></label>
+              <label class="srv-option"><input type="radio" name="english_frequency" value="few_yearly"><span class="srv-option-dot"></span><span data-i18n="q_freq_2">年に数回</span></label>
+              <label class="srv-option"><input type="radio" name="english_frequency" value="monthly"><span class="srv-option-dot"></span><span data-i18n="q_freq_3">月に数回</span></label>
+              <label class="srv-option"><input type="radio" name="english_frequency" value="weekly"><span class="srv-option-dot"></span><span data-i18n="q_freq_4">週に数回</span></label>
+              <label class="srv-option"><input type="radio" name="english_frequency" value="daily"><span class="srv-option-dot"></span><span data-i18n="q_freq_5">ほぼ毎日</span></label>
+            </div>
+          </div>
+
+          <!-- Q: Feeling scale -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_feeling">英語を聞いたとき、どんな気持ちになりますか？</span>
+            <div class="srv-scale" id="feeling-scale">
+              <button type="button" class="srv-scale-btn" data-val="1">1</button>
+              <button type="button" class="srv-scale-btn" data-val="2">2</button>
+              <button type="button" class="srv-scale-btn" data-val="3">3</button>
+              <button type="button" class="srv-scale-btn" data-val="4">4</button>
+              <button type="button" class="srv-scale-btn" data-val="5">5</button>
+            </div>
+            <div class="srv-scale-labels">
+              <span data-i18n="q_feeling_low">とても不安</span>
+              <span data-i18n="q_feeling_high">ワクワクする</span>
+            </div>
+            <input type="hidden" name="english_feeling" id="feeling-value" value="">
+          </div>
+
+          <!-- Q: Stuck moment -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_stuck">最近、英語が必要で困った場面はありますか？</span>
+            <p class="srv-q-hint" data-i18n="q_stuck_hint">（任意）具体的な場面を教えてください</p>
+            <textarea class="srv-textarea" name="stuck_moment" placeholder="" data-i18n-placeholder="q_stuck_ph"></textarea>
+          </div>
+
+          <!-- Q: Study history (multi-select with follow-ups) -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_history">今まで英語を勉強したことはありますか？（複数選択可）</span>
+            <div id="history-options">
+              <label class="srv-check-option" data-method="school"><input type="checkbox" name="study_history" value="school"><span data-i18n="q_hist_school">学校の授業のみ</span></label>
+              <div class="srv-followup" id="followup-school"><label data-i18n="q_hist_fu">良かった点・悪かった点は？</label><textarea name="history_school_notes" placeholder=""></textarea></div>
+
+              <label class="srv-check-option" data-method="self"><input type="checkbox" name="study_history" value="self_study"><span data-i18n="q_hist_self">独学（本、YouTube等）</span></label>
+              <div class="srv-followup" id="followup-self"><label data-i18n="q_hist_fu">良かった点・悪かった点は？</label><textarea name="history_self_notes" placeholder=""></textarea></div>
+
+              <label class="srv-check-option" data-method="eikaiwa"><input type="checkbox" name="study_history" value="eikaiwa"><span data-i18n="q_hist_eikaiwa">英会話教室</span></label>
+              <div class="srv-followup" id="followup-eikaiwa"><label data-i18n="q_hist_fu">良かった点・悪かった点は？</label><textarea name="history_eikaiwa_notes" placeholder=""></textarea></div>
+
+              <label class="srv-check-option" data-method="app"><input type="checkbox" name="study_history" value="app"><span data-i18n="q_hist_app">オンラインアプリ（Duolingo等）</span></label>
+              <div class="srv-followup" id="followup-app"><label data-i18n="q_hist_fu">良かった点・悪かった点は？</label><textarea name="history_app_notes" placeholder=""></textarea></div>
+
+              <label class="srv-check-option" data-method="tutor"><input type="checkbox" name="study_history" value="tutor"><span data-i18n="q_hist_tutor">個人レッスン・家庭教師</span></label>
+              <div class="srv-followup" id="followup-tutor"><label data-i18n="q_hist_fu">良かった点・悪かった点は？</label><textarea name="history_tutor_notes" placeholder=""></textarea></div>
+
+              <label class="srv-check-option" data-method="none"><input type="checkbox" name="study_history" value="none"><span data-i18n="q_hist_none">勉強したことがない</span></label>
+            </div>
+          </div>
+
+          <div class="srv-field-error" id="err-step2" data-i18n="errRequired">必須項目を入力してください</div>
+          <div class="srv-nav">
+            <button type="button" class="srv-btn srv-btn-secondary" data-goto="1" data-i18n="btnBack">戻る</button>
+            <button type="button" class="srv-btn srv-btn-primary" id="btn-s2-next" data-i18n="btnNext">次へ</button>
+          </div>
+        </div>
+
+        <!-- ═══ STEP 3: Your Goals ═══ -->
+        <div class="srv-step" id="step-3">
+          <div class="srv-intro">
+            <div class="srv-intro-icon"><i class="fas fa-bullseye"></i></div>
+            <h2 class="srv-step-title" data-i18n="s3Title">あなたの目標</h2>
+            <p class="srv-step-desc" data-i18n="s3Desc">英語で実現したいことを教えてください。</p>
+          </div>
+
+          <!-- Q: Dream scenario -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_dream">英語を自信を持って話せたら、どんな場面で使いたいですか？</span>
+            <textarea class="srv-textarea" name="dream_scenario" placeholder="" data-i18n-placeholder="q_dream_ph"></textarea>
+          </div>
+
+          <!-- Q: Specific target -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_target">英語を使いたい特定の人、場所、機会はありますか？</span>
+            <p class="srv-q-hint" data-i18n="q_target_hint">（任意）例：パートナーと話したい、外資系企業に転職したい、海外旅行で困らないようにしたい</p>
+            <textarea class="srv-textarea" name="specific_target" placeholder="" data-i18n-placeholder="q_target_ph"></textarea>
+          </div>
+
+          <!-- Q: 3-month goal -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_3month">3ヶ月後、どのレベルになっていたいですか？</span>
+            <div class="srv-options" data-name="three_month_goal">
+              <label class="srv-option"><input type="radio" name="three_month_goal" value="greet"><span class="srv-option-dot"></span><span data-i18n="q_3m_1">自信を持って挨拶できるようになりたい</span></label>
+              <label class="srv-option"><input type="radio" name="three_month_goal" value="short_convo"><span class="srv-option-dot"></span><span data-i18n="q_3m_2">短い会話ができるようになりたい</span></label>
+              <label class="srv-option"><input type="radio" name="three_month_goal" value="opinions"><span class="srv-option-dot"></span><span data-i18n="q_3m_3">自分の意見を伝えられるようになりたい</span></label>
+              <label class="srv-option"><input type="radio" name="three_month_goal" value="unexpected"><span class="srv-option-dot"></span><span data-i18n="q_3m_4">予想外の場面にも対応できるようになりたい</span></label>
+            </div>
+          </div>
+
+          <div class="srv-field-error" id="err-step3" data-i18n="errRequired">必須項目を入力してください</div>
+          <div class="srv-nav">
+            <button type="button" class="srv-btn srv-btn-secondary" data-goto="2" data-i18n="btnBack">戻る</button>
+            <button type="button" class="srv-btn srv-btn-primary" id="btn-s3-next" data-i18n="btnNext">次へ</button>
+          </div>
+        </div>
+
+        <!-- ═══ STEP 4: Learning Style ═══ -->
+        <div class="srv-step" id="step-4">
+          <div class="srv-intro">
+            <div class="srv-intro-icon"><i class="fas fa-sliders"></i></div>
+            <h2 class="srv-step-title" data-i18n="s4Title">あなたの学習スタイル</h2>
+            <p class="srv-step-desc" data-i18n="s4Desc">最適なサポートのために教えてください。</p>
+          </div>
+
+          <!-- Q: Daily minutes -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_minutes">毎日の英語練習に使える時間はどのくらいですか？</span>
+            <div class="srv-options" data-name="daily_minutes">
+              <label class="srv-option"><input type="radio" name="daily_minutes" value="5"><span class="srv-option-dot"></span><span data-i18n="q_min_1">5分くらい</span></label>
+              <label class="srv-option"><input type="radio" name="daily_minutes" value="10"><span class="srv-option-dot"></span><span data-i18n="q_min_2">10分くらい</span></label>
+              <label class="srv-option"><input type="radio" name="daily_minutes" value="15"><span class="srv-option-dot"></span><span data-i18n="q_min_3">15分くらい</span></label>
+              <label class="srv-option"><input type="radio" name="daily_minutes" value="20+"><span class="srv-option-dot"></span><span data-i18n="q_min_4">20分以上</span></label>
+            </div>
+          </div>
+
+          <!-- Q: Response preference -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_pref">テキストとボイスメッセージ、どちらが好きですか？</span>
+            <div class="srv-options" data-name="response_preference">
+              <label class="srv-option"><input type="radio" name="response_preference" value="text"><span class="srv-option-dot"></span><span data-i18n="q_pref_1">テキストが好き</span></label>
+              <label class="srv-option"><input type="radio" name="response_preference" value="voice"><span class="srv-option-dot"></span><span data-i18n="q_pref_2">ボイスメッセージが好き</span></label>
+              <label class="srv-option"><input type="radio" name="response_preference" value="both"><span class="srv-option-dot"></span><span data-i18n="q_pref_3">どちらでも</span></label>
+            </div>
+          </div>
+
+          <!-- Q: Priorities (rank by click) -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_priorities">あなたにとって大切な順に選んでください（タップで順位付け）</span>
+            <div class="srv-rank-options" id="rank-priorities">
+              <div class="srv-rank-item" data-val="understood"><span class="srv-rank-num">-</span><span data-i18n="q_pri_1">相手に伝わること</span></div>
+              <div class="srv-rank-item" data-val="grammar"><span class="srv-rank-num">-</span><span data-i18n="q_pri_2">正しい文法で話すこと</span></div>
+              <div class="srv-rank-item" data-val="confidence"><span class="srv-rank-num">-</span><span data-i18n="q_pri_3">自信を持って話すこと</span></div>
+            </div>
+            <input type="hidden" name="priorities" id="priorities-value" value="">
+          </div>
+
+          <!-- Q: Mistake comfort -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_mistakes">英語で間違えることについてどう感じますか？</span>
+            <div class="srv-options" data-name="mistake_comfort">
+              <label class="srv-option"><input type="radio" name="mistake_comfort" value="very_uncomfortable"><span class="srv-option-dot"></span><span data-i18n="q_mis_1">とても恥ずかしい</span></label>
+              <label class="srv-option"><input type="radio" name="mistake_comfort" value="nervous"><span class="srv-option-dot"></span><span data-i18n="q_mis_2">少し緊張する</span></label>
+              <label class="srv-option"><input type="radio" name="mistake_comfort" value="okay"><span class="srv-option-dot"></span><span data-i18n="q_mis_3">大丈夫、気にしない</span></label>
+              <label class="srv-option"><input type="radio" name="mistake_comfort" value="fine"><span class="srv-option-dot"></span><span data-i18n="q_mis_4">全然平気！間違いから学ぶ</span></label>
+            </div>
+          </div>
+
+          <!-- Q: Feedback preferences -->
+          <div class="srv-question">
+            <span class="srv-q-label" data-i18n="q_feedback">どんなフィードバックが一番役に立ちますか？（複数選択可）</span>
+            <div id="feedback-options">
+              <label class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="corrections"><span data-i18n="q_fb_1">間違いの訂正</span></label>
+              <label class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="encouragement"><span data-i18n="q_fb_2">励まし・褒め言葉</span></label>
+              <label class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="examples"><span data-i18n="q_fb_3">例文・使い方の例</span></label>
+              <label class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="pronunciation"><span data-i18n="q_fb_4">発音のアドバイス</span></label>
+              <label class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="grammar"><span data-i18n="q_fb_5">文法の説明</span></label>
+            </div>
+          </div>
+
+          <div class="srv-field-error" id="err-step4" data-i18n="errRequired">必須項目を入力してください</div>
+          <div class="srv-nav">
+            <button type="button" class="srv-btn srv-btn-secondary" data-goto="3" data-i18n="btnBack">戻る</button>
+            <button type="button" class="srv-btn srv-btn-primary" id="btn-s4-next" data-i18n="btnNext">次へ</button>
+          </div>
+        </div>
+
+        <!-- ═══ STEP 5: Anything Else ═══ -->
+        <div class="srv-step" id="step-5">
+          <div class="srv-intro">
+            <div class="srv-intro-icon"><i class="fas fa-message"></i></div>
+            <h2 class="srv-step-title" data-i18n="s5Title">その他</h2>
+            <p class="srv-step-desc" data-i18n="s5Desc">他に知っておいてほしいことがあれば教えてください。</p>
+          </div>
+
+          <div class="srv-question">
+            <textarea class="srv-textarea" name="additional_notes" placeholder="" data-i18n-placeholder="q_other_ph" style="min-height:120px;"></textarea>
+            <p class="srv-textarea-hint" data-i18n="q_other_hint">任意です。心配なこと、期待していること、なんでも大丈夫です。</p>
+          </div>
+
+          <div class="srv-nav">
+            <button type="button" class="srv-btn srv-btn-secondary" data-goto="4" data-i18n="btnBack">戻る</button>
+            <button type="button" class="srv-btn srv-btn-primary" id="btn-s5-next">
+              <span class="srv-btn-label" data-i18n="btnToPart2">パート2へ進む</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ═══ STEP 6: Your Learning Journey ═══ -->
+        <div class="srv-step" id="step-6">
+          <div class="srv-intro">
+            <div class="srv-intro-icon"><i class="fas fa-map"></i></div>
+            <h2 class="srv-step-title" data-i18n="s6Title">あなたの学習の旅</h2>
+            <p class="srv-step-desc" data-i18n="s6Desc">Prokaiwaでは、1年かけて6つのスキルを身につけます。</p>
+          </div>
+
+          <!-- 6 Competencies -->
+          <div class="srv-comp-list">
+            <div class="srv-comp-item"><span class="srv-comp-num">1</span><span class="srv-comp-text">First Contact<span class="srv-comp-ja"> — はじめの一歩</span></span></div>
+            <div class="srv-comp-item"><span class="srv-comp-num">2</span><span class="srv-comp-text">Keep It Alive<span class="srv-comp-ja"> — 会話をつなげよう</span></span></div>
+            <div class="srv-comp-item"><span class="srv-comp-num">3</span><span class="srv-comp-text">Tell Your Story<span class="srv-comp-ja"> — 自分のことを話そう</span></span></div>
+            <div class="srv-comp-item"><span class="srv-comp-num">4</span><span class="srv-comp-text">Handle the Unexpected<span class="srv-comp-ja"> — とっさの対応</span></span></div>
+            <div class="srv-comp-item"><span class="srv-comp-num">5</span><span class="srv-comp-text">Say What You Think<span class="srv-comp-ja"> — 自分の意見を言おう</span></span></div>
+            <div class="srv-comp-item"><span class="srv-comp-num">6</span><span class="srv-comp-text">Full Confidence<span class="srv-comp-ja"> — 自信を持って話せる</span></span></div>
+          </div>
+
+          <!-- 7-Day Cycle -->
+          <div class="srv-info-card" style="margin-top:1.5rem;">
+            <div class="srv-info-card-title"><i class="fas fa-calendar-week"></i> <span data-i18n="s6CycleTitle">毎週の7日間サイクル</span></div>
+            <p data-i18n="s6CycleDesc" style="margin-bottom:.75rem;">毎週同じリズムで練習します。何が来るか分かるので安心です。</p>
+            <div class="srv-cycle-grid">
+              <div class="srv-cycle-day"><i class="fas fa-headphones"></i><span class="srv-cycle-day-label" data-i18n="day1">Day 1</span><span class="srv-cycle-day-name" data-i18n="day1Name">リスニング</span></div>
+              <div class="srv-cycle-day"><i class="fas fa-book"></i><span class="srv-cycle-day-label" data-i18n="day2">Day 2</span><span class="srv-cycle-day-name" data-i18n="day2Name">文法のコツ</span></div>
+              <div class="srv-cycle-day"><i class="fas fa-spell-check"></i><span class="srv-cycle-day-label" data-i18n="day3">Day 3</span><span class="srv-cycle-day-name" data-i18n="day3Name">単語・表現</span></div>
+              <div class="srv-cycle-day"><i class="fas fa-microphone"></i><span class="srv-cycle-day-label" data-i18n="day4">Day 4</span><span class="srv-cycle-day-name" data-i18n="day4Name">スピーキング</span></div>
+              <div class="srv-cycle-day"><i class="fas fa-circle-question"></i><span class="srv-cycle-day-label" data-i18n="day5">Day 5</span><span class="srv-cycle-day-name" data-i18n="day5Name">クイズ</span></div>
+              <div class="srv-cycle-day"><i class="fas fa-comments"></i><span class="srv-cycle-day-label" data-i18n="day6">Day 6</span><span class="srv-cycle-day-name" data-i18n="day6Name">リアルトーク</span></div>
+              <div class="srv-cycle-day"><i class="fas fa-graduation-cap"></i><span class="srv-cycle-day-label" data-i18n="day7">Day 7</span><span class="srv-cycle-day-name" data-i18n="day7Name">フリースピーキング</span></div>
+            </div>
+          </div>
+
+          <div class="srv-nav">
+            <button type="button" class="srv-btn srv-btn-secondary" data-goto="5" data-i18n="btnBack">戻る</button>
+            <button type="button" class="srv-btn srv-btn-primary" id="btn-s6-next" data-i18n="btnNext">次へ</button>
+          </div>
+        </div>
+
+        <!-- ═══ STEP 7: How to Succeed ═══ -->
+        <div class="srv-step" id="step-7">
+          <div class="srv-intro">
+            <div class="srv-intro-icon"><i class="fas fa-star"></i></div>
+            <h2 class="srv-step-title" data-i18n="s7Title">成功するために</h2>
+            <p class="srv-step-desc" data-i18n="s7Desc">レッスンを最大限に活用するためのポイントです。</p>
+          </div>
+
+          <!-- Schedule -->
+          <div class="srv-schedule-box">
+            <p><strong data-i18n="s7Sched1">毎日のプロンプト：</strong><span data-i18n="s7Sched1d">毎朝9:00（日本時間）にLINEでメッセージが届きます。</span></p>
+            <p><strong data-i18n="s7Sched2">返信の目安：</strong><span data-i18n="s7Sched2d">20:00までの返信がおすすめです。21:00以降の返信は翌日に確認・フィードバックします。</span></p>
+            <p><strong data-i18n="s7Sched3">先生のフィードバック：</strong><span data-i18n="s7Sched3d">Day 6とDay 7は先生から直接フィードバックがあります。</span></p>
+          </div>
+
+          <!-- Tips -->
+          <div class="srv-info-card">
+            <div class="srv-info-card-title"><i class="fas fa-lightbulb"></i> <span data-i18n="s7Tips">返信のコツ</span></div>
+            <p data-i18n="s7Tip1">ボイスメッセージは静かな場所で、はっきりと話してください。</p>
+            <p data-i18n="s7Tip2" style="margin-top:.5rem;">完璧でなくて大丈夫！間違いは学びのチャンスです。</p>
+            <p data-i18n="s7Tip3" style="margin-top:.5rem;">短くてもOK。毎日続けることが一番大切です。</p>
+          </div>
+
+          <!-- Video lessons (conditional - shown/hidden by JS based on plan) -->
+          <div class="srv-info-card" id="video-info" style="display:none;">
+            <div class="srv-info-card-title"><i class="fas fa-video"></i> <span data-i18n="s7Video">ビデオレッスンについて</span></div>
+            <p data-i18n="s7Vid1">ビデオレッスンはGoogle Meetで行います。</p>
+            <p data-i18n="s7Vid2" style="margin-top:.5rem;">予約は土曜日・日曜日（日本時間）のみ可能です。</p>
+            <p data-i18n="s7Vid3" style="margin-top:.5rem;">ダッシュボードの「レッスン予約」から予約できます。</p>
+            <p data-i18n="s7Vid4" style="margin-top:.5rem;">キャンセルは24時間前までにお願いします。</p>
+          </div>
+
+          <div class="srv-nav">
+            <button type="button" class="srv-btn srv-btn-secondary" data-goto="6" data-i18n="btnBack">戻る</button>
+            <button type="button" class="srv-btn srv-btn-primary" id="btn-s7-next" data-i18n="btnNext">次へ</button>
+          </div>
+        </div>
+
+        <!-- ═══ STEP 8: Confirmation + Celebration ═══ -->
+        <div class="srv-step" id="step-8">
+          <div class="srv-intro">
+            <div class="srv-intro-icon"><i class="fas fa-check-circle"></i></div>
+            <h2 class="srv-step-title" data-i18n="s8Title">最終確認</h2>
+            <p class="srv-step-desc" data-i18n="s8Desc">以下の内容を確認して、始めましょう。</p>
+          </div>
+
+          <div class="srv-confirm-box" id="confirm-box">
+            <label class="srv-confirm-label">
+              <input type="checkbox" id="chk-confirm">
+              <span data-i18n="s8Confirm">Prokaiwaの仕組み、毎日のスケジュール、フィードバックの流れを理解しました。英語学習の旅を始める準備ができています。</span>
+            </label>
+          </div>
+
+          <div class="srv-field-error" id="err-step8" data-i18n="errConfirm">確認にチェックを入れてください</div>
+
+          <!-- Celebration (hidden until submit) -->
+          <div class="srv-celebration" id="srv-celebration" style="display:none;">
+            <div class="srv-celebration-icon"><i class="fas fa-party-horn"></i></div>
+            <div class="srv-celebration-title" data-i18n="s8DoneTitle">準備完了！</div>
+            <div class="srv-celebration-msg" data-i18n="s8DoneMsg">明日の9:00に最初のメッセージがLINEに届きます。<br>楽しみにしていてください！</div>
+          </div>
+
+          <div class="srv-nav" id="nav-step8">
+            <button type="button" class="srv-btn srv-btn-secondary" data-goto="7" data-i18n="btnBack">戻る</button>
+            <button type="button" class="srv-btn srv-btn-primary" id="btn-submit">
+              <span class="srv-btn-label" data-i18n="btnComplete">完了する</span>
+              <i class="fas fa-check" style="font-size:.85rem;"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCRIPT
+       ═══════════════════════════════════════════ -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
+
+    const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ── State ──
+    let tokenData = null;  // { user_id, token }
+    let userPlan = null;   // from questionnaire_responses
+
+    // ══════════════════════════════════════════
+    //  i18n (partial — JA defaults in HTML, EN swaps here)
+    // ══════════════════════════════════════════
+    const i18n = {
+      ja: {
+        errorTitle: 'このリンクは無効です',
+        errorMsg: 'LINEで受け取ったリンクをお使いください。\nリンクの有効期限が切れている可能性があります。',
+        welcomeEn: 'Your English Needs Survey',
+        welcomeJa: 'あなたの英語ニーズ調査',
+        welcomeSub: 'あなたに最適なレッスンを提供するために、いくつかの質問にお答えください。その後、Prokaiwaの使い方をご案内します。',
+        welcomeEta: '所要時間：約8〜10分',
+        welcomePart1: 'パート1：あなたの英語について（約5分）',
+        welcomePart2: 'パート2：Prokaiwaの使い方ガイド（約3分）',
+        btnStart: 'はじめる', btnBack: '戻る', btnNext: '次へ', btnToPart2: 'パート2へ進む', btnComplete: '完了する',
+        errRequired: '必須項目を入力してください', errConfirm: '確認にチェックを入れてください',
+        s2Title: 'あなたの今の英語について', s2Desc: '正解・不正解はありません。素直にお答えください。',
+        s3Title: 'あなたの目標', s3Desc: '英語で実現したいことを教えてください。',
+        s4Title: 'あなたの学習スタイル', s4Desc: '最適なサポートのために教えてください。',
+        s5Title: 'その他', s5Desc: '他に知っておいてほしいことがあれば教えてください。',
+        s6Title: 'あなたの学習の旅', s6Desc: 'Prokaiwaでは、1年かけて6つのスキルを身につけます。',
+        s7Title: '成功するために', s7Desc: 'レッスンを最大限に活用するためのポイントです。',
+        s8Title: '最終確認', s8Desc: '以下の内容を確認して、始めましょう。',
+        s8DoneTitle: '準備完了！', s8DoneMsg: '明日の9:00に最初のメッセージがLINEに届きます。\n楽しみにしていてください！',
+        q_freq: '日常生活でどのくらい英語を使いますか？',
+        q_freq_1: 'まったく使わない', q_freq_2: '年に数回', q_freq_3: '月に数回', q_freq_4: '週に数回', q_freq_5: 'ほぼ毎日',
+        q_feeling: '英語を聞いたとき、どんな気持ちになりますか？', q_feeling_low: 'とても不安', q_feeling_high: 'ワクワクする',
+        q_stuck: '最近、英語が必要で困った場面はありますか？', q_stuck_hint: '（任意）具体的な場面を教えてください',
+        q_history: '今まで英語を勉強したことはありますか？（複数選択可）',
+        q_hist_school: '学校の授業のみ', q_hist_self: '独学（本、YouTube等）', q_hist_eikaiwa: '英会話教室', q_hist_app: 'オンラインアプリ（Duolingo等）', q_hist_tutor: '個人レッスン・家庭教師', q_hist_none: '勉強したことがない', q_hist_fu: '良かった点・悪かった点は？',
+        q_dream: '英語を自信を持って話せたら、どんな場面で使いたいですか？',
+        q_target: '英語を使いたい特定の人、場所、機会はありますか？', q_target_hint: '（任意）例：パートナーと話したい、外資系企業に転職したい、海外旅行で困らないようにしたい',
+        q_3month: '3ヶ月後、どのレベルになっていたいですか？',
+        q_3m_1: '自信を持って挨拶できるようになりたい', q_3m_2: '短い会話ができるようになりたい', q_3m_3: '自分の意見を伝えられるようになりたい', q_3m_4: '予想外の場面にも対応できるようになりたい',
+        q_minutes: '毎日の英語練習に使える時間はどのくらいですか？', q_min_1: '5分くらい', q_min_2: '10分くらい', q_min_3: '15分くらい', q_min_4: '20分以上',
+        q_pref: 'テキストとボイスメッセージ、どちらが好きですか？', q_pref_1: 'テキストが好き', q_pref_2: 'ボイスメッセージが好き', q_pref_3: 'どちらでも',
+        q_priorities: 'あなたにとって大切な順に選んでください（タップで順位付け）', q_pri_1: '相手に伝わること', q_pri_2: '正しい文法で話すこと', q_pri_3: '自信を持って話すこと',
+        q_mistakes: '英語で間違えることについてどう感じますか？', q_mis_1: 'とても恥ずかしい', q_mis_2: '少し緊張する', q_mis_3: '大丈夫、気にしない', q_mis_4: '全然平気！間違いから学ぶ',
+        q_feedback: 'どんなフィードバックが一番役に立ちますか？（複数選択可）', q_fb_1: '間違いの訂正', q_fb_2: '励まし・褒め言葉', q_fb_3: '例文・使い方の例', q_fb_4: '発音のアドバイス', q_fb_5: '文法の説明',
+        q_other_hint: '任意です。心配なこと、期待していること、なんでも大丈夫です。',
+        s8Confirm: 'Prokaiwaの仕組み、毎日のスケジュール、フィードバックの流れを理解しました。英語学習の旅を始める準備ができています。',
+      },
+      en: {
+        errorTitle: 'This link is invalid',
+        errorMsg: 'Please use the link you received on LINE.\nThe link may have expired.',
+        welcomeEn: 'Your English Needs Survey',
+        welcomeJa: 'あなたの英語ニーズ調査',
+        welcomeSub: 'Help us understand your English needs so we can personalize your lessons. Then we\'ll show you how Prokaiwa works.',
+        welcomeEta: 'Estimated time: 8–10 minutes',
+        welcomePart1: 'Part 1: About your English (approx. 5 min)',
+        welcomePart2: 'Part 2: How Prokaiwa works (approx. 3 min)',
+        btnStart: 'Let\'s begin', btnBack: 'Back', btnNext: 'Next', btnToPart2: 'Go to Part 2', btnComplete: 'Complete',
+        errRequired: 'Please fill in required fields', errConfirm: 'Please check the confirmation box',
+        s2Title: 'Your English right now', s2Desc: 'There are no right or wrong answers. Just be honest.',
+        s3Title: 'Your goals', s3Desc: 'Tell us what you want to achieve with English.',
+        s4Title: 'Your learning style', s4Desc: 'Help us support you in the best way.',
+        s5Title: 'Anything else', s5Desc: 'Is there anything else you\'d like us to know?',
+        s6Title: 'Your learning journey', s6Desc: 'Over one year, you\'ll build 6 core skills with Prokaiwa.',
+        s7Title: 'How to succeed', s7Desc: 'Tips for getting the most out of your lessons.',
+        s8Title: 'Final confirmation', s8Desc: 'Review and confirm to get started.',
+        s8DoneTitle: 'You\'re all set!', s8DoneMsg: 'Your first message arrives on LINE tomorrow at 9:00 AM.\nWe can\'t wait to get started!',
+        q_freq: 'How often do you use English in your daily life?',
+        q_freq_1: 'Never', q_freq_2: 'A few times a year', q_freq_3: 'A few times a month', q_freq_4: 'A few times a week', q_freq_5: 'Almost every day',
+        q_feeling: 'How do you feel when someone speaks English to you?', q_feeling_low: 'Very anxious', q_feeling_high: 'Excited',
+        q_stuck: 'Was there a recent time you needed English and felt stuck?', q_stuck_hint: '(Optional) Tell us what happened',
+        q_history: 'Have you studied English before? (Select all that apply)',
+        q_hist_school: 'School classes only', q_hist_self: 'Self-study (books, YouTube, etc.)', q_hist_eikaiwa: 'English conversation school', q_hist_app: 'Online app (Duolingo, etc.)', q_hist_tutor: 'Private tutor', q_hist_none: 'Never studied', q_hist_fu: 'What worked? What didn\'t?',
+        q_dream: 'If you could speak English confidently, what situation would you use it in?',
+        q_target: 'Is there a specific person, place, or opportunity where you want to use English?', q_target_hint: '(Optional) e.g., talk with my partner, get a job at an international company, travel without stress',
+        q_3month: 'Where do you want to be in 3 months?',
+        q_3m_1: 'Able to greet people confidently', q_3m_2: 'Able to have a short conversation', q_3m_3: 'Able to express my opinions', q_3m_4: 'Able to handle unexpected situations',
+        q_minutes: 'How many minutes a day can you practice English?', q_min_1: 'About 5 min', q_min_2: 'About 10 min', q_min_3: 'About 15 min', q_min_4: '20+ min',
+        q_pref: 'Do you prefer text or voice messages?', q_pref_1: 'I prefer text', q_pref_2: 'I prefer voice', q_pref_3: 'Either is fine',
+        q_priorities: 'Rank these in order of importance to you (tap to rank)', q_pri_1: 'Being understood', q_pri_2: 'Correct grammar', q_pri_3: 'Feeling confident',
+        q_mistakes: 'How do you feel about making mistakes in English?', q_mis_1: 'Very uncomfortable', q_mis_2: 'A little nervous', q_mis_3: 'It\'s okay', q_mis_4: 'Totally fine — I learn from them!',
+        q_feedback: 'What kind of feedback helps you most? (Select all that apply)', q_fb_1: 'Corrections', q_fb_2: 'Encouragement', q_fb_3: 'Examples', q_fb_4: 'Pronunciation tips', q_fb_5: 'Grammar explanations',
+        q_other_hint: 'Optional. Worries, hopes, anything at all.',
+        s8Confirm: 'I understand how Prokaiwa works — the daily schedule, the feedback flow — and I\'m ready to begin my English journey.',
+      }
+    };
+
+    function getCurrentLang() { return localStorage.getItem('prokaiwaLang') || 'ja'; }
+
+    function applyLanguage(lang) {
+      const strings = i18n[lang];
+      if (!strings) return;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (strings[key] !== undefined) el.innerHTML = strings[key].replace(/\n/g, '<br>');
+      });
+    }
+
+    // Language toggle observer
+    const langObserver = new MutationObserver(() => { applyLanguage(document.documentElement.lang || 'ja'); });
+    langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+
+    // ══════════════════════════════════════════
+    //  Token Validation
+    // ══════════════════════════════════════════
+    async function validateToken() {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+
+      if (!token) { showError(); return false; }
+
+      const { data, error } = await supabase
+        .from('survey_tokens')
+        .select('user_id, token, used_at, expires_at')
+        .eq('token', token)
+        .single();
+
+      if (error || !data) { showError(); return false; }
+      if (data.used_at) { showError(); return false; }
+      if (new Date(data.expires_at) < new Date()) { showError(); return false; }
+
+      tokenData = { user_id: data.user_id, token: data.token };
+
+      // Get plan for conditional video section
+      const { data: profile } = await supabase
+        .from('questionnaire_responses')
+        .select('plan')
+        .eq('user_id', data.user_id)
+        .single();
+
+      if (profile) {
+        userPlan = profile.plan;
+        if (['power_lite', 'power_pro', 'video'].includes(userPlan)) {
+          document.getElementById('video-info').style.display = 'block';
+        }
+      }
+
+      return true;
+    }
+
+    function showError() {
+      document.getElementById('srv-loading').classList.add('hidden');
+      document.getElementById('srv-error').classList.add('visible');
+    }
+
+    // ══════════════════════════════════════════
+    //  Wizard Navigation
+    // ══════════════════════════════════════════
+    let currentStep = 1;
+    const totalSteps = 8;
+
+    function goToStep(n) {
+      if (n < 1 || n > totalSteps) return;
+      document.getElementById(`step-${currentStep}`)?.classList.remove('active');
+      currentStep = n;
+      document.getElementById(`step-${n}`)?.classList.add('active');
+
+      const progress = document.getElementById('srv-progress');
+      progress.style.display = n === 1 ? 'none' : 'flex';
+
+      if (n > 1) {
+        document.querySelectorAll('.srv-progress-dot').forEach(dot => {
+          const s = parseInt(dot.dataset.step);
+          dot.classList.remove('active', 'completed');
+          if (s < n) dot.classList.add('completed');
+          else if (s === n) dot.classList.add('active');
+        });
+        document.querySelectorAll('.srv-progress-line').forEach(line => {
+          line.classList.toggle('completed', parseInt(line.dataset.line) <= n);
+        });
+      }
+
+      clearErrors();
+      saveProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Back buttons
+    document.querySelectorAll('[data-goto]').forEach(btn => {
+      btn.addEventListener('click', () => goToStep(parseInt(btn.dataset.goto)));
+    });
+
+    document.getElementById('btn-start').addEventListener('click', () => goToStep(2));
+
+    // ══════════════════════════════════════════
+    //  Interactive Elements
+    // ══════════════════════════════════════════
+
+    // Single-select options
+    document.querySelectorAll('.srv-options').forEach(group => {
+      group.querySelectorAll('.srv-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          group.querySelectorAll('.srv-option').forEach(o => o.classList.remove('selected'));
+          opt.classList.add('selected');
+          opt.querySelector('input').checked = true;
+        });
+      });
+    });
+
+    // Multi-select checkboxes
+    document.querySelectorAll('.srv-check-option').forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        if (e.target.tagName === 'INPUT') return; // let native handle
+        const cb = opt.querySelector('input');
+        cb.checked = !cb.checked;
+        opt.classList.toggle('selected', cb.checked);
+
+        // Handle study history follow-ups
+        const method = opt.dataset.method;
+        if (method) {
+          const followup = document.getElementById(`followup-${method}`);
+          if (followup) followup.classList.toggle('visible', cb.checked);
+        }
+      });
+      // Also handle direct checkbox clicks
+      const cb = opt.querySelector('input');
+      if (cb) {
+        cb.addEventListener('change', () => {
+          opt.classList.toggle('selected', cb.checked);
+          const method = opt.dataset.method;
+          if (method) {
+            const followup = document.getElementById(`followup-${method}`);
+            if (followup) followup.classList.toggle('visible', cb.checked);
+          }
+        });
+      }
+    });
+
+    // Feeling scale
+    document.querySelectorAll('#feeling-scale .srv-scale-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#feeling-scale .srv-scale-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('feeling-value').value = btn.dataset.val;
+      });
+    });
+
+    // Priority ranking
+    let rankOrder = [];
+    document.querySelectorAll('#rank-priorities .srv-rank-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const val = item.dataset.val;
+        if (rankOrder.includes(val)) {
+          // Deselect this and everything after it
+          const idx = rankOrder.indexOf(val);
+          rankOrder = rankOrder.slice(0, idx);
+        } else {
+          if (rankOrder.length < 3) rankOrder.push(val);
+        }
+        // Update display
+        document.querySelectorAll('#rank-priorities .srv-rank-item').forEach(i => {
+          const v = i.dataset.val;
+          const pos = rankOrder.indexOf(v);
+          i.classList.toggle('ranked', pos >= 0);
+          i.querySelector('.srv-rank-num').textContent = pos >= 0 ? pos + 1 : '-';
+        });
+        document.getElementById('priorities-value').value = JSON.stringify(rankOrder);
+      });
+    });
+
+    // Confirmation checkbox
+    document.getElementById('chk-confirm').addEventListener('change', (e) => {
+      document.getElementById('confirm-box').classList.toggle('checked', e.target.checked);
+    });
+
+    // ══════════════════════════════════════════
+    //  Validation
+    // ══════════════════════════════════════════
+    function clearErrors() {
+      document.querySelectorAll('.srv-field-error').forEach(el => el.classList.remove('visible'));
+    }
+
+    function showStepError(stepNum) {
+      document.getElementById(`err-step${stepNum}`)?.classList.add('visible');
+    }
+
+    function validateStep2() {
+      clearErrors();
+      const freq = document.querySelector('input[name="english_frequency"]:checked');
+      const feeling = document.getElementById('feeling-value').value;
+      if (!freq || !feeling) { showStepError(2); return false; }
+      return true;
+    }
+
+    function validateStep3() {
+      clearErrors();
+      const dream = document.querySelector('textarea[name="dream_scenario"]').value.trim();
+      const goal = document.querySelector('input[name="three_month_goal"]:checked');
+      if (!dream || !goal) { showStepError(3); return false; }
+      return true;
+    }
+
+    function validateStep4() {
+      clearErrors();
+      const mins = document.querySelector('input[name="daily_minutes"]:checked');
+      const pref = document.querySelector('input[name="response_preference"]:checked');
+      const mistakes = document.querySelector('input[name="mistake_comfort"]:checked');
+      const feedback = document.querySelectorAll('input[name="feedback_prefs"]:checked');
+      if (!mins || !pref || !mistakes || feedback.length === 0 || rankOrder.length < 3) { showStepError(4); return false; }
+      return true;
+    }
+
+    function validateStep8() {
+      clearErrors();
+      if (!document.getElementById('chk-confirm').checked) { showStepError(8); return false; }
+      return true;
+    }
+
+    // Navigation with validation
+    document.getElementById('btn-s2-next').addEventListener('click', () => { if (validateStep2()) goToStep(3); });
+    document.getElementById('btn-s3-next').addEventListener('click', () => { if (validateStep3()) goToStep(4); });
+    document.getElementById('btn-s4-next').addEventListener('click', () => { if (validateStep4()) goToStep(5); });
+    document.getElementById('btn-s5-next').addEventListener('click', () => goToStep(6));
+    document.getElementById('btn-s6-next').addEventListener('click', () => goToStep(7));
+    document.getElementById('btn-s7-next').addEventListener('click', () => goToStep(8));
+
+    // ══════════════════════════════════════════
+    //  Save Progress (localStorage)
+    // ══════════════════════════════════════════
+    function saveProgress() {
+      if (!tokenData) return;
+      const data = collectFormData();
+      data._step = currentStep;
+      localStorage.setItem(`srv-${tokenData.token}`, JSON.stringify(data));
+    }
+
+    function restoreProgress() {
+      if (!tokenData) return;
+      const saved = localStorage.getItem(`srv-${tokenData.token}`);
+      if (!saved) return;
+
+      try {
+        const data = JSON.parse(saved);
+
+        // Restore radio selections
+        ['english_frequency', 'three_month_goal', 'daily_minutes', 'response_preference', 'mistake_comfort'].forEach(name => {
+          if (data[name]) {
+            const radio = document.querySelector(`input[name="${name}"][value="${data[name]}"]`);
+            if (radio) { radio.checked = true; radio.closest('.srv-option')?.classList.add('selected'); }
+          }
+        });
+
+        // Restore feeling
+        if (data.english_feeling) {
+          document.getElementById('feeling-value').value = data.english_feeling;
+          document.querySelector(`#feeling-scale .srv-scale-btn[data-val="${data.english_feeling}"]`)?.classList.add('selected');
+        }
+
+        // Restore textareas
+        ['stuck_moment', 'dream_scenario', 'specific_target', 'additional_notes'].forEach(name => {
+          if (data[name]) { const ta = document.querySelector(`textarea[name="${name}"]`); if (ta) ta.value = data[name]; }
+        });
+
+        // Restore priorities
+        if (data.priorities && Array.isArray(data.priorities)) {
+          rankOrder = data.priorities;
+          document.querySelectorAll('#rank-priorities .srv-rank-item').forEach(i => {
+            const pos = rankOrder.indexOf(i.dataset.val);
+            i.classList.toggle('ranked', pos >= 0);
+            i.querySelector('.srv-rank-num').textContent = pos >= 0 ? pos + 1 : '-';
+          });
+          document.getElementById('priorities-value').value = JSON.stringify(rankOrder);
+        }
+
+      } catch (e) { /* ignore corrupt data */ }
+    }
+
+    // ══════════════════════════════════════════
+    //  Collect Form Data
+    // ══════════════════════════════════════════
+    function collectFormData() {
+      // Study history with notes
+      const historyMethods = document.querySelectorAll('input[name="study_history"]:checked');
+      const studyHistory = Array.from(historyMethods).map(cb => {
+        const method = cb.value;
+        const notes = document.querySelector(`textarea[name="history_${cb.closest('.srv-check-option')?.dataset.method}_notes"]`)?.value?.trim() || '';
+        return { method, notes };
+      });
+
+      return {
+        english_frequency: document.querySelector('input[name="english_frequency"]:checked')?.value || null,
+        english_feeling: parseInt(document.getElementById('feeling-value').value) || null,
+        stuck_moment: document.querySelector('textarea[name="stuck_moment"]')?.value?.trim() || null,
+        study_history: studyHistory.length > 0 ? studyHistory : null,
+        dream_scenario: document.querySelector('textarea[name="dream_scenario"]')?.value?.trim() || null,
+        specific_target: document.querySelector('textarea[name="specific_target"]')?.value?.trim() || null,
+        three_month_goal: document.querySelector('input[name="three_month_goal"]:checked')?.value || null,
+        daily_minutes: document.querySelector('input[name="daily_minutes"]:checked')?.value || null,
+        response_preference: document.querySelector('input[name="response_preference"]:checked')?.value || null,
+        priorities: rankOrder.length > 0 ? rankOrder : null,
+        mistake_comfort: document.querySelector('input[name="mistake_comfort"]:checked')?.value || null,
+        feedback_preferences: Array.from(document.querySelectorAll('input[name="feedback_prefs"]:checked')).map(cb => cb.value),
+        additional_notes: document.querySelector('textarea[name="additional_notes"]')?.value?.trim() || null,
+      };
+    }
+
+    // ══════════════════════════════════════════
+    //  Submit
+    // ══════════════════════════════════════════
+    document.getElementById('btn-submit').addEventListener('click', async () => {
+      if (!validateStep8()) return;
+
+      const submitBtn = document.getElementById('btn-submit');
+      submitBtn.classList.add('srv-btn-loading');
+      submitBtn.disabled = true;
+
+      const formData = collectFormData();
+
+      try {
+        // Upsert survey data
+        const { error: surveyError } = await supabase
+          .from('student_needs_survey')
+          .upsert({
+            user_id: tokenData.user_id,
+            token: tokenData.token,
+            ...formData,
+            onboarding_confirmed: true,
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+
+        if (surveyError) throw surveyError;
+
+        // Mark token as used
+        await supabase
+          .from('survey_tokens')
+          .update({ used_at: new Date().toISOString() })
+          .eq('token', tokenData.token);
+
+        // Clear saved progress
+        localStorage.removeItem(`srv-${tokenData.token}`);
+
+        // Show celebration
+        document.getElementById('nav-step8').style.display = 'none';
+        document.querySelector('#step-8 .srv-intro').style.display = 'none';
+        document.getElementById('confirm-box').style.display = 'none';
+        document.getElementById('srv-celebration').style.display = 'block';
+
+      } catch (err) {
+        submitBtn.classList.remove('srv-btn-loading');
+        submitBtn.disabled = false;
+        showStepError(8);
+      }
+    });
+
+    // ══════════════════════════════════════════
+    //  Initialize
+    // ══════════════════════════════════════════
+    async function init() {
+      const valid = await validateToken();
+      if (!valid) return;
+
+      applyLanguage(getCurrentLang());
+      restoreProgress();
+
+      document.getElementById('srv-loading').classList.add('hidden');
+      document.getElementById('srv-main').style.display = 'flex';
+    }
+
+    init();
+  </script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
+</body>
+</html>
