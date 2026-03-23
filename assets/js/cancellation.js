@@ -18,6 +18,64 @@ const supabase = createClient(
     }
 );
 
+
+// =====================================================
+// i18n DICTIONARY (Static HTML text)
+// =====================================================
+
+const cancellationI18n = {
+    ja: {
+        processing: '処理中...',
+        pageTitle: 'サブスクリプションのキャンセル',
+        pageSubtitle: 'お別れする前に、改善のお手伝いをさせてください',
+        stepReason: '理由',
+        stepDetails: '詳細',
+        stepConfirm: '確認',
+        step1Title: 'キャンセルされる理由を教えてください',
+        step1Subtitle: 'あなたのフィードバックは、サービスの改善に役立ちます',
+        step2Title: '詳しく教えてください',
+        step3Title: '本当にキャンセルしますか？',
+        step3Warning: 'キャンセルすると失うもの：',
+        labelPlan: '現在のプラン',
+        labelEndDate: 'アクセス終了日',
+        labelReason: 'キャンセル理由',
+        btnNext: '次へ',
+        btnBack: '戻る',
+        btnConfirmCancel: 'キャンセルを確定'
+    },
+    en: {
+        processing: 'Processing...',
+        pageTitle: 'Cancel Subscription',
+        pageSubtitle: 'Before you go, let us help make things better',
+        stepReason: 'Reason',
+        stepDetails: 'Details',
+        stepConfirm: 'Confirm',
+        step1Title: 'Why are you cancelling?',
+        step1Subtitle: 'Your feedback helps us improve our service',
+        step2Title: 'Tell us more',
+        step3Title: 'Are you sure you want to cancel?',
+        step3Warning: "You'll lose access to:",
+        labelPlan: 'Current Plan',
+        labelEndDate: 'Access Until',
+        labelReason: 'Cancellation Reason',
+        btnNext: 'Continue',
+        btnBack: 'Go Back',
+        btnConfirmCancel: 'Confirm Cancellation'
+    }
+};
+
+function applyCancellationLanguage(lang) {
+    const strings = cancellationI18n[lang];
+    if (!strings) return;
+    
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (strings[key]) {
+            el.textContent = strings[key];
+        }
+    });
+}
+
 // =====================================================
 // CANCELLATION REASONS
 // =====================================================
@@ -1856,7 +1914,8 @@ const cancellationState = {
 // OFFER DECISION LOGIC
 // =====================================================
 
-function determineOffer(reason, answers, lang) {
+function determineOffer(reason, answers) {
+    const lang = cancellationState.currentLang;
     // console.log('🎯 Determining offer for:', { reason, answers });
     
     switch(reason) {
@@ -2015,7 +2074,20 @@ async function initCancellationFlow() {
     
     // Render initial state
     renderCurrentStep();
-// Language display is handled by script.js
+    applyCancellationLanguage(savedLang);
+
+    // Listen for language toggle clicks in nav
+    document.addEventListener('click', (e) => {
+        const langBtn = e.target.closest('[data-lang]');
+        if (langBtn) {
+            const newLang = langBtn.getAttribute('data-lang');
+            if (newLang && newLang !== cancellationState.currentLang) {
+                cancellationState.currentLang = newLang;
+                applyCancellationLanguage(newLang);
+                renderCurrentStep();
+            }
+        }
+    });
 }
         
 // =====================================================
@@ -2045,33 +2117,34 @@ function renderCurrentStep() {
     // console.log('🎨 Rendering step:', step, 'lang:', lang);
     
     // Update step indicators
-    updateStepIndicators(lang, step);
+    updateStepIndicators(step);
     
     // Render appropriate content
     switch(step) {
     case 'reason':
-        renderReasonSelection(lang);
+        renderReasonSelection();
         break;
     case 'details':
-        renderQuestionForm(lang);
+        renderQuestionForm();
         break;
     case 'offer':
-        renderOffer(lang, cancellationState.offerDecision);
+        renderOffer(cancellationState.offerDecision);
         break;
     case 'confirm':
-        renderConfirmation(lang);
+        renderConfirmation();
         break;
 }
 }
 
-function updateStepIndicators(lang, currentStep) {
+function updateStepIndicators(currentStep) {
+    const lang = cancellationState.currentLang;
     const steps = ['reason', 'details', 'confirm'];
     const stepMap = { reason: 1, details: 2, offer: 2.5, confirm: 3 };
     const currentStepNum = stepMap[currentStep];
     
     steps.forEach((step, index) => {
         const stepNum = index + 1;
-        const stepEl = document.getElementById(`${lang}-step${stepNum}`);
+        const stepEl = document.getElementById(`step${stepNum}`);
         
         if (!stepEl) return;
         
@@ -2085,14 +2158,15 @@ function updateStepIndicators(lang, currentStep) {
     });
 }
 
-function renderReasonSelection(lang) {
-    const gridEl = document.getElementById(`${lang}-reason-grid`);
+function renderReasonSelection() {
+    const lang = cancellationState.currentLang;
+    const gridEl = document.getElementById(`reason-grid`);
     if (!gridEl) return;
     
     const reasons = cancellationReasons[lang];
     
     gridEl.innerHTML = reasons.map(reason => `
-        <div class="reason-option" data-reason="${reason.id}" onclick="selectReason('${lang}', '${reason.id}')">
+        <div class="reason-option" data-reason="${reason.id}" onclick="selectReason('${reason.id}')">
             <div class="reason-icon">${reason.icon}</div>
             <div class="reason-content">
                 <div class="reason-title">${reason.title}</div>
@@ -2102,16 +2176,17 @@ function renderReasonSelection(lang) {
     `).join('');
     
     // Show reason section, hide others
-    document.getElementById(`${lang}-section-reason`).classList.add('active');
-    document.getElementById(`${lang}-section-details`).classList.remove('active');
-    document.getElementById(`${lang}-section-offer`).classList.remove('active');
-    document.getElementById(`${lang}-section-confirm`).classList.remove('active');
+    document.getElementById(`section-reason`).classList.add('active');
+    document.getElementById(`section-details`).classList.remove('active');
+    document.getElementById(`section-offer`).classList.remove('active');
+    document.getElementById(`section-confirm`).classList.remove('active');
 }
 
-function renderQuestionForm(lang) {
+function renderQuestionForm() {
+    const lang = cancellationState.currentLang;
     const reason = cancellationState.selectedReason;
-    const formEl = document.getElementById(`${lang}-question-form`);
-    const titleEl = document.getElementById(`${lang}-details-title`);
+    const formEl = document.getElementById(`question-form`);
+    const titleEl = document.getElementById(`details-title`);
     
     if (!formEl || !titleEl) return;
     
@@ -2122,21 +2197,22 @@ function renderQuestionForm(lang) {
     titleEl.textContent = lang === 'ja' ? '詳しく教えてください' : 'Tell us more';
     
     // Render questions
-    formEl.innerHTML = questions.map(q => renderQuestion(q, lang)).join('');
+    formEl.innerHTML = questions.map(q => renderQuestion(q)).join('');
     
     // Add universal questions at the end
     const universalQs = universalQuestions[lang];
     formEl.innerHTML += '<div style="border-top: 2px solid var(--color-border); margin: 2rem 0; padding-top: 2rem;"></div>';
-    formEl.innerHTML += universalQs.map(q => renderQuestion(q, lang)).join('');
+    formEl.innerHTML += universalQs.map(q => renderQuestion(q)).join('');
     
     // Show details section
-    document.getElementById(`${lang}-section-reason`).classList.remove('active');
-    document.getElementById(`${lang}-section-details`).classList.add('active');
-    document.getElementById(`${lang}-section-offer`).classList.remove('active');
-    document.getElementById(`${lang}-section-confirm`).classList.remove('active');
+    document.getElementById(`section-reason`).classList.remove('active');
+    document.getElementById(`section-details`).classList.add('active');
+    document.getElementById(`section-offer`).classList.remove('active');
+    document.getElementById(`section-confirm`).classList.remove('active');
 }
 
-function renderQuestion(question, lang) {
+function renderQuestion(question) {
+    const lang = cancellationState.currentLang;
     const qId = question.id;
     const currentAnswer = cancellationState.questionAnswers[qId] || 
                          cancellationState.universalAnswers[qId];
@@ -2230,8 +2306,6 @@ function renderQuestion(question, lang) {
     }
 }
 
-// CONTINUED IN NEXT MESSAGE...
-// console.log('✅ Part 2A loaded: Universal questions, offers, state, render functions');
 // =====================================================
 // PART 2B: INPUT HANDLERS, NAVIGATION, VALIDATION, API
 // =====================================================
@@ -2240,16 +2314,17 @@ function renderQuestion(question, lang) {
 // INPUT HANDLERS
 // =====================================================
 
-function selectReason(lang, reasonId) {
+function selectReason(reasonId) {
+    const lang = cancellationState.currentLang;
     // console.log('📝 Reason selected:', reasonId);
     
     // Remove selection from all reasons
-    document.querySelectorAll(`#${lang}-reason-grid .reason-option`).forEach(el => {
+    document.querySelectorAll(`#reason-grid .reason-option`).forEach(el => {
         el.classList.remove('selected');
     });
     
     // Add selection to clicked reason
-    const selectedEl = document.querySelector(`#${lang}-reason-grid .reason-option[data-reason="${reasonId}"]`);
+    const selectedEl = document.querySelector(`#reason-grid .reason-option[data-reason="${reasonId}"]`);
     if (selectedEl) {
         selectedEl.classList.add('selected');
     }
@@ -2258,7 +2333,7 @@ function selectReason(lang, reasonId) {
     cancellationState.selectedReason = reasonId;
     
     // Enable continue button
-    const continueBtn = document.getElementById(`${lang}-btn-continue-step1`);
+    const continueBtn = document.getElementById(`btn-continue-step1`);
     if (continueBtn) {
         continueBtn.disabled = false;
     }
@@ -2405,7 +2480,8 @@ function setRating(questionId, stars) {
 // VALIDATION
 // =====================================================
 
-function validateStep(step, lang) {
+function validateStep(step) {
+    const lang = cancellationState.currentLang;
     // console.log('✓ Validating step:', step);
     
     switch(step) {
@@ -2417,14 +2493,15 @@ function validateStep(step, lang) {
             return true;
             
         case 'details':
-            return validateQuestions(lang);
+            return validateQuestions();
             
         default:
             return true;
     }
 }
 
-function validateQuestions(lang) {
+function validateQuestions() {
+    const lang = cancellationState.currentLang;
     const reason = cancellationState.selectedReason;
     
     // Get all questions for this reason + universal
@@ -2490,10 +2567,11 @@ function validateQuestions(lang) {
 // NAVIGATION
 // =====================================================
 
-function proceedToDetails(lang) {
+function proceedToDetails() {
+    const lang = cancellationState.currentLang;
     // console.log('➡️ Proceeding to details...');
     
-    if (!validateStep('reason', lang)) return;
+    if (!validateStep('reason')) return;
     
     // Track analytics
     trackEvent('cancellation_step1_completed', {
@@ -2510,10 +2588,11 @@ function proceedToDetails(lang) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function proceedToOfferOrConfirm(lang) {
+function proceedToOfferOrConfirm() {
+    const lang = cancellationState.currentLang;
     // console.log('➡️ Proceeding to offer or confirm...');
     
-    if (!validateStep('details', lang)) return;
+    if (!validateStep('details')) return;
     
     // Track analytics
     trackEvent('cancellation_step2_completed', {
@@ -2524,8 +2603,7 @@ function proceedToOfferOrConfirm(lang) {
     // Determine if we should show an offer
     const offerDecision = determineOffer(
         cancellationState.selectedReason,
-        cancellationState.questionAnswers,
-        lang
+        cancellationState.questionAnswers
     );
     
     if (offerDecision) {
@@ -2536,7 +2614,7 @@ function proceedToOfferOrConfirm(lang) {
     cancellationState.offerType = offerDecision.type;
     cancellationState.offerDecision = offerDecision;
     
-    renderOffer(lang, offerDecision);
+    renderOffer(offerDecision);
         
         // Track offer shown
         trackEvent('retention_offer_shown', {
@@ -2554,7 +2632,8 @@ function proceedToOfferOrConfirm(lang) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function goBack(lang, from) {
+function goBack(from) {
+    const lang = cancellationState.currentLang;
     // console.log('⬅️ Going back from:', from);
     
     if (from === 'details') {
@@ -2577,9 +2656,10 @@ function goBack(lang, from) {
 // OFFER RENDERING
 // =====================================================
 
-function renderOffer(lang, offerDecision) {
+function renderOffer(offerDecision) {
+    const lang = cancellationState.currentLang;
     const offer = offerDecision.offer;
-    const offerSectionEl = document.getElementById(`${lang}-section-offer`);
+    const offerSectionEl = document.getElementById(`section-offer`);
     
     if (!offerSectionEl) return;
     
@@ -2596,10 +2676,10 @@ function renderOffer(lang, offerDecision) {
             </ul>
             
             <div class="offer-actions">
-                <button class="btn-primary-action" onclick="acceptOffer('${lang}')">
+                <button class="btn-primary-action" onclick="acceptOffer()">
                     ${offer.primaryAction.text}
                 </button>
-                <button class="btn-secondary-action" onclick="declineOffer('${lang}')">
+                <button class="btn-secondary-action" onclick="declineOffer()">
                     ${offer.secondaryAction.text}
                 </button>
             </div>
@@ -2607,13 +2687,14 @@ function renderOffer(lang, offerDecision) {
     `;
     
     // Show offer section
-    document.getElementById(`${lang}-section-reason`).classList.remove('active');
-    document.getElementById(`${lang}-section-details`).classList.remove('active');
+    document.getElementById(`section-reason`).classList.remove('active');
+    document.getElementById(`section-details`).classList.remove('active');
     offerSectionEl.classList.add('active');
-    document.getElementById(`${lang}-section-confirm`).classList.remove('active');
+    document.getElementById(`section-confirm`).classList.remove('active');
 }
 
-async function acceptOffer(lang) {
+async function acceptOffer() {
+    const lang = cancellationState.currentLang;
     // console.log('✅ Offer accepted');
     
     const offerType = cancellationState.offerType;
@@ -2684,7 +2765,8 @@ async function acceptOffer(lang) {
     }
 }
 
-function declineOffer(lang) {
+function declineOffer() {
+    const lang = cancellationState.currentLang;
     // console.log('❌ Offer declined');
     
     // Track analytics
@@ -2703,15 +2785,16 @@ function declineOffer(lang) {
 // CONFIRMATION RENDERING
 // =====================================================
 
-function renderConfirmation(lang) {
+function renderConfirmation() {
+    const lang = cancellationState.currentLang;
     const reason = cancellationState.selectedReason;
     const reasonObj = cancellationReasons[lang].find(r => r.id === reason);
     const plan = cancellationState.userData.currentPlan || 'Standard';
     
     // Update confirmation details
-    const planEl = document.getElementById(`${lang}-confirm-plan`);
-    const endDateEl = document.getElementById(`${lang}-confirm-end-date`);
-    const reasonEl = document.getElementById(`${lang}-confirm-reason`);
+    const planEl = document.getElementById(`confirm-plan`);
+    const endDateEl = document.getElementById(`confirm-end-date`);
+    const reasonEl = document.getElementById(`confirm-reason`);
     
     if (planEl) planEl.textContent = `Plan ${plan}`;
     if (endDateEl) {
@@ -2722,7 +2805,7 @@ function renderConfirmation(lang) {
     if (reasonEl && reasonObj) reasonEl.textContent = reasonObj.title;
     
     // Update loss list based on plan
-    const lossListEl = document.getElementById(`${lang}-loss-list`);
+    const lossListEl = document.getElementById(`loss-list`);
     if (lossListEl) {
         const losses = lang === 'ja' ? [
             '毎日のLINE練習',
@@ -2742,13 +2825,14 @@ function renderConfirmation(lang) {
     }
     
     // Show confirmation section
-    document.getElementById(`${lang}-section-reason`).classList.remove('active');
-    document.getElementById(`${lang}-section-details`).classList.remove('active');
-    document.getElementById(`${lang}-section-offer`).classList.remove('active');
-    document.getElementById(`${lang}-section-confirm`).classList.add('active');
+    document.getElementById(`section-reason`).classList.remove('active');
+    document.getElementById(`section-details`).classList.remove('active');
+    document.getElementById(`section-offer`).classList.remove('active');
+    document.getElementById(`section-confirm`).classList.add('active');
 }
 
-async function confirmCancellation(lang) {
+async function confirmCancellation() {
+    const lang = cancellationState.currentLang;
     // console.log('🚨 Confirming cancellation...');
     
     // Double-check confirmation
@@ -2928,4 +3012,4 @@ window.addEventListener('beforeunload', (e) => {
     }
 });
 
-// console.log('✅ Part 2B loaded: Input handlers, navigation, validation, API calls');
+
