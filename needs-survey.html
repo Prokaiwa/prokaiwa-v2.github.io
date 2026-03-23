@@ -662,6 +662,27 @@
         q_feedback: 'What kind of feedback helps you most? (Select all that apply)', q_fb_1: 'Corrections', q_fb_2: 'Encouragement', q_fb_3: 'Examples', q_fb_4: 'Pronunciation tips', q_fb_5: 'Grammar explanations',
         q_other_hint: 'Optional. Worries, hopes, anything at all.',
         s8Confirm: 'I understand how Prokaiwa works — the daily schedule, the feedback flow — and I\'m ready to begin my English journey.',
+        s6CycleTitle: 'The 7-day weekly cycle',
+        s6CycleDesc: 'Every week follows the same rhythm, so you always know what\'s coming.',
+        day1: 'Day 1', day1Name: 'Listening',
+        day2: 'Day 2', day2Name: 'Grammar tip',
+        day3: 'Day 3', day3Name: 'Vocabulary',
+        day4: 'Day 4', day4Name: 'Speaking',
+        day5: 'Day 5', day5Name: 'Quiz',
+        day6: 'Day 6', day6Name: 'Real talk',
+        day7: 'Day 7', day7Name: 'Free speaking',
+        s7Sched1: 'Daily prompts:', s7Sched1d: 'A new message arrives on LINE every morning at 9:00 AM (JST).',
+        s7Sched2: 'Response target:', s7Sched2d: 'We recommend replying by 8:00 PM. Replies after 9:00 PM will be reviewed the next day.',
+        s7Sched3: 'Teacher feedback:', s7Sched3d: 'On Day 6 and Day 7, your teacher gives you personal feedback.',
+        s7Tips: 'Tips for great responses',
+        s7Tip1: 'Record voice messages in a quiet place and speak clearly.',
+        s7Tip2: 'You don\'t need to be perfect! Mistakes are chances to learn.',
+        s7Tip3: 'Even short responses are fine. The most important thing is practicing every day.',
+        s7Video: 'About video lessons',
+        s7Vid1: 'Video lessons are conducted on Google Meet.',
+        s7Vid2: 'Booking is available on Saturdays and Sundays (JST) only.',
+        s7Vid3: 'Book from the "Lesson Booking" section in your dashboard.',
+        s7Vid4: 'Please cancel at least 24 hours in advance.',
       }
     };
 
@@ -780,7 +801,7 @@
     // Multi-select checkboxes
     document.querySelectorAll('.srv-check-option').forEach(opt => {
       opt.addEventListener('click', (e) => {
-        if (e.target.tagName === 'INPUT') return; // let native handle
+        e.preventDefault();
         const cb = opt.querySelector('input');
         cb.checked = !cb.checked;
         opt.classList.toggle('selected', cb.checked);
@@ -792,18 +813,6 @@
           if (followup) followup.classList.toggle('visible', cb.checked);
         }
       });
-      // Also handle direct checkbox clicks
-      const cb = opt.querySelector('input');
-      if (cb) {
-        cb.addEventListener('change', () => {
-          opt.classList.toggle('selected', cb.checked);
-          const method = opt.dataset.method;
-          if (method) {
-            const followup = document.getElementById(`followup-${method}`);
-            if (followup) followup.classList.toggle('visible', cb.checked);
-          }
-        });
-      }
     });
 
     // Feeling scale
