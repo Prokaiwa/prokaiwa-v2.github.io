@@ -1,0 +1,521 @@
+/* Cancellation Page Styles */
+.cancellation-container {
+    max-width: 800px;
+    margin: 3rem auto;
+    padding: 2rem;
+}
+
+.cancellation-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.cancellation-header h1 {
+    color: var(--color-text);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.cancellation-header p {
+    color: var(--color-text-light);
+    font-size: 1.1rem;
+}
+
+/* Progress Steps */
+.cancellation-steps {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    padding: 0 1rem;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    max-width: 150px;
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-bg);
+    border: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    transition: all 0.3s ease;
+}
+
+.step.active .step-circle {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+.step.completed .step-circle {
+    background: var(--color-success);
+    border-color: var(--color-success);
+    color: white;
+}
+
+.step-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.step.active .step-label {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* Cancellation Card */
+.cancellation-card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Step Sections */
+.step-section {
+    display: none;
+}
+
+.step-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Reason Selection */
+.reason-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.reason-option {
+    padding: 1.25rem;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.reason-option:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+.reason-option.selected {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+    box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
+}
+
+.reason-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    text-align: center;
+}
+
+.reason-content {
+    flex: 1;
+}
+
+.reason-title {
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 0.25rem;
+}
+
+.reason-subtitle {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+}
+
+/* Question Form */
+.question-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.question-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.question-label {
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 0.95rem;
+}
+
+.question-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.radio-option,
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.radio-option:hover,
+.checkbox-option:hover {
+    background: var(--color-bg);
+    border-color: var(--color-primary);
+}
+
+.radio-option.selected {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+}
+
+.radio-option input[type="radio"],
+.checkbox-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.radio-option label,
+.checkbox-option label {
+    flex: 1;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+.text-input,
+.textarea-input {
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.text-input:focus,
+.textarea-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
+}
+
+.char-counter {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    text-align: right;
+    margin-top: 0.25rem;
+}
+
+.char-counter.valid {
+    color: var(--color-success);
+}
+
+.char-counter.invalid {
+    color: var(--color-error);
+}
+
+.validation-message {
+    font-size: 0.85rem;
+    color: var(--color-error);
+    margin-top: 0.5rem;
+    display: none;
+}
+
+.validation-message.show {
+    display: block;
+}
+
+/* Retention Offer */
+.retention-offer {
+    background: linear-gradient(135deg, var(--color-primary-light) 0%, rgba(0, 128, 128, 0.05) 100%);
+    border: 2px solid var(--color-primary);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.retention-offer h3 {
+    color: var(--color-primary-dark);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.retention-offer p {
+    color: var(--color-text);
+    font-size: 1.05rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.offer-features {
+    text-align: left;
+    margin: 1.5rem 0;
+    padding-left: 1rem;
+}
+
+.offer-features li {
+    color: var(--color-text);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.offer-features i {
+    color: var(--color-primary);
+    font-size: 1.1rem;
+}
+
+.offer-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn-primary-action {
+    background: var(--color-primary);
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary-action:hover:not(:disabled) {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+}
+
+.btn-primary-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary-action {
+    background: white;
+    color: var(--color-text);
+    padding: 1rem 2rem;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-secondary-action:hover {
+    border-color: var(--color-text-light);
+    background: var(--color-bg);
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.navigation-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+/* Confirmation Section */
+.confirmation-warning {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 1.5rem;
+    border-radius: 0 8px 8px 0;
+    margin: 1.5rem 0;
+}
+
+.confirmation-warning h4 {
+    color: #856404;
+    margin: 0 0 0.75rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.confirmation-warning ul {
+    margin: 0.5rem 0 0 1.5rem;
+    color: #856404;
+}
+
+.confirmation-details {
+    background: var(--color-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    color: var(--color-text-light);
+    font-weight: 500;
+}
+
+.detail-value {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+/* Loading State */
+.processing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.processing-overlay.show {
+    display: flex;
+}
+
+.processing-content {
+    background: white;
+    padding: 3rem;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+}
+
+.processing-content i {
+    font-size: 3rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .cancellation-container {
+        padding: 1rem;
+        margin: 1rem auto;
+    }
+    
+    .cancellation-card {
+        padding: 1.5rem;
+    }
+    
+    .cancellation-steps {
+        gap: 0.5rem;
+    }
+    
+    .step {
+        max-width: 100px;
+    }
+    
+    .step-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+    
+    .step-label {
+        font-size: 0.75rem;
+    }
+    
+    .offer-actions,
+    .navigation-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-primary-action,
+    .btn-secondary-action,
+    .btn-danger {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+    .confirmation-warning {
+        background: rgba(255, 193, 7, 0.2);
+    }
+}
