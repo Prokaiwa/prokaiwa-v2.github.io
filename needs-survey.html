@@ -810,7 +810,13 @@
         const method = opt.dataset.method;
         if (method) {
           const followup = document.getElementById(`followup-${method}`);
-          if (followup) followup.classList.toggle('visible', cb.checked);
+          if (followup) {
+            followup.classList.toggle('visible', cb.checked);
+            if (cb.checked) {
+              const ta = followup.querySelector('textarea');
+              if (ta) setTimeout(() => ta.focus(), 100);
+            }
+          }
         }
       });
     });
