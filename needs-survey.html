@@ -882,8 +882,9 @@
     const confirmBox = document.getElementById('confirm-box');
     const confirmCb = document.getElementById('chk-confirm');
     confirmBox.addEventListener('click', (e) => {
-      if (e.target !== confirmCb) {
-      }
+      confirmBox.classList.toggle('checked', confirmCb.checked);
+    });
+    confirmCb.addEventListener('change', () => {
       confirmBox.classList.toggle('checked', confirmCb.checked);
     });
 
