@@ -1072,7 +1072,7 @@
       } catch (err) {
         submitBtn.classList.remove('srv-btn-loading');
         submitBtn.disabled = false;
-        showStepError(8);
+        alert('Submit error: ' + err.message);
       }
     });
 
