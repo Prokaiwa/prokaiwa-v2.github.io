@@ -857,6 +857,7 @@
 
     // Priority ranking
     let rankOrder = [];
+    let confirmationChecked = false;
     document.querySelectorAll('#rank-priorities .srv-rank-item').forEach(item => {
       item.addEventListener('click', () => {
         const val = item.dataset.val;
@@ -882,8 +883,9 @@
     const confirmBox = document.getElementById('confirm-box');
     const confirmCb = document.getElementById('chk-confirm');
     confirmBox.addEventListener('click', () => {
-      confirmCb.checked = !confirmCb.checked;
-      confirmBox.classList.toggle('checked', confirmCb.checked);
+      confirmationChecked = !confirmationChecked;
+      confirmCb.checked = confirmationChecked;
+      confirmBox.classList.toggle('checked', confirmationChecked);
     });
 
     // ══════════════════════════════════════════
@@ -925,7 +927,7 @@
 
     function validateStep8() {
       clearErrors();
-      if (!document.getElementById('chk-confirm').checked) { showStepError(8); return false; }
+      if (!confirmationChecked) { showStepError(8); return false; }
       return true;
     }
 
