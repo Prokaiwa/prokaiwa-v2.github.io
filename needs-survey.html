@@ -301,22 +301,22 @@
           <div class="srv-question">
             <span class="srv-q-label" data-i18n="q_history">今まで英語を勉強したことはありますか？（複数選択可）</span>
             <div id="history-options">
-              <label class="srv-check-option" data-method="school"><input type="checkbox" name="study_history" value="school"><span data-i18n="q_hist_school">学校の授業のみ</span></label>
+              <div class="srv-check-option" data-method="school"><input type="checkbox" name="study_history" value="school"><span data-i18n="q_hist_school">学校の授業のみ</span></div>
               <div class="srv-followup" id="followup-school"><label data-i18n="q_hist_fu">良かった点・悪かった点は？</label><textarea name="history_school_notes" placeholder=""></textarea></div>
 
-              <label class="srv-check-option" data-method="self"><input type="checkbox" name="study_history" value="self_study"><span data-i18n="q_hist_self">独学（本、YouTube等）</span></label>
+              <div class="srv-check-option" data-method="self"><input type="checkbox" name="study_history" value="self_study"><span data-i18n="q_hist_self">独学（本、YouTube等）</span></div>
               <div class="srv-followup" id="followup-self"><label data-i18n="q_hist_fu">良かった点・悪かった点は？</label><textarea name="history_self_notes" placeholder=""></textarea></div>
 
-              <label class="srv-check-option" data-method="eikaiwa"><input type="checkbox" name="study_history" value="eikaiwa"><span data-i18n="q_hist_eikaiwa">英会話教室</span></label>
+              <div class="srv-check-option" data-method="eikaiwa"><input type="checkbox" name="study_history" value="eikaiwa"><span data-i18n="q_hist_eikaiwa">英会話教室</span></div>
               <div class="srv-followup" id="followup-eikaiwa"><label data-i18n="q_hist_fu">良かった点・悪かった点は？</label><textarea name="history_eikaiwa_notes" placeholder=""></textarea></div>
 
-              <label class="srv-check-option" data-method="app"><input type="checkbox" name="study_history" value="app"><span data-i18n="q_hist_app">オンラインアプリ（Duolingo等）</span></label>
+              <div class="srv-check-option" data-method="app"><input type="checkbox" name="study_history" value="app"><span data-i18n="q_hist_app">オンラインアプリ（Duolingo等）</span></div>
               <div class="srv-followup" id="followup-app"><label data-i18n="q_hist_fu">良かった点・悪かった点は？</label><textarea name="history_app_notes" placeholder=""></textarea></div>
 
-              <label class="srv-check-option" data-method="tutor"><input type="checkbox" name="study_history" value="tutor"><span data-i18n="q_hist_tutor">個人レッスン・家庭教師</span></label>
+              <div class="srv-check-option" data-method="tutor"><input type="checkbox" name="study_history" value="tutor"><span data-i18n="q_hist_tutor">個人レッスン・家庭教師</span></div>
               <div class="srv-followup" id="followup-tutor"><label data-i18n="q_hist_fu">良かった点・悪かった点は？</label><textarea name="history_tutor_notes" placeholder=""></textarea></div>
 
-              <label class="srv-check-option" data-method="none"><input type="checkbox" name="study_history" value="none"><span data-i18n="q_hist_none">勉強したことがない</span></label>
+              <div class="srv-check-option" data-method="none"><input type="checkbox" name="study_history" value="none"><span data-i18n="q_hist_none">勉強したことがない</span></div>
             </div>
           </div>
 
@@ -421,11 +421,11 @@
           <div class="srv-question">
             <span class="srv-q-label" data-i18n="q_feedback">どんなフィードバックが一番役に立ちますか？（複数選択可）</span>
             <div id="feedback-options">
-              <label class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="corrections"><span data-i18n="q_fb_1">間違いの訂正</span></label>
-              <label class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="encouragement"><span data-i18n="q_fb_2">励まし・褒め言葉</span></label>
-              <label class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="examples"><span data-i18n="q_fb_3">例文・使い方の例</span></label>
-              <label class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="pronunciation"><span data-i18n="q_fb_4">発音のアドバイス</span></label>
-              <label class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="grammar"><span data-i18n="q_fb_5">文法の説明</span></label>
+              <div class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="corrections"><span data-i18n="q_fb_1">間違いの訂正</span></div>
+              <div class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="encouragement"><span data-i18n="q_fb_2">励まし・褒め言葉</span></div>
+              <div class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="examples"><span data-i18n="q_fb_3">例文・使い方の例</span></div>
+              <div class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="pronunciation"><span data-i18n="q_fb_4">発音のアドバイス</span></div>
+              <div class="srv-check-option"><input type="checkbox" name="feedback_prefs" value="grammar"><span data-i18n="q_fb_5">文法の説明</span></div>
             </div>
           </div>
 
@@ -544,10 +544,10 @@
           </div>
 
           <div class="srv-confirm-box" id="confirm-box">
-            <label class="srv-confirm-label">
+            <div class="srv-confirm-label">
               <input type="checkbox" id="chk-confirm">
               <span data-i18n="s8Confirm">Prokaiwaの仕組み、毎日のスケジュール、フィードバックの流れを理解しました。英語学習の旅を始める準備ができています。</span>
-            </label>
+            </div>
           </div>
 
           <div class="srv-field-error" id="err-step8" data-i18n="errConfirm">確認にチェックを入れてください</div>
