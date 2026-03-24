@@ -89,7 +89,7 @@
     .srv-check-option { display:flex; align-items:flex-start; gap:.75rem; padding:.7rem 1rem; background:var(--color-surface); border:2px solid var(--color-border); border-radius:10px; cursor:pointer; transition:all .2s ease; font-size:.92rem; color:var(--color-text-light); margin-bottom:.5rem; }
     .srv-check-option:hover { border-color:var(--color-primary); }
     .srv-check-option.selected { border-color:var(--color-primary); background:rgba(0,128,128,.04); color:var(--color-text); }
-    .srv-check-option input[type="checkbox"] { width:18px; height:18px; margin-top:1px; flex-shrink:0; accent-color:var(--color-primary); }
+    .srv-check-option input[type="checkbox"] { width:18px; height:18px; margin-top:1px; flex-shrink:0; accent-color:var(--color-primary); pointer-events:none; }
 
     /* ── Expandable follow-up ── */
     .srv-followup { display:none; padding:.75rem 1rem; margin:-0.25rem 0 .5rem 2.5rem; background:var(--color-bg); border-radius:8px; border-left:3px solid var(--color-primary); }
@@ -146,7 +146,7 @@
     .srv-confirm-box { background:var(--color-bg); border-radius:10px; padding:1rem 1.25rem; margin:1.5rem 0; border:2px solid var(--color-border); transition:border-color .2s; }
     .srv-confirm-box.checked { border-color:var(--color-primary); }
     .srv-confirm-label { display:flex; align-items:flex-start; gap:.75rem; cursor:pointer; font-size:.92rem; color:var(--color-text); line-height:1.5; }
-    .srv-confirm-label input { width:20px; height:20px; margin-top:2px; flex-shrink:0; accent-color:var(--color-primary); }
+    .srv-confirm-label input { width:20px; height:20px; margin-top:2px; flex-shrink:0; accent-color:var(--color-primary); pointer-events:none; }
 
     /* ── Celebration ── */
     .srv-celebration { text-align:center; padding:2rem 0; }
@@ -881,10 +881,7 @@
     // Confirmation checkbox — tap anywhere in the box
     const confirmBox = document.getElementById('confirm-box');
     const confirmCb = document.getElementById('chk-confirm');
-    confirmBox.addEventListener('click', (e) => {
-      confirmBox.classList.toggle('checked', confirmCb.checked);
-    });
-    confirmCb.addEventListener('change', () => {
+    confirmBox.addEventListener('click', () => {
       confirmBox.classList.toggle('checked', confirmCb.checked);
     });
 
