@@ -1046,6 +1046,13 @@
         // Clear saved progress
         localStorage.removeItem(`srv-${tokenData.token}`);
 
+        // Send welcome video via LINE (fire and forget — don't block celebration)
+        fetch(`${SUPABASE_URL}/functions/v1/send-welcome-video`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: tokenData.token })
+        }).catch(() => {});
+
         // Show celebration
         document.getElementById('nav-step8').style.display = 'none';
         document.querySelector('#step-8 .srv-intro').style.display = 'none';
