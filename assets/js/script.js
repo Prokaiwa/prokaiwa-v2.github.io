@@ -283,6 +283,32 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
 }
 
     
+    // ==========================================================================
+    // SCROLL REVEAL ANIMATIONS (IntersectionObserver)
+    // ==========================================================================
+    
+    const revealElements = document.querySelectorAll('.reveal');
+    
+    if (revealElements.length > 0 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -40px 0px'
+        });
+        
+        revealElements.forEach(el => revealObserver.observe(el));
+    } else {
+        // If reduced motion or no observer support, show everything immediately
+        revealElements.forEach(el => el.classList.add('revealed'));
+    }
+
+    
   // ==========================================================================
     // DEVELOPMENT LOG
     // ==========================================================================
