@@ -284,6 +284,62 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
 
     
     // ==========================================================================
+    // HERO TEXT MORPH ANIMATION
+    // ==========================================================================
+    
+    const morphElements = document.querySelectorAll('.hero-morph-text');
+    
+    if (morphElements.length > 0 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const morphPairs = [
+            { ja: 'おはようございます', en: 'Good morning' },
+            { ja: 'ありがとうございます', en: 'Thank you' },
+            { ja: 'お元気ですか？', en: 'How are you?' },
+            { ja: '英語を話したい', en: 'I want to speak English' },
+            { ja: 'もう一度お願いします', en: 'Could you say that again?' },
+            { ja: '今日はいい天気ですね', en: "It's a beautiful day" }
+        ];
+        
+        let currentIndex = 0;
+        let showingJapanese = true;
+        
+        function morphText() {
+            morphElements.forEach(el => {
+                const pair = morphPairs[currentIndex];
+                
+                // Morph out
+                el.classList.remove('morph-in');
+                el.classList.add('morph-out');
+                
+                setTimeout(() => {
+                    // Switch text
+                    el.textContent = showingJapanese ? pair.en : morphPairs[(currentIndex + 1) % morphPairs.length].ja;
+                    
+                    // Morph in
+                    el.classList.remove('morph-out');
+                    el.classList.add('morph-in');
+                    
+                    if (!showingJapanese) {
+                        currentIndex = (currentIndex + 1) % morphPairs.length;
+                    }
+                    showingJapanese = !showingJapanese;
+                }, 400);
+            });
+        }
+        
+        // Initialize with first Japanese phrase after entrance animation completes
+        setTimeout(() => {
+            morphElements.forEach(el => {
+                el.textContent = morphPairs[0].ja;
+                el.classList.add('morph-in');
+            });
+            
+            // Start cycling every 2.5 seconds
+            setInterval(morphText, 2500);
+        }, 600);
+    }
+
+
+    // ==========================================================================
     // SCROLL REVEAL ANIMATIONS (IntersectionObserver)
     // ==========================================================================
     

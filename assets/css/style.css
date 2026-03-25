@@ -179,6 +179,16 @@ img {
         transition: none;
     }
     
+    .hero-entrance {
+        opacity: 1;
+        transform: none;
+        animation: none;
+    }
+    
+    .hero-morph-text {
+        transition: none;
+    }
+    
     .trial-badge {
         animation: none;
     }
@@ -482,6 +492,82 @@ main .container:not(.legal-page-container) {
 
 .hero-image {
     display: none;
+}
+
+/* =============================================================================
+   9A. HERO GRADIENT MESH BACKGROUND
+   ============================================================================= */
+.homepage-main .hero-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.homepage-main .hero-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 600px 400px at 15% 20%, rgba(0, 128, 128, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 500px 350px at 85% 60%, rgba(212, 160, 23, 0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 400px 300px at 50% 80%, rgba(0, 128, 128, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.homepage-main .hero-section .content-wrap {
+    position: relative;
+    z-index: 1;
+}
+
+/* =============================================================================
+   9B. HERO CINEMATIC ENTRANCE
+   ============================================================================= */
+.hero-entrance {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: heroEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: var(--entrance-delay, 0ms);
+}
+
+@keyframes heroEnter {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============================================================================
+   9C. HERO TEXT MORPH ANIMATION
+   ============================================================================= */
+.hero-morph-container {
+    margin-bottom: 1.5rem;
+    min-height: 2.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-morph-text {
+    font-family: var(--font-heading);
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 50%, var(--color-gold) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.hero-morph-text.morph-out {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
+.hero-morph-text.morph-in {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* =============================================================================
@@ -1699,6 +1785,14 @@ main .container:not(.legal-page-container) {
         color: #1a1a1a;
     }
     
+    /* Hero gradient mesh dark mode */
+    .homepage-main .hero-section::before {
+        background:
+            radial-gradient(ellipse 600px 400px at 15% 20%, rgba(0, 168, 168, 0.12) 0%, transparent 70%),
+            radial-gradient(ellipse 500px 350px at 85% 60%, rgba(212, 160, 23, 0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 400px 300px at 50% 80%, rgba(0, 168, 168, 0.07) 0%, transparent 70%);
+    }
+    
     /* Pricing trial notice dark mode */
     .pricing-trial-notice {
         background: linear-gradient(135deg, var(--color-primary-light) 0%, #2a3f3f 100%);
@@ -1773,6 +1867,11 @@ main .container:not(.legal-page-container) {
     .hero-content {
         max-width: 100%;
         padding: 1rem;
+    }
+    
+    .hero-morph-container {
+        min-height: 2.2rem;
+        margin-bottom: 1rem;
     }
 
     .hero-cta-buttons {
