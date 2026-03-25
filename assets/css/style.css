@@ -185,10 +185,6 @@ img {
         animation: none;
     }
     
-    .hero-morph-text {
-        transition: none;
-    }
-    
     .typing-cursor {
         animation: none;
         display: none;
@@ -542,22 +538,6 @@ main .container:not(.legal-page-container) {
 }
 
 /* =============================================================================
-   9C. HERO TEXT MORPH ANIMATION
-   ============================================================================= */
-.hero-morph-container {
-    margin-bottom: 1.5rem;
-    min-height: 3.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.hero-morph-text.morph-in {
-    opacity: 1;
-}
-
-/* =============================================================================
    9D. HERO TAGLINE TYPING EFFECT
    ============================================================================= */
 .tagline-fade {
@@ -588,40 +568,6 @@ main .container:not(.legal-page-container) {
 
 @keyframes cursorFadeOut {
     to { opacity: 0; }
-}
-
-/* =============================================================================
-   9E. HERO MORPH PHASE TRANSITION STYLES
-   ============================================================================= */
-.hero-morph-text {
-    font-family: var(--font-heading);
-    font-size: clamp(1.4rem, 4vw, 2rem);
-    font-weight: 600;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 50%, var(--color-gold) 100%);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    transition: opacity 0.4s ease;
-}
-
-.hero-morph-text.morph-hidden {
-    opacity: 0;
-}
-
-.hero-morph-label {
-    display: block;
-    font-family: var(--font-primary);
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-    -webkit-text-fill-color: var(--color-text-muted);
-    background: none;
-    margin-top: 0.3rem;
-    transition: opacity 0.3s ease;
 }
 
 /* =============================================================================
@@ -1921,11 +1867,6 @@ main .container:not(.legal-page-container) {
     .hero-content {
         max-width: 100%;
         padding: 1rem;
-    }
-    
-    .hero-morph-container {
-        min-height: 2.2rem;
-        margin-bottom: 1rem;
     }
 
     .hero-cta-buttons {
