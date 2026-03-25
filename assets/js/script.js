@@ -327,135 +327,122 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
 
 
     // ==========================================================================
-    // HERO TEXT MORPH — CHARACTER SCRAMBLE DECODER
+    // HERO TEXT MORPH — 3-PHASE TRANSLATION (日本語 → カタカナ → English)
     // ==========================================================================
     
     const morphElements = document.querySelectorAll('.hero-morph-text');
     
     if (morphElements.length > 0 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const morphPairs = [
-            { ja: 'おはようございます', en: 'Good morning' },
-            { ja: 'ありがとうございます', en: 'Thank you' },
-            { ja: 'お元気ですか？', en: 'How are you?' },
-            { ja: '英語を話したい', en: 'I want to speak English' },
-            { ja: 'もう一度お願いします', en: 'Could you say that again?' },
-            { ja: '今日はいい天気ですね', en: "It's a beautiful day" }
+        const morphPhrases = [
+            { ja: 'ありがとう', kata: 'サンキュー', en: 'Thank you' },
+            { ja: 'おはよう', kata: 'グッドモーニング', en: 'Good morning' },
+            { ja: 'お元気ですか？', kata: 'ハウ アー ユー？', en: 'How are you?' },
+            { ja: 'すみません', kata: 'エクスキューズ ミー', en: 'Excuse me' },
+            { ja: 'いい天気ですね', kata: 'ナイス ウェザー', en: 'Nice weather' },
+            { ja: 'がんばって', kata: 'グッドラック', en: 'Good luck' }
         ];
         
-        const scrambleChars = 'アイウエオカキクケコ_-*!#$0X+';
+        // Add label element to each morph container
+        morphElements.forEach(function(el) {
+            var label = document.createElement('span');
+            label.className = 'hero-morph-label';
+            label.textContent = '';
+            el.parentElement.appendChild(label);
+        });
         
-        function getRandomScrambleChar(prev) {
-            var ch;
-            do {
-                ch = scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
-            } while (ch === prev);
-            return ch;
+        var morphTimer = null;
+        
+        function clearMorphTimer() {
+            if (morphTimer) {
+                clearTimeout(morphTimer);
+                morphTimer = null;
+            }
         }
         
         /**
-         * Scramble-decode from sourceText to targetText on a given element.
-         * Phase 1: Scramble all chars to random glyphs (adjusting length).
-         * Phase 2: Resolve target chars one by one from left to right.
+         * Reveals text character by character from left to right.
          */
-        function scrambleTo(el, sourceText, targetText, onComplete) {
-            var maxLen = Math.max(sourceText.length, targetText.length);
-            var step = 0;
-            var totalScrambleSteps = maxLen * 2;
-            var totalResolveSteps = targetText.length * 2;
-            var phase = 'scramble';
-            var currentChars = sourceText.split('');
+        function revealText(el, text, onComplete) {
+            var charIndex = 0;
+            el.textContent = '';
             
-            var interval = setInterval(function() {
-                if (phase === 'scramble') {
-                    // Adjust array length toward targetText length
-                    if (currentChars.length < targetText.length) {
-                        currentChars.push(getRandomScrambleChar());
-                    } else if (currentChars.length > targetText.length && step > totalScrambleSteps * 0.5) {
-                        currentChars.pop();
-                    }
-                    
-                    // Scramble all characters
-                    for (var i = 0; i < currentChars.length; i++) {
-                        currentChars[i] = getRandomScrambleChar(currentChars[i]);
-                    }
-                    
-                    el.textContent = currentChars.join('');
-                    step++;
-                    
-                    if (step >= totalScrambleSteps) {
-                        // Ensure length matches target before resolving
-                        while (currentChars.length < targetText.length) {
-                            currentChars.push(getRandomScrambleChar());
-                        }
-                        while (currentChars.length > targetText.length) {
-                            currentChars.pop();
-                        }
-                        phase = 'resolve';
-                        step = 0;
-                    }
-                } else {
-                    // Resolve phase — reveal target chars one by one from left
-                    var resolvedCount = Math.floor(step / 2);
-                    
-                    for (var i = 0; i < currentChars.length; i++) {
-                        if (i < resolvedCount) {
-                            currentChars[i] = targetText[i];
-                        } else if (i === resolvedCount) {
-                            // Current resolving position — alternate cursor and random
-                            currentChars[i] = (step % 2 === 0) ? '_' : getRandomScrambleChar();
-                        } else {
-                            currentChars[i] = getRandomScrambleChar(currentChars[i]);
-                        }
-                    }
-                    
-                    el.textContent = currentChars.join('');
-                    step++;
-                    
-                    if (step >= totalResolveSteps) {
-                        el.textContent = targetText;
-                        clearInterval(interval);
-                        if (onComplete) onComplete();
-                    }
+            function showNext() {
+                if (charIndex < text.length) {
+                    el.textContent += text[charIndex];
+                    charIndex++;
+                    morphTimer = setTimeout(showNext, 50);
+                } else if (onComplete) {
+                    onComplete();
                 }
-            }, 30);
+            }
+            showNext();
         }
         
-        var currentPairIndex = 0;
-        var showingJapanese = true;
-        
-        function runMorphCycle() {
-            var pair = morphPairs[currentPairIndex];
-            
-            morphElements.forEach(function(el) {
-                if (showingJapanese) {
-                    // JP → EN
-                    scrambleTo(el, pair.ja, pair.en, function() {
-                        showingJapanese = false;
-                        setTimeout(runMorphCycle, 2000);
-                    });
-                } else {
-                    // EN → next JP
-                    var nextIndex = (currentPairIndex + 1) % morphPairs.length;
-                    scrambleTo(el, pair.en, morphPairs[nextIndex].ja, function() {
-                        currentPairIndex = nextIndex;
-                        showingJapanese = true;
-                        setTimeout(runMorphCycle, 2000);
-                    });
-                }
-            });
+        /**
+         * Fades out the morph text, then calls onComplete.
+         */
+        function fadeOutMorph(el, onComplete) {
+            el.classList.add('morph-hidden');
+            morphTimer = setTimeout(function() {
+                el.textContent = '';
+                if (onComplete) onComplete();
+            }, 400);
         }
         
-        // Initialize — wait for entrance animation, then start with first JP phrase
-        setTimeout(function() {
-            var firstPair = morphPairs[0];
+        /**
+         * Runs one full 3-phase cycle for a given phrase index.
+         */
+        function runPhrase(phraseIndex) {
+            var phrase = morphPhrases[phraseIndex];
+            
             morphElements.forEach(function(el) {
-                // Scramble in the first Japanese phrase from nothing
-                scrambleTo(el, '', firstPair.ja, function() {
-                    el.classList.add('morph-in');
-                    setTimeout(runMorphCycle, 2500);
+                var label = el.parentElement.querySelector('.hero-morph-label');
+                
+                // Phase 1: Japanese
+                el.classList.remove('morph-hidden');
+                if (label) { label.textContent = '日本語'; label.style.opacity = '1'; }
+                
+                revealText(el, phrase.ja, function() {
+                    morphTimer = setTimeout(function() {
+                        fadeOutMorph(el, function() {
+                            
+                            // Phase 2: Katakana
+                            el.classList.remove('morph-hidden');
+                            if (label) label.textContent = 'カタカナ';
+                            
+                            revealText(el, phrase.kata, function() {
+                                morphTimer = setTimeout(function() {
+                                    fadeOutMorph(el, function() {
+                                        
+                                        // Phase 3: English
+                                        el.classList.remove('morph-hidden');
+                                        if (label) label.textContent = 'English';
+                                        
+                                        revealText(el, phrase.en, function() {
+                                            morphTimer = setTimeout(function() {
+                                                if (label) label.style.opacity = '0';
+                                                fadeOutMorph(el, function() {
+                                                    // Next phrase
+                                                    var next = (phraseIndex + 1) % morphPhrases.length;
+                                                    morphTimer = setTimeout(function() {
+                                                        runPhrase(next);
+                                                    }, 500);
+                                                });
+                                            }, 2000);
+                                        });
+                                    });
+                                }, 1500);
+                            });
+                        });
+                    }, 2000);
                 });
             });
-        }, 600);
+        }
+        
+        // Start after hero entrance animation completes
+        morphTimer = setTimeout(function() {
+            runPhrase(0);
+        }, 800);
     }
 
 

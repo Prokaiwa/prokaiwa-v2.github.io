@@ -546,33 +546,15 @@ main .container:not(.legal-page-container) {
    ============================================================================= */
 .hero-morph-container {
     margin-bottom: 1.5rem;
-    min-height: 2.8rem;
+    min-height: 3.5rem;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-.hero-morph-text {
-    font-family: var(--font-heading);
-    font-size: clamp(1.4rem, 4vw, 2rem);
-    font-weight: 600;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 50%, var(--color-gold) 100%);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-.hero-morph-text.morph-out {
-    opacity: 0;
-    transform: translateY(-8px);
-}
-
 .hero-morph-text.morph-in {
     opacity: 1;
-    transform: translateY(0);
 }
 
 /* =============================================================================
@@ -584,12 +566,12 @@ main .container:not(.legal-page-container) {
 
 .tagline-typed {
     display: inline;
-    color: var(--color-gold);
+    color: var(--color-primary);
 }
 
 .typing-cursor {
     display: inline;
-    color: var(--color-gold);
+    color: var(--color-primary);
     font-weight: 400;
     animation: cursorBlink 0.7s step-end infinite;
 }
@@ -609,15 +591,37 @@ main .container:not(.legal-page-container) {
 }
 
 /* =============================================================================
-   9E. HERO MORPH SCRAMBLE STYLES
+   9E. HERO MORPH PHASE TRANSITION STYLES
    ============================================================================= */
-.hero-morph-text .morph-char {
+.hero-morph-text {
+    font-family: var(--font-heading);
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 50%, var(--color-gold) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
     display: inline-block;
-    transition: opacity 0.15s ease;
+    transition: opacity 0.4s ease;
 }
 
-.hero-morph-text .morph-char.scrambling {
-    opacity: 0.7;
+.hero-morph-text.morph-hidden {
+    opacity: 0;
+}
+
+.hero-morph-label {
+    display: block;
+    font-family: var(--font-primary);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    -webkit-text-fill-color: var(--color-text-muted);
+    background: none;
+    margin-top: 0.3rem;
+    transition: opacity 0.3s ease;
 }
 
 /* =============================================================================
