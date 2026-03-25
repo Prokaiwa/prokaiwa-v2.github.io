@@ -189,6 +189,11 @@ img {
         transition: none;
     }
     
+    .typing-cursor {
+        animation: none;
+        display: none;
+    }
+    
     .trial-badge {
         animation: none;
     }
@@ -568,6 +573,51 @@ main .container:not(.legal-page-container) {
 .hero-morph-text.morph-in {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* =============================================================================
+   9D. HERO TAGLINE TYPING EFFECT
+   ============================================================================= */
+.tagline-fade {
+    display: inline;
+}
+
+.tagline-typed {
+    display: inline;
+    color: var(--color-gold);
+}
+
+.typing-cursor {
+    display: inline;
+    color: var(--color-gold);
+    font-weight: 400;
+    animation: cursorBlink 0.7s step-end infinite;
+}
+
+.typing-cursor.done {
+    animation: cursorFadeOut 0.5s ease forwards;
+    animation-delay: 1s;
+}
+
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+@keyframes cursorFadeOut {
+    to { opacity: 0; }
+}
+
+/* =============================================================================
+   9E. HERO MORPH SCRAMBLE STYLES
+   ============================================================================= */
+.hero-morph-text .morph-char {
+    display: inline-block;
+    transition: opacity 0.15s ease;
+}
+
+.hero-morph-text .morph-char.scrambling {
+    opacity: 0.7;
 }
 
 /* =============================================================================
