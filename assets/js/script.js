@@ -326,6 +326,43 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
     }
 
 
+
+    // ==========================================================================
+    // TESTIMONIALS CAROUSEL — Clone cards for loop + touch pause
+    // ==========================================================================
+    
+    const carousels = document.querySelectorAll('.testimonials-carousel');
+    
+    carousels.forEach(function(carousel) {
+        var cards = carousel.querySelectorAll('.testimonial-card');
+        if (cards.length === 0) return;
+        
+        // Wrap existing cards in a track div
+        var track = document.createElement('div');
+        track.className = 'testimonials-track';
+        
+        // Move cards into track
+        cards.forEach(function(card) {
+            track.appendChild(card);
+        });
+        
+        // Clone all cards for seamless loop
+        cards.forEach(function(card) {
+            track.appendChild(card.cloneNode(true));
+        });
+        
+        carousel.appendChild(track);
+        
+        // Pause on touch for mobile
+        carousel.addEventListener('touchstart', function() {
+            track.style.animationPlayState = 'paused';
+        }, { passive: true });
+        
+        carousel.addEventListener('touchend', function() {
+            track.style.animationPlayState = 'running';
+        }, { passive: true });
+    });
+
     // ==========================================================================
     // SCROLL REVEAL ANIMATIONS (IntersectionObserver)
     // ==========================================================================

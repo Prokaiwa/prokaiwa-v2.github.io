@@ -2068,11 +2068,28 @@ main .container:not(.legal-page-container) {
     padding: 4rem 0;
 }
 
-.testimonials-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
+.testimonials-carousel {
+    overflow: hidden;
     margin-top: 2rem;
+    position: relative;
+    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+}
+
+.testimonials-track {
+    display: flex;
+    gap: 1.5rem;
+    animation: testimonialScroll 30s linear infinite;
+    width: max-content;
+}
+
+.testimonials-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes testimonialScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
 }
 
 .testimonial-card {
@@ -2082,6 +2099,9 @@ main .container:not(.legal-page-container) {
     padding: 2rem;
     display: flex;
     flex-direction: column;
+    min-width: 320px;
+    max-width: 360px;
+    flex-shrink: 0;
     transition: transform var(--transition-speed) var(--transition-timing),
                 box-shadow var(--transition-speed) var(--transition-timing);
 }
@@ -2210,8 +2230,17 @@ main .container:not(.legal-page-container) {
 
 .teacher-flag {
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 0.4rem;
+}
+
+.teacher-flag-img {
+    width: 60px;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    display: block;
 }
 
 .teacher-flag-label {
@@ -2259,6 +2288,11 @@ main .container:not(.legal-page-container) {
     
     .trust-stat-value {
         font-size: 1.25rem;
+    }
+
+    .testimonial-card {
+        min-width: 280px;
+        max-width: 320px;
     }
 
     .teacher-grid {
