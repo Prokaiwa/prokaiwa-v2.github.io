@@ -250,6 +250,7 @@ img {
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--color-border);
     transition: background-color 0.3s ease, border-color 0.3s ease;
+    overflow-x: clip;
 }
 
 .site-header .container {
@@ -267,6 +268,27 @@ img {
 .logo {
     max-width: clamp(180px, 25vw, 250px);
     margin: 0;
+    border-radius: 4px;
+}
+
+.logo-wrap {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-primary);
+    padding: 0.4rem 1.2rem 0.4rem 2rem;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    margin-left: -2rem;
+    position: relative;
+}
+
+.logo-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 100%;
+    width: 50vw;
+    background-color: var(--color-primary);
 }
 
 .burger-menu {
@@ -1009,6 +1031,9 @@ main .container:not(.legal-page-container) {
 
 .site-footer .container {
     padding: 2rem;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
 }
 
 .footer-grid {
@@ -1020,6 +1045,7 @@ main .container:not(.legal-page-container) {
 }
 
 .footer-column h3 {
+    font-family: var(--font-heading);
     font-size: 1.1rem;
     color: var(--color-accent);
     margin-bottom: 1rem;
@@ -1857,6 +1883,11 @@ main .container:not(.legal-page-container) {
         justify-content: center;
     }
 
+    .logo-wrap {
+        margin-left: -1rem;
+        padding-left: 1rem;
+    }
+
     /* Hero adjustments */
     .hero-section {
         min-height: auto;
@@ -1956,6 +1987,10 @@ main .container:not(.legal-page-container) {
         padding: 0 1rem;
     }
     
+    .logo-wrap {
+        padding: 0.3rem 0.8rem 0.3rem 1rem;
+    }
+
     .hero-section {
         padding: 1.5rem 0.5rem;
     }
