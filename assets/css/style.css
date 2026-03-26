@@ -130,10 +130,6 @@ img {
     background-color: var(--color-bg);
 }
 
-.homepage-main .features-section {
-    background-color: var(--color-surface);
-}
-
 .homepage-main .comparison-section {
     background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
 }
@@ -2238,7 +2234,7 @@ main .container:not(.legal-page-container) {
 }
 
 .teacher-flag-img {
-    width: 78px;
+    width: 92px;
     height: auto;
     border-radius: 4px;
     border: 1px solid var(--color-border);
