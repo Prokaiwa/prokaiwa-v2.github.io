@@ -260,6 +260,7 @@ img {
     align-items: center;
     justify-content: space-between;
     padding-right: 2rem;
+    padding-left: 0;
     border: none;
     background: transparent;
     border-radius: 0;
