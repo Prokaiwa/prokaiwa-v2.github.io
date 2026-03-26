@@ -1007,9 +1007,9 @@ main .container:not(.legal-page-container) {
    ============================================================================= */
 .site-footer {
     text-align: center;
-    padding: 3rem 0 2rem;
+    padding: 1.5rem 0 1rem;
     background-color: var(--color-surface);
-    margin-top: 4rem;
+    margin-top: 2rem;
 }
 
 .site-footer .container {
