@@ -131,7 +131,7 @@ img {
 }
 
 .homepage-main .comparison-section {
-    background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
+    background-color: var(--color-surface);
 }
 
 .homepage-main .mission-section {
@@ -664,8 +664,7 @@ main .container:not(.legal-page-container) {
 /* =============================================================================
    11. PROCESS/FEATURES SECTIONS
    ============================================================================= */
-.how-it-works-section,
-.features-section {
+.how-it-works-section {
     padding: 4rem 0;
 }
 
@@ -1541,7 +1540,7 @@ main .container:not(.legal-page-container) {
    ============================================================================= */
 .comparison-section {
     padding: 4rem 0;
-    background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
+    background-color: var(--color-surface);
 }
 
 .comparison-grid {
@@ -1824,7 +1823,7 @@ main .container:not(.legal-page-container) {
     
     /* Comparison section dark mode */
     .comparison-section {
-        background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
+        background-color: var(--color-surface);
     }
     
     .comparison-card {
@@ -1933,7 +1932,6 @@ main .container:not(.legal-page-container) {
 
     /* Section spacing */
     .how-it-works-section,
-    .features-section,
     .mission-section,
     .pricing-section,
     .faq-section {
