@@ -250,6 +250,22 @@ img {
     box-shadow: none;
 }
 
+.mission-lottie {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 200px;
+    opacity: 0.15;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.mission-section .content-wrap {
+    position: relative;
+    z-index: 1;
+}
+
 /* =============================================================================
    5. HEADER & NAVIGATION
    ============================================================================= */
@@ -2308,6 +2324,10 @@ main .container:not(.legal-page-container) {
     
     .teacher-message p {
         text-align: left;
+    }
+
+    .mission-lottie {
+        display: none;
     }
 }
 
