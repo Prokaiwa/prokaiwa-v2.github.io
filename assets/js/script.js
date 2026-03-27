@@ -369,42 +369,50 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
     // ==========================================================================
     
     document.querySelectorAll('[data-lottie-cycle]').forEach(function(container) {
-        var players = container.querySelectorAll('dotlottie-player');
-        
-        
+        var players = Array.from(container.querySelectorAll('dotlottie-player'));
+        if (players.length === 0) return;
         
         var currentIndex = 0;
+        var readyCount = 0;
         
-        function showPlayer(index) {
-            players.forEach(function(p, i) {
-                if (i === index) {
-                    p.classList.add('lottie-active');
-                    p.play();
-                } else {
-                    p.classList.remove('lottie-active');
-                    try { p.stop(); } catch(e) {}
-                }
-            });
-
+        function cycleToNext() {
+            // Fade out current
+            players[currentIndex].classList.remove('lottie-active');
+            
+            // Move to next
+            currentIndex = (currentIndex + 1) % players.length;
+            
+            // Fade in and play next after transition
+            setTimeout(function() {
+                players[currentIndex].classList.add('lottie-active');
+                try { players[currentIndex].play(); } catch(e) {}
+            }, 500);
         }
         
-        // When active player completes, cycle to next
-        players.forEach(function(player, index) {
+        // Attach complete listener to each player
+        players.forEach(function(player) {
+            // Listen for complete (fires when non-looping animation ends)
             player.addEventListener('complete', function() {
-                currentIndex = (currentIndex + 1) % players.length;
-                // Brief pause before next animation
-                setTimeout(function() {
-                    showPlayer(currentIndex);
-                }, 400);
+                setTimeout(cycleToNext, 400);
+            });
+            
+            // Track when players are ready
+            player.addEventListener('ready', function() {
+                readyCount++;
+                // Once all players are loaded, start the first one
+                if (readyCount === players.length) {
+                    players[0].classList.add('lottie-active');
+                    try { players[0].play(); } catch(e) {}
+                }
             });
         });
         
-        // Start first animation after a delay
+        // Fallback: if ready events dont fire within 3s, force start
         setTimeout(function() {
-            if (players[0]) {
-                showPlayer(0);
+                players[0].classList.add('lottie-active');
+                try { players[0].play(); } catch(e) {}
             }
-        }, 500);
+        }, 3000);
     });
 
     // ==========================================================================
