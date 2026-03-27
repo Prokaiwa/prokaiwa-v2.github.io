@@ -173,23 +173,6 @@ img {
     opacity: 1;
 }
 
-.lottie-cycle-label {
-    position: absolute;
-    bottom: -0.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: var(--font-heading);
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--color-text-muted);
-    letter-spacing: 0.05em;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-.lottie-cycle-label.lottie-active {
-    opacity: 1;
-}
 
 @media (max-width: 768px) {
     .lottie-cycle-container {

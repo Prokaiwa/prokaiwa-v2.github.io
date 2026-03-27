@@ -370,9 +370,9 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
     
     document.querySelectorAll('[data-lottie-cycle]').forEach(function(container) {
         var players = container.querySelectorAll('dotlottie-player');
-        var label = container.querySelector('.lottie-cycle-label');
-        var labels = [];
-        try { labels = JSON.parse(label.getAttribute('data-labels')); } catch(e) {}
+        
+        
+        
         var currentIndex = 0;
         
         function showPlayer(index) {
@@ -385,9 +385,7 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
                     try { p.stop(); } catch(e) {}
                 }
             });
-            if (label && labels[index]) {
-                label.textContent = labels[index];
-            }
+
         }
         
         // When active player completes, cycle to next
