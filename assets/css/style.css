@@ -158,13 +158,13 @@ img {
     justify-content: center;
     align-items: center;
     position: relative;
-    height: 350px;
+    height: 500px;
 }
 
 .lottie-cycle-container dotlottie-player {
     position: absolute;
-    width: 350px;
-    height: 350px;
+    width: 500px;
+    height: 500px;
     opacity: 0;
     transition: opacity 0.5s ease;
 }
@@ -176,11 +176,11 @@ img {
 
 @media (max-width: 768px) {
     .lottie-cycle-container {
-        height: 280px;
+        height: 90vw;
     }
     .lottie-cycle-container dotlottie-player {
-        width: 280px;
-        height: 280px;
+        width: 90vw;
+        height: 90vw;
     }
 }
 

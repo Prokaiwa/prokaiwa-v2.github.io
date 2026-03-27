@@ -383,18 +383,18 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
             // Reset the outgoing player so it can replay next cycle
             setTimeout(function() {
                 try { players[prev].stop(); } catch(e) {}
-            }, 300);
+            }, 100);
             
             // Fade in and play next
             setTimeout(function() {
                 players[currentIndex].classList.add('lottie-active');
                 try { players[currentIndex].play(); } catch(e) {}
-            }, 250);
+            }, 100);
         }
         
         players.forEach(function(player) {
             player.addEventListener('complete', function() {
-                setTimeout(cycleToNext, 200);
+                setTimeout(cycleToNext, 50);
             });
             
             player.addEventListener('ready', function() {
