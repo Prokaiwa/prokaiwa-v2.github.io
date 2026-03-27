@@ -377,16 +377,24 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
         
         function cycleToNext() {
             players[currentIndex].classList.remove('lottie-active');
+            var prev = currentIndex;
             currentIndex = (currentIndex + 1) % players.length;
+            
+            // Reset the outgoing player so it can replay next cycle
+            setTimeout(function() {
+                try { players[prev].stop(); } catch(e) {}
+            }, 300);
+            
+            // Fade in and play next
             setTimeout(function() {
                 players[currentIndex].classList.add('lottie-active');
                 try { players[currentIndex].play(); } catch(e) {}
-            }, 500);
+            }, 250);
         }
         
         players.forEach(function(player) {
             player.addEventListener('complete', function() {
-                setTimeout(cycleToNext, 400);
+                setTimeout(cycleToNext, 200);
             });
             
             player.addEventListener('ready', function() {
