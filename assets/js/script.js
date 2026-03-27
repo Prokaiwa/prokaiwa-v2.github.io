@@ -363,6 +363,52 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
         }, { passive: true });
     });
 
+
+    // ==========================================================================
+    // LOTTIE CYCLE ANIMATION (Work → Travel → Conversation)
+    // ==========================================================================
+    
+    document.querySelectorAll('[data-lottie-cycle]').forEach(function(container) {
+        var players = container.querySelectorAll('dotlottie-player');
+        var label = container.querySelector('.lottie-cycle-label');
+        var labels = [];
+        try { labels = JSON.parse(label.getAttribute('data-labels')); } catch(e) {}
+        var currentIndex = 0;
+        
+        function showPlayer(index) {
+            players.forEach(function(p, i) {
+                if (i === index) {
+                    p.classList.add('lottie-active');
+                    p.play();
+                } else {
+                    p.classList.remove('lottie-active');
+                    p.stop();
+                }
+            });
+            if (label && labels[index]) {
+                label.textContent = labels[index];
+            }
+        }
+        
+        // When active player completes, cycle to next
+        players.forEach(function(player, index) {
+            player.addEventListener('complete', function() {
+                currentIndex = (currentIndex + 1) % players.length;
+                // Brief pause before next animation
+                setTimeout(function() {
+                    showPlayer(currentIndex);
+                }, 400);
+            });
+        });
+        
+        // Start first animation after a delay
+        setTimeout(function() {
+            if (players[0]) {
+                showPlayer(0);
+            }
+        }, 500);
+    });
+
     // ==========================================================================
     // SCROLL REVEAL ANIMATIONS (IntersectionObserver)
     // ==========================================================================

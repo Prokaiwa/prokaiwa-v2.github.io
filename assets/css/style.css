@@ -148,6 +148,59 @@ img {
     background-color: var(--color-bg);
 }
 
+.homepage-main .lottie-cycle-section {
+    background-color: var(--color-surface);
+    padding: 2rem 0;
+}
+
+.lottie-cycle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 180px;
+}
+
+.lottie-cycle-container dotlottie-player {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.lottie-cycle-container dotlottie-player.lottie-active {
+    opacity: 1;
+}
+
+.lottie-cycle-label {
+    position: absolute;
+    bottom: -0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.lottie-cycle-label.lottie-active {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .lottie-cycle-container {
+        height: 140px;
+    }
+    .lottie-cycle-container dotlottie-player {
+        width: 140px;
+        height: 140px;
+    }
+}
+
 .homepage-main .trust-bar-section {
     background-color: var(--color-primary-light);
 }
