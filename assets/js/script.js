@@ -365,7 +365,7 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
 
 
     // ==========================================================================
-    // LOTTIE CYCLE ANIMATION (Work → Travel → Conversation)
+    // LOTTIE CYCLE ANIMATION (Work > Travel > Conversation)
     // ==========================================================================
     
     document.querySelectorAll('[data-lottie-cycle]').forEach(function(container) {
@@ -376,30 +376,21 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
         var readyCount = 0;
         
         function cycleToNext() {
-            // Fade out current
             players[currentIndex].classList.remove('lottie-active');
-            
-            // Move to next
             currentIndex = (currentIndex + 1) % players.length;
-            
-            // Fade in and play next after transition
             setTimeout(function() {
                 players[currentIndex].classList.add('lottie-active');
                 try { players[currentIndex].play(); } catch(e) {}
             }, 500);
         }
         
-        // Attach complete listener to each player
         players.forEach(function(player) {
-            // Listen for complete (fires when non-looping animation ends)
             player.addEventListener('complete', function() {
                 setTimeout(cycleToNext, 400);
             });
             
-            // Track when players are ready
             player.addEventListener('ready', function() {
                 readyCount++;
-                // Once all players are loaded, start the first one
                 if (readyCount === players.length) {
                     players[0].classList.add('lottie-active');
                     try { players[0].play(); } catch(e) {}
@@ -407,14 +398,15 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
             });
         });
         
-        // Fallback: if ready events dont fire within 3s, force start
         setTimeout(function() {
+            if (!players[0].classList.contains('lottie-active')) {
                 players[0].classList.add('lottie-active');
                 try { players[0].play(); } catch(e) {}
+            }
         }, 3000);
     });
 
-    // ==========================================================================
+        // ==========================================================================
     // SCROLL REVEAL ANIMATIONS (IntersectionObserver)
     // ==========================================================================
     
