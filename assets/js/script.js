@@ -382,7 +382,7 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
                     p.play();
                 } else {
                     p.classList.remove('lottie-active');
-                    p.stop();
+                    try { p.stop(); } catch(e) {}
                 }
             });
             if (label && labels[index]) {
