@@ -175,6 +175,10 @@ img {
 
 
 @media (max-width: 768px) {
+    .lottie-cycle-section .content-wrap {
+        padding: 0;
+    }
+
     .lottie-cycle-container {
         height: 90vw;
     }
