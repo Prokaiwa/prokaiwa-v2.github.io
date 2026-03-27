@@ -180,11 +180,11 @@ img {
     }
 
     .lottie-cycle-container {
-        height: 90vw;
+        height: 100vw;
     }
     .lottie-cycle-container dotlottie-player {
         width: 90vw;
-        height: 90vw;
+        height: 100vw;
     }
 }
 
