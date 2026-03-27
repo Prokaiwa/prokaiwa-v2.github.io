@@ -411,7 +411,6 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
         setTimeout(function() {
                 players[0].classList.add('lottie-active');
                 try { players[0].play(); } catch(e) {}
-            }
         }, 3000);
     });
 
