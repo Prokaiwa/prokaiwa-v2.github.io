@@ -1444,7 +1444,7 @@ const retentionOffers = {
             features: [
                 '毎日のLINE練習（変わらず）',
                 '週1回の総合フィードバック',
-                '月額¥6,000（¥4,000お得）'
+                '月額¥6,000（¥6,000お得）'
             ],
             primaryAction: {
                 text: 'LINE練習プランにダウングレード',
@@ -1464,8 +1464,8 @@ const retentionOffers = {
                 '現在のプランそのまま',
                 '今後3ヶ月間20%オフ',
                 'LINE練習プラン: 月額¥4,800（通常¥6,000）',
-                'パワーパック・ライト: 月額¥8,000（通常¥10,000）',
-                'パワーパック・プロ: 月額¥12,800（通常¥16,000）'
+                'パワーパック・ライト: 月額¥8,000（通常¥12,000）',
+                'パワーパック・プロ: 月額¥12,800（通常¥20,000）'
             ],
             primaryAction: {
                 text: '割引を利用する',
@@ -1486,7 +1486,7 @@ const retentionOffers = {
             features: [
                 'Daily LINE practice (unchanged)',
                 'Weekly comprehensive feedback',
-                '¥6,000/month (Save ¥4,000)'
+                '¥6,000/month (Save ¥6,000)'
             ],
             primaryAction: {
                 text: 'Switch to LINE Practice Plan',
@@ -1506,8 +1506,8 @@ const retentionOffers = {
                 'Keep your current plan',
                 '20% off for 3 months',
                 'LINE Practice: ¥4,800/month (normally ¥6,000)',
-                'Power Pack Lite: ¥8,000/month (normally ¥10,000)',
-                'Power Pack Pro: ¥12,800/month (normally ¥16,000)'
+                'Power Pack Lite: ¥8,000/month (normally ¥12,000)',
+                'Power Pack Pro: ¥12,800/month (normally ¥20,000)'
             ],
             primaryAction: {
                 text: 'Accept Discount',
