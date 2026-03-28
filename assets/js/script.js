@@ -441,6 +441,64 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
 
     
   // ==========================================================================
+
+    // ==========================================================================
+    // HOW IT WORKS — LINE PHONE CAROUSEL
+    // ==========================================================================
+
+    document.querySelectorAll('.hiw-carousel').forEach(function(carousel) {
+        var slides = carousel.querySelectorAll('.hiw-slide');
+        var dots = carousel.querySelectorAll('.hiw-dot');
+        var slidesContainer = carousel.querySelector('.hiw-slides');
+        if (slides.length === 0) return;
+
+        var current = 0;
+        var total = slides.length;
+        var timer = null;
+        var INTERVAL = 6000;
+        var touchStartX = 0;
+        var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function goTo(n) {
+            slides[current].classList.remove('hiw-slide-active');
+            dots[current].classList.remove('hiw-dot-active');
+            current = ((n % total) + total) % total;
+            slides.forEach(function(s) { s.classList.remove('hiw-slide-active'); });
+            slides[current].classList.add('hiw-slide-active');
+            dots[current].classList.add('hiw-dot-active');
+        }
+
+        function startTimer() {
+            if (reducedMotion) return;
+            clearInterval(timer);
+            timer = setInterval(function() { goTo(current + 1); }, INTERVAL);
+        }
+
+        dots.forEach(function(dot) {
+            dot.addEventListener('click', function() {
+                goTo(parseInt(this.getAttribute('data-hiw-dot')));
+                startTimer();
+            });
+        });
+
+        if (slidesContainer) {
+            slidesContainer.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+                clearInterval(timer);
+            }, { passive: true });
+
+            slidesContainer.addEventListener('touchend', function(e) {
+                var diff = touchStartX - e.changedTouches[0].screenX;
+                if (Math.abs(diff) > 50) {
+                    goTo(diff > 0 ? current + 1 : current - 1);
+                }
+                startTimer();
+            }, { passive: true });
+        }
+
+        startTimer();
+    });
+
     // DEVELOPMENT LOG
     // ==========================================================================
     

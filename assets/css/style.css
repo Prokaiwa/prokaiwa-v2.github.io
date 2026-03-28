@@ -2384,6 +2384,359 @@ main .container:not(.legal-page-container) {
     }
 }
 
+
+/* =============================================================================
+   10B. HOW IT WORKS — LINE PHONE CAROUSEL
+   ============================================================================= */
+.hiw-carousel {
+    margin-top: 2rem;
+}
+
+.hiw-slides {
+    position: relative;
+    overflow: hidden;
+    min-height: 460px;
+}
+
+.hiw-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    padding: 0 1rem;
+}
+
+.hiw-slide-active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+    position: relative;
+}
+
+/* --- Phone Frame --- */
+.hiw-phone {
+    width: 230px;
+    min-width: 230px;
+    height: 430px;
+    border-radius: 30px;
+    border: 3px solid #222;
+    background: #7494C0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.hiw-phone-header {
+    background: #fff;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 0.5px solid #e5e5e5;
+}
+
+.hiw-phone-back {
+    color: #555;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.hiw-phone-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    flex: 1;
+}
+
+.hiw-phone-header-icons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* --- Chat Area --- */
+.hiw-phone-chat {
+    flex: 1;
+    padding: 10px 10px 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hiw-msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.hiw-msg-user {
+    justify-content: flex-end;
+}
+
+.hiw-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 2px;
+}
+
+.hiw-bubble {
+    border-radius: 16px;
+    padding: 8px 11px;
+    font-size: 11px;
+    line-height: 1.5;
+    max-width: 78%;
+}
+
+.hiw-bubble-pk {
+    background: #fff;
+    color: #333;
+    border-top-left-radius: 4px;
+}
+
+.hiw-bubble-user {
+    background: #06C755;
+    color: #111;
+    border-top-right-radius: 4px;
+}
+
+.hiw-bubble-compact {
+    font-size: 10px;
+    padding: 6px 10px;
+}
+
+.hiw-bubble-hint {
+    padding-top: 5px;
+    border-top: 0.5px solid #eee;
+    font-size: 10px;
+    color: #888;
+}
+
+.hiw-bubble-time {
+    font-size: 8px;
+    color: rgba(0, 0, 0, 0.35);
+    align-self: flex-end;
+    flex-shrink: 0;
+    margin-bottom: 2px;
+}
+
+/* --- Voice Message --- */
+.hiw-bubble-voice {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.hiw-wave-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 22px;
+}
+
+.hiw-wave-bar {
+    width: 3px;
+    border-radius: 1.5px;
+    background: rgba(0, 0, 0, 0.5);
+    animation: hiwWaveBar 0.8s ease-in-out infinite alternate;
+    height: 3px;
+}
+
+@keyframes hiwWaveBar {
+    0% { height: 3px; }
+    100% { height: var(--h, 14px); }
+}
+
+.hiw-voice-dur {
+    font-size: 9.5px;
+    opacity: 0.7;
+    white-space: nowrap;
+}
+
+/* --- Phone Footer (Input Bar) --- */
+.hiw-phone-footer {
+    background: #fff;
+    padding: 7px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-top: 0.5px solid #e5e5e5;
+}
+
+.hiw-footer-icons {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.hiw-footer-input {
+    flex: 1;
+    background: #f0f0f0;
+    border-radius: 16px;
+    padding: 5px 10px;
+    font-size: 11px;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hiw-footer-mic {
+    flex-shrink: 0;
+}
+
+.hiw-icon {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* --- Text Column --- */
+.hiw-text-col {
+    flex: 1;
+    max-width: 340px;
+}
+
+.hiw-step-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.hiw-step-title {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+}
+
+.hiw-step-title-jp {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.hiw-step-desc {
+    font-size: 0.95rem;
+    color: var(--color-text-light);
+    line-height: 1.7;
+}
+
+/* --- Navigation Dots --- */
+.hiw-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1.5rem;
+}
+
+.hiw-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-border);
+    cursor: pointer;
+    transition: all var(--transition-speed) var(--transition-timing);
+    border: none;
+    padding: 0;
+}
+
+.hiw-dot-active {
+    background: var(--color-primary);
+    transform: scale(1.25);
+}
+
+.hiw-dot:hover {
+    background: var(--color-primary-dark);
+}
+
+/* --- Responsive: Mobile --- */
+@media (max-width: 768px) {
+    .hiw-slide {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .hiw-phone {
+        width: 200px;
+        min-width: 200px;
+        height: 390px;
+    }
+
+    .hiw-text-col {
+        text-align: center;
+        max-width: 100%;
+    }
+
+    .hiw-slides {
+        min-height: 600px;
+    }
+
+    .hiw-step-title {
+        font-size: 1.2rem;
+    }
+
+    .hiw-step-desc {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hiw-slides {
+        min-height: 560px;
+    }
+
+    .hiw-phone {
+        width: 190px;
+        min-width: 190px;
+        height: 370px;
+    }
+
+    .hiw-bubble {
+        font-size: 10px;
+    }
+}
+
+/* --- Reduced Motion --- */
+@media (prefers-reduced-motion: reduce) {
+    .hiw-slide {
+        transition: none;
+    }
+
+    .hiw-wave-bar {
+        animation: none;
+        height: var(--h, 10px);
+    }
+}
+
+/* --- Dark Mode: Phone frame visibility --- */
+@media (prefers-color-scheme: dark) {
+    .hiw-phone {
+        border-color: #555;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+}
+
 /* =============================================================================
    24. PRINT STYLES
    ============================================================================= */
