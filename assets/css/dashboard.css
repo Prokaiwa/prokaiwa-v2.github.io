@@ -1,0 +1,1987 @@
+/* ============================================================
+   Prokaiwa Dashboard — Page-Specific Styles
+   ============================================================ */
+
+/* Dashboard-specific styles */
+    /* Dashboard-specific container padding */
+    #ja-dashboard-content,
+    #en-dashboard-content {
+      padding-bottom: 2rem;
+    }
+
+    .site-footer {
+      margin-top: 2rem;
+    }
+
+    .dashboard-loading {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    .dashboard-loading i {
+      font-size: 2rem;
+      color: var(--color-primary);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .dashboard-error {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--color-text);
+    }
+    .dashboard-error i {
+      font-size: 3rem;
+      color: #dc3545;
+      margin-bottom: 1rem;
+    }
+    .dashboard-error h2 {
+      margin-bottom: 1rem;
+    }
+    .dashboard-error p {
+      margin-bottom: 1.5rem;
+      color: var(--color-text-light);
+    }
+
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .welcome-banner h1 {
+      font-size: 1.75rem;
+      margin: 0 0 0.5rem 0;
+      color: white;
+    }
+    .welcome-banner p {
+      margin: 0;
+      opacity: 0.9;
+    }
+    .welcome-stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .welcome-stat {
+      text-align: center;
+    }
+    .welcome-stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      display: block;
+    }
+    .welcome-stat-label {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .practice-status-card {
+      background: linear-gradient(135deg, #28a745 0%, #20863d 100%);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .practice-status-card.completed {
+      background: linear-gradient(135deg, var(--color-gold) 0%, #b8860b 100%);
+    }
+    .practice-status-card h2 {
+      color: white;
+      margin: 0 0 0.25rem 0;
+      font-size: 1.1rem;
+    }
+    .practice-status-card p {
+      margin: 0;
+      opacity: 0.95;
+      font-size: 0.9rem;
+    }
+    .practice-status-icon {
+      font-size: 2rem;
+      margin-bottom: 0.25rem;
+    }
+
+    @media (max-width: 768px) {
+      .practice-status-card {
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1.5rem;
+      }
+      .practice-status-card h2 {
+        font-size: 1rem;
+      }
+      .practice-status-card p {
+        font-size: 0.85rem;
+      }
+      .practice-status-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.2rem;
+      }
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .quick-action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem 1rem;
+      background-color: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      text-decoration: none;
+      color: var(--color-text);
+      transition: all var(--transition-speed) ease;
+      text-align: center;
+      cursor: pointer;
+    }
+    .quick-action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--color-primary);
+    }
+    .quick-action-btn i {
+      font-size: 1.5rem;
+      color: var(--color-primary);
+      margin-bottom: 0.5rem;
+    }
+    .quick-action-btn span {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .card-skills {
+      grid-column: 2 / 3;
+      grid-row: 1 / 3;
+      background: linear-gradient(135deg, rgba(0, 128, 128, 0.05) 0%, rgba(0, 128, 128, 0.02) 100%);
+      border: 2px solid var(--color-primary);
+      box-shadow: 0 8px 24px rgba(0, 128, 128, 0.15);
+    }
+
+    .card-phrase {
+      grid-column: 1 / 2;
+      grid-row: 1 / 2;
+    }
+
+    .card-progress {
+      grid-column: 3 / 4;
+      grid-row: 1 / 2;
+    }
+
+    .card-streak {
+      grid-column: 1 / 2;
+      grid-row: 2 / 3;
+    }
+
+    .card-achievements {
+      grid-column: 3 / 4;
+      grid-row: 2 / 3;
+    }
+
+    .card-account {
+      grid-column: 1 / 2;
+      grid-row: 3 / 4;
+    }
+
+    .card-lessons {
+      grid-column: 2 / 3;
+      grid-row: 3 / 4;
+    }
+
+    .card-booking-rules {
+    grid-column: 3 / 4;
+    grid-row: 3 / 4;
+}
+    .card-resources {
+      grid-column: 3 / 4;
+      grid-row: 3 / 4;
+    }
+
+    .card-upgrade {
+      grid-column: 1 / 4;
+      grid-row: 4 / 5;
+    }
+
+    .dashboard-card {
+      background-color: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      transition: box-shadow var(--transition-speed) ease;
+    }
+    .dashboard-card:hover {
+      box-shadow: var(--shadow);
+    }
+    .dashboard-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.05rem;
+      color: var(--color-accent);
+      margin: 0 0 0.75rem 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .dashboard-card h3 i {
+      color: var(--color-primary);
+      font-size: 1rem;
+    }
+
+    /* Skills Chart */
+    .skills-chart-container {
+      position: relative;
+      height: 420px;
+      margin: 0;
+      padding: 0.5rem 0 0.25rem 0;
+    }
+    .no-assessment-message {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--color-text-light);
+    }
+    .no-assessment-message i {
+      font-size: 2.5rem;
+      color: var(--color-primary);
+      opacity: 0.5;
+      margin-bottom: 0.5rem;
+    }
+    .no-assessment-message p {
+      margin: 0.25rem 0;
+      line-height: 1.4;
+      font-size: 0.9rem;
+    }
+    .no-assessment-message p:first-of-type {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .assessment-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--color-border);
+      font-size: 0.85rem;
+      color: var(--color-text-light);
+    }
+    .assessment-date {
+      font-style: italic;
+      font-size: 0.8rem;
+    }
+    .assessment-band {
+      font-weight: 700;
+      color: var(--color-primary);
+      font-size: 0.95rem;
+    }
+
+    /* Learning Archetype Display */
+    .learning-archetype {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(135deg, var(--color-primary-light) 0%, rgba(0, 128, 128, 0.05) 100%);
+      border-left: 4px solid var(--color-primary);
+      border-radius: 0 8px 8px 0;
+    }
+    .archetype-icon {
+      font-size: 2rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .archetype-content {
+      flex: 1;
+    }
+    .archetype-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.25rem;
+    }
+    .archetype-description {
+      font-size: 0.85rem;
+      color: var(--color-text);
+      line-height: 1.4;
+    }
+
+    .progress-ring-container {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .progress-ring {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    .progress-ring svg {
+      transform: rotate(-90deg);
+    }
+    .progress-ring-bg {
+      fill: none;
+      stroke: var(--color-border);
+      stroke-width: 8;
+    }
+    .progress-ring-fill {
+      fill: none;
+      stroke: var(--color-primary);
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+    .progress-ring-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    .progress-details h4 {
+      margin: 0 0 0.25rem 0;
+      color: var(--color-text);
+    }
+    .progress-details p {
+      margin: 0;
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+    }
+
+    .streak-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+    .streak-fire {
+      font-size: 1.5rem;
+    }
+    .streak-count {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    .streak-label {
+      color: var(--color-text-light);
+      font-size: 0.75rem;
+    }
+    .streak-calendar-container,
+    #ja-streak-calendar,
+    #en-streak-calendar {
+      width: 100%;
+      display: block;
+    }
+    .streak-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 2px;
+      width: 100%;
+      transition: max-height 0.3s ease;
+      overflow-y: hidden;
+      overflow-x: visible;
+    }
+    .streak-day-header {
+      text-align: center;
+      font-size: 0.55rem;
+      color: var(--color-text-muted);
+      padding: 1px;
+      font-weight: 600;
+      min-width: 0;
+    }
+    .streak-day {
+      aspect-ratio: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--color-bg);
+      border-radius: 3px;
+      font-size: 0.6rem;
+      color: var(--color-text-light);
+      min-width: 0;
+      overflow: hidden;
+    }
+    .streak-day.active {
+      background-color: var(--color-primary);
+      color: white;
+    }
+    .streak-day.streak-hot {
+      background-color: #E67E22;
+      color: white;
+      font-weight: 600;
+    }
+    .streak-day.streak-fire {
+      background-color: #E74C3C;
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 0 8px rgba(231, 76, 60, 0.4);
+    }
+    .streak-day.today {
+      border: 2px solid var(--color-gold);
+    }
+    .streak-day.future {
+      opacity: 0.4;
+    }
+
+    .no-lessons {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--color-text-light);
+    }
+    .no-lessons i {
+      font-size: 1.75rem;
+      margin-bottom: 0.4rem;
+      opacity: 0.5;
+    }
+    .no-lessons p {
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+    }
+
+    .resource-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem;
+      border-radius: 8px;
+      transition: background-color var(--transition-speed) ease;
+    }
+    .resource-item:hover {
+      background-color: var(--color-bg);
+    }
+    .resource-item i {
+      font-size: 1.1rem;
+      color: var(--color-primary);
+      width: 25px;
+      text-align: center;
+    }
+    .resource-item a {
+      flex: 1;
+      color: var(--color-text);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    .resource-item a:hover {
+      color: var(--color-primary);
+    }
+    .resource-item .coming-soon {
+      color: var(--color-text-muted);
+      font-style: italic;
+      cursor: default;
+    }
+    .resource-item .coming-soon:hover {
+      color: var(--color-text-muted);
+    }
+    .resource-tag {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.4rem;
+      background-color: var(--color-primary-light);
+      color: var(--color-primary-dark);
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .resource-tag.coming {
+      background-color: var(--color-bg);
+      color: var(--color-text-muted);
+    }
+
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+    .achievement {
+      text-align: center;
+      padding: 0.4rem;
+    }
+    .achievement-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.3rem;
+      font-size: 1rem;
+    }
+    .achievement-icon.earned {
+      background-color: var(--color-gold);
+      color: white;
+    }
+    .achievement-icon.locked {
+      background-color: var(--color-bg);
+      color: var(--color-text-muted);
+      opacity: 0.5;
+    }
+    .achievement-name {
+      font-size: 0.7rem;
+      color: var(--color-text-light);
+      line-height: 1.1;
+      min-height: 2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .achievement.locked .achievement-name {
+      opacity: 0.5;
+    }
+
+    .plan-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      background-color: var(--color-primary);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .plan-badge.pending {
+      background-color: var(--color-gold);
+    }
+    .plan-badge.has-addon {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-gold) 100%);
+    }
+    /* Cancellation Status Banner */
+.cancellation-banner {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 0 0 2rem 0;
+    display: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.cancellation-banner.expired {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    border-color: #dc3545;
+}
+
+.cancellation-banner-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.cancellation-banner-icon {
+    font-size: 2.5rem;
+}
+
+.cancellation-banner-content h3 {
+    margin: 0 0 0.5rem 0;
+    color: #856404;
+    font-size: 1.3rem;
+}
+
+.cancellation-banner.expired .cancellation-banner-content h3 {
+    color: #721c24;
+}
+
+.cancellation-banner-content p {
+    margin: 0.25rem 0;
+    color: #856404;
+    font-size: 0.95rem;
+}
+
+.cancellation-banner.expired .cancellation-banner-content p {
+    color: #721c24;
+}
+
+.countdown-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    margin-top: 0.75rem;
+    font-weight: 600;
+    color: #856404;
+}
+
+.cancellation-banner.expired .countdown-timer {
+    color: #721c24;
+}
+
+.countdown-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffc107;
+}
+
+.cancellation-banner.expired .countdown-number {
+    color: #dc3545;
+}
+
+.cancellation-banner-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-reactivate {
+    background: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-reactivate:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+}
+
+.btn-contact-support {
+    background: white;
+    color: var(--color-text);
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-contact-support:hover {
+    border-color: var(--color-text-light);
+    background: var(--color-bg);
+}
+
+/* Status badge updates */
+.plan-badge.cancelled {
+    background: var(--color-primary);  /* Teal instead of yellow */
+    color: white;
+}
+
+.plan-badge.expired {
+    background: #dc3545;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .cancellation-banner-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cancellation-banner-icon {
+        font-size: 2rem;
+    }
+
+    .cancellation-banner-actions {
+        flex-direction: column;
+    }
+
+    .btn-reactivate,
+    .btn-contact-support {
+        width: 100%;
+        justify-content: center;
+    }
+}
+    .addon-badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      background-color: var(--color-gold);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-left: 0.4rem;
+    }
+    .account-details {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .account-details li {
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+    .account-details li:last-child {
+      border-bottom: none;
+    }
+    .account-details strong {
+      color: var(--color-text-light);
+      font-weight: 500;
+    }
+
+    .upgrade-card {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      color: white;
+      text-align: center;
+    }
+    .upgrade-card h3 {
+      color: white;
+      border-bottom-color: rgba(255,255,255,0.3);
+    }
+    .upgrade-card h3 i {
+      color: white;
+    }
+    .upgrade-card p {
+      margin-bottom: 1rem;
+      opacity: 0.95;
+    }
+    .upgrade-card .cta-button {
+      background: white;
+      color: var(--color-primary);
+    }
+    .upgrade-card .cta-button:hover {
+      background: #f0f0f0;
+      transform: translateY(-2px);
+    }
+
+    .tip-box {
+      background-color: var(--color-primary-light);
+      border-left: 4px solid var(--color-primary);
+      padding: 0.75rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .tip-box p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    .tip-box .tip-phrase {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-primary-dark);
+      display: block;
+      margin-top: 0.4rem;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .card-lessons {
+    grid-column: 1 / 3;
+    grid-row: 5 / 6;
+}
+
+.card-booking-rules {
+    grid-column: 1 / 3;
+    grid-row: 6 / 7;
+}
+      .card-skills {
+        grid-column: 1 / 3;
+        grid-row: 1 / 2;
+      }
+
+      .card-phrase {
+        grid-column: 1 / 2;
+        grid-row: 2 / 3;
+      }
+
+      .card-progress {
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
+      }
+
+      .card-streak {
+        grid-column: 1 / 2;
+        grid-row: 3 / 4;
+      }
+
+      .card-achievements {
+        grid-column: 2 / 3;
+        grid-row: 3 / 4;
+      }
+
+      .card-account {
+        grid-column: 1 / 3;
+        grid-row: 4 / 5;
+      }
+
+      .card-lessons {
+        grid-column: 1 / 3;
+        grid-row: 5 / 6;
+      }
+
+      .card-resources {
+        grid-column: 1 / 3;
+        grid-row: 6 / 7;
+      }
+
+      .card-upgrade {
+        grid-column: 1 / 3;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .welcome-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.25rem 1.5rem;
+      }
+      .card-booking-rules {
+    grid-column: 1;
+    grid-row: auto;
+}
+      .welcome-banner h1 {
+        font-size: 1.4rem;
+        margin-bottom: 0.25rem;
+      }
+      .welcome-banner p {
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+      }
+      .welcome-stats {
+        justify-content: center;
+        gap: 1.5rem;
+      }
+      .welcome-stat-value {
+        font-size: 1.5rem;
+      }
+      .welcome-stat-label {
+        font-size: 0.75rem;
+      }
+      .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        padding-bottom: 1.5rem;
+      }
+
+      .card-skills,
+      .card-phrase,
+      .card-progress,
+      .card-streak,
+      .card-achievements,
+      .card-account,
+      .card-lessons,
+      .card-resources,
+      .card-upgrade {
+        grid-column: 1;
+        grid-row: auto;
+      }
+
+      .skills-chart-container {
+        height: 300px;
+      }
+
+      #ja-dashboard-content,
+      #en-dashboard-content {
+        padding-bottom: 1.5rem;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .tip-box {
+        background-color: var(--color-card-bg);
+      }
+      .resource-tag {
+        background-color: var(--color-primary-dark);
+        color: var(--color-primary-light);
+      }
+      .practice-status-card {
+        background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+      }
+      .practice-status-card.completed {
+        background: linear-gradient(135deg, #b8860b 0%, #8b6914 100%);
+      }
+      .learning-archetype {
+        background: linear-gradient(135deg, var(--color-card-bg) 0%, rgba(0, 168, 168, 0.1) 100%);
+        border-left-color: var(--color-primary);
+      }
+      .archetype-name {
+        color: var(--color-primary);
+      }
+      .archetype-description {
+        color: var(--color-text-light);
+      }
+    }
+
+    /* BOOKING MODAL STYLES */
+/* Modal Overlay */
+.booking-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9998;
+  animation: fadeIn 0.2s ease;
+}
+
+.booking-modal-overlay.show {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.booking-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  background: var(--color-card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+.booking-modal.show {
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.booking-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 2px solid var(--color-border);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+}
+
+.booking-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.booking-modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+.booking-modal-close:hover {
+  transform: scale(1.2);
+}
+
+.booking-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.booking-widget {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+}
+
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.booking-header h2 {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  display: none;
+}
+
+.booking-credits {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+}
+
+.credit-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary-light);
+  border-radius: 20px;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.credit-badge i {
+  font-size: 1.1rem;
+}
+
+.credit-number {
+  font-size: 1.2rem;
+  color: var(--color-primary);
+}
+
+.consultation-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-gold);
+  border-radius: 20px;
+  font-weight: 600;
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.calendar-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.calendar-picker {
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-month-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-month-nav h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.calendar-nav-btn {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.calendar-nav-btn:hover {
+  background: var(--color-primary-dark);
+  transform: scale(1.1);
+}
+
+.calendar-nav-btn:disabled {
+  background: var(--color-border);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 0.5rem 0;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.calendar-day:hover:not(.disabled):not(.other-month) {
+  background: var(--color-primary-light);
+  transform: scale(1.05);
+}
+
+.calendar-day.other-month {
+  color: var(--color-text-muted);
+  opacity: 0.3;
+}
+
+    /* Next month available dates - more specific selector */
+.calendar-day.available {
+    color: var(--color-primary);
+    opacity: 0.7;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.calendar-day.available:hover {
+    opacity: 1;
+    background: var(--color-primary-light);
+    transform: scale(1.05);
+}
+.calendar-day.today {
+  border-color: var(--color-gold);
+  font-weight: 700;
+}
+
+.calendar-day.selected {
+  background: var(--color-primary);
+  color: white;
+  font-weight: 700;
+}
+
+.calendar-day.disabled {
+  color: var(--color-text-muted);
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.calendar-day.has-booking {
+  background: var(--color-primary);  /* Changed to teal */
+  color: white;
+  position: relative;
+  font-weight: 700;
+}
+
+.calendar-day.has-booking::after {
+  content: '•';
+  position: absolute;
+  top: 2px;  /* Moved to top */
+  right: 2px;
+  font-size: 0.5rem;  /* Much smaller */
+  color: var(--color-gold);  /* Gold dot for contrast */
+}
+
+.time-slots-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.selected-date-display {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--color-bg);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.time-slots-loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-light);
+}
+
+.time-slots-loading i {
+  font-size: 2rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.time-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.time-period {
+  margin-bottom: 0.5rem;
+}
+
+.time-period h4 {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.time-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 0.5rem;
+}
+
+.time-slot {
+  padding: 0.6rem;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.time-slot:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+}
+
+.time-slot.selected {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.time-slot.booked {
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.no-slots-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-light);
+}
+
+.no-slots-message i {
+  font-size: 2rem;
+  color: var(--color-border);
+  margin-bottom: 0.5rem;
+}
+
+.booking-actions {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lesson-type-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lesson-type-selector label {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.lesson-type-selector select {
+  padding: 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+}
+
+.booking-summary {
+  padding: 1rem;
+  background: var(--color-bg);
+  border-radius: 8px;
+  border-left: 4px solid var(--color-primary);
+}
+
+.booking-summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.booking-summary-item:last-child {
+  margin-bottom: 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.booking-summary-label {
+  color: var(--color-text-light);
+}
+
+.booking-summary-value {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.booking-summary-value.free {
+  color: var(--color-success);
+}
+
+.booking-summary-value.paid {
+  color: var(--color-primary);
+}
+
+.book-lesson-btn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.book-lesson-btn:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+}
+
+.book-lesson-btn:disabled {
+  background: var(--color-border);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.book-lesson-btn i {
+  margin-right: 0.5rem;
+}
+
+.my-bookings {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--color-border);
+}
+
+.my-bookings h3 {
+  margin: 0 0 1rem 0;
+  color: var(--color-accent);
+}
+
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.booking-item {
+  padding: 1rem;
+  background: var(--color-bg);
+  border-radius: 8px;
+  border-left: 4px solid var(--color-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.booking-info {
+  flex: 1;
+}
+
+.booking-date {
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.25rem;
+}
+
+.booking-time {
+  color: var(--color-text-light);
+  font-size: 0.9rem;
+}
+
+.booking-type {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.booking-actions-btns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.booking-action-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reschedule-btn {
+  background: var(--color-primary);
+  color: white;
+}
+
+.reschedule-btn:hover {
+  background: var(--color-primary-dark);
+}
+
+.cancel-btn {
+  background: var(--color-error);
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #c0392b;
+}
+
+.no-bookings {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-light);
+}
+
+@media (max-width: 768px) {
+  .booking-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .calendar-container {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-credits {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .time-slots-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .booking-modal {
+    background: var(--color-card-bg);
+  }
+
+  .time-slot {
+    background: var(--color-card-bg);
+  }
+
+  .lesson-type-selector select {
+    background: var(--color-card-bg);
+    color: var(--color-text);
+  }
+}
+
+/* ================================
+   ENHANCED UPCOMING LESSONS CARD - TEAL STYLING
+   ================================ */
+
+.lessons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.lesson-item {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+/* Next lesson uses TEAL gradient instead of purple */
+.lesson-item.lesson-next {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+}
+
+.lesson-item.lesson-next .lesson-info {
+    color: white;
+}
+
+.lesson-item.lesson-next .lesson-datetime i,
+.lesson-item.lesson-next .lesson-countdown i {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.lesson-info {
+    margin-bottom: 1rem;
+}
+
+.lesson-datetime {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lesson-countdown {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lesson-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Meet link status indicator */
+.meet-link-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 12px 20px;
+    background: rgba(0, 128, 128, 0.1);
+    border: 1px solid rgba(0, 128, 128, 0.3);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--color-primary-dark);
+}
+
+.meet-link-status i {
+    animation: spin 1s linear infinite;
+}
+
+/* Google Meet Button */
+.google-meet-btn {
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #3c4043;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    width: 100%;
+}
+
+.google-meet-btn:hover {
+    background: #f8f9fa;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+.google-meet-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.google-meet-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Pulse animation for Join button when lesson is within 1 hour */
+.google-meet-btn.pulse {
+    animation: pulse 2s infinite;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    font-weight: 600;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 2px 6px rgba(76, 175, 80, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 16px rgba(76, 175, 80, 0.6);
+    }
+}
+
+.google-meet-btn.pulse svg {
+    filter: brightness(0) invert(1);
+}
+
+/* Secondary actions (Reschedule, Cancel) */
+.lesson-secondary-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.lesson-action-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 8px 16px;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    background: white;
+    color: #5f6368;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.lesson-action-btn:hover {
+    background: #f1f3f4;
+    border-color: #c4c7c9;
+}
+
+.reschedule-btn {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.reschedule-btn:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+}
+
+.cancel-btn {
+    color: #d93025;
+    border-color: #d93025;
+}
+
+.cancel-btn:hover {
+    background: #fce8e6;
+    border-color: #d93025;
+}
+
+/* Expanded lessons section */
+.lessons-more {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.lessons-more.expanded {
+    max-height: 2000px;
+}
+
+.lessons-more .lesson-item {
+    margin-top: 1rem;
+}
+
+/* Toggle button */
+.toggle-lessons-btn {
+    width: 100%;
+    padding: 10px;
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    color: #5f6368;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.toggle-lessons-btn:hover {
+    background: #f8f9fa;
+    border-color: #c4c7c9;
+}
+
+/* Divider before book another */
+.book-another-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #dadce0, transparent);
+    margin: 0.5rem 0;
+}
+
+/* Book another button - TEAL gradient instead of purple */
+.book-another-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 6px rgba(0, 128, 128, 0.3);
+}
+
+.book-another-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 128, 128, 0.4);
+}
+
+.book-another-btn:active {
+    transform: translateY(0);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .lesson-item {
+        padding: 1rem;
+    }
+
+    .lesson-secondary-actions {
+        flex-direction: column;
+    }
+
+    .lesson-action-btn {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    .google-meet-btn {
+        font-size: 14px;
+        padding: 10px 16px;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .lesson-item {
+        background: #2d2d2d;
+        border-color: #404040;
+    }
+
+    .lesson-item:not(.lesson-next) .lesson-datetime,
+    .lesson-item:not(.lesson-next) .lesson-countdown {
+        color: #e0e0e0;
+    }
+
+    .google-meet-btn,
+    .lesson-action-btn,
+    .toggle-lessons-btn {
+        background: #2d2d2d;
+        border-color: #404040;
+        color: #e0e0e0;
+    }
+
+    .google-meet-btn:hover,
+    .lesson-action-btn:hover,
+    .toggle-lessons-btn:hover {
+        background: #353535;
+    }
+
+    .meet-link-status {
+        background: rgba(0, 168, 168, 0.15);
+        border-color: rgba(0, 168, 168, 0.4);
+        color: var(--color-primary);
+    }
+}
+    /* ================================
+   LESSON STATUS BANNERS - ADD THIS BEFORE
+   ================================ */
+.lesson-status-banner {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lesson-status-banner.in-progress {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+}
+
+.lesson-status-banner.in-progress i {
+    animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.lesson-status-banner.recently-ended {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+}
+
+.lesson-status-banner.locked {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+}
+
+@media (prefers-color-scheme: dark) {
+    .lesson-status-banner.locked {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Booking policy notice in modal */
+.booking-policy-notice {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-left: 4px solid #2196F3;
+    padding: 0.5rem 0.75rem;  /* ← Even smaller padding */
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 0.75rem;  /* ← Reduced */
+    display: flex;
+    gap: 0.5rem;  /* ← Smaller gap */
+    align-items: flex-start;
+}
+
+.booking-policy-notice i {
+    color: #2196F3;
+    font-size: 1rem;  /* ← Smaller icon */
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.booking-policy-notice strong {
+    color: #1976D2;
+    font-size: 0.85rem;  /* ← Smaller heading */
+}
+
+.booking-policy-notice ul {
+    margin: 0.25rem 0 0 0;
+    padding-left: 1rem;  /* ← Less indent */
+    font-size: 0.8rem;  /* ← Smaller text */
+    line-height: 1.4;  /* ← Tighter spacing */
+}
+
+.booking-policy-notice li {
+    margin-bottom: 0.1rem;  /* ← Minimal spacing */
+}
+
+/* Rules card styles */
+.rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.rule-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: var(--color-bg);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.rule-item i {
+    font-size: 1.1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .booking-policy-notice {
+        background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(33, 150, 243, 0.08) 100%);
+        border-left-color: #42A5F5;
+    }
+
+    .booking-policy-notice i {
+        color: #42A5F5;
+    }
+
+    .booking-policy-notice strong {
+        color: #64B5F6;
+    }
+}
