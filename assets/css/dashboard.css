@@ -4,8 +4,7 @@
 
 /* Dashboard-specific styles */
     /* Dashboard-specific container padding */
-    #ja-dashboard-content,
-    #en-dashboard-content {
+    #dashboard-content {
       padding-bottom: 2rem;
     }
 
@@ -388,8 +387,7 @@
       font-size: 0.75rem;
     }
     .streak-calendar-container,
-    #ja-streak-calendar,
-    #en-streak-calendar {
+    #streak-calendar {
       width: 100%;
       display: block;
     }
@@ -903,8 +901,7 @@
         height: 300px;
       }
 
-      #ja-dashboard-content,
-      #en-dashboard-content {
+      #dashboard-content {
         padding-bottom: 1.5rem;
       }
     }

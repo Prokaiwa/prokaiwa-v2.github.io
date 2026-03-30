@@ -43,117 +43,115 @@
             </div>
         </div>
 
-        <!-- JAPANESE VERSION -->
-        <section id="ja-dashboard" class="lang-section" lang="ja">
+        <section id="dashboard">
             <div class="container legal-page-container">
                 <!-- Loading State -->
-                <div id="ja-dashboard-loading" class="dashboard-loading">
+                <div id="dashboard-loading" class="dashboard-loading">
                     <i class="fas fa-spinner"></i>
-                    <p>読み込み中...</p>
+                    <p data-i18n="loadingText">読み込み中...</p>
                 </div>
 
                 <!-- Error State -->
-                <div id="ja-dashboard-error" class="dashboard-error" style="display: none;">
+                <div id="dashboard-error" class="dashboard-error" style="display: none;">
                     <i class="fas fa-exclamation-circle"></i>
-                    <h2>エラーが発生しました</h2>
-                    <p id="ja-error-message">ページを読み込めませんでした。</p>
-                    <button onclick="location.reload()" class="cta-button">再読み込み</button>
-                    <a href="login.html" class="cta-button cta-secondary" style="margin-left: 1rem;">ログインページへ</a>
+                    <h2 data-i18n="errorTitle">エラーが発生しました</h2>
+                    <p id="error-message" data-i18n="errorMessage">ページを読み込めませんでした。</p>
+                    <button onclick="location.reload()" class="cta-button" data-i18n="errorReload">再読み込み</button>
+                    <a href="login.html" class="cta-button cta-secondary" style="margin-left: 1rem;" data-i18n="errorLogin">ログインページへ</a>
                 </div>
 
                 <!-- Dashboard Content -->
-                <div id="ja-dashboard-content" style="display: none;">
+                <div id="dashboard-content" style="display: none;">
                     
                     <!-- Welcome Banner -->
                     <div class="welcome-banner">
                         <div>
-                            <h1 id="ja-welcome-name">おかえりなさい！</h1>
-                            <p>今日も英語学習、頑張りましょう！</p>
+                            <h1 id="welcome-name">おかえりなさい！</h1>
+                            <p data-i18n="welcomeSubtitle">今日も英語学習、頑張りましょう！</p>
                         </div>
                         <div class="welcome-stats">
                             <div class="welcome-stat">
-                                <span class="welcome-stat-value" id="ja-stat-streak">0</span>
-                                <span class="welcome-stat-label">日連続</span>
+                                <span class="welcome-stat-value" id="stat-streak">0</span>
+                                <span class="welcome-stat-label" data-i18n="statStreakLabel">日連続</span>
                             </div>
                             <div class="welcome-stat">
-                                <span class="welcome-stat-value" id="ja-stat-total">0</span>
-                                <span class="welcome-stat-label">練習回数</span>
+                                <span class="welcome-stat-value" id="stat-total">0</span>
+                                <span class="welcome-stat-label" data-i18n="statTotalLabel">練習回数</span>
                             </div>
                             <div class="welcome-stat">
-                                <span class="welcome-stat-value" id="ja-stat-month">0</span>
-                                <span class="welcome-stat-label">今月</span>
+                                <span class="welcome-stat-value" id="stat-month">0</span>
+                                <span class="welcome-stat-label" data-i18n="statMonthLabel">今月</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Practice Status Card -->
-                    <div class="practice-status-card" id="ja-practice-status">
+                    <div class="practice-status-card" id="practice-status">
                         <div class="practice-status-icon">⏳</div>
-                        <h2>今日の練習状況を確認中...</h2>
-                        <p>データを読み込んでいます</p>
+                        <h2 data-i18n="practiceChecking">今日の練習状況を確認中...</h2>
+                        <p data-i18n="practiceLoading">データを読み込んでいます</p>
                     </div>
 
                     <!-- Quick Actions -->
                     <div class="quick-actions">
                         <a href="https://line.me/R/ti/p/@845irjbc" target="_blank" rel="noopener noreferrer" class="quick-action-btn">
                             <i class="fab fa-line"></i>
-                            <span>LINEで練習</span>
+                            <span data-i18n="actionLine">LINEで練習</span>
                         </a>
-                        <button class="quick-action-btn" id="ja-book-lesson-btn" onclick="openBookingModal('ja')">
+                        <button class="quick-action-btn" id="book-lesson-btn" onclick="openBookingModal(getCurrentLang())">
                             <i class="fas fa-video"></i>
-                            <span>レッスン予約</span>
+                            <span data-i18n="actionBook">レッスン予約</span>
                         </button>
-                        <a href="#ja-resources" class="quick-action-btn">
+                        <a href="#resources" class="quick-action-btn">
                             <i class="fas fa-book"></i>
-                            <span>学習教材</span>
+                            <span data-i18n="actionResources">学習教材</span>
                         </a>
                         <a href="/contact" class="quick-action-btn">
                             <i class="fas fa-envelope"></i>
-                            <span>お問い合わせ</span>
+                            <span data-i18n="actionContact">お問い合わせ</span>
                         </a>
                     </div>
 
-                  <!-- Cancellation Banner -->
-        <div class="cancellation-banner" id="ja-cancellation-banner" style="display: none;">
-            <div class="cancellation-banner-header">
-                <div class="cancellation-banner-icon">⚠️</div>
-                <div class="cancellation-banner-content">
-                    <h3 id="ja-cancellation-title">サブスクリプションがキャンセルされました</h3>
-                    <p id="ja-cancellation-message">アクセスは継続されます</p>
-                    <div class="countdown-timer" id="ja-countdown-timer">
-                        <i class="fas fa-clock"></i>
-                        <span>残り <span class="countdown-number" id="ja-days-remaining">0</span> 日</span>
+                    <!-- Cancellation Banner -->
+                    <div class="cancellation-banner" id="cancellation-banner" style="display: none;">
+                        <div class="cancellation-banner-header">
+                            <div class="cancellation-banner-icon">⚠️</div>
+                            <div class="cancellation-banner-content">
+                                <h3 id="cancellation-title" data-i18n="cancelTitle">サブスクリプションがキャンセルされました</h3>
+                                <p id="cancellation-message" data-i18n="cancelMessage">アクセスは継続されます</p>
+                                <div class="countdown-timer" id="countdown-timer">
+                                    <i class="fas fa-clock"></i>
+                                    <span><span data-i18n="cancelDaysPrefix">残り </span><span class="countdown-number" id="days-remaining">0</span><span data-i18n="cancelDaysSuffix"> 日</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cancellation-banner-actions">
+                            <a href="questionnaire.html" class="btn-reactivate">
+                                <i class="fas fa-redo"></i> <span data-i18n="cancelReactivate">サブスクリプションを再開</span>
+                            </a>
+                            <a href="contact.html?subject=reactivation" class="btn-contact-support">
+                                <i class="fas fa-envelope"></i> <span data-i18n="cancelContact">サポートに連絡</span>
+                            </a>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="cancellation-banner-actions">
-                <a href="questionnaire.html" class="btn-reactivate">
-                    <i class="fas fa-redo"></i> サブスクリプションを再開
-                </a>
-                <a href="contact.html?subject=reactivation" class="btn-contact-support">
-                    <i class="fas fa-envelope"></i> サポートに連絡
-                </a>
-            </div>
-        </div>
-
 
                     <!-- Dashboard Grid -->
                     <div class="dashboard-grid">
                         <!-- Skills Assessment Card -->
                         <div class="dashboard-card card-skills">
-                            <h3><i class="fas fa-chart-radar"></i>スキル評価</h3>
-                            <div id="ja-skills-assessment">
+                            <h3><i class="fas fa-chart-radar"></i><span data-i18n="headingSkills">スキル評価</span></h3>
+                            <div id="skills-assessment">
                                 <!-- Will be populated by JavaScript -->
                             </div>
                         </div>
 
                         <!-- Today's Tip -->
                         <div class="dashboard-card card-phrase">
-                            <h3><i class="fas fa-lightbulb"></i>今日のフレーズ</h3>
+                            <h3><i class="fas fa-lightbulb"></i><span data-i18n="headingPhrase">今日のフレーズ</span></h3>
                             <div class="tip-box">
-                                <p>今日はこのフレーズを使ってみましょう：</p>
-                                <span class="tip-phrase" id="ja-daily-phrase">"I'm looking forward to..."</span>
-                                <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--color-text-light);" id="ja-phrase-example">
+                                <p data-i18n="phraseIntro">今日はこのフレーズを使ってみましょう：</p>
+                                <span class="tip-phrase" id="daily-phrase">"I'm looking forward to..."</span>
+                                <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--color-text-light);" id="phrase-example">
                                     例：I'm looking forward to our next lesson!<br>
                                     （次のレッスンが楽しみです！）
                                 </p>
@@ -162,138 +160,141 @@
 
                         <!-- Progress -->
                         <div class="dashboard-card card-progress">
-                            <h3><i class="fas fa-chart-line"></i>今月の進捗</h3>
+                            <h3><i class="fas fa-chart-line"></i><span data-i18n="headingProgress">今月の進捗</span></h3>
                             <div class="progress-ring-container">
                                 <div class="progress-ring">
                                     <svg width="80" height="80">
                                         <circle class="progress-ring-bg" cx="40" cy="40" r="32"></circle>
                                         <circle class="progress-ring-fill" cx="40" cy="40" r="32" 
                                                 stroke-dasharray="201" 
-                                                id="ja-progress-ring"></circle>
+                                                id="progress-ring"></circle>
                                     </svg>
-                                    <span class="progress-ring-text" id="ja-progress-percent">0%</span>
+                                    <span class="progress-ring-text" id="progress-percent">0%</span>
                                 </div>
                                 <div class="progress-details">
-                                    <h4 id="ja-progress-message">頑張りましょう！</h4>
-                                    <p id="ja-progress-sub">今月の目標に向かって</p>
+                                    <h4 id="progress-message" data-i18n="progressDefault">頑張りましょう！</h4>
+                                    <p id="progress-sub" data-i18n="progressSub">今月の目標に向かって</p>
                                 </div>
                             </div>
                             <p style="font-size: 0.9rem; color: var(--color-text-light);">
                                 <i class="fas fa-check-circle" style="color: var(--color-primary);"></i>
-                                今月 <strong id="ja-sessions-completed">0</strong> / <span id="ja-sessions-total">20</span> 回完了
+                                <span data-i18n="progressPrefix">今月 </span><strong id="sessions-completed">0</strong> / <span id="sessions-total">20</span><span data-i18n="progressSuffix"> 回完了</span>
                             </p>
                         </div>
 
                         <!-- Streak -->
                         <div class="dashboard-card card-streak">
-                            <h3><i class="fas fa-fire"></i>練習継続記録</h3>
+                            <h3><i class="fas fa-fire"></i><span data-i18n="headingStreak">練習継続記録</span></h3>
                             <div class="streak-header">
-                                <span class="streak-fire" id="ja-streak-emoji">🔥</span>
+                                <span class="streak-fire" id="streak-emoji">🔥</span>
                                 <div>
-                                    <span class="streak-count" id="ja-streak-count">0</span>
-                                    <span class="streak-label">日連続！</span>
+                                    <span class="streak-count" id="streak-count">0</span>
+                                    <span class="streak-label" data-i18n="streakSuffix">日連続！</span>
                                 </div>
                             </div>
-                            <div class="streak-calendar" id="ja-streak-calendar">
+                            <div class="streak-calendar" id="streak-calendar">
                                 <!-- Calendar will be populated by JavaScript -->
                             </div>
                         </div>
 
                         <!-- Achievements -->
                         <div class="dashboard-card card-achievements">
-                            <h3><i class="fas fa-trophy"></i>達成バッジ</h3>
-                            <div class="achievements-grid" id="ja-achievements">
+                            <h3><i class="fas fa-trophy"></i><span data-i18n="headingAchievements">達成バッジ</span></h3>
+                            <div class="achievements-grid" id="achievements">
                                 <!-- Will be populated by JavaScript -->
                             </div>
                         </div>
 
                         <!-- Account Info -->
-<div class="dashboard-card card-account">
-    <h3><i class="fas fa-user-circle"></i>アカウント情報</h3>
-    <div id="ja-plan-badges">
-        <span class="plan-badge" id="ja-plan-badge">プランA</span>
-    </div>
-    <ul class="account-details">
-        <li><strong>氏名</strong><span id="ja-profile-name">-</span></li>
-        <li><strong>メール</strong><span id="ja-profile-email">-</span></li>
-        <li><strong>レベル</strong><span id="ja-profile-level">-</span></li>
-        <li><strong>ステータス</strong><span id="ja-profile-status">-</span></li>
-    </ul>
-    <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <a href="account-settings.html" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
-            <i class="fas fa-cog"></i> 設定
-        </a>
-        <a href="contact.html?subject=plan-change" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">プラン変更</a>
-        <button id="ja-logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">ログアウト</button>
-    </div>
-</div>
-                        <!-- Upcoming Lessons -->
-<div class="dashboard-card card-lessons" id="ja-upcoming-lessons-card" style="display: none;">
-    <h3><i class="fas fa-calendar-alt"></i>予定レッスン</h3>
-    <div id="ja-upcoming-lessons">
-        <!-- Will be populated by JavaScript -->
-    </div>
-</div>
+                        <div class="dashboard-card card-account">
+                            <h3><i class="fas fa-user-circle"></i><span data-i18n="headingAccount">アカウント情報</span></h3>
+                            <div id="plan-badges">
+                                <span class="plan-badge" id="plan-badge">プランA</span>
+                                <span class="addon-badge" id="addon-badge" style="display: none;" data-i18n="addonVideo">+ ビデオ</span>
+                            </div>
+                            <ul class="account-details">
+                                <li><strong data-i18n="accountName">氏名</strong><span id="profile-name">-</span></li>
+                                <li><strong data-i18n="accountEmail">メール</strong><span id="profile-email">-</span></li>
+                                <li><strong data-i18n="accountLevel">レベル</strong><span id="profile-level">-</span></li>
+                                <li><strong data-i18n="accountStatus">ステータス</strong><span id="profile-status">-</span></li>
+                            </ul>
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <a href="account-settings.html" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                    <i class="fas fa-cog"></i> <span data-i18n="accountSettings">設定</span>
+                                </a>
+                                <a href="contact.html?subject=plan-change" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;" data-i18n="accountChangePlan">プラン変更</a>
+                                <button id="logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;" data-i18n="accountLogout">ログアウト</button>
+                            </div>
+                        </div>
 
-<!-- 🆕 BOOKING RULES CARD -->
-<div class="dashboard-card card-booking-rules">
-    <h3><i class="fas fa-book-open"></i>予約ルール</h3>
-    <div class="rules-list">
-        <div class="rule-item">
-            <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
-            <span><strong>無料で変更OK：</strong>レッスン24時間前までならキャンセル・変更無料</span>
-        </div>
-        <div class="rule-item">
-            <i class="fas fa-times-circle" style="color: #f44336;"></i>
-            <span><strong>返金なし：</strong>24時間前を切るとクレジット返金不可</span>
-        </div>
-        <div class="rule-item">
-            <i class="fas fa-user-slash" style="color: #ff9800;"></i>
-            <span><strong>無断欠席：</strong>連絡なしで欠席した場合もクレジット消費</span>
-        </div>
-        <div class="rule-item">
-            <i class="fas fa-video" style="color: #2196F3;"></i>
-            <span><strong>Meetリンク：</strong>レッスン24時間前から終了1時間後まで表示</span>
-        </div>
-    </div>
-</div>
+                        <!-- Upcoming Lessons -->
+                        <div class="dashboard-card card-lessons" id="upcoming-lessons-card" style="display: none;">
+                            <h3><i class="fas fa-calendar-alt"></i><span data-i18n="headingLessons">予定レッスン</span></h3>
+                            <div id="upcoming-lessons">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Booking Rules Card -->
+                        <div class="dashboard-card card-booking-rules">
+                            <h3><i class="fas fa-book-open"></i><span data-i18n="headingBookingRules">予約ルール</span></h3>
+                            <div class="rules-list">
+                                <div class="rule-item">
+                                    <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                                    <span><strong data-i18n="rulesFreeTitle">無料で変更OK：</strong><span data-i18n="rulesFreeDesc">レッスン24時間前までならキャンセル・変更無料</span></span>
+                                </div>
+                                <div class="rule-item">
+                                    <i class="fas fa-times-circle" style="color: #f44336;"></i>
+                                    <span><strong data-i18n="rulesNoRefundTitle">返金なし：</strong><span data-i18n="rulesNoRefundDesc">24時間前を切るとクレジット返金不可</span></span>
+                                </div>
+                                <div class="rule-item">
+                                    <i class="fas fa-user-slash" style="color: #ff9800;"></i>
+                                    <span><strong data-i18n="rulesNoShowTitle">無断欠席：</strong><span data-i18n="rulesNoShowDesc">連絡なしで欠席した場合もクレジット消費</span></span>
+                                </div>
+                                <div class="rule-item">
+                                    <i class="fas fa-video" style="color: #2196F3;"></i>
+                                    <span><strong data-i18n="rulesMeetTitle">Meetリンク：</strong><span data-i18n="rulesMeetDesc">レッスン24時間前から終了1時間後まで表示</span></span>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Learning Resources -->
-                        <div class="dashboard-card card-resources" id="ja-resources">
-                            <h3><i class="fas fa-folder-open"></i>学習教材</h3>
+                        <div class="dashboard-card card-resources" id="resources">
+                            <h3><i class="fas fa-folder-open"></i><span data-i18n="headingResources">学習教材</span></h3>
                             <div class="resource-item">
                                 <i class="fas fa-file-pdf"></i>
-                                <a href="#" class="coming-soon">日常会話フレーズ集</a>
-                                <span class="resource-tag coming">準備中</span>
+                                <a href="#" class="coming-soon" data-i18n="resConversation">日常会話フレーズ集</a>
+                                <span class="resource-tag coming" data-i18n="resComingSoon">準備中</span>
                             </div>
                             <div class="resource-item">
                                 <i class="fas fa-file-pdf"></i>
-                                <a href="#" class="coming-soon">ビジネス英語基礎</a>
-                                <span class="resource-tag coming">準備中</span>
+                                <a href="#" class="coming-soon" data-i18n="resBusiness">ビジネス英語基礎</a>
+                                <span class="resource-tag coming" data-i18n="resComingSoon">準備中</span>
                             </div>
                             <div class="resource-item">
                                 <i class="fas fa-link"></i>
-                                <a href="#" class="coming-soon">おすすめYouTubeチャンネル</a>
-                                <span class="resource-tag coming">準備中</span>
+                                <a href="#" class="coming-soon" data-i18n="resYouTube">おすすめYouTubeチャンネル</a>
+                                <span class="resource-tag coming" data-i18n="resComingSoon">準備中</span>
                             </div>
                             <div class="resource-item">
                                 <i class="fas fa-headphones"></i>
-                                <a href="#" class="coming-soon">リスニング練習音声</a>
-                                <span class="resource-tag coming">準備中</span>
+                                <a href="#" class="coming-soon" data-i18n="resListening">リスニング練習音声</a>
+                                <span class="resource-tag coming" data-i18n="resComingSoon">準備中</span>
                             </div>
                             <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--color-text-muted); text-align: center;">
-                                <i class="fas fa-info-circle"></i> 教材は順次追加予定です
+                                <i class="fas fa-info-circle"></i> <span data-i18n="resNote">教材は順次追加予定です</span>
                             </p>
                         </div>
 
                         <!-- Upgrade Card -->
-                        <div class="dashboard-card upgrade-card card-upgrade" id="ja-upgrade-card" style="display: none;">
-                            <h3><i class="fas fa-star"></i>ビデオレッスンを追加</h3>
-                            <p>講師と直接話して、さらに上達しませんか？</p>
-                            <a href="https://buy.stripe.com/28E9AS4UrcIP8JK7wbes002" target="_blank" rel="noopener noreferrer" class="cta-button">
+                        <div class="dashboard-card upgrade-card card-upgrade" id="upgrade-card" style="display: none;">
+                            <h3><i class="fas fa-star"></i><span data-i18n="headingUpgrade">ビデオレッスンを追加</span></h3>
+                            <p data-i18n="upgradeDesc">講師と直接話して、さらに上達しませんか？</p>
+                            <a href="https://buy.stripe.com/28E9AS4UrcIP8JK7wbes002" target="_blank" rel="noopener noreferrer" class="cta-button" data-i18n="upgradeCasual">
                                 カジュアルレッスン ¥3,000
                             </a>
                             <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.9;">
-                                <a href="https://buy.stripe.com/28E14mev16kr4tu5o3es003" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: underline;">
+                                <a href="https://buy.stripe.com/28E14mev16kr4tu5o3es003" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: underline;" data-i18n="upgradeBusiness">
                                     ビジネスレッスン ¥5,000
                                 </a>
                             </p>
@@ -304,265 +305,6 @@
             </div>
         </section>
 
-        <!-- ENGLISH VERSION -->
-        <section id="en-dashboard" class="lang-section" lang="en">
-            <div class="container legal-page-container">
-                <!-- Loading State -->
-                <div id="en-dashboard-loading" class="dashboard-loading">
-                    <i class="fas fa-spinner"></i>
-                    <p>Loading your dashboard...</p>
-                </div>
-
-                <!-- Error State -->
-                <div id="en-dashboard-error" class="dashboard-error" style="display: none;">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <h2>Something went wrong</h2>
-                    <p id="en-error-message">Could not load the page.</p>
-                    <button onclick="location.reload()" class="cta-button">Refresh</button>
-                    <a href="login.html" class="cta-button cta-secondary" style="margin-left: 1rem;">Go to Login</a>
-                </div>
-
-                <!-- Dashboard Content -->
-                <div id="en-dashboard-content" style="display: none;">
-                    
-                    <!-- Welcome Banner -->
-                    <div class="welcome-banner">
-                        <div>
-                            <h1 id="en-welcome-name">Welcome back!</h1>
-                            <p>Let's continue your English learning journey!</p>
-                        </div>
-                        <div class="welcome-stats">
-                            <div class="welcome-stat">
-                                <span class="welcome-stat-value" id="en-stat-streak">0</span>
-                                <span class="welcome-stat-label">Day Streak</span>
-                            </div>
-                            <div class="welcome-stat">
-                                <span class="welcome-stat-value" id="en-stat-total">0</span>
-                                <span class="welcome-stat-label">Total Sessions</span>
-                            </div>
-                            <div class="welcome-stat">
-                                <span class="welcome-stat-value" id="en-stat-month">0</span>
-                                <span class="welcome-stat-label">This Month</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Practice Status Card -->
-                    <div class="practice-status-card" id="en-practice-status">
-                        <div class="practice-status-icon">⏳</div>
-                        <h2>Checking today's practice...</h2>
-                        <p>Loading data</p>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="quick-actions">
-                        <a href="https://line.me/R/ti/p/@845irjbc" target="_blank" rel="noopener noreferrer" class="quick-action-btn">
-                            <i class="fab fa-line"></i>
-                            <span>Practice on LINE</span>
-                        </a>
-                        <button class="quick-action-btn" id="en-book-lesson-btn" onclick="openBookingModal('en')">
-                            <i class="fas fa-video"></i>
-                            <span>Book Lesson</span>
-                        </button>
-                        <a href="#en-resources" class="quick-action-btn">
-                            <i class="fas fa-book"></i>
-                            <span>Resources</span>
-                        </a>
-                        <a href="/contact" class="quick-action-btn">
-                            <i class="fas fa-envelope"></i>
-                            <span>Contact Us</span>
-                        </a>
-                    </div>
-
-                  <!-- Cancellation Banner -->
-        <div class="cancellation-banner" id="en-cancellation-banner" style="display: none;">
-            <div class="cancellation-banner-header">
-                <div class="cancellation-banner-icon">⚠️</div>
-                <div class="cancellation-banner-content">
-                    <h3 id="en-cancellation-title">Subscription Cancelled</h3>
-                    <p id="en-cancellation-message">Your access continues</p>
-                    <div class="countdown-timer" id="en-countdown-timer">
-                        <i class="fas fa-clock"></i>
-                        <span><span class="countdown-number" id="en-days-remaining">0</span> days remaining</span>
-                    </div>
-                </div>
-            </div>
-            <div class="cancellation-banner-actions">
-                <a href="questionnaire.html" class="btn-reactivate">
-                    <i class="fas fa-redo"></i> Reactivate Subscription
-                </a>
-                <a href="contact.html?subject=reactivation" class="btn-contact-support">
-                    <i class="fas fa-envelope"></i> Contact Support
-                </a>
-            </div>
-        </div>
-
-
-                    <!-- Dashboard Grid -->
-                    <div class="dashboard-grid">
-                        <!-- Skills Assessment Card -->
-                        <div class="dashboard-card card-skills">
-                            <h3><i class="fas fa-chart-radar"></i>Skills Assessment</h3>
-                            <div id="en-skills-assessment">
-                                <!-- Will be populated by JavaScript -->
-                            </div>
-                        </div>
-
-                        <!-- Today's Tip -->
-                        <div class="dashboard-card card-phrase">
-                            <h3><i class="fas fa-lightbulb"></i>Phrase of the Day</h3>
-                            <div class="tip-box">
-                                <p>Try using this phrase today:</p>
-                                <span class="tip-phrase" id="en-daily-phrase">"I'm looking forward to..."</span>
-                                <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--color-text-light);" id="en-phrase-example">
-                                    Example: I'm looking forward to our next lesson!
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Progress -->
-                        <div class="dashboard-card card-progress">
-                            <h3><i class="fas fa-chart-line"></i>Monthly Progress</h3>
-                            <div class="progress-ring-container">
-                                <div class="progress-ring">
-                                    <svg width="80" height="80">
-                                        <circle class="progress-ring-bg" cx="40" cy="40" r="32"></circle>
-                                        <circle class="progress-ring-fill" cx="40" cy="40" r="32" 
-                                                stroke-dasharray="201" 
-                                                id="en-progress-ring"></circle>
-                                    </svg>
-                                    <span class="progress-ring-text" id="en-progress-percent">0%</span>
-                                </div>
-                                <div class="progress-details">
-                                    <h4 id="en-progress-message">Let's go!</h4>
-                                    <p id="en-progress-sub">Working toward your goal</p>
-                                </div>
-                            </div>
-                            <p style="font-size: 0.9rem; color: var(--color-text-light);">
-                                <i class="fas fa-check-circle" style="color: var(--color-primary);"></i>
-                                <strong id="en-sessions-completed">0</strong> / <span id="en-sessions-total">20</span> sessions this month
-                            </p>
-                        </div>
-
-                        <!-- Streak -->
-                        <div class="dashboard-card card-streak">
-                            <h3><i class="fas fa-fire"></i>Practice Streak</h3>
-                            <div class="streak-header">
-                                <span class="streak-fire" id="en-streak-emoji">🔥</span>
-                                <div>
-                                    <span class="streak-count" id="en-streak-count">0</span>
-                                    <span class="streak-label">day streak!</span>
-                                </div>
-                            </div>
-                            <div class="streak-calendar" id="en-streak-calendar">
-                                <!-- Calendar will be populated by JavaScript -->
-                            </div>
-                        </div>
-
-                        <!-- Achievements -->
-                        <div class="dashboard-card card-achievements">
-                            <h3><i class="fas fa-trophy"></i>Achievements</h3>
-                            <div class="achievements-grid" id="en-achievements">
-                                <!-- Will be populated by JavaScript -->
-                            </div>
-                        </div>
-
-                       <!-- Account Info -->
-<div class="dashboard-card card-account">
-    <h3><i class="fas fa-user-circle"></i>Account Info</h3>
-    <div id="en-plan-badges">
-        <span class="plan-badge" id="en-plan-badge">Plan A</span>
-    </div>
-    <ul class="account-details">
-        <li><strong>Name</strong><span id="en-profile-name">-</span></li>
-        <li><strong>Email</strong><span id="en-profile-email">-</span></li>
-        <li><strong>Level</strong><span id="en-profile-level">-</span></li>
-        <li><strong>Status</strong><span id="en-profile-status">-</span></li>
-    </ul>
-    <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <a href="account-settings.html" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
-            <i class="fas fa-cog"></i> Settings
-        </a>
-        <a href="contact.html?subject=plan-change" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Change Plan</a>
-        <button id="en-logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Log Out</button>
-    </div>
-</div>
-                    <!-- Upcoming Lessons -->
-<div class="dashboard-card card-lessons" id="en-upcoming-lessons-card" style="display: none;">
-    <h3><i class="fas fa-calendar-alt"></i>Upcoming Lessons</h3>
-    <div id="en-upcoming-lessons">
-        <!-- Will be populated by JavaScript -->
-    </div>
-</div>
-
-<!-- 🆕 BOOKING RULES CARD -->
-<div class="dashboard-card card-booking-rules">
-    <h3><i class="fas fa-book-open"></i>Lesson Booking Rules</h3>
-    <div class="rules-list">
-        <div class="rule-item">
-            <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
-            <span><strong>Free changes:</strong> Cancel or reschedule >24h before lesson</span>
-        </div>
-        <div class="rule-item">
-            <i class="fas fa-times-circle" style="color: #f44336;"></i>
-            <span><strong>No refund:</strong> Changes made <24h before lesson</span>
-        </div>
-        <div class="rule-item">
-            <i class="fas fa-user-slash" style="color: #ff9800;"></i>
-            <span><strong>No-shows:</strong> Credit is not refunded if you miss your lesson</span>
-        </div>
-        <div class="rule-item">
-            <i class="fas fa-video" style="color: #2196F3;"></i>
-            <span><strong>Meet link:</strong> Available 24h before until 1h after lesson</span>
-        </div>
-    </div>
-</div>
-                        <!-- Learning Resources -->
-                        <div class="dashboard-card card-resources" id="en-resources">
-                            <h3><i class="fas fa-folder-open"></i>Learning Resources</h3>
-                            <div class="resource-item">
-                                <i class="fas fa-file-pdf"></i>
-                                <a href="#" class="coming-soon">Common Conversation Phrases</a>
-                                <span class="resource-tag coming">Coming Soon</span>
-                            </div>
-                            <div class="resource-item">
-                                <i class="fas fa-file-pdf"></i>
-                                <a href="#" class="coming-soon">Business English Basics</a>
-                                <span class="resource-tag coming">Coming Soon</span>
-                            </div>
-                            <div class="resource-item">
-                                <i class="fas fa-link"></i>
-                                <a href="#" class="coming-soon">Recommended YouTube Channels</a>
-                                <span class="resource-tag coming">Coming Soon</span>
-                            </div>
-                            <div class="resource-item">
-                                <i class="fas fa-headphones"></i>
-                                <a href="#" class="coming-soon">Listening Practice Audio</a>
-                                <span class="resource-tag coming">Coming Soon</span>
-                            </div>
-                            <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--color-text-muted); text-align: center;">
-                                <i class="fas fa-info-circle"></i> More resources coming soon!
-                            </p>
-                        </div>
-
-                        <!-- Upgrade Card -->
-                        <div class="dashboard-card upgrade-card card-upgrade" id="en-upgrade-card" style="display: none;">
-                            <h3><i class="fas fa-star"></i>Add Video Lessons</h3>
-                            <p>Want to practice speaking with a teacher directly?</p>
-                            <a href="https://buy.stripe.com/28E9AS4UrcIP8JK7wbes002" target="_blank" rel="noopener noreferrer" class="cta-button">
-                                Casual Lesson ¥3,000
-                            </a>
-                            <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.9;">
-                                <a href="https://buy.stripe.com/28E14mev16kr4tu5o3es003" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: underline;">
-                                    Business Lesson ¥5,000
-                                </a>
-                            </p>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </section>
     </main>
 
     <div id="footer-placeholder"></div>

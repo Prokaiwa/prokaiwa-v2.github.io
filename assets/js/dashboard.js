@@ -363,6 +363,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 upgradeDesc: '講師と直接話して、さらに上達しませんか？',
                 upgradeCasual: 'カジュアルレッスン ¥3,000',
                 upgradeBusiness: 'ビジネスレッスン ¥5,000',
+                addonVideo: '+ ビデオ',
             },
             en: {
                 // Loading
@@ -441,6 +442,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 upgradeDesc: 'Want to practice speaking with a teacher directly?',
                 upgradeCasual: 'Casual Lesson ¥3,000',
                 upgradeBusiness: 'Business Lesson ¥5,000',
+                addonVideo: '+ Video',
             }
         };
 
@@ -456,11 +458,142 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             });
         }
 
+        // =============================================
+        // DASHBOARD STATE (stored for language refresh)
+        // =============================================
+
+        const dashboardState = {
+            loaded: false,
+            profile: null,
+            stats: null,
+            assessment: null,
+            practiceDates: [],
+            progressPercent: 0,
+            hasVideoAccess: false,
+            hasVideoAddon: false,
+            userId: null
+        };
+
+        // =============================================
+        // DYNAMIC TEXT REFRESH (called on language toggle)
+        // =============================================
+
+        function refreshDynamicText(lang) {
+            if (!dashboardState.loaded) return;
+            const { profile, stats, assessment, practiceDates, progressPercent, hasVideoAccess, hasVideoAddon } = dashboardState;
+
+            // Welcome text
+            const welcomeText = lang === 'ja' 
+                ? `${profile.given_name_romaji || profile.name}さん、おかえりなさい！`
+                : `Welcome back, ${profile.given_name_romaji || profile.name}!`;
+            document.getElementById('welcome-name').textContent = welcomeText;
+
+            // Profile level
+            document.getElementById('profile-level').textContent = levelNames[lang][profile.level] || profile.level;
+
+            // Profile status
+            const statusEl = document.getElementById('profile-status');
+            const isCancelled = profile.subscription_status === 'cancelled';
+            const dashboardExpiresAt = profile.dashboard_access_expires_at ? new Date(profile.dashboard_access_expires_at) : null;
+            const now = new Date();
+            const isExpired = dashboardExpiresAt && dashboardExpiresAt < now;
+
+            // Reset status styles
+            statusEl.style.cssText = '';
+
+            let statusText = '';
+            if (isExpired) {
+                statusText = lang === 'ja' ? '期限切れ' : 'Expired';
+                statusEl.style.color = '#dc3545';
+                statusEl.style.fontWeight = '600';
+            } else if (isCancelled && dashboardExpiresAt) {
+                const expiryDate = dashboardExpiresAt.toLocaleDateString(
+                    lang === 'ja' ? 'ja-JP' : 'en-US',
+                    { year: 'numeric', month: 'long', day: 'numeric' }
+                );
+                statusText = lang === 'ja' 
+                    ? `キャンセル済 - ${expiryDate}まで利用可能`
+                    : `Cancelled - Access Until ${expiryDate}`;
+                statusEl.style.color = '#856404';
+                statusEl.style.fontWeight = '600';
+                statusEl.style.backgroundColor = '#fff3cd';
+                statusEl.style.padding = '0.5rem 1rem';
+                statusEl.style.borderRadius = '6px';
+                statusEl.style.display = 'inline-block';
+            } else if (profile.subscription_status === 'trialing') {
+                statusText = lang === 'ja' ? '無料トライアル中' : 'Free Trial';
+            } else if (profile.subscription_status === 'active') {
+                statusText = lang === 'ja' ? '有効' : 'Active';
+            } else {
+                statusText = lang === 'ja' ? '支払い待ち' : 'Payment Pending';
+            }
+            statusEl.textContent = statusText;
+
+            // Plan badge
+            const planBadge = document.getElementById('plan-badge');
+            planBadge.textContent = planNames[lang][profile.plan] || profile.plan;
+
+            // Addon badge
+            if (hasVideoAddon) {
+                document.getElementById('addon-badge').style.display = 'inline-block';
+            }
+
+            // Cancellation banner text
+            if (isCancelled && !isExpired && dashboardExpiresAt) {
+                const banner = document.getElementById('cancellation-banner');
+                const titleEl = document.getElementById('cancellation-title');
+                const messageEl = document.getElementById('cancellation-message');
+                const daysEl = document.getElementById('days-remaining');
+                const timerEl = document.getElementById('countdown-timer');
+                if (banner) {
+                    const daysRemaining = Math.ceil((dashboardExpiresAt - now) / (1000 * 60 * 60 * 24));
+                    titleEl.textContent = lang === 'ja' ? 'サブスクリプションがキャンセルされました' : 'Subscription Cancelled';
+                    messageEl.textContent = lang === 'ja'
+                        ? `${dashboardExpiresAt.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}までアクセス可能です`
+                        : `Your access continues until ${dashboardExpiresAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+                    daysEl.textContent = daysRemaining;
+                    timerEl.style.display = daysRemaining <= 0 ? 'none' : 'inline-flex';
+                }
+            } else if (isExpired) {
+                const titleEl = document.getElementById('cancellation-title');
+                const messageEl = document.getElementById('cancellation-message');
+                if (titleEl) {
+                    titleEl.textContent = lang === 'ja' ? 'アクセス期限が切れました' : 'Access Expired';
+                    messageEl.textContent = lang === 'ja'
+                        ? '再度サブスクリプションを開始するには、下のボタンをクリックしてください'
+                        : 'Reactivate your subscription to continue learning';
+                }
+            }
+
+            // Progress ring
+            updateProgressRing(lang, progressPercent);
+
+            // Daily phrase
+            setDailyPhrase(lang);
+
+            // Streak calendar
+            renderStreakCalendar('streak-calendar', practiceDates, lang);
+
+            // Achievements
+            renderAchievements('achievements', stats, lang);
+
+            // Skills chart
+            renderSkillsChart('skills-assessment', assessment, lang);
+
+            // Practice status
+            checkTodaysPractice(dashboardState.userId, lang);
+
+            // Upcoming lessons
+            renderUpcomingLessonsCard(bookingState.userBookings || [], lang);
+        }
+
+
+
         function showError(lang, message) {
-            document.getElementById(`${lang}-dashboard-loading`).style.display = 'none';
-            document.getElementById(`${lang}-dashboard-content`).style.display = 'none';
-            document.getElementById(`${lang}-dashboard-error`).style.display = 'block';
-            document.getElementById(`${lang}-error-message`).textContent = message;
+            document.getElementById('dashboard-loading').style.display = 'none';
+            document.getElementById('dashboard-content').style.display = 'none';
+            document.getElementById('dashboard-error').style.display = 'block';
+            document.getElementById('error-message').textContent = message;
         }
 
         // =============================================
@@ -663,7 +796,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         // =============================================
 
         async function checkTodaysPractice(userId, lang) {
-            const statusCard = document.getElementById(`${lang}-practice-status`);
+            const statusCard = document.getElementById('practice-status');
             const todayStart = new Date();
             todayStart.setHours(0, 0, 0, 0);
 
@@ -994,9 +1127,9 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         }
 
         function updateProgressRing(lang, percentage) {
-            const ring = document.getElementById(`${lang}-progress-ring`);
-            const text = document.getElementById(`${lang}-progress-percent`);
-            const message = document.getElementById(`${lang}-progress-message`);
+            const ring = document.getElementById('progress-ring');
+            const text = document.getElementById('progress-percent');
+            const message = document.getElementById('progress-message');
 
             const circumference = 201;
             const offset = circumference - (percentage / 100) * circumference;
@@ -1023,8 +1156,8 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
             const phrase = dailyPhrases[dayOfYear % dailyPhrases.length];
 
-            document.getElementById(`${lang}-daily-phrase`).textContent = phrase.phrase;
-            document.getElementById(`${lang}-phrase-example`).innerHTML = lang === 'ja'
+            document.getElementById('daily-phrase').textContent = phrase.phrase;
+            document.getElementById('phrase-example').innerHTML = lang === 'ja'
                 ? `例：${phrase.example_en}<br>（${phrase.example_ja}）`
                 : `Example: ${phrase.example_en}`;
         }
@@ -1035,8 +1168,8 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
         async function loadDashboard() {
             const lang = getCurrentLang();
-            const loadingDiv = document.getElementById(`${lang}-dashboard-loading`);
-            const contentDiv = document.getElementById(`${lang}-dashboard-content`);
+            const loadingDiv = document.getElementById('dashboard-loading');
+            const contentDiv = document.getElementById('dashboard-content');
 
             debugLog('Loading dashboard with Phase 1 features...');
 
@@ -1080,8 +1213,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 const realProgress = await loadRealProgress(user.id, lang);
                 const assessment = await loadLatestAssessment(user.id);
 
-                await checkTodaysPractice(user.id, 'ja');
-                await checkTodaysPractice(user.id, 'en');
+                await checkTodaysPractice(user.id, lang);
 
                 let stats = {
                     current: 0,
@@ -1109,40 +1241,51 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 const hasVideoAddon = profile.addons?.includes('video') || false;
                 const hasVideoAccess = profile.had_video_access || hasVideoAddon;
 
-                ['ja', 'en'].forEach(l => {
+                // Store data for language refresh
+                dashboardState.loaded = true;
+                dashboardState.profile = profile;
+                dashboardState.stats = stats;
+                dashboardState.assessment = assessment;
+                dashboardState.practiceDates = practiceDates;
+                dashboardState.progressPercent = progressPercent;
+                dashboardState.hasVideoAccess = hasVideoAccess;
+                dashboardState.hasVideoAddon = hasVideoAddon;
+                dashboardState.userId = user.id;
+
+                // Single-pass population (i18n handles language toggle)
     const isCancelled = profile.subscription_status === 'cancelled';
     const cancelledAt = profile.cancelled_at ? new Date(profile.cancelled_at) : null;
     const dashboardExpiresAt = profile.dashboard_access_expires_at ? new Date(profile.dashboard_access_expires_at) : null;
     const now = new Date();
     const isExpired = dashboardExpiresAt && dashboardExpiresAt < now;
-                    const welcomeText = l === 'ja' 
+                    const welcomeText = lang === 'ja' 
                         ? `${profile.given_name_romaji || profile.name}さん、おかえりなさい！`
                         : `Welcome back, ${profile.given_name_romaji || profile.name}!`;
-                    document.getElementById(`${l}-welcome-name`).textContent = welcomeText;
+                    document.getElementById('welcome-name').textContent = welcomeText;
 
-                    document.getElementById(`${l}-stat-streak`).textContent = stats.current;
-                    document.getElementById(`${l}-stat-total`).textContent = stats.total;
-                    document.getElementById(`${l}-stat-month`).textContent = stats.thisMonth;
+                    document.getElementById('stat-streak').textContent = stats.current;
+                    document.getElementById('stat-total').textContent = stats.total;
+                    document.getElementById('stat-month').textContent = stats.thisMonth;
 
-document.getElementById(`${l}-profile-name`).textContent = profile.name;
-                    document.getElementById(`${l}-profile-email`).textContent = profile.email;
-                    document.getElementById(`${l}-profile-level`).textContent = levelNames[l][profile.level] || profile.level;
+document.getElementById('profile-name').textContent = profile.name;
+                    document.getElementById('profile-email').textContent = profile.email;
+                    document.getElementById('profile-level').textContent = levelNames[lang][profile.level] || profile.level;
 
                     // Get status element
-                    const statusEl = document.getElementById(`${l}-profile-status`);
+                    const statusEl = document.getElementById('profile-status');
 
                     // Update status text based on subscription state
                     let statusText = '';
                     if (isExpired) {
-                        statusText = l === 'ja' ? '期限切れ' : 'Expired';
+                        statusText = lang === 'ja' ? '期限切れ' : 'Expired';
                         statusEl.style.color = '#dc3545';
                         statusEl.style.fontWeight = '600';
                     } else if (isCancelled && dashboardExpiresAt) {
                         const expiryDate = dashboardExpiresAt.toLocaleDateString(
-                            l === 'ja' ? 'ja-JP' : 'en-US',
+                            lang === 'ja' ? 'ja-JP' : 'en-US',
                             { year: 'numeric', month: 'long', day: 'numeric' }
                         );
-                        statusText = l === 'ja' 
+                        statusText = lang === 'ja' 
                             ? `キャンセル済 - ${expiryDate}まで利用可能`
                             : `Cancelled - Access Until ${expiryDate}`;
 
@@ -1154,29 +1297,29 @@ document.getElementById(`${l}-profile-name`).textContent = profile.name;
                         statusEl.style.borderRadius = '6px';
                         statusEl.style.display = 'inline-block';
                     } else if (profile.subscription_status === 'trialing') {
-                        statusText = l === 'ja' ? '無料トライアル中' : 'Free Trial';
+                        statusText = lang === 'ja' ? '無料トライアル中' : 'Free Trial';
                     } else if (profile.subscription_status === 'active') {
-                        statusText = l === 'ja' ? '有効' : 'Active';
+                        statusText = lang === 'ja' ? '有効' : 'Active';
                     } else {
-                        statusText = l === 'ja' ? '支払い待ち' : 'Payment Pending';
+                        statusText = lang === 'ja' ? '支払い待ち' : 'Payment Pending';
                     }
 
                     statusEl.textContent = statusText;
 
                     // Update plan badge
-                    const planBadge = document.getElementById(`${l}-plan-badge`);
-                    planBadge.textContent = planNames[l][profile.plan] || profile.plan;
+                    const planBadge = document.getElementById('plan-badge');
+                    planBadge.textContent = planNames[lang][profile.plan] || profile.plan;
                     if (profile.payment_status !== 'paid') planBadge.classList.add('pending');
                     if (isExpired) planBadge.classList.add('expired');
                     if (hasVideoAddon) planBadge.classList.add('has-addon');
 
                     // Show cancellation banner if applicable
                     if (isCancelled && !isExpired && dashboardExpiresAt) {
-                        const banner = document.getElementById(`${l}-cancellation-banner`);
-                        const titleEl = document.getElementById(`${l}-cancellation-title`);
-                        const messageEl = document.getElementById(`${l}-cancellation-message`);
-                        const daysEl = document.getElementById(`${l}-days-remaining`);
-                        const timerEl = document.getElementById(`${l}-countdown-timer`);
+                        const banner = document.getElementById('cancellation-banner');
+                        const titleEl = document.getElementById('cancellation-title');
+                        const messageEl = document.getElementById('cancellation-message');
+                        const daysEl = document.getElementById('days-remaining');
+                        const timerEl = document.getElementById('countdown-timer');
 
                         if (banner) {
                             const daysRemaining = Math.ceil((dashboardExpiresAt - now) / (1000 * 60 * 60 * 24));
@@ -1194,10 +1337,10 @@ document.getElementById(`${l}-profile-name`).textContent = profile.name;
                             banner.style.display = 'block';
                         }
                     } else if (isExpired) {
-                        const banner = document.getElementById(`${l}-cancellation-banner`);
-                        const titleEl = document.getElementById(`${l}-cancellation-title`);
-                        const messageEl = document.getElementById(`${l}-cancellation-message`);
-                        const timerEl = document.getElementById(`${l}-countdown-timer`);
+                        const banner = document.getElementById('cancellation-banner');
+                        const titleEl = document.getElementById('cancellation-title');
+                        const messageEl = document.getElementById('cancellation-message');
+                        const timerEl = document.getElementById('countdown-timer');
 
                         if (banner) {
                             banner.classList.add('expired');
@@ -1216,13 +1359,12 @@ document.getElementById(`${l}-profile-name`).textContent = profile.name;
                     }
 
                     if (hasVideoAddon) {
-                        const badgeContainer = document.getElementById(`${l}-plan-badges`);
-                        badgeContainer.innerHTML += `<span class="addon-badge">+ ${l === 'ja' ? 'ビデオ' : 'Video'}</span>`;
+                        document.getElementById('addon-badge').style.display = 'inline-block';
                     }
 
-                    const bookLessonBtn = document.getElementById(`${l}-book-lesson-btn`);
-const upcomingCard = document.getElementById(`${l}-upcoming-lessons-card`);
-const upgradeCard = document.getElementById(`${l}-upgrade-card`);
+                    const bookLessonBtn = document.getElementById('book-lesson-btn');
+const upcomingCard = document.getElementById('upcoming-lessons-card');
+const upgradeCard = document.getElementById('upgrade-card');
 
 if (hasVideoAccess) {
     if (upcomingCard) {
@@ -1243,27 +1385,23 @@ if (hasVideoAccess) {
     }
 }
 
-                    document.getElementById(`${l}-sessions-completed`).textContent = stats.thisMonth;
-                    document.getElementById(`${l}-sessions-total`).textContent = MONTHLY_GOAL;
-                    updateProgressRing(l, progressPercent);
+                    document.getElementById('sessions-completed').textContent = stats.thisMonth;
+                    document.getElementById('sessions-total').textContent = MONTHLY_GOAL;
+                    updateProgressRing(lang, progressPercent);
 
-                    document.getElementById(`${l}-streak-count`).textContent = stats.current;
-                    document.getElementById(`${l}-streak-emoji`).textContent = stats.current >= 7 ? '🔥' : stats.current >= 3 ? '🔥' : '💪';
-                    renderStreakCalendar(`${l}-streak-calendar`, practiceDates, l);
+                    document.getElementById('streak-count').textContent = stats.current;
+                    document.getElementById('streak-emoji').textContent = stats.current >= 7 ? '🔥' : stats.current >= 3 ? '🔥' : '💪';
+                    renderStreakCalendar('streak-calendar', practiceDates, lang);
 
-                    renderAchievements(`${l}-achievements`, stats, l);
+                    renderAchievements('achievements', stats, lang);
 
-                    setDailyPhrase(l);
+                    setDailyPhrase(lang);
 
-                    renderSkillsChart(`${l}-skills-assessment`, assessment, l);
-                });
+                    renderSkillsChart('skills-assessment', assessment, lang);
 
                 loadingDiv.style.display = 'none';
                 contentDiv.style.display = 'block';
 
-                const otherLang = lang === 'ja' ? 'en' : 'ja';
-                document.getElementById(`${otherLang}-dashboard-loading`).style.display = 'none';
-                document.getElementById(`${otherLang}-dashboard-content`).style.display = 'block';
 
                 // Initialize booking widget
                 await initializeBookingWidget(profile.id, user.id);
@@ -1285,11 +1423,15 @@ if (hasVideoAccess) {
         function setLanguage(lang) {
             localStorage.setItem('prokaiwaLang', lang);
 
-            document.querySelectorAll('.lang-section').forEach(section => {
-                section.classList.remove('show');
-            });
-            document.getElementById(`${lang}-dashboard`).classList.add('show');
+            // Update static text via i18n
+            applyDashboardLanguage(lang);
 
+            // Refresh dynamic content if dashboard is loaded
+            if (dashboardState.loaded) {
+                refreshDynamicText(lang);
+            }
+
+            // Update nav toggle buttons
             document.querySelectorAll('.nav-lang-toggle button').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.dataset.lang === lang) {
@@ -1304,6 +1446,7 @@ if (hasVideoAccess) {
             });
         });
 
+        window.getCurrentLang = getCurrentLang;
         const initialLang = getCurrentLang();
         setLanguage(initialLang);
 
@@ -1322,10 +1465,8 @@ if (hasVideoAccess) {
             e.preventDefault();
             handleLogout();
         });
-        const jaLogoutBtn = document.getElementById('ja-logout-btn');
-        if (jaLogoutBtn) jaLogoutBtn.addEventListener('click', handleLogout);
-        const enLogoutBtn = document.getElementById('en-logout-btn');
-        if (enLogoutBtn) enLogoutBtn.addEventListener('click', handleLogout);
+        const dashLogoutBtn = document.getElementById('logout-btn');
+        if (dashLogoutBtn) dashLogoutBtn.addEventListener('click', handleLogout);
 
         supabase.auth.onAuthStateChange((event, session) => {
             debugLog('Auth state changed:', event);
@@ -1487,11 +1628,9 @@ if (hasVideoAccess) {
     bookingState.studentId = studentId;
     bookingState.userId = userId;
 
-    await fetchBookingEligibility(studentId, 'ja');
-    await fetchBookingEligibility(studentId, 'en');
-
-    await fetchUserBookings(userId, 'ja');
-    await fetchUserBookings(userId, 'en');
+    const currentLang = getCurrentLang();
+    await fetchBookingEligibility(studentId, currentLang);
+    await fetchUserBookings(userId, currentLang);
 
     // 🆕 Initialize lessons card on dashboard load
     initializeEnhancedLessonsCard();
@@ -2259,10 +2398,10 @@ function isWithin1Hour(scheduledAt) {
 
 // Render upcoming lessons card
 function renderUpcomingLessonsCard(lessons, lang) {  // ← ADD lang parameter
-    const card = document.getElementById(`${lang}-upcoming-lessons-card`);  // ← Use lang
+    const card = document.getElementById('upcoming-lessons-card');  // ← Use lang
     if (!card) return;
 
-    const container = document.getElementById(`${lang}-upcoming-lessons`);  // ← Use lang
+    const container = document.getElementById('upcoming-lessons');  // ← Use lang
     if (!container) return;
 
     // 🆕 FILTER: Hide lessons that ended >60 min ago
@@ -2319,16 +2458,14 @@ function toggleLessonsExpanded() {
     const lang = getCurrentLang();
 
     // Toggle both language versions
-    ['ja', 'en'].forEach(l => {
-        const moreSection = document.querySelector(`#${l}-upcoming-lessons .lessons-more`);
-        if (moreSection) {
-            if (lessonsCardState.expanded) {
-                moreSection.classList.add('expanded');
-            } else {
-                moreSection.classList.remove('expanded');
-            }
+    const moreSection = document.querySelector('#upcoming-lessons .lessons-more');
+    if (moreSection) {
+        if (lessonsCardState.expanded) {
+            moreSection.classList.add('expanded');
+        } else {
+            moreSection.classList.remove('expanded');
         }
-    });
+    }
 
     // Update button text
     const toggleBtn = document.querySelector('.toggle-lessons-btn');
@@ -2518,8 +2655,7 @@ function startCountdownUpdates() {
 // Initialize - call this after fetching bookings
 function initializeEnhancedLessonsCard() {
     // 🆕 Render for BOTH languages
-    renderUpcomingLessonsCard(bookingState.userBookings || [], 'ja');
-    renderUpcomingLessonsCard(bookingState.userBookings || [], 'en');
+    renderUpcomingLessonsCard(bookingState.userBookings || [], getCurrentLang());
 
     // Only start countdown if there are bookings
     if (bookingState.userBookings && bookingState.userBookings.length > 0) {
