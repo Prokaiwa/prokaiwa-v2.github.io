@@ -1485,9 +1485,9 @@ if (!day.classList.contains('disabled')) {
             calendarGrid.appendChild(day);
         } 
 
-        // SHOW NEXT MONTH'S AVAILABLE DATES
-        const totalCells = calendarGrid.children.length - 7;
-const remainingCells = 42 - totalCells; // 6 rows x 7 days = 42 total
+        // SHOW NEXT MONTH'S DATES (fill to complete the last row only)
+        const totalCells = calendarGrid.children.length - 7; // subtract header row
+const remainingCells = (7 - (totalCells % 7)) % 7; // only fill to end of current row
 
 for (let date = 1; date <= remainingCells; date++) {
     const nextMonthDate = new Date(year, monthIndex + 1, date);
@@ -1497,11 +1497,11 @@ for (let date = 1; date <= remainingCells; date++) {
     day.className = 'calendar-day other-month';
     day.textContent = date;
 
-    // Format date as YYYY-MM-DD
-    const nextMonth = monthIndex + 1; // JavaScript months are 0-indexed
-    const nextMonthFormatted = nextMonth === 12 ? 0 : nextMonth + 1;
-    const yearFormatted = nextMonth === 12 ? year + 1 : year;
-    day.dataset.date = `${yearFormatted}-${String(nextMonthFormatted + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+    // Format date as YYYY-MM-DD (FIX: correct month calculation)
+    const nextMonthIndex = monthIndex + 1; // 0-indexed JS month
+    const yearFormatted = nextMonthIndex > 11 ? year + 1 : year;
+    const monthForDate = (nextMonthIndex > 11 ? 0 : nextMonthIndex) + 1; // convert to 1-indexed
+    day.dataset.date = `${yearFormatted}-${String(monthForDate).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
 
     // Check if it's a weekend (Fri=5, Sat=6, Sun=0)
     const dayOfWeek = nextMonthDate.getDay();
