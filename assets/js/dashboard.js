@@ -1548,6 +1548,14 @@ for (let date = 1; date <= remainingCells; date++) {
     bookingState.selectedDate = dateStr;
     bookingState.selectedTime = null;
 
+    // Auto-navigate if clicked date is in a different month
+    const [clickedYear, clickedMonth] = dateStr.split('-').map(Number);
+    const viewMonth = bookingState.currentMonth.getMonth() + 1;
+    const viewYear = bookingState.currentMonth.getFullYear();
+    if (clickedMonth !== viewMonth || clickedYear !== viewYear) {
+        bookingState.currentMonth = new Date(clickedYear, clickedMonth - 1, 1);
+    }
+
     renderCalendar(lang);
 
     // TIMEZONE FIX: Parse date as local date
