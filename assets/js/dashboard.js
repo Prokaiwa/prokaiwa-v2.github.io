@@ -279,6 +279,183 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             en: { 'Super Beginner': 'Super Beginner', 'Beginner': 'Beginner', 'Intermediate': 'Intermediate', 'Advanced': 'Advanced' }
         };
 
+
+        // =============================================
+        // i18n DICTIONARY (Static HTML text)
+        // Matches data-i18n attributes in dashboard.html
+        // =============================================
+
+        const dashboardI18n = {
+            ja: {
+                // Loading
+                loadingText: '読み込み中...',
+                // Error
+                errorTitle: 'エラーが発生しました',
+                errorMessage: 'ページを読み込めませんでした。',
+                errorReload: '再読み込み',
+                errorLogin: 'ログインページへ',
+                // Welcome banner
+                welcomeDefault: 'おかえりなさい！',
+                welcomeSubtitle: '今日も英語学習、頑張りましょう！',
+                statStreakLabel: '日連続',
+                statTotalLabel: '練習回数',
+                statMonthLabel: '今月',
+                // Practice status (defaults before JS overwrites)
+                practiceChecking: '今日の練習状況を確認中...',
+                practiceLoading: 'データを読み込んでいます',
+                // Quick actions
+                actionLine: 'LINEで練習',
+                actionBook: 'レッスン予約',
+                actionResources: '学習教材',
+                actionContact: 'お問い合わせ',
+                // Cancellation banner
+                cancelTitle: 'サブスクリプションがキャンセルされました',
+                cancelMessage: 'アクセスは継続されます',
+                cancelDaysPrefix: '残り ',
+                cancelDaysSuffix: ' 日',
+                cancelReactivate: 'サブスクリプションを再開',
+                cancelContact: 'サポートに連絡',
+                // Card headings
+                headingSkills: 'スキル評価',
+                headingPhrase: '今日のフレーズ',
+                headingProgress: '今月の進捗',
+                headingStreak: '練習継続記録',
+                headingAchievements: '達成バッジ',
+                headingAccount: 'アカウント情報',
+                headingLessons: '予定レッスン',
+                headingBookingRules: '予約ルール',
+                headingResources: '学習教材',
+                headingUpgrade: 'ビデオレッスンを追加',
+                // Phrase of the Day card
+                phraseIntro: '今日はこのフレーズを使ってみましょう：',
+                // Progress card
+                progressDefault: '頑張りましょう！',
+                progressSub: '今月の目標に向かって',
+                progressPrefix: '今月 ',
+                progressSuffix: ' 回完了',
+                // Streak card
+                streakSuffix: '日連続！',
+                // Account card labels
+                accountName: '氏名',
+                accountEmail: 'メール',
+                accountLevel: 'レベル',
+                accountStatus: 'ステータス',
+                accountSettings: '設定',
+                accountChangePlan: 'プラン変更',
+                accountLogout: 'ログアウト',
+                // Booking rules card
+                rulesFreeTitle: '無料で変更OK：',
+                rulesFreeDesc: 'レッスン24時間前までならキャンセル・変更無料',
+                rulesNoRefundTitle: '返金なし：',
+                rulesNoRefundDesc: '24時間前を切るとクレジット返金不可',
+                rulesNoShowTitle: '無断欠席：',
+                rulesNoShowDesc: '連絡なしで欠席した場合もクレジット消費',
+                rulesMeetTitle: 'Meetリンク：',
+                rulesMeetDesc: 'レッスン24時間前から終了1時間後まで表示',
+                // Resources card
+                resConversation: '日常会話フレーズ集',
+                resBusiness: 'ビジネス英語基礎',
+                resYouTube: 'おすすめYouTubeチャンネル',
+                resListening: 'リスニング練習音声',
+                resComingSoon: '準備中',
+                resNote: '教材は順次追加予定です',
+                // Upgrade card
+                upgradeDesc: '講師と直接話して、さらに上達しませんか？',
+                upgradeCasual: 'カジュアルレッスン ¥3,000',
+                upgradeBusiness: 'ビジネスレッスン ¥5,000',
+            },
+            en: {
+                // Loading
+                loadingText: 'Loading your dashboard...',
+                // Error
+                errorTitle: 'Something went wrong',
+                errorMessage: 'Could not load the page.',
+                errorReload: 'Refresh',
+                errorLogin: 'Go to Login',
+                // Welcome banner
+                welcomeDefault: 'Welcome back!',
+                welcomeSubtitle: "Let's continue your English learning journey!",
+                statStreakLabel: 'Day Streak',
+                statTotalLabel: 'Total Sessions',
+                statMonthLabel: 'This Month',
+                // Practice status (defaults before JS overwrites)
+                practiceChecking: "Checking today's practice...",
+                practiceLoading: 'Loading data',
+                // Quick actions
+                actionLine: 'Practice on LINE',
+                actionBook: 'Book Lesson',
+                actionResources: 'Resources',
+                actionContact: 'Contact Us',
+                // Cancellation banner
+                cancelTitle: 'Subscription Cancelled',
+                cancelMessage: 'Your access continues',
+                cancelDaysPrefix: '',
+                cancelDaysSuffix: ' days remaining',
+                cancelReactivate: 'Reactivate Subscription',
+                cancelContact: 'Contact Support',
+                // Card headings
+                headingSkills: 'Skills Assessment',
+                headingPhrase: 'Phrase of the Day',
+                headingProgress: 'Monthly Progress',
+                headingStreak: 'Practice Streak',
+                headingAchievements: 'Achievements',
+                headingAccount: 'Account Info',
+                headingLessons: 'Upcoming Lessons',
+                headingBookingRules: 'Lesson Booking Rules',
+                headingResources: 'Learning Resources',
+                headingUpgrade: 'Add Video Lessons',
+                // Phrase of the Day card
+                phraseIntro: 'Try using this phrase today:',
+                // Progress card
+                progressDefault: "Let's go!",
+                progressSub: 'Working toward your goal',
+                progressPrefix: '',
+                progressSuffix: ' sessions this month',
+                // Streak card
+                streakSuffix: 'day streak!',
+                // Account card labels
+                accountName: 'Name',
+                accountEmail: 'Email',
+                accountLevel: 'Level',
+                accountStatus: 'Status',
+                accountSettings: 'Settings',
+                accountChangePlan: 'Change Plan',
+                accountLogout: 'Log Out',
+                // Booking rules card
+                rulesFreeTitle: 'Free changes:',
+                rulesFreeDesc: 'Cancel or reschedule >24h before lesson',
+                rulesNoRefundTitle: 'No refund:',
+                rulesNoRefundDesc: 'Changes made <24h before lesson',
+                rulesNoShowTitle: 'No-shows:',
+                rulesNoShowDesc: 'Credit is not refunded if you miss your lesson',
+                rulesMeetTitle: 'Meet link:',
+                rulesMeetDesc: 'Available 24h before until 1h after lesson',
+                // Resources card
+                resConversation: 'Common Conversation Phrases',
+                resBusiness: 'Business English Basics',
+                resYouTube: 'Recommended YouTube Channels',
+                resListening: 'Listening Practice Audio',
+                resComingSoon: 'Coming Soon',
+                resNote: 'More resources coming soon!',
+                // Upgrade card
+                upgradeDesc: 'Want to practice speaking with a teacher directly?',
+                upgradeCasual: 'Casual Lesson ¥3,000',
+                upgradeBusiness: 'Business Lesson ¥5,000',
+            }
+        };
+
+        function applyDashboardLanguage(lang) {
+            const strings = dashboardI18n[lang];
+            if (!strings) return;
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (strings[key] !== undefined) {
+                    el.textContent = strings[key];
+                }
+            });
+        }
+
         function showError(lang, message) {
             document.getElementById(`${lang}-dashboard-loading`).style.display = 'none';
             document.getElementById(`${lang}-dashboard-content`).style.display = 'none';
