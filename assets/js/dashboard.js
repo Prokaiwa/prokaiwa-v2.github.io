@@ -43,7 +43,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         const learningArchetypes = [
             {
                 code: 'perfect_master',
-                icon: '💎',
+                icon: 'fas fa-gem',
                 name_ja: 'パーフェクトマスター',
                 name_en: 'Perfect Master',
                 description_ja: '全スキル完璧！あなたは英語学習の頂点に立っています。素晴らしい努力の結晶です！',
@@ -55,7 +55,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             },
             {
                 code: 'advanced_achiever',
-                icon: '🏆',
+                icon: 'fas fa-trophy',
                 name_ja: '上級達成者',
                 name_en: 'Advanced Achiever',
                 description_ja: '高いレベルまで到達しています！この実力を維持しながら、さらなる高みを目指しましょう！',
@@ -68,7 +68,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             },
             {
                 code: 'natural_speaker',
-                icon: '🗣️',
+                icon: 'fas fa-comments',
                 name_ja: '天性のスピーカー',
                 name_en: 'Natural Speaker',
                 description_ja: '流暢さと発音が特に優れています。あなたは生まれながらのコミュニケーターですね！',
@@ -81,7 +81,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             },
             {
                 code: 'grammar_guru',
-                icon: '📚',
+                icon: 'fas fa-book',
                 name_ja: '文法マスター',
                 name_en: 'Grammar Guru',
                 description_ja: '文法と語彙力が強みです。分析的な学習スタイルが英語の構造理解を深めています！',
@@ -94,7 +94,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             },
             {
                 code: 'comprehension_champion',
-                icon: '👂',
+                icon: 'fas fa-headphones',
                 name_ja: '理解力の達人',
                 name_en: 'Comprehension Champion',
                 description_ja: '理解力が抜群です。聞き取りと文脈把握の才能が際立っています！',
@@ -105,7 +105,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             },
             {
                 code: 'rising_star',
-                icon: '⭐',
+                icon: 'fas fa-star',
                 name_ja: 'ライジングスター',
                 name_en: 'Rising Star',
                 description_ja: 'すべてのスキルが着実に成長中！この調子で頑張れば、必ず目標に到達できます！',
@@ -117,7 +117,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             },
             {
                 code: 'foundation_builder',
-                icon: '🏗️',
+                icon: 'fas fa-cubes',
                 name_ja: '基礎固め中',
                 name_en: 'Foundation Builder',
                 description_ja: '基礎をしっかり築いている段階です。この土台が将来の成長を支えます。着実に進みましょう！',
@@ -130,7 +130,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             },
             {
                 code: 'balanced_learner',
-                icon: '🎯',
+                icon: 'fas fa-bullseye',
                 name_ja: 'バランス型学習者',
                 name_en: 'Balanced Learner',
                 description_ja: 'すべてのスキルがバランスよく成長しています。この万能さは実践的なコミュニケーション力の証です！',
@@ -300,7 +300,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 statMonthLabel: '今月',
                 // Practice status (defaults before JS overwrites)
                 // Quick actions
-                actionLine: 'LINEで練習',
                 actionBook: 'レッスン予約',
                 actionResources: '学習教材',
                 actionContact: 'お問い合わせ',
@@ -355,7 +354,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 statMonthLabel: 'This Month',
                 // Practice status (defaults before JS overwrites)
                 // Quick actions
-                actionLine: 'Practice on LINE',
                 actionBook: 'Book Lesson',
                 actionResources: 'Resources',
                 actionContact: 'Contact Us',
@@ -646,7 +644,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     <span class="assessment-band">${assessment.band_level || '-'}</span>
                 </div>
                 <div class="learning-archetype">
-                    <div class="archetype-icon">${archetype.icon}</div>
+                    <div class="archetype-icon"><i class="${archetype.icon}"></i></div>
                     <div class="archetype-content">
                         <div class="archetype-name">${lang === 'ja' ? archetype.name_ja : archetype.name_en}</div>
                         <div class="archetype-description">${lang === 'ja' ? archetype.description_ja : archetype.description_en}</div>
@@ -779,15 +777,16 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 if (practicedToday) {
                     statusCard.classList.add('completed');
                     statusCard.innerHTML = `
-                        <span class="hero-practice-icon">✅</span>
+                        <span class="hero-practice-icon"><i class="fas fa-check-circle"></i></span>
                         <span>${lang === 'ja' ? '今日の練習完了！素晴らしい！' : "Today's practice complete! Great job!"}</span>
                     `;
                 } else {
                     statusCard.classList.remove('completed');
                     statusCard.innerHTML = `
-                        <a href="https://line.me/R/ti/p/@845irjbc" target="_blank" rel="noopener noreferrer">
-                            <span class="hero-practice-icon"><i class="fab fa-line"></i></span>
+                        <a href="https://line.me/R/ti/p/@845irjbc" target="_blank" rel="noopener noreferrer" class="hero-line-cta">
+                            <i class="fab fa-line"></i>
                             <span>${lang === 'ja' ? 'LINEで今日のプロンプトに答えましょう！' : "Head to LINE for today's prompt!"}</span>
+                            <i class="fas fa-arrow-right"></i>
                         </a>
                     `;
                 }
@@ -1195,11 +1194,17 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             const phrase = getDailyPhrase();
             const container = document.getElementById('hero-phrase');
             if (!container) return;
-            const label = lang === 'ja' ? '今日のフレーズ：' : "Today\'s phrase:";
+            const label = lang === 'ja' ? '今日のフレーズ' : "Today's phrase";
+            const example = lang === 'ja'
+                ? `${phrase.example_en}（${phrase.example_ja}）`
+                : phrase.example_en;
             container.innerHTML = `
-                <span class="hero-phrase-icon">💡</span>
-                <span class="hero-phrase-label">${label}</span>
-                <strong>${phrase.phrase}</strong>
+                <div class="hero-phrase-top">
+                    <i class="fas fa-lightbulb hero-phrase-icon"></i>
+                    <span class="hero-phrase-label">${label}:</span>
+                    <strong>${phrase.phrase}</strong>
+                </div>
+                <div class="hero-phrase-example">${example}</div>
             `;
         }
 
@@ -1436,7 +1441,11 @@ if (hasVideoAccess) {
                     updateProgressRing(lang, progressPercent);
 
                     document.getElementById('streak-count').textContent = stats.current;
-                    document.getElementById('streak-emoji').textContent = stats.current >= 7 ? '🔥' : stats.current >= 3 ? '🔥' : '💪';
+                    document.getElementById('streak-emoji').innerHTML = stats.current >= 7
+                        ? '<i class="fas fa-fire" style="color: #E74C3C;"></i>'
+                        : stats.current >= 3
+                            ? '<i class="fas fa-fire" style="color: #E67E22;"></i>'
+                            : '<i class="fas fa-fist-raised" style="color: var(--color-primary);"></i>';
                     renderStreakCalendar('streak-calendar', practiceDates, lang);
 
                     renderAchievements('achievements', stats, lang);
