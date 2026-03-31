@@ -436,6 +436,12 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 document.getElementById('addon-badge').style.display = 'inline-block';
             }
 
+            // Subscription state (for cancellation banner)
+            const isCancelled = profile.subscription_status === 'cancelled';
+            const dashboardExpiresAt = profile.dashboard_access_expires_at ? new Date(profile.dashboard_access_expires_at) : null;
+            const now = new Date();
+            const isExpired = dashboardExpiresAt && dashboardExpiresAt < now;
+
             // Cancellation banner text
             if (isCancelled && !isExpired && dashboardExpiresAt) {
                 const banner = document.getElementById('cancellation-banner');
