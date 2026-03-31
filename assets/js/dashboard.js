@@ -1126,17 +1126,21 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         };
 
         function getContextualGreeting(name, lang) {
-            const hour = new Date().getHours();
+            const now = new Date();
+            const hour = now.getHours();
             let timeKey;
             if (hour >= 5 && hour < 12) timeKey = 'morning';
             else if (hour >= 12 && hour < 18) timeKey = 'afternoon';
             else timeKey = 'evening';
 
+            // Day-based seed so greeting stays stable for the whole day
+            const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+
             const greetingList = heroGreetings[timeKey][lang];
-            const greeting = greetingList[Math.floor(Math.random() * greetingList.length)];
+            const greeting = greetingList[dayOfYear % greetingList.length];
 
             const phraseList = warmPhrases[lang];
-            const warmPhrase = phraseList[Math.floor(Math.random() * phraseList.length)];
+            const warmPhrase = phraseList[dayOfYear % phraseList.length];
 
             return {
                 greeting: greeting.replace('{name}', name),
@@ -1321,6 +1325,10 @@ if (hasVideoAccess) {
                 loadingDiv.style.display = 'none';
                 contentDiv.style.display = 'block';
 
+
+                // Apply language to all dynamic elements (ensures correct lang on load)
+                applyDashboardLanguage(lang);
+                refreshDynamicText(lang);
 
                 // Initialize booking widget
                 await initializeBookingWidget(profile.id, user.id);
