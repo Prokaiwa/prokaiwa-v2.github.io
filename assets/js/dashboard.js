@@ -317,17 +317,13 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 cancelContact: 'サポートに連絡',
                 // Card headings
                 headingSkills: 'スキル評価',
-                headingPhrase: '今日のフレーズ',
                 headingProgress: '今月の進捗',
                 headingStreak: '練習継続記録',
                 headingAchievements: '達成バッジ',
                 headingAccount: 'アカウント情報',
                 headingLessons: '予定レッスン',
-                headingBookingRules: '予約ルール',
-                headingResources: '学習教材',
                 headingUpgrade: 'ビデオレッスンを追加',
                 // Phrase of the Day card
-                phraseIntro: '今日はこのフレーズを使ってみましょう：',
                 // Progress card
                 progressDefault: '頑張りましょう！',
                 progressSub: '今月の目標に向かって',
@@ -344,21 +340,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 accountChangePlan: 'プラン変更',
                 accountLogout: 'ログアウト',
                 // Booking rules card
-                rulesFreeTitle: '無料で変更OK：',
-                rulesFreeDesc: 'レッスン24時間前までならキャンセル・変更無料',
-                rulesNoRefundTitle: '返金なし：',
-                rulesNoRefundDesc: '24時間前を切るとクレジット返金不可',
-                rulesNoShowTitle: '無断欠席：',
-                rulesNoShowDesc: '連絡なしで欠席した場合もクレジット消費',
-                rulesMeetTitle: 'Meetリンク：',
-                rulesMeetDesc: 'レッスン24時間前から終了1時間後まで表示',
                 // Resources card
-                resConversation: '日常会話フレーズ集',
-                resBusiness: 'ビジネス英語基礎',
-                resYouTube: 'おすすめYouTubeチャンネル',
-                resListening: 'リスニング練習音声',
-                resComingSoon: '準備中',
-                resNote: '教材は順次追加予定です',
                 // Upgrade card
                 upgradeDesc: '講師と直接話して、さらに上達しませんか？',
                 upgradeCasual: 'カジュアルレッスン ¥3,000',
@@ -396,17 +378,13 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 cancelContact: 'Contact Support',
                 // Card headings
                 headingSkills: 'Skills Assessment',
-                headingPhrase: 'Phrase of the Day',
                 headingProgress: 'Monthly Progress',
                 headingStreak: 'Practice Streak',
                 headingAchievements: 'Achievements',
                 headingAccount: 'Account Info',
                 headingLessons: 'Upcoming Lessons',
-                headingBookingRules: 'Lesson Booking Rules',
-                headingResources: 'Learning Resources',
                 headingUpgrade: 'Add Video Lessons',
                 // Phrase of the Day card
-                phraseIntro: 'Try using this phrase today:',
                 // Progress card
                 progressDefault: "Let's go!",
                 progressSub: 'Working toward your goal',
@@ -423,21 +401,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 accountChangePlan: 'Change Plan',
                 accountLogout: 'Log Out',
                 // Booking rules card
-                rulesFreeTitle: 'Free changes:',
-                rulesFreeDesc: 'Cancel or reschedule >24h before lesson',
-                rulesNoRefundTitle: 'No refund:',
-                rulesNoRefundDesc: 'Changes made <24h before lesson',
-                rulesNoShowTitle: 'No-shows:',
-                rulesNoShowDesc: 'Credit is not refunded if you miss your lesson',
-                rulesMeetTitle: 'Meet link:',
-                rulesMeetDesc: 'Available 24h before until 1h after lesson',
                 // Resources card
-                resConversation: 'Common Conversation Phrases',
-                resBusiness: 'Business English Basics',
-                resYouTube: 'Recommended YouTube Channels',
-                resListening: 'Listening Practice Audio',
-                resComingSoon: 'Coming Soon',
-                resNote: 'More resources coming soon!',
                 // Upgrade card
                 upgradeDesc: 'Want to practice speaking with a teacher directly?',
                 upgradeCasual: 'Casual Lesson ¥3,000',
@@ -568,8 +532,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             // Progress ring
             updateProgressRing(lang, progressPercent);
 
-            // Daily phrase
-            setDailyPhrase(lang);
 
             // Streak calendar
             renderStreakCalendar('streak-calendar', practiceDates, lang);
@@ -1152,14 +1114,9 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             }
         }
 
-        function setDailyPhrase(lang) {
+        function getDailyPhrase() {
             const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-            const phrase = dailyPhrases[dayOfYear % dailyPhrases.length];
-
-            document.getElementById('daily-phrase').textContent = phrase.phrase;
-            document.getElementById('phrase-example').innerHTML = lang === 'ja'
-                ? `例：${phrase.example_en}<br>（${phrase.example_ja}）`
-                : `Example: ${phrase.example_en}`;
+            return dailyPhrases[dayOfYear % dailyPhrases.length];
         }
 
         // =============================================
@@ -1395,7 +1352,6 @@ if (hasVideoAccess) {
 
                     renderAchievements('achievements', stats, lang);
 
-                    setDailyPhrase(lang);
 
                     renderSkillsChart('skills-assessment', assessment, lang);
 
