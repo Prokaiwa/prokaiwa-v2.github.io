@@ -1014,22 +1014,95 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             }
         }
 
+        function getAchievementProgress(achievement, stats) {
+            if (achievement.condition(stats)) return { earned: true, progress: 1, current: 0, target: 0 };
+            
+            switch (achievement.code) {
+                case 'first_session': return { earned: false, progress: Math.min(stats.total / 1, 0.99), current: stats.total, target: 1 };
+                case 'streak_3': return { earned: false, progress: Math.min(stats.current / 3, 0.99), current: stats.current, target: 3 };
+                case 'weekend_warrior': {
+                    const dates = stats.practiceDates || [];
+                    let sat = false, sun = false;
+                    for (const d of dates) { const day = new Date(d).getDay(); if (day === 6) sat = true; if (day === 0) sun = true; }
+                    const count = (sat ? 1 : 0) + (sun ? 1 : 0);
+                    return { earned: false, progress: count / 2, current: count, target: 2 };
+                }
+                case 'streak_7': return { earned: false, progress: Math.min(stats.current / 7, 0.99), current: stats.current, target: 7 };
+                case 'sessions_10': return { earned: false, progress: Math.min(stats.total / 10, 0.99), current: stats.total, target: 10 };
+                case 'consistency_champion': {
+                    const dates = stats.practiceDates || [];
+                    const months = {};
+                    for (const d of dates) { const ym = d.substring(0, 7); months[ym] = (months[ym] || 0) + 1; }
+                    const best = Math.max(0, ...Object.values(months));
+                    return { earned: false, progress: Math.min(best / 20, 0.99), current: best, target: 20 };
+                }
+                case 'streak_30': return { earned: false, progress: Math.min(stats.current / 30, 0.99), current: stats.current, target: 30 };
+                case 'golden_milestone': return { earned: false, progress: Math.min(stats.total / 50, 0.99), current: stats.total, target: 50 };
+                case 'sessions_100': return { earned: false, progress: Math.min(stats.total / 100, 0.99), current: stats.total, target: 100 };
+                default: return { earned: false, progress: 0, current: 0, target: 0 };
+            }
+        }
+
         function renderAchievements(containerId, stats, lang) {
             const container = document.getElementById(containerId);
-            container.innerHTML = '';
+            if (!container) return;
 
-            achievements.forEach(achievement => {
-                const earned = achievement.condition(stats);
-                const div = document.createElement('div');
-                div.className = `achievement${earned ? '' : ' locked'}`;
-                div.innerHTML = `
-                    <div class="achievement-icon ${earned ? 'earned' : 'locked'}">
-                        <i class="fas ${achievement.icon}"></i>
+            let earnedCount = 0;
+            let nextBadge = null;
+            let nextProgress = null;
+
+            for (const achievement of achievements) {
+                const prog = getAchievementProgress(achievement, stats);
+                if (prog.earned) {
+                    earnedCount++;
+                } else if (!nextBadge) {
+                    nextBadge = achievement;
+                    nextProgress = prog;
+                }
+            }
+
+            const totalBadges = achievements.length;
+            const earnedLabel = lang === 'ja' ? '獲得済み' : 'earned';
+
+            let nextHTML = '';
+            if (nextBadge) {
+                const badgeName = lang === 'ja' ? nextBadge.name_ja : nextBadge.name_en;
+                const progressPct = Math.round(nextProgress.progress * 100);
+                const nextLabel = lang === 'ja' ? '次のバッジ' : 'Next';
+                nextHTML = `
+                    <div class="teaser-next">
+                        <div class="teaser-next-header">
+                            <span class="teaser-next-label">${nextLabel}:</span>
+                            <span class="teaser-next-name">
+                                <i class="${nextBadge.icon}"></i> ${badgeName}
+                            </span>
+                            <span class="teaser-next-count">${nextProgress.current}/${nextProgress.target}</span>
+                        </div>
+                        <div class="teaser-progress-bar">
+                            <div class="teaser-progress-fill" style="width: ${progressPct}%"></div>
+                        </div>
                     </div>
-                    <span class="achievement-name">${lang === 'ja' ? achievement.name_ja : achievement.name_en}</span>
                 `;
-                container.appendChild(div);
-            });
+            } else {
+                const allDone = lang === 'ja' ? '全バッジ獲得済み！🎉' : 'All badges earned! 🎉';
+                nextHTML = `<div class="teaser-all-done">${allDone}</div>`;
+            }
+
+            const viewAllText = lang === 'ja' ? 'すべてのバッジを見る' : 'View All Badges';
+
+            container.innerHTML = `
+                <div class="achievement-teaser">
+                    <div class="teaser-earned">
+                        <div class="teaser-earned-icon"><i class="fas fa-trophy"></i></div>
+                        <div class="teaser-earned-count">${earnedCount}<span class="teaser-earned-total">/${totalBadges}</span></div>
+                        <div class="teaser-earned-label">${earnedLabel}</div>
+                    </div>
+                    ${nextHTML}
+                    <a href="achievements/" class="teaser-view-all">
+                        ${viewAllText} <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            `;
         }
 
         function updateProgressRing(lang, percentage) {
