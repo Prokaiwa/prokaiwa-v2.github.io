@@ -1566,6 +1566,7 @@ if (hasVideoAccess) {
                             <li>❌ <strong>${lang === 'ja' ? '24時間前を切ると' : '<24 hours before'}</strong>${lang === 'ja' ? 'クレジットの返金なし' : ': No credit refund'}</li>
                             <li>❌ <strong>${lang === 'ja' ? '無断欠席の場合' : 'No-shows'}</strong>${lang === 'ja' ? 'もクレジットは消費されます' : ': Credit is not refunded'}</li>
                             <li>⏰ <strong>${lang === 'ja' ? '準備：' : 'Preparation:'}</strong>${lang === 'ja' ? 'レッスン5分前までに準備し、カメラ・マイクをテストしてください' : ' Please be ready 5 minutes early and test your camera/microphone'}</li>
+                            <li>📹 <strong>${lang === 'ja' ? 'Meetリンク：' : 'Meet link:'}</strong>${lang === 'ja' ? ' レッスン24時間前から終了1時間後まで表示されます' : ' Available from 24h before until 1h after your lesson'}</li>
                         </ul>
                     </div>
                 </div>
