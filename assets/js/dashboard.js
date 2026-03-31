@@ -315,7 +315,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 headingProgress: '今月の進捗',
                 headingStreak: '練習継続記録',
                 headingAchievements: '達成バッジ',
-                headingAccount: 'アカウント情報',
                 headingLessons: '予定レッスン',
                 headingUpgrade: 'ビデオレッスンを追加',
                 // Phrase of the Day card
@@ -327,11 +326,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 // Streak card
                 streakSuffix: '日連続！',
                 // Account card labels
-                accountName: '氏名',
-                accountEmail: 'メール',
-                accountLevel: 'レベル',
-                accountStatus: 'ステータス',
-                accountChangePlan: 'プラン変更',
                 // Booking rules card
                 // Resources card
                 // Upgrade card
@@ -369,7 +363,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 headingProgress: 'Monthly Progress',
                 headingStreak: 'Practice Streak',
                 headingAchievements: 'Achievements',
-                headingAccount: 'Account Info',
                 headingLessons: 'Upcoming Lessons',
                 headingUpgrade: 'Add Video Lessons',
                 // Phrase of the Day card
@@ -381,11 +374,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 // Streak card
                 streakSuffix: 'day streak!',
                 // Account card labels
-                accountName: 'Name',
-                accountEmail: 'Email',
-                accountLevel: 'Level',
-                accountStatus: 'Status',
-                accountChangePlan: 'Change Plan',
                 // Booking rules card
                 // Resources card
                 // Upgrade card
@@ -438,46 +426,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             document.getElementById('welcome-name').textContent = greetingData.greeting;
             document.getElementById('welcome-subtitle').textContent = greetingData.subtitle;
 
-            // Profile level
-            document.getElementById('profile-level').textContent = levelNames[lang][profile.level] || profile.level;
-
-            // Profile status
-            const statusEl = document.getElementById('profile-status');
-            const isCancelled = profile.subscription_status === 'cancelled';
-            const dashboardExpiresAt = profile.dashboard_access_expires_at ? new Date(profile.dashboard_access_expires_at) : null;
-            const now = new Date();
-            const isExpired = dashboardExpiresAt && dashboardExpiresAt < now;
-
-            // Reset status styles
-            statusEl.style.cssText = '';
-
-            let statusText = '';
-            if (isExpired) {
-                statusText = lang === 'ja' ? '期限切れ' : 'Expired';
-                statusEl.style.color = '#dc3545';
-                statusEl.style.fontWeight = '600';
-            } else if (isCancelled && dashboardExpiresAt) {
-                const expiryDate = dashboardExpiresAt.toLocaleDateString(
-                    lang === 'ja' ? 'ja-JP' : 'en-US',
-                    { year: 'numeric', month: 'long', day: 'numeric' }
-                );
-                statusText = lang === 'ja' 
-                    ? `キャンセル済 - ${expiryDate}まで利用可能`
-                    : `Cancelled - Access Until ${expiryDate}`;
-                statusEl.style.color = '#856404';
-                statusEl.style.fontWeight = '600';
-                statusEl.style.backgroundColor = '#fff3cd';
-                statusEl.style.padding = '0.5rem 1rem';
-                statusEl.style.borderRadius = '6px';
-                statusEl.style.display = 'inline-block';
-            } else if (profile.subscription_status === 'trialing') {
-                statusText = lang === 'ja' ? '無料トライアル中' : 'Free Trial';
-            } else if (profile.subscription_status === 'active') {
-                statusText = lang === 'ja' ? '有効' : 'Active';
-            } else {
-                statusText = lang === 'ja' ? '支払い待ち' : 'Payment Pending';
-            }
-            statusEl.textContent = statusText;
 
             // Plan badge
             const planBadge = document.getElementById('plan-badge');
@@ -1315,96 +1263,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     document.getElementById('stat-total').textContent = stats.total;
                     document.getElementById('stat-month').textContent = stats.thisMonth;
 
-document.getElementById('profile-name').textContent = profile.name;
-                    document.getElementById('profile-email').textContent = profile.email;
-                    document.getElementById('profile-level').textContent = levelNames[lang][profile.level] || profile.level;
 
-                    // Get status element
-                    const statusEl = document.getElementById('profile-status');
-
-                    // Update status text based on subscription state
-                    let statusText = '';
-                    if (isExpired) {
-                        statusText = lang === 'ja' ? '期限切れ' : 'Expired';
-                        statusEl.style.color = '#dc3545';
-                        statusEl.style.fontWeight = '600';
-                    } else if (isCancelled && dashboardExpiresAt) {
-                        const expiryDate = dashboardExpiresAt.toLocaleDateString(
-                            lang === 'ja' ? 'ja-JP' : 'en-US',
-                            { year: 'numeric', month: 'long', day: 'numeric' }
-                        );
-                        statusText = lang === 'ja' 
-                            ? `キャンセル済 - ${expiryDate}まで利用可能`
-                            : `Cancelled - Access Until ${expiryDate}`;
-
-                        // Yellow styling for cancelled status
-                        statusEl.style.color = '#856404';
-                        statusEl.style.fontWeight = '600';
-                        statusEl.style.backgroundColor = '#fff3cd';
-                        statusEl.style.padding = '0.5rem 1rem';
-                        statusEl.style.borderRadius = '6px';
-                        statusEl.style.display = 'inline-block';
-                    } else if (profile.subscription_status === 'trialing') {
-                        statusText = lang === 'ja' ? '無料トライアル中' : 'Free Trial';
-                    } else if (profile.subscription_status === 'active') {
-                        statusText = lang === 'ja' ? '有効' : 'Active';
-                    } else {
-                        statusText = lang === 'ja' ? '支払い待ち' : 'Payment Pending';
-                    }
-
-                    statusEl.textContent = statusText;
-
-                    // Update plan badge
-                    const planBadge = document.getElementById('plan-badge');
-                    planBadge.textContent = planNames[lang][profile.plan] || profile.plan;
-                    if (profile.payment_status !== 'paid') planBadge.classList.add('pending');
-                    if (isExpired) planBadge.classList.add('expired');
-                    if (hasVideoAddon) planBadge.classList.add('has-addon');
-
-                    // Show cancellation banner if applicable
-                    if (isCancelled && !isExpired && dashboardExpiresAt) {
-                        const banner = document.getElementById('cancellation-banner');
-                        const titleEl = document.getElementById('cancellation-title');
-                        const messageEl = document.getElementById('cancellation-message');
-                        const daysEl = document.getElementById('days-remaining');
-                        const timerEl = document.getElementById('countdown-timer');
-
-                        if (banner) {
-                            const daysRemaining = Math.ceil((dashboardExpiresAt - now) / (1000 * 60 * 60 * 24));
-
-                            if (l === 'ja') {
-                                titleEl.textContent = 'サブスクリプションがキャンセルされました';
-                                messageEl.textContent = `${dashboardExpiresAt.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}までアクセス可能です`;
-                            } else {
-                                titleEl.textContent = 'Subscription Cancelled';
-                                messageEl.textContent = `Your access continues until ${dashboardExpiresAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
-                            }
-
-                            daysEl.textContent = daysRemaining;
-                            timerEl.style.display = daysRemaining <= 0 ? 'none' : 'inline-flex';
-                            banner.style.display = 'block';
-                        }
-                    } else if (isExpired) {
-                        const banner = document.getElementById('cancellation-banner');
-                        const titleEl = document.getElementById('cancellation-title');
-                        const messageEl = document.getElementById('cancellation-message');
-                        const timerEl = document.getElementById('countdown-timer');
-
-                        if (banner) {
-                            banner.classList.add('expired');
-
-                            if (l === 'ja') {
-                                titleEl.textContent = 'アクセス期限が切れました';
-                                messageEl.textContent = '再度サブスクリプションを開始するには、下のボタンをクリックしてください';
-                            } else {
-                                titleEl.textContent = 'Access Expired';
-                                messageEl.textContent = 'Reactivate your subscription to continue learning';
-                            }
-
-                            timerEl.style.display = 'none';
-                            banner.style.display = 'block';
-                        }
-                    }
 
                     if (hasVideoAddon) {
                         document.getElementById('addon-badge').style.display = 'inline-block';
