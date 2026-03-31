@@ -295,14 +295,10 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 errorReload: '再読み込み',
                 errorLogin: 'ログインページへ',
                 // Welcome banner
-                welcomeDefault: 'おかえりなさい！',
-                welcomeSubtitle: '今日も英語学習、頑張りましょう！',
                 statStreakLabel: '日連続',
                 statTotalLabel: '練習回数',
                 statMonthLabel: '今月',
                 // Practice status (defaults before JS overwrites)
-                practiceChecking: '今日の練習状況を確認中...',
-                practiceLoading: 'データを読み込んでいます',
                 // Quick actions
                 actionLine: 'LINEで練習',
                 actionBook: 'レッスン予約',
@@ -336,9 +332,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 accountEmail: 'メール',
                 accountLevel: 'レベル',
                 accountStatus: 'ステータス',
-                accountSettings: '設定',
                 accountChangePlan: 'プラン変更',
-                accountLogout: 'ログアウト',
                 // Booking rules card
                 // Resources card
                 // Upgrade card
@@ -356,14 +350,10 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 errorReload: 'Refresh',
                 errorLogin: 'Go to Login',
                 // Welcome banner
-                welcomeDefault: 'Welcome back!',
-                welcomeSubtitle: "Let's continue your English learning journey!",
                 statStreakLabel: 'Day Streak',
                 statTotalLabel: 'Total Sessions',
                 statMonthLabel: 'This Month',
                 // Practice status (defaults before JS overwrites)
-                practiceChecking: "Checking today's practice...",
-                practiceLoading: 'Loading data',
                 // Quick actions
                 actionLine: 'Practice on LINE',
                 actionBook: 'Book Lesson',
@@ -397,9 +387,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 accountEmail: 'Email',
                 accountLevel: 'Level',
                 accountStatus: 'Status',
-                accountSettings: 'Settings',
                 accountChangePlan: 'Change Plan',
-                accountLogout: 'Log Out',
                 // Booking rules card
                 // Resources card
                 // Upgrade card
@@ -446,11 +434,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             if (!dashboardState.loaded) return;
             const { profile, stats, assessment, practiceDates, progressPercent, hasVideoAccess, hasVideoAddon } = dashboardState;
 
-            // Welcome text
-            const welcomeText = lang === 'ja' 
-                ? `${profile.given_name_romaji || profile.name}さん、おかえりなさい！`
-                : `Welcome back, ${profile.given_name_romaji || profile.name}!`;
-            document.getElementById('welcome-name').textContent = welcomeText;
+            // Welcome text (contextual greeting)
+            const heroName = profile.given_name_romaji || profile.name;
+            const greetingData = getContextualGreeting(heroName, lang);
+            document.getElementById('welcome-name').textContent = greetingData.greeting;
+            document.getElementById('welcome-subtitle').textContent = greetingData.subtitle;
 
             // Profile level
             document.getElementById('profile-level').textContent = levelNames[lang][profile.level] || profile.level;
@@ -544,6 +532,9 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
             // Practice status
             checkTodaysPractice(dashboardState.userId, lang);
+
+            // Hero phrase
+            renderHeroPhrase(lang);
 
             // Upcoming lessons
             renderUpcomingLessonsCard(bookingState.userBookings || [], lang);
@@ -788,16 +779,16 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 if (practicedToday) {
                     statusCard.classList.add('completed');
                     statusCard.innerHTML = `
-                        <div class="practice-status-icon">✅</div>
-                        <h2>${lang === 'ja' ? '今日の練習完了！' : 'Today\'s Practice Complete!'}</h2>
-                        <p>${lang === 'ja' ? '素晴らしい！今日もよく頑張りました！' : 'Great job! You practiced today!'}</p>
+                        <span class="hero-practice-icon">✅</span>
+                        <span>${lang === 'ja' ? '今日の練習完了！素晴らしい！' : "Today's practice complete! Great job!"}</span>
                     `;
                 } else {
                     statusCard.classList.remove('completed');
                     statusCard.innerHTML = `
-                        <div class="practice-status-icon"><i class="fab fa-line" style="color: white;"></i></div>
-                        <h2>${lang === 'ja' ? 'まだ練習していません' : 'No Practice Yet Today'}</h2>
-                        <p>${lang === 'ja' ? 'LINEで今日のプロンプトに答えましょう！' : 'Head to LINE to respond to today\'s prompt!'}</p>
+                        <a href="https://line.me/R/ti/p/@845irjbc" target="_blank" rel="noopener noreferrer">
+                            <span class="hero-practice-icon"><i class="fab fa-line"></i></span>
+                            <span>${lang === 'ja' ? 'LINEで今日のプロンプトに答えましょう！' : "Head to LINE for today's prompt!"}</span>
+                        </a>
                     `;
                 }
 
@@ -1120,6 +1111,101 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         }
 
         // =============================================
+        // CONTEXTUAL GREETING SYSTEM
+        // =============================================
+
+        const heroGreetings = {
+            morning: {
+                ja: [
+                    'おはようございます、{name}さん！',
+                    '{name}さん、おはよう！',
+                    '{name}さん、おはようございます！',
+                ],
+                en: [
+                    'Good morning, {name}!',
+                    'Morning, {name}!',
+                    'Rise and shine, {name}!',
+                ]
+            },
+            afternoon: {
+                ja: [
+                    'こんにちは、{name}さん！',
+                    '{name}さん、こんにちは！',
+                    'お疲れさまです、{name}さん！',
+                ],
+                en: [
+                    'Good afternoon, {name}!',
+                    'Hey there, {name}!',
+                    'Hi, {name}!',
+                ]
+            },
+            evening: {
+                ja: [
+                    'こんばんは、{name}さん！',
+                    '{name}さん、こんばんは！',
+                    'お疲れさまです、{name}さん！',
+                ],
+                en: [
+                    'Good evening, {name}!',
+                    'Evening, {name}!',
+                    'Welcome back, {name}!',
+                ]
+            }
+        };
+
+        const warmPhrases = {
+            ja: [
+                '今日も英語学習、頑張りましょう！',
+                '一緒に練習しましょう！',
+                '今日も英語を楽しみましょう！',
+                'この調子で頑張りましょう！',
+                '今日はどんな練習をしましょうか？',
+                '毎日の積み重ねが大切です！',
+            ],
+            en: [
+                "Let's keep the momentum going!",
+                'Ready to practice?',
+                'Nice to see you again!',
+                "Let's make today count!",
+                'Every day counts — keep it up!',
+                "Let's continue your journey!",
+            ]
+        };
+
+        function getContextualGreeting(name, lang) {
+            const hour = new Date().getHours();
+            let timeKey;
+            if (hour >= 5 && hour < 12) timeKey = 'morning';
+            else if (hour >= 12 && hour < 18) timeKey = 'afternoon';
+            else timeKey = 'evening';
+
+            const greetingList = heroGreetings[timeKey][lang];
+            const greeting = greetingList[Math.floor(Math.random() * greetingList.length)];
+
+            const phraseList = warmPhrases[lang];
+            const warmPhrase = phraseList[Math.floor(Math.random() * phraseList.length)];
+
+            return {
+                greeting: greeting.replace('{name}', name),
+                subtitle: warmPhrase
+            };
+        }
+
+        function renderHeroPhrase(lang) {
+            const phrase = getDailyPhrase();
+            const container = document.getElementById('hero-phrase');
+            if (!container) return;
+            const label = lang === 'ja' ? '今日のフレーズ：' : "Today\'s phrase:";
+            container.innerHTML = `
+                <span class="hero-phrase-icon">💡</span>
+                <span class="hero-phrase-label">${label}</span>
+                <strong>${phrase.phrase}</strong>
+            `;
+        }
+
+
+
+        // =============================================
         // MAIN DASHBOARD LOADER
         // =============================================
 
@@ -1215,10 +1301,10 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
     const dashboardExpiresAt = profile.dashboard_access_expires_at ? new Date(profile.dashboard_access_expires_at) : null;
     const now = new Date();
     const isExpired = dashboardExpiresAt && dashboardExpiresAt < now;
-                    const welcomeText = lang === 'ja' 
-                        ? `${profile.given_name_romaji || profile.name}さん、おかえりなさい！`
-                        : `Welcome back, ${profile.given_name_romaji || profile.name}!`;
-                    document.getElementById('welcome-name').textContent = welcomeText;
+                    const heroName = profile.given_name_romaji || profile.name;
+                    const greetingData = getContextualGreeting(heroName, lang);
+                    document.getElementById('welcome-name').textContent = greetingData.greeting;
+                    document.getElementById('welcome-subtitle').textContent = greetingData.subtitle;
 
                     document.getElementById('stat-streak').textContent = stats.current;
                     document.getElementById('stat-total').textContent = stats.total;
@@ -1318,6 +1404,9 @@ document.getElementById('profile-name').textContent = profile.name;
                     if (hasVideoAddon) {
                         document.getElementById('addon-badge').style.display = 'inline-block';
                     }
+
+                    // Render daily phrase in hero
+                    renderHeroPhrase(lang);
 
                     const bookLessonBtn = document.getElementById('book-lesson-btn');
 const upcomingCard = document.getElementById('upcoming-lessons-card');

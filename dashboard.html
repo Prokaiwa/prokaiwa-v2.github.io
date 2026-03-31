@@ -63,33 +63,52 @@
                 <!-- Dashboard Content -->
                 <div id="dashboard-content" style="display: none;">
                     
-                    <!-- Welcome Banner -->
-                    <div class="welcome-banner">
-                        <div>
-                            <h1 id="welcome-name">おかえりなさい！</h1>
-                            <p data-i18n="welcomeSubtitle">今日も英語学習、頑張りましょう！</p>
+                    <!-- Dashboard Hero -->
+                    <div class="dashboard-hero">
+                        <div class="hero-top">
+                            <div class="hero-greeting">
+                                <h1 id="welcome-name">おかえりなさい！</h1>
+                                <p id="welcome-subtitle" class="hero-subtitle">今日も英語学習、頑張りましょう！</p>
+                                <div class="hero-badges">
+                                    <span class="plan-badge" id="plan-badge">プランA</span>
+                                    <span class="addon-badge" id="addon-badge" style="display: none;" data-i18n="addonVideo">+ ビデオ</span>
+                                </div>
+                            </div>
+                            <div class="hero-utility">
+                                <a href="account-settings.html" class="hero-utility-btn" title="Settings">
+                                    <i class="fas fa-cog"></i>
+                                </a>
+                                <button id="logout-btn" class="hero-utility-btn" title="Logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="welcome-stats">
-                            <div class="welcome-stat">
-                                <span class="welcome-stat-value" id="stat-streak">0</span>
-                                <span class="welcome-stat-label" data-i18n="statStreakLabel">日連続</span>
-                            </div>
-                            <div class="welcome-stat">
-                                <span class="welcome-stat-value" id="stat-total">0</span>
-                                <span class="welcome-stat-label" data-i18n="statTotalLabel">練習回数</span>
-                            </div>
-                            <div class="welcome-stat">
-                                <span class="welcome-stat-value" id="stat-month">0</span>
-                                <span class="welcome-stat-label" data-i18n="statMonthLabel">今月</span>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Practice Status Card -->
-                    <div class="practice-status-card" id="practice-status">
-                        <div class="practice-status-icon">⏳</div>
-                        <h2 data-i18n="practiceChecking">今日の練習状況を確認中...</h2>
-                        <p data-i18n="practiceLoading">データを読み込んでいます</p>
+                        <div class="hero-stats">
+                            <div class="hero-stat">
+                                <i class="fas fa-fire"></i>
+                                <span class="hero-stat-value" id="stat-streak">0</span>
+                                <span class="hero-stat-label" data-i18n="statStreakLabel">日連続</span>
+                            </div>
+                            <div class="hero-stat">
+                                <i class="fas fa-check-circle"></i>
+                                <span class="hero-stat-value" id="stat-total">0</span>
+                                <span class="hero-stat-label" data-i18n="statTotalLabel">練習回数</span>
+                            </div>
+                            <div class="hero-stat">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span class="hero-stat-value" id="stat-month">0</span>
+                                <span class="hero-stat-label" data-i18n="statMonthLabel">今月</span>
+                            </div>
+                        </div>
+
+                        <div class="hero-bottom">
+                            <div class="hero-practice" id="practice-status">
+                                <span class="hero-practice-icon">⏳</span>
+                                <span>確認中...</span>
+                            </div>
+                            <div class="hero-phrase" id="hero-phrase"></div>
+                        </div>
                     </div>
 
                     <!-- Quick Actions -->
@@ -191,22 +210,15 @@
                         <!-- Account Info -->
                         <div class="dashboard-card card-account">
                             <h3><i class="fas fa-user-circle"></i><span data-i18n="headingAccount">アカウント情報</span></h3>
-                            <div id="plan-badges">
-                                <span class="plan-badge" id="plan-badge">プランA</span>
-                                <span class="addon-badge" id="addon-badge" style="display: none;" data-i18n="addonVideo">+ ビデオ</span>
-                            </div>
+
                             <ul class="account-details">
                                 <li><strong data-i18n="accountName">氏名</strong><span id="profile-name">-</span></li>
                                 <li><strong data-i18n="accountEmail">メール</strong><span id="profile-email">-</span></li>
                                 <li><strong data-i18n="accountLevel">レベル</strong><span id="profile-level">-</span></li>
                                 <li><strong data-i18n="accountStatus">ステータス</strong><span id="profile-status">-</span></li>
                             </ul>
-                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                <a href="account-settings.html" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
-                                    <i class="fas fa-cog"></i> <span data-i18n="accountSettings">設定</span>
-                                </a>
+                            <div style="margin-top: 1rem;">
                                 <a href="contact.html?subject=plan-change" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;" data-i18n="accountChangePlan">プラン変更</a>
-                                <button id="logout-btn" class="cta-button cta-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;" data-i18n="accountLogout">ログアウト</button>
                             </div>
                         </div>
 

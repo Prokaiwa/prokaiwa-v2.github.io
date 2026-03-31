@@ -41,89 +41,7 @@
     .dashboard-error p {
       margin-bottom: 1.5rem;
       color: var(--color-text-light);
-    }
-
-    .welcome-banner {
-      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-      color: white;
-      padding: 2rem;
-      border-radius: var(--border-radius);
-      margin-bottom: 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .welcome-banner h1 {
-      font-size: 1.75rem;
-      margin: 0 0 0.5rem 0;
-      color: white;
-    }
-    .welcome-banner p {
-      margin: 0;
-      opacity: 0.9;
-    }
-    .welcome-stats {
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
-    .welcome-stat {
-      text-align: center;
-    }
-    .welcome-stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      display: block;
-    }
-    .welcome-stat-label {
-      font-size: 0.85rem;
-      opacity: 0.9;
-    }
-
-    .practice-status-card {
-      background: linear-gradient(135deg, #28a745 0%, #20863d 100%);
-      color: white;
-      padding: 1rem 1.5rem;
-      border-radius: var(--border-radius);
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-    .practice-status-card.completed {
-      background: linear-gradient(135deg, var(--color-gold) 0%, #b8860b 100%);
-    }
-    .practice-status-card h2 {
-      color: white;
-      margin: 0 0 0.25rem 0;
-      font-size: 1.1rem;
-    }
-    .practice-status-card p {
-      margin: 0;
-      opacity: 0.95;
-      font-size: 0.9rem;
-    }
-    .practice-status-icon {
-      font-size: 2rem;
-      margin-bottom: 0.25rem;
-    }
-
-    @media (max-width: 768px) {
-      .practice-status-card {
-        padding: 0.75rem 1.25rem;
-        margin-bottom: 1.5rem;
-      }
-      .practice-status-card h2 {
-        font-size: 1rem;
-      }
-      .practice-status-card p {
-        font-size: 0.85rem;
-      }
-      .practice-status-icon {
-        font-size: 1.5rem;
-        margin-bottom: 0.2rem;
-      }
-    }
+    }    @media (max-width: 768px) {    }
 
     .quick-actions {
       display: grid;
@@ -740,30 +658,7 @@
       }
     }
 
-    @media (max-width: 768px) {
-      .welcome-banner {
-        flex-direction: column;
-        text-align: center;
-        padding: 1.25rem 1.5rem;
-      }      .welcome-banner h1 {
-        font-size: 1.4rem;
-        margin-bottom: 0.25rem;
-      }
-      .welcome-banner p {
-        font-size: 0.9rem;
-        margin-bottom: 0.75rem;
-      }
-      .welcome-stats {
-        justify-content: center;
-        gap: 1.5rem;
-      }
-      .welcome-stat-value {
-        font-size: 1.5rem;
-      }
-      .welcome-stat-label {
-        font-size: 0.75rem;
-      }
-      .quick-actions {
+    @media (max-width: 768px) {      .quick-actions {
         grid-template-columns: repeat(2, 1fr);
       }
       .dashboard-grid {
@@ -794,13 +689,7 @@
     @media (prefers-color-scheme: dark) {
       .tip-box {
         background-color: var(--color-card-bg);
-      }      .practice-status-card {
-        background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
-      }
-      .practice-status-card.completed {
-        background: linear-gradient(135deg, #b8860b 0%, #8b6914 100%);
-      }
-      .learning-archetype {
+      }      .learning-archetype {
         background: linear-gradient(135deg, var(--color-card-bg) 0%, rgba(0, 168, 168, 0.1) 100%);
         border-left-color: var(--color-primary);
       }
@@ -1836,5 +1725,251 @@
 
     .booking-policy-notice strong {
         color: #64B5F6;
+    }
+}
+
+/* ============================================================
+   DASHBOARD HERO
+   ============================================================ */
+
+.dashboard-hero {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Gradient mesh overlay (matches homepage) */
+.dashboard-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 400px 300px at 10% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 300px 200px at 90% 60%, rgba(212, 160, 23, 0.1) 0%, transparent 70%),
+        radial-gradient(ellipse 250px 200px at 50% 90%, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.dashboard-hero > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Hero Top Row: Greeting + Utility */
+.hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.hero-greeting h1 {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem 0;
+    color: white;
+    font-weight: 700;
+}
+
+.hero-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.85;
+    margin: 0 0 0.5rem 0;
+}
+
+.hero-badges {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.hero-badges .plan-badge {
+    margin-bottom: 0;
+}
+
+/* Utility Buttons (Settings, Logout) */
+.hero-utility {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.hero-utility-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.hero-utility-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.1);
+}
+
+/* Stats Row (trust-bar style from homepage) */
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.hero-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.15rem;
+}
+
+.hero-stat i {
+    font-size: 1rem;
+    opacity: 0.7;
+    margin-bottom: 0.1rem;
+}
+
+.hero-stat i.fa-fire {
+    color: #E67E22;
+    opacity: 1;
+}
+
+.hero-stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.hero-stat-label {
+    font-size: 0.8rem;
+    opacity: 0.85;
+}
+
+/* Hero Bottom: Practice Status + Daily Phrase */
+.hero-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.hero-practice {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.hero-practice-icon {
+    font-size: 1.1rem;
+}
+
+.hero-practice a {
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    transition: background 0.2s ease;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.hero-practice a:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.hero-practice.completed {
+    opacity: 0.95;
+}
+
+.hero-phrase {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+}
+
+.hero-phrase-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.hero-phrase-label {
+    opacity: 0.8;
+}
+
+.hero-phrase strong {
+    color: var(--color-gold);
+}
+
+/* Hero Mobile */
+@media (max-width: 768px) {
+    .dashboard-hero {
+        padding: 1.5rem;
+    }
+
+    .hero-top {
+        margin-bottom: 1rem;
+    }
+
+    .hero-greeting h1 {
+        font-size: 1.25rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .hero-stats {
+        gap: 1.5rem;
+    }
+
+    .hero-stat-value {
+        font-size: 1.4rem;
+    }
+
+    .hero-bottom {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-phrase {
+        justify-content: center;
+    }
+}
+
+/* Hero Dark Mode */
+@media (prefers-color-scheme: dark) {
+    .dashboard-hero::before {
+        background:
+            radial-gradient(ellipse 400px 300px at 10% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 70%),
+            radial-gradient(ellipse 300px 200px at 90% 60%, rgba(212, 160, 23, 0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 250px 200px at 50% 90%, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
     }
 }
