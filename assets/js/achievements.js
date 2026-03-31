@@ -407,3 +407,12 @@ loadAchievements();
 // Footer year
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+// Burger menu (mobile nav)
+const burgerMenu = document.querySelector('.burger-menu');
+const mainNav = document.querySelector('.main-nav');
+if (burgerMenu && mainNav) {
+    burgerMenu.addEventListener('click', () => {
+        mainNav.classList.toggle('open');
+    });
+}

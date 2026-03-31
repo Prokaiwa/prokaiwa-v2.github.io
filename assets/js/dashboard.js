@@ -1074,7 +1074,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                         <div class="teaser-next-header">
                             <span class="teaser-next-label">${nextLabel}:</span>
                             <span class="teaser-next-name">
-                                <i class="${nextBadge.icon}"></i> ${badgeName}
+                                <i class="fas ${nextBadge.icon}"></i> ${badgeName}
                             </span>
                             <span class="teaser-next-count">${nextProgress.current}/${nextProgress.target}</span>
                         </div>
