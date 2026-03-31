@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KLVF2ZG1WX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KLVF2ZG1WX');
+</script>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://api.qrserver.com; connect-src 'self' https://*.supabase.co https://cdn.jsdelivr.net https://www.google-analytics.com https://region1.google-analytics.com; media-src 'self' blob: https://*.supabase.co; frame-src 'none'; object-src 'none';">
+  <title>Prokaiwa | Achievements</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="Track your English learning achievements and badges on Prokaiwa.">
+  <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/achievements.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div id="nav-placeholder"></div>
+
+    <main>
+        <div class="container legal-page-container">
+            <!-- Loading State -->
+            <div id="achievements-loading" class="achievements-loading">
+                <i class="fas fa-spinner"></i>
+                <p data-i18n="loadingText">読み込み中...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="achievements-error" class="achievements-error" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <h2 data-i18n="errorTitle">エラーが発生しました</h2>
+                <p data-i18n="errorMessage">ページを読み込めませんでした。</p>
+                <button onclick="location.reload()" class="cta-button" data-i18n="errorReload">再読み込み</button>
+            </div>
+
+            <!-- Achievements Content -->
+            <div id="achievements-content" style="display: none;">
+                <!-- Header -->
+                <div class="achievements-header">
+                    <a href="/dashboard.html" class="back-link">
+                        <i class="fas fa-arrow-left"></i>
+                        <span data-i18n="backToDashboard">ダッシュボードに戻る</span>
+                    </a>
+                    <h1 data-i18n="pageTitle">達成バッジ</h1>
+                    <p class="achievements-subtitle" data-i18n="pageSubtitle">英語学習の成果を記録しましょう</p>
+                </div>
+
+                <!-- Summary Bar -->
+                <div class="achievements-summary">
+                    <div class="summary-stat">
+                        <i class="fas fa-trophy"></i>
+                        <span id="earned-count">0</span>
+                        <span class="summary-divider">/</span>
+                        <span id="total-count">9</span>
+                        <span class="summary-label" data-i18n="badgesEarned">バッジ獲得</span>
+                    </div>
+                    <div class="summary-progress-bar">
+                        <div class="summary-progress-fill" id="overall-progress"></div>
+                    </div>
+                </div>
+
+                <!-- Badge Grid -->
+                <div class="badge-grid" id="badge-grid">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script type="module" src="/assets/js/achievements.js"></script>
+    <script src="/assets/js/components.js"></script>
+</body>
+</html>
