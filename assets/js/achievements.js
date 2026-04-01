@@ -525,9 +525,9 @@ function renderBadges(stats, lang) {
             const desc = lang === 'ja' ? badge.desc_ja : badge.desc_en;
             const earnedLabel = achievementsI18n[lang].earnedLabel;
             const tierClass = earned ? `tier-${badge.tier}` : 'tier-locked';
-            const themeStyle = badge.colors && earned
+            const themeStyle = badge.colors
                 ? `style="--badge-bg: ${badge.colors.bg}; --badge-fg: ${badge.colors.fg};"`
-                : (badge.colors && !earned ? '' : '');
+                : '';
             const fillClass = earned ? `fill-${badge.tier}` : 'fill-locked';
             const fillStyle = badge.colors && earned ? `style="background: ${badge.colors.bg}; box-shadow: 0 0 4px ${badge.colors.bg}40;"` : '';
 
