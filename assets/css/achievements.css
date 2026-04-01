@@ -171,41 +171,51 @@
 
 /* Earned badge styles */
 .badge-card.earned {
-    border-color: var(--color-gold);
-    background: linear-gradient(135deg, rgba(212, 160, 23, 0.05) 0%, var(--color-card-bg) 100%);
+    border-color: transparent;
+    background: linear-gradient(135deg, rgba(212, 160, 23, 0.04) 0%, var(--color-card-bg) 60%, rgba(212, 160, 23, 0.02) 100%);
+    border-left: 3px solid var(--color-gold);
 }
 
 .badge-card.earned::after {
     content: '✓';
     position: absolute;
-    top: 8px;
+    top: 10px;
     right: 10px;
-    background: var(--color-gold);
+    background: linear-gradient(135deg, var(--color-gold) 0%, #f4c542 100%);
     color: white;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 700;
+    box-shadow: 0 2px 6px rgba(212, 160, 23, 0.3);
 }
 
 /* Locked badge styles */
 .badge-card.locked {
-    opacity: 0.6;
+    opacity: 0.75;
 }
 
 .badge-card.locked .badge-icon {
-    filter: grayscale(100%);
-    opacity: 0.4;
+    opacity: 0.5;
+}
+
+.badge-card.locked:hover {
+    opacity: 0.9;
+}
+
+.badge-card.locked:hover .badge-icon {
+    opacity: 0.7;
 }
 
 /* Badge Icon */
+/* ── Badge Icon System ── */
 .badge-icon {
-    width: 64px;
-    height: 64px;
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -213,33 +223,126 @@
     margin: 0 auto 0.75rem;
     font-size: 1.5rem;
     transition: transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .badge-card:hover .badge-icon {
     transform: scale(1.1);
 }
 
-.badge-icon.tier-bronze {
-    background: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(205, 127, 50, 0.3);
-}
-
-.badge-icon.tier-silver {
-    background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(192, 192, 192, 0.3);
-}
-
-.badge-icon.tier-gold {
-    background: linear-gradient(135deg, var(--color-gold) 0%, #f4c542 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(212, 160, 23, 0.3);
-}
-
+/* ── Locked: flat, lifeless ── */
 .badge-icon.tier-locked {
     background: var(--color-bg);
     color: var(--color-text-muted);
+    border: 2px dashed var(--color-border);
+}
+
+/* ── Bronze: warm copper ring ── */
+.badge-icon.tier-bronze {
+    background: linear-gradient(145deg, #f5e6d3 0%, #e8d5c0 100%);
+    color: #8b5e3c;
+    border: 3px solid;
+    border-image: linear-gradient(145deg, #cd7f32, #daa520, #b8860b, #cd7f32) 1;
+    border-radius: 50%;
+    border-image: none;
+    border-color: #cd7f32;
+    box-shadow:
+        0 0 0 2px rgba(205, 127, 50, 0.2),
+        0 4px 12px rgba(205, 127, 50, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+/* ── Silver: metallic ring with shimmer ── */
+.badge-icon.tier-silver {
+    background: linear-gradient(145deg, #f0f0f0 0%, #d8d8d8 50%, #e8e8e8 100%);
+    color: #606060;
+    border: 3px solid #b0b0b0;
+    box-shadow:
+        0 0 0 2px rgba(192, 192, 192, 0.3),
+        0 4px 14px rgba(120, 120, 120, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+/* ── Gold: premium ring with glow ── */
+.badge-icon.tier-gold {
+    background: linear-gradient(145deg, #fff8e1 0%, #ffe082 40%, #ffd54f 100%);
+    color: #b8860b;
+    border: 3px solid var(--color-gold);
+    box-shadow:
+        0 0 0 2px rgba(212, 160, 23, 0.2),
+        0 0 16px rgba(212, 160, 23, 0.15),
+        0 4px 14px rgba(212, 160, 23, 0.25),
+        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+}
+
+/* ── Shimmer sweep on earned badges ── */
+.badge-card.earned .badge-icon::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -75%;
+    width: 50%;
+    height: 200%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+    );
+    transform: skewX(-20deg);
+    animation: shimmerSweep 3s ease-in-out infinite;
+    animation-delay: var(--shimmer-delay, 0s);
+}
+
+@keyframes shimmerSweep {
+    0%, 100% { left: -75%; }
+    50% { left: 125%; }
+}
+
+/* Stagger shimmer timing per card */
+.badge-card.earned:nth-child(3n+1) .badge-icon { --shimmer-delay: 0s; }
+.badge-card.earned:nth-child(3n+2) .badge-icon { --shimmer-delay: 1s; }
+.badge-card.earned:nth-child(3n+3) .badge-icon { --shimmer-delay: 2s; }
+
+/* ── Gold glow pulse (earned gold only) ── */
+.badge-card.earned .badge-icon.tier-gold {
+    animation: goldGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes goldGlow {
+    0%, 100% {
+        box-shadow:
+            0 0 0 2px rgba(212, 160, 23, 0.2),
+            0 0 16px rgba(212, 160, 23, 0.15),
+            0 4px 14px rgba(212, 160, 23, 0.25),
+            inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    }
+    50% {
+        box-shadow:
+            0 0 0 3px rgba(212, 160, 23, 0.3),
+            0 0 24px rgba(212, 160, 23, 0.3),
+            0 4px 18px rgba(212, 160, 23, 0.35),
+            inset 0 2px 4px rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* ── Bronze earned: warm glow ── */
+.badge-card.earned .badge-icon.tier-bronze {
+    box-shadow:
+        0 0 0 2px rgba(205, 127, 50, 0.25),
+        0 0 12px rgba(205, 127, 50, 0.2),
+        0 4px 12px rgba(205, 127, 50, 0.25),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+/* ── Silver earned: cool shimmer ── */
+.badge-card.earned .badge-icon.tier-silver {
+    box-shadow:
+        0 0 0 2px rgba(192, 192, 192, 0.35),
+        0 0 14px rgba(160, 160, 160, 0.2),
+        0 4px 14px rgba(120, 120, 120, 0.25),
+        inset 0 2px 4px rgba(255, 255, 255, 0.5);
 }
 
 /* Badge Info */
@@ -279,19 +382,23 @@
 }
 
 .badge-progress-fill.fill-bronze {
-    background: linear-gradient(90deg, #cd7f32, #daa520);
+    background: linear-gradient(90deg, #b8860b, #cd7f32, #daa520);
+    box-shadow: 0 0 4px rgba(205, 127, 50, 0.3);
 }
 
 .badge-progress-fill.fill-silver {
-    background: linear-gradient(90deg, #a0a0a0, #c0c0c0);
+    background: linear-gradient(90deg, #909090, #c0c0c0, #d8d8d8);
+    box-shadow: 0 0 4px rgba(192, 192, 192, 0.3);
 }
 
 .badge-progress-fill.fill-gold {
-    background: linear-gradient(90deg, var(--color-gold), #f4c542);
+    background: linear-gradient(90deg, #b8860b, var(--color-gold), #f4c542);
+    box-shadow: 0 0 6px rgba(212, 160, 23, 0.4);
 }
 
 .badge-progress-fill.fill-locked {
-    background: var(--color-text-muted);
+    background: var(--color-border);
+    opacity: 0.6;
 }
 
 .badge-progress-text {
@@ -304,10 +411,18 @@
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    color: var(--color-gold);
-    font-size: 0.8rem;
+    color: white;
+    background: linear-gradient(135deg, var(--color-gold) 0%, #e8b000 100%);
+    font-size: 0.75rem;
     font-weight: 700;
     margin-top: 0.25rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(212, 160, 23, 0.25);
+}
+
+.badge-earned-label .fa-check {
+    font-size: 0.65rem;
 }
 
 /* Responsive */
@@ -370,11 +485,27 @@
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
     .badge-card.earned {
-        background: linear-gradient(135deg, rgba(212, 160, 23, 0.08) 0%, var(--color-card-bg) 100%);
+        background: linear-gradient(135deg, rgba(212, 160, 23, 0.06) 0%, var(--color-card-bg) 60%, rgba(212, 160, 23, 0.03) 100%);
     }
 
     .badge-icon.tier-locked {
         background: var(--color-card-bg);
+        border-color: var(--color-border);
+    }
+
+    .badge-icon.tier-bronze {
+        background: linear-gradient(145deg, #3d2e1e 0%, #4a3728 100%);
+        color: #cd7f32;
+    }
+
+    .badge-icon.tier-silver {
+        background: linear-gradient(145deg, #2e2e2e 0%, #3a3a3a 100%);
+        color: #c0c0c0;
+    }
+
+    .badge-icon.tier-gold {
+        background: linear-gradient(145deg, #3d3010 0%, #4a3a18 100%);
+        color: var(--color-gold);
     }
 
     .achievements-summary {
@@ -423,5 +554,42 @@
 
     .badge-category-title {
         font-size: 0.95rem;
+    }
+}
+
+/* ── Legendary Badges (365-streak, 500 sessions, etc.) ── */
+.badge-card.earned.legendary .badge-icon.tier-gold {
+    border-width: 4px;
+    animation: legendaryGlow 2s ease-in-out infinite;
+}
+
+@keyframes legendaryGlow {
+    0%, 100% {
+        box-shadow:
+            0 0 0 3px rgba(212, 160, 23, 0.3),
+            0 0 20px rgba(212, 160, 23, 0.25),
+            0 0 40px rgba(212, 160, 23, 0.1),
+            0 4px 14px rgba(212, 160, 23, 0.3),
+            inset 0 2px 4px rgba(255, 255, 255, 0.5);
+    }
+    50% {
+        box-shadow:
+            0 0 0 4px rgba(212, 160, 23, 0.4),
+            0 0 30px rgba(212, 160, 23, 0.35),
+            0 0 50px rgba(212, 160, 23, 0.15),
+            0 4px 18px rgba(212, 160, 23, 0.4),
+            inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    }
+}
+
+/* ── Respect reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+    .badge-card.earned .badge-icon::after {
+        animation: none;
+    }
+
+    .badge-card.earned .badge-icon.tier-gold,
+    .badge-card.earned.legendary .badge-icon.tier-gold {
+        animation: none;
     }
 }
