@@ -593,3 +593,176 @@
         animation: none;
     }
 }
+
+/* ── Platinum: cool blue-white metallic ── */
+.badge-icon.tier-platinum {
+    background: linear-gradient(145deg, #E8EEF4 0%, #B8C9DB 40%, #D4E0EC 100%);
+    color: #4A6A8A;
+    border: 3px solid #8EAAC4;
+    box-shadow:
+        0 0 0 2px rgba(142, 170, 196, 0.3),
+        0 0 18px rgba(142, 170, 196, 0.15),
+        0 4px 14px rgba(100, 140, 180, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.6);
+}
+
+.badge-card.earned .badge-icon.tier-platinum {
+    animation: platinumGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes platinumGlow {
+    0%, 100% {
+        box-shadow:
+            0 0 0 2px rgba(142, 170, 196, 0.3),
+            0 0 18px rgba(142, 170, 196, 0.15),
+            0 4px 14px rgba(100, 140, 180, 0.2),
+            inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    }
+    50% {
+        box-shadow:
+            0 0 0 3px rgba(142, 170, 196, 0.4),
+            0 0 26px rgba(142, 170, 196, 0.25),
+            0 4px 18px rgba(100, 140, 180, 0.3),
+            inset 0 2px 4px rgba(255, 255, 255, 0.7);
+    }
+}
+
+.badge-progress-fill.fill-platinum {
+    background: linear-gradient(90deg, #8EAAC4, #B8C9DB, #D4E0EC);
+    box-shadow: 0 0 5px rgba(142, 170, 196, 0.4);
+}
+
+/* ── Legendary: prismatic animated border ── */
+.badge-icon.tier-legendary {
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #FFD700;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+}
+
+.badge-icon.tier-legendary::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: conic-gradient(
+        from var(--legendary-angle, 0deg),
+        #FFD700, #FF6B6B, #C084FC, #60A5FA, #34D399, #FBBF24, #FFD700
+    );
+    z-index: -1;
+    animation: legendaryRotate 4s linear infinite;
+}
+
+@keyframes legendaryRotate {
+    to { --legendary-angle: 360deg; }
+}
+
+/* Fallback for browsers without @property */
+@supports not (background: conic-gradient(from 0deg, red, blue)) {
+    .badge-icon.tier-legendary::before {
+        background: linear-gradient(135deg, #FFD700, #FF6B6B, #C084FC, #60A5FA);
+    }
+}
+
+@property --legendary-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.badge-card.earned .badge-icon.tier-legendary {
+    box-shadow:
+        0 0 20px rgba(255, 215, 0, 0.3),
+        0 0 40px rgba(255, 107, 107, 0.15),
+        0 0 60px rgba(96, 165, 250, 0.1);
+    animation: legendaryPulse 3s ease-in-out infinite;
+}
+
+@keyframes legendaryPulse {
+    0%, 100% {
+        box-shadow:
+            0 0 20px rgba(255, 215, 0, 0.3),
+            0 0 40px rgba(255, 107, 107, 0.15);
+    }
+    50% {
+        box-shadow:
+            0 0 30px rgba(255, 215, 0, 0.4),
+            0 0 50px rgba(255, 107, 107, 0.2),
+            0 0 70px rgba(96, 165, 250, 0.15);
+    }
+}
+
+.badge-progress-fill.fill-legendary {
+    background: linear-gradient(90deg, #FFD700, #FF6B6B, #C084FC, #60A5FA, #34D399);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+    background-size: 200% 100%;
+    animation: legendaryFill 3s linear infinite;
+}
+
+@keyframes legendaryFill {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+/* ── Themed: custom colors via CSS variables ── */
+.badge-icon.tier-themed {
+    background: var(--badge-bg, #666);
+    color: var(--badge-fg, white);
+    border: 3px solid color-mix(in srgb, var(--badge-bg, #666) 80%, black);
+    box-shadow:
+        0 0 0 2px color-mix(in srgb, var(--badge-bg, #666) 30%, transparent),
+        0 4px 12px color-mix(in srgb, var(--badge-bg, #666) 25%, transparent),
+        inset 0 2px 4px rgba(255, 255, 255, 0.25);
+}
+
+/* Fallback for browsers without color-mix */
+@supports not (color: color-mix(in srgb, red, blue)) {
+    .badge-icon.tier-themed {
+        border-color: rgba(0, 0, 0, 0.2);
+        box-shadow:
+            0 4px 12px rgba(0, 0, 0, 0.15),
+            inset 0 2px 4px rgba(255, 255, 255, 0.25);
+    }
+}
+
+.badge-card.earned .badge-icon.tier-themed {
+    box-shadow:
+        0 0 0 2px color-mix(in srgb, var(--badge-bg, #666) 30%, transparent),
+        0 0 12px color-mix(in srgb, var(--badge-bg, #666) 20%, transparent),
+        0 4px 14px color-mix(in srgb, var(--badge-bg, #666) 25%, transparent),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.badge-progress-fill.fill-themed {
+    background: var(--badge-bg, #666);
+    box-shadow: 0 0 4px color-mix(in srgb, var(--badge-bg, #666) 40%, transparent);
+}
+
+/* Dark mode themed adjustments */
+@media (prefers-color-scheme: dark) {
+    .badge-icon.tier-platinum {
+        background: linear-gradient(145deg, #2a3a4a 0%, #354a5e 100%);
+        color: #B8C9DB;
+    }
+
+    .badge-icon.tier-legendary {
+        background: linear-gradient(145deg, #0a0a1a 0%, #0f1a2e 100%);
+    }
+}
+
+/* Reduced motion for new tiers */
+@media (prefers-reduced-motion: reduce) {
+    .badge-card.earned .badge-icon.tier-platinum,
+    .badge-card.earned .badge-icon.tier-legendary {
+        animation: none;
+    }
+
+    .badge-icon.tier-legendary::before {
+        animation: none;
+    }
+
+    .badge-progress-fill.fill-legendary {
+        animation: none;
+    }
+}
