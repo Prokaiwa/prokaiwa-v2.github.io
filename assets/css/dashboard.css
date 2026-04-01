@@ -105,7 +105,7 @@
       transition: box-shadow var(--transition-speed) ease;
     }
     .dashboard-card:hover {
-      box-shadow: var(--shadow);
+      /* No hover lift on data cards — only interactive elements */
     }
     .dashboard-card h3 {
       display: flex;
@@ -2029,4 +2029,10 @@
 
 .teaser-view-all .fa-arrow-right {
     font-size: 0.7rem;
+}
+
+/* Override global card hover for dashboard data cards */
+.dashboard-card:hover {
+    transform: none;
+    box-shadow: var(--shadow-sm);
 }

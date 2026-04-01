@@ -381,3 +381,47 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
 }
+
+/* Category Headers */
+.badge-category-header {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 2px solid var(--color-border);
+    margin-top: 1rem;
+}
+
+.badge-category-header:first-child {
+    margin-top: 0;
+}
+
+.badge-category-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.badge-category-title i {
+    font-size: 0.9rem;
+}
+
+.badge-category-count {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+
+@media (max-width: 480px) {
+    .badge-category-header {
+        padding: 0.5rem 0;
+    }
+
+    .badge-category-title {
+        font-size: 0.95rem;
+    }
+}
