@@ -1497,6 +1497,43 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 
 
+
+        // =============================================
+        // CARD ENTRANCE ANIMATIONS
+        // =============================================
+
+        function initCardAnimations(contentDiv) {
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReduced) return;
+
+            // Select visible animatable sections
+            const animatables = [...contentDiv.querySelectorAll(
+                '.dashboard-hero, .quick-actions, .dashboard-card, .cancellation-banner'
+            )].filter(el => el.style.display !== 'none');
+
+            // Apply initial hidden state
+            animatables.forEach(el => el.classList.add('card-animate'));
+
+            // Double rAF ensures browser paints opacity:0 before triggering transitions
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    const observer = new IntersectionObserver((entries) => {
+                        // Stagger each batch of newly-visible elements
+                        const visible = entries.filter(e => e.isIntersecting);
+                        visible.forEach((entry, i) => {
+                            setTimeout(() => {
+                                entry.target.classList.add('card-revealed');
+                            }, i * 100);
+                            observer.unobserve(entry.target);
+                        });
+                    }, { threshold: 0.05 });
+
+                    animatables.forEach(el => observer.observe(el));
+                });
+            });
+        }
+
+
         // =============================================
         // MAIN DASHBOARD LOADER
         // =============================================
@@ -1653,18 +1690,23 @@ if (hasVideoAccess) {
 
                     renderSkillsChart('skills-assessment', assessment, lang);
 
+                // Crossfade: loading → content
+                loadingDiv.classList.add('fade-out');
+                await new Promise(r => setTimeout(r, 300));
                 loadingDiv.style.display = 'none';
                 contentDiv.style.display = 'block';
 
-
-                // Apply language to all dynamic elements (ensures correct lang on load)
+                // Apply language to all static elements
                 applyDashboardLanguage(lang);
                 refreshDynamicText(lang);
+
+                // Animate cards in (staggered reveal)
+                initCardAnimations(contentDiv);
 
                 // Initialize booking widget
                 await initializeBookingWidget(profile.id, user.id);
 
-                debugLog('✅ Dashboard loaded with Phase 1 features!');
+                debugLog('✅ Dashboard loaded!');
 
             } catch (error) {
                 console.error('Dashboard load error:', error);

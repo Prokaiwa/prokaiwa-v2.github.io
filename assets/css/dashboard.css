@@ -11,6 +11,31 @@
     padding: 2rem;
 }
 
+/* ── Entrance Animations ── */
+.card-animate {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card-animate.card-revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Accessibility: skip all entrance animations */
+@media (prefers-reduced-motion: reduce) {
+    .card-animate {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+    .dashboard-loading {
+        transition: none;
+    }
+}
+
     /* Dashboard-specific container padding */
     #dashboard-content {
       padding-bottom: 2rem;
@@ -23,6 +48,10 @@
     .dashboard-loading {
       text-align: center;
       padding: 4rem 2rem;
+      transition: opacity 0.3s ease;
+    }
+    .dashboard-loading.fade-out {
+      opacity: 0;
     }
     .dashboard-loading i {
       font-size: 2rem;
