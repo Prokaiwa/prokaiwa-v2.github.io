@@ -889,13 +889,17 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
             const ctx = document.getElementById(`${containerId}-canvas`).getContext('2d');
 
-            new Chart(ctx, {
+            // Use zeros on initial load so chart animates when card becomes visible
+            const chartData = dashboardState.animationsReady ? skillValues : [0, 0, 0, 0, 0];
+            dashboardState.skillsChartRealData = skillValues;
+
+            dashboardState.skillsChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
                     labels: skillLabels,
                     datasets: [{
                         label: lang === 'ja' ? 'スキルレベル' : 'Skill Level',
-                        data: skillValues,
+                        data: chartData,
                         borderColor: borderColor,
                         backgroundColor: backgroundColor,
                         borderWidth: allPerfect ? 3 : 2,
@@ -1556,7 +1560,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                         visible.forEach((entry, i) => {
                             setTimeout(() => {
                                 entry.target.classList.add('card-revealed');
-                            }, i * 180);
+                            }, i * 250);
                             observer.unobserve(entry.target);
                         });
                     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
@@ -1782,6 +1786,10 @@ if (hasVideoAccess) {
                                 if (!entry.isIntersecting) return;
                                 const card = entry.target;
 
+                                if (card.classList.contains('card-skills') && dashboardState.skillsChart) {
+                                    dashboardState.skillsChart.data.datasets[0].data = dashboardState.skillsChartRealData;
+                                    dashboardState.skillsChart.update();
+                                }
                                 if (card.classList.contains('card-progress')) {
                                     animateCountUp('sessions-completed', stats.thisMonth, 700);
                                     updateProgressRing(lang, progressPercent);
@@ -1794,8 +1802,10 @@ if (hasVideoAccess) {
                             });
                         }, { threshold: 0.2 });
 
+                        const skillsCard = contentDiv.querySelector('.card-skills');
                         const progressCard = contentDiv.querySelector('.card-progress');
                         const streakCard = contentDiv.querySelector('.card-streak');
+                        if (skillsCard) scrollObserver.observe(skillsCard);
                         if (progressCard) scrollObserver.observe(progressCard);
                         if (streakCard) scrollObserver.observe(streakCard);
                     }, 1800);
