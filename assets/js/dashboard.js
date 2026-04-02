@@ -1235,15 +1235,38 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             return Math.floor((now - last) / (1000 * 60 * 60 * 24));
         }
 
-        function getStreakHeatClass(dateStr, practiceDates) {
+        function buildStreakMap(practiceDates) {
+            if (!practiceDates || practiceDates.length === 0) return {};
             const sorted = [...practiceDates].sort();
-            let len = 1;
-            const d = new Date(dateStr);
-            for (let i = 1; i <= 30; i++) {
-                const prev = new Date(d);
-                prev.setDate(prev.getDate() - i);
-                if (sorted.includes(prev.toISOString().split('T')[0])) { len++; } else { break; }
+            const map = {};
+            let streakStart = 0;
+
+            for (let i = 0; i <= sorted.length; i++) {
+                const isEnd = i === sorted.length;
+                let endStreak = isEnd;
+
+                if (!isEnd && i > 0) {
+                    const cur = new Date(sorted[i]);
+                    const prev = new Date(sorted[i - 1]);
+                    const gap = (cur - prev) / (1000 * 60 * 60 * 24);
+                    if (gap > 1) {
+                        // End previous streak first
+                        const len = i - streakStart;
+                        for (let j = streakStart; j < i; j++) map[sorted[j]] = len;
+                        streakStart = i;
+                    }
+                }
+
+                if (isEnd) {
+                    const len = i - streakStart;
+                    for (let j = streakStart; j < i; j++) map[sorted[j]] = len;
+                }
             }
+            return map;
+        }
+
+        function getStreakHeatClass(dateStr, streakMap) {
+            const len = streakMap[dateStr] || 1;
             if (len >= 7) return 'fire';
             if (len >= 3) return 'hot';
             return 'active';
@@ -1257,6 +1280,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             const current = stats.current;
             const best = stats.maxStreak;
             const inactive = daysSinceLastPractice(practiceDates);
+            const streakMap = buildStreakMap(practiceDates);
 
             // Fire/ice card state
             card.classList.remove('streak-state-warm', 'streak-state-fire', 'streak-state-blaze', 'streak-state-frozen');
@@ -1279,7 +1303,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
             const streakLabel = lang === 'ja' ? '日連続' : 'day streak';
             const bestLabel = lang === 'ja' ? '最高' : 'Best';
-            const tapLabel = lang === 'ja' ? 'タップして詳細を見る' : 'Tap to see details';
+
+            // Lottie fire (only when on active streak)
+            const lottieHTML = current >= 1 && inactive < 5
+                ? '<div class="streak-lottie-wrap"><dotlottie-player src="assets/lottie/fire.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>'
+                : '';
 
             // Build last 7 days
             const now = new Date();
@@ -1300,7 +1328,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 if (dateStr === today) dotClass += ' today';
                 if (dateStr > today) dotClass += ' future';
                 if (practiceDates.includes(dateStr)) {
-                    dotClass += ' ' + getStreakHeatClass(dateStr, practiceDates);
+                    dotClass += ' ' + getStreakHeatClass(dateStr, streakMap);
                 }
 
                 weekHTML += `<div class="streak-week-day">
@@ -1311,6 +1339,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
             container.innerHTML = `
                 <div class="streak-stats">
+                    ${lottieHTML}
                     <div class="streak-current">
                         <span class="streak-current-icon"><i class="${iconClass}" style="color: ${iconColor};"></i></span>
                         <div>
@@ -1324,7 +1353,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     </div>
                 </div>
                 <div class="streak-week">${weekHTML}</div>
-                <div class="streak-tap-hint"><i class="fas fa-hand-pointer"></i> ${tapLabel}</div>
             `;
         }
 
@@ -1333,6 +1361,9 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             document.getElementById('streak-modal-title').textContent =
                 lang === 'ja' ? '練習カレンダー' : 'Practice Calendar';
 
+            // Always start at current month
+            const now = new Date();
+            streakModalMonth = { year: now.getFullYear(), month: now.getMonth() };
             renderStreakModalCalendar(lang);
 
             document.getElementById('streak-modal-overlay').classList.add('show');
@@ -1347,64 +1378,37 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             document.getElementById('streak-modal').classList.remove('show');
         };
 
+        var streakModalMonth = null; // { year, month } for current modal view
+
+        function getEarliestPracticeMonth(practiceDates) {
+            if (!practiceDates || practiceDates.length === 0) return null;
+            const earliest = [...practiceDates].sort()[0];
+            const d = new Date(earliest);
+            return { year: d.getFullYear(), month: d.getMonth() };
+        }
+
         function renderStreakModalCalendar(lang) {
             const content = document.getElementById('streak-modal-content');
             if (!content) return;
 
             const stats = dashboardState.stats;
             const practiceDates = dashboardState.practiceDates || [];
+            const streakMap = buildStreakMap(practiceDates);
             const current = stats ? stats.current : 0;
             const best = stats ? stats.maxStreak : 0;
             const total = stats ? stats.total : 0;
 
+            const now = new Date();
+            if (!streakModalMonth) {
+                streakModalMonth = { year: now.getFullYear(), month: now.getMonth() };
+            }
+
             const currentLabel = lang === 'ja' ? '現在の連続' : 'Current';
             const bestLabel = lang === 'ja' ? '最高記録' : 'Best';
             const totalLabel = lang === 'ja' ? '合計日数' : 'Total Days';
-            const dayHeaders = lang === 'ja'
-                ? ['日', '月', '火', '水', '木', '金', '土']
-                : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-            const now = new Date();
-            const today = now.toISOString().split('T')[0];
-
-            // Show current month and 2 previous months
-            let monthsHTML = '';
-            for (let m = 2; m >= 0; m--) {
-                const monthDate = new Date(now.getFullYear(), now.getMonth() - m, 1);
-                const year = monthDate.getFullYear();
-                const month = monthDate.getMonth();
-                const lastDay = new Date(year, month + 1, 0).getDate();
-                const firstDayOfWeek = monthDate.getDay();
-
-                const monthName = monthDate.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US',
-                    { year: 'numeric', month: 'long' });
-
-                let gridHTML = dayHeaders.map(d => `<div class="modal-day-header">${d}</div>`).join('');
-
-                for (let i = 0; i < firstDayOfWeek; i++) {
-                    gridHTML += '<div class="modal-day empty"></div>';
-                }
-
-                const sorted = [...practiceDates].sort();
-                for (let d = 1; d <= lastDay; d++) {
-                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                    let cls = 'modal-day';
-                    if (dateStr === today) cls += ' is-today';
-                    if (dateStr > today) cls += ' future';
-                    if (practiceDates.includes(dateStr)) {
-                        cls += ' practiced ' + getStreakHeatClass(dateStr, practiceDates);
-                    }
-                    gridHTML += `<div class="${cls}">${d}</div>`;
-                }
-
-                monthsHTML += `
-                    <div class="modal-month">
-                        <div class="modal-month-title">${monthName}</div>
-                        <div class="modal-calendar-grid">${gridHTML}</div>
-                    </div>`;
-            }
-
-            content.innerHTML = `
+            // Summary bar
+            const summaryHTML = `
                 <div class="modal-streak-summary">
                     <div class="modal-streak-stat">
                         <span class="modal-streak-stat-value">${current}</span>
@@ -1418,9 +1422,78 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                         <span class="modal-streak-stat-value">${total}</span>
                         <span class="modal-streak-stat-label">${totalLabel}</span>
                     </div>
+                </div>`;
+
+            content.innerHTML = summaryHTML + '<div id="streak-modal-calendar-area"></div>';
+            renderStreakModalMonth(lang, streakMap);
+        }
+
+        function renderStreakModalMonth(lang, streakMap) {
+            const area = document.getElementById('streak-modal-calendar-area');
+            if (!area) return;
+
+            const practiceDates = dashboardState.practiceDates || [];
+            if (!streakMap) streakMap = buildStreakMap(practiceDates);
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const { year, month } = streakModalMonth;
+
+            const earliest = getEarliestPracticeMonth(practiceDates);
+            const isAtEarliest = earliest && year === earliest.year && month === earliest.month;
+            const isAtCurrent = year === now.getFullYear() && month === now.getMonth();
+
+            const monthDate = new Date(year, month, 1);
+            const monthName = monthDate.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US',
+                { year: 'numeric', month: 'long' });
+
+            const dayHeaders = lang === 'ja'
+                ? ['日', '月', '火', '水', '木', '金', '土']
+                : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            const firstDayOfWeek = monthDate.getDay();
+
+            let gridHTML = dayHeaders.map(d => `<div class="modal-day-header">${d}</div>`).join('');
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                gridHTML += '<div class="modal-day empty"></div>';
+            }
+            for (let d = 1; d <= lastDay; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                let cls = 'modal-day';
+                if (dateStr === today) cls += ' is-today';
+                if (dateStr > today) cls += ' future';
+                if (practiceDates.includes(dateStr)) {
+                    cls += ' practiced ' + getStreakHeatClass(dateStr, streakMap);
+                }
+                gridHTML += `<div class="${cls}">${d}</div>`;
+            }
+
+            area.innerHTML = `
+                <div class="modal-month-nav">
+                    <button class="modal-nav-btn" id="streak-nav-prev" ${isAtEarliest || !earliest ? 'disabled' : ''}>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span class="modal-month-nav-title">${monthName}</span>
+                    <button class="modal-nav-btn" id="streak-nav-next" ${isAtCurrent ? 'disabled' : ''}>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
-                ${monthsHTML}
+                <div class="modal-calendar-grid">${gridHTML}</div>
             `;
+
+            // Attach nav listeners
+            const prevBtn = document.getElementById('streak-nav-prev');
+            const nextBtn = document.getElementById('streak-nav-next');
+            if (prevBtn) prevBtn.addEventListener('click', () => {
+                streakModalMonth.month--;
+                if (streakModalMonth.month < 0) { streakModalMonth.month = 11; streakModalMonth.year--; }
+                renderStreakModalMonth(lang, streakMap);
+            });
+            if (nextBtn) nextBtn.addEventListener('click', () => {
+                streakModalMonth.month++;
+                if (streakModalMonth.month > 11) { streakModalMonth.month = 0; streakModalMonth.year++; }
+                renderStreakModalMonth(lang, streakMap);
+            });
         }
 
         function getAchievementProgress(achievement, stats) {
@@ -2012,6 +2085,25 @@ if (hasVideoAccess) {
             }
         });
 
+
+
+        // =============================================
+        // CONSOLE HELPERS (testing card states)
+        // =============================================
+        window.testIceState = function() {
+            const card = document.getElementById('streak-card');
+            card.classList.remove('streak-state-warm', 'streak-state-fire', 'streak-state-blaze');
+            card.classList.add('streak-state-frozen');
+            console.log('❄️ Ice state applied. Run testFireState() or reload to reset.');
+        };
+        window.testFireState = function(level) {
+            const card = document.getElementById('streak-card');
+            card.classList.remove('streak-state-warm', 'streak-state-fire', 'streak-state-blaze', 'streak-state-frozen');
+            if (level === 'blaze') card.classList.add('streak-state-blaze');
+            else if (level === 'fire') card.classList.add('streak-state-fire');
+            else card.classList.add('streak-state-warm');
+            console.log('🔥 Fire state applied: ' + (level || 'warm') + '. Reload to reset.');
+        };
         loadDashboard();
 
         const yearEl = document.getElementById('year'); if (yearEl) yearEl.textContent = new Date().getFullYear();

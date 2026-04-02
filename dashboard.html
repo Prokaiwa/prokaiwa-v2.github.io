@@ -198,7 +198,7 @@
 
                         <!-- Streak -->
                         <div class="dashboard-card card-streak" id="streak-card" onclick="openStreakModal(getCurrentLang())">
-                            <h3><i class="fas fa-fire"></i><span data-i18n="headingStreak">練習継続記録</span></h3>
+                            <h3><i class="fas fa-fire"></i><span data-i18n="headingStreak">練習継続記録</span><i class="fas fa-chevron-right streak-chevron"></i></h3>
                             <div id="streak-card-content">
                                 <!-- Populated by renderStreakCard() -->
                             </div>
@@ -243,6 +243,7 @@
 
     <div id="footer-placeholder"></div>
 
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@dotlottie/player-component@2/dist/dotlottie-player.mjs"></script>
     <script type="module" src="assets/js/dashboard.js"></script>
 <script src="assets/js/components.js"></script>
 </body>
