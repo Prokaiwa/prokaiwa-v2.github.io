@@ -1754,27 +1754,31 @@ if (hasVideoAccess) {
                     }, 400);
 
                     // Below-fold cards: animate when scrolled into view
-                    const scrollObserver = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (!entry.isIntersecting) return;
-                            const card = entry.target;
+                    // Delay observer setup so entrance animations finish first —
+                    // prevents ring/stats animating while cards are still invisible
+                    setTimeout(() => {
+                        const scrollObserver = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (!entry.isIntersecting) return;
+                                const card = entry.target;
 
-                            if (card.classList.contains('card-progress')) {
-                                animateCountUp('sessions-completed', stats.thisMonth, 700);
-                                updateProgressRing(lang, progressPercent);
-                            }
-                            if (card.classList.contains('card-streak')) {
-                                animateCountUp('streak-count', stats.current, 700);
-                            }
+                                if (card.classList.contains('card-progress')) {
+                                    animateCountUp('sessions-completed', stats.thisMonth, 700);
+                                    updateProgressRing(lang, progressPercent);
+                                }
+                                if (card.classList.contains('card-streak')) {
+                                    animateCountUp('streak-count', stats.current, 700);
+                                }
 
-                            scrollObserver.unobserve(card);
-                        });
-                    }, { threshold: 0.2 });
+                                scrollObserver.unobserve(card);
+                            });
+                        }, { threshold: 0.2 });
 
-                    const progressCard = contentDiv.querySelector('.card-progress');
-                    const streakCard = contentDiv.querySelector('.card-streak');
-                    if (progressCard) scrollObserver.observe(progressCard);
-                    if (streakCard) scrollObserver.observe(streakCard);
+                        const progressCard = contentDiv.querySelector('.card-progress');
+                        const streakCard = contentDiv.querySelector('.card-streak');
+                        if (progressCard) scrollObserver.observe(progressCard);
+                        if (streakCard) scrollObserver.observe(streakCard);
+                    }, 1500);
                 }
 
                 // Initialize booking widget
