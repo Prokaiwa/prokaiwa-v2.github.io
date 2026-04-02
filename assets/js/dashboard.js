@@ -1762,26 +1762,26 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             streakGrow: {
                 ja: [
                     { text: 'すごい！{n}日連続達成！', sub: 'Keep it up! この調子！' },
-                    { text: '素晴らしい！{n}日連続！', sub: "You're on fire! 燃えてます！" },
+                    { text: '素晴らしい！{n}日連続！', sub: "You\'re on fire! 燃えてます！" },
                     { text: '{n}日連続達成！', sub: 'Amazing consistency! 毎日の努力が光ってます！' },
                 ],
                 en: [
-                    { text: '{n}-day streak!', sub: "You're on fire!" },
+                    { text: '{n}-day streak!', sub: "You\'re on fire!" },
                     { text: 'Amazing — {n} days!', sub: 'Keep the momentum going!' },
                     { text: '{n} days in a row!', sub: 'Incredible dedication!' },
                 ]
             },
             streakBroken: {
                 ja: [
-                    { text: 'お帰りなさい！', sub: '大丈夫！Everyone needs a break sometimes. Let's start fresh!' },
+                    { text: 'お帰りなさい！', sub: '大丈夫！Everyone needs a break sometimes. Let\'s start fresh!' },
                     { text: 'また会えて嬉しいです！', sub: '人生いろいろありますね。また一緒に頑張りましょう！' },
                     { text: 'おかえり！', sub: '頑張って！Every day is a new beginning!' },
                     { text: '戻ってきてくれてありがとう！', sub: '休憩も大事です。Ready to start again? 💪' },
                 ],
                 en: [
-                    { text: 'Welcome back!', sub: 'Life happens! Let's build a fresh streak!' },
-                    { text: 'Good to see you!', sub: 'Every day is a new start. Let's go!' },
-                    { text: 'Hey, you're back!', sub: 'No worries — the best time to restart is now!' },
+                    { text: 'Welcome back!', sub: 'Life happens! Let\'s build a fresh streak!' },
+                    { text: 'Good to see you!', sub: 'Every day is a new start. Let\'s go!' },
+                    { text: 'Hey, you\'re back!', sub: 'No worries — the best time to restart is now!' },
                     { text: 'Welcome back!', sub: 'A break doesn't erase your progress. Let's keep going!' },
                 ]
             },
@@ -1791,7 +1791,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     { text: '再スタート！', sub: 'Let's go! 新しいストリークを作りましょう！' },
                 ],
                 en: [
-                    { text: 'Day 1 — you're back!', sub: 'Fresh start! Let's build from here!' },
+                    { text: 'Day 1 — you\'re back!', sub: 'Fresh start! Let\'s build from here!' },
                     { text: 'New streak begins!', sub: 'Welcome back! The journey continues!' },
                 ]
             },
