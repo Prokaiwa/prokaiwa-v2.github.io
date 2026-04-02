@@ -1369,6 +1369,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
             document.getElementById('streak-modal-overlay').classList.add('show');
             document.getElementById('streak-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
 
             const body = document.querySelector('.streak-modal-body');
             if (body) body.scrollTop = 0;
@@ -1377,6 +1378,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         window.closeStreakModal = function() {
             document.getElementById('streak-modal-overlay').classList.remove('show');
             document.getElementById('streak-modal').classList.remove('show');
+            document.body.style.overflow = '';
         };
 
         var streakModalMonth = null; // { year, month } for current modal view
