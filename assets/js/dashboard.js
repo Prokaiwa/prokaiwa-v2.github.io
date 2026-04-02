@@ -1782,13 +1782,13 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     { text: 'Welcome back!', sub: 'Life happens! Let\'s build a fresh streak!' },
                     { text: 'Good to see you!', sub: 'Every day is a new start. Let\'s go!' },
                     { text: 'Hey, you\'re back!', sub: 'No worries — the best time to restart is now!' },
-                    { text: 'Welcome back!', sub: 'A break doesn't erase your progress. Let's keep going!' },
+                    { text: 'Welcome back!', sub: "A break doesn't erase your progress. Let's keep going!" },
                 ]
             },
             recovery: {
                 ja: [
                     { text: '復活！1日目スタート！', sub: 'お帰りなさい！Welcome back! 新しい旅の始まりです！' },
-                    { text: '再スタート！', sub: 'Let's go! 新しいストリークを作りましょう！' },
+                    { text: '再スタート！', sub: "Let's go! 新しいストリークを作りましょう！" },
                 ],
                 en: [
                     { text: 'Day 1 — you\'re back!', sub: 'Fresh start! Let\'s build from here!' },
