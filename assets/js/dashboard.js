@@ -1523,10 +1523,10 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                         visible.forEach((entry, i) => {
                             setTimeout(() => {
                                 entry.target.classList.add('card-revealed');
-                            }, i * 100);
+                            }, i * 120);
                             observer.unobserve(entry.target);
                         });
-                    }, { threshold: 0.05 });
+                    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
                     animatables.forEach(el => observer.observe(el));
                 });
