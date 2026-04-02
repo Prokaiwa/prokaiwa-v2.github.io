@@ -5,6 +5,7 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
         const PROKAIWA_DEBUG = false;
+        const LOTTIE_FIRE_ENABLED = true;
         const debugLog = PROKAIWA_DEBUG ? console.log.bind(console) : () => {};
               debugLog('🚀 DASHBOARD SCRIPT STARTING...');
 
@@ -1304,8 +1305,8 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             const streakLabel = lang === 'ja' ? '日連続' : 'day streak';
             const bestLabel = lang === 'ja' ? '最高' : 'Best';
 
-            // Lottie fire (only when on active streak)
-            const lottieHTML = current >= 1 && inactive < 5
+            // Lottie fire (only when on active streak AND file is uploaded)
+            const lottieHTML = LOTTIE_FIRE_ENABLED && current >= 1 && inactive < 5
                 ? '<div class="streak-lottie-wrap"><dotlottie-player src="assets/lottie/fire.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>'
                 : '';
 
@@ -1494,6 +1495,40 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 if (streakModalMonth.month > 11) { streakModalMonth.month = 0; streakModalMonth.year++; }
                 renderStreakModalMonth(lang, streakMap);
             });
+
+            // Touch swipe support for mobile
+            let touchStartX = 0;
+            let touchStartY = 0;
+            area.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            area.addEventListener('touchend', (e) => {
+                const deltaX = e.changedTouches[0].clientX - touchStartX;
+                const deltaY = e.changedTouches[0].clientY - touchStartY;
+
+                // Only trigger if horizontal swipe > 50px and more horizontal than vertical
+                if (Math.abs(deltaX) < 50 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+
+                const pDates = dashboardState.practiceDates || [];
+                const earliest = getEarliestPracticeMonth(pDates);
+                const isEarliest = earliest && streakModalMonth.year === earliest.year && streakModalMonth.month === earliest.month;
+                const now = new Date();
+                const isCurrent = streakModalMonth.year === now.getFullYear() && streakModalMonth.month === now.getMonth();
+
+                if (deltaX < 0 && !isCurrent) {
+                    // Swipe left → next month
+                    streakModalMonth.month++;
+                    if (streakModalMonth.month > 11) { streakModalMonth.month = 0; streakModalMonth.year++; }
+                    renderStreakModalMonth(lang, streakMap);
+                } else if (deltaX > 0 && !isEarliest && earliest) {
+                    // Swipe right → previous month
+                    streakModalMonth.month--;
+                    if (streakModalMonth.month < 0) { streakModalMonth.month = 11; streakModalMonth.year--; }
+                    renderStreakModalMonth(lang, streakMap);
+                }
+            }, { passive: true });
         }
 
         function getAchievementProgress(achievement, stats) {
