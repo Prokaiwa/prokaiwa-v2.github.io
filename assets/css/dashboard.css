@@ -290,79 +290,355 @@
       font-size: 0.9rem;
     }
 
-    .streak-header {
+    /* ── STREAK CARD REDESIGN ── */
+    .card-streak {
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow var(--transition-speed) ease,
+                  border-color var(--transition-speed) ease;
+    }
+    .card-streak:hover {
+      border-color: var(--color-primary);
+    }
+    .card-streak .streak-tap-hint {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+    .card-streak .streak-tap-hint i {
+      color: var(--color-text-muted);
+      font-size: 0.65rem;
+    }
+
+    /* Streak stats row */
+    .streak-stats {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .streak-current {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      margin-bottom: 0.4rem;
+      flex: 1;
     }
-    .streak-fire {
-      font-size: 1.5rem;
+    .streak-current-icon {
+      font-size: 1.75rem;
+      line-height: 1;
+      color: var(--color-primary);
     }
-    .streak-count {
+    .streak-current-number {
       font-family: var(--font-heading);
-      font-size: 1.3rem;
+      font-size: 2rem;
       font-weight: 700;
       color: var(--color-text);
+      line-height: 1;
     }
-    .streak-label {
+    .streak-current-label {
+      font-size: 0.8rem;
       color: var(--color-text-light);
-      font-size: 0.75rem;
+      line-height: 1.2;
     }
-    .streak-calendar-container,
-    #streak-calendar {
-      width: 100%;
+    .streak-best {
+      text-align: center;
+      padding: 0.5rem 0.75rem;
+      background: var(--color-bg);
+      border-radius: 8px;
+    }
+    .streak-best-number {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--color-text);
       display: block;
     }
-    .streak-calendar {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 2px;
-      width: 100%;
-      transition: max-height 0.3s ease;
-      overflow-y: hidden;
-      overflow-x: visible;
-    }
-    .streak-day-header {
-      text-align: center;
-      font-size: 0.55rem;
+    .streak-best-label {
+      font-size: 0.65rem;
       color: var(--color-text-muted);
-      padding: 1px;
-      font-weight: 600;
-      min-width: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .streak-day {
+
+    /* 7-day dot view */
+    .streak-week {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+    }
+    .streak-week-day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .streak-week-label {
+      font-size: 0.65rem;
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+    .streak-week-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: var(--color-bg);
+      color: var(--color-text-muted);
+      transition: all 0.3s ease;
+    }
+    .streak-week-dot.active {
+      background: var(--color-primary);
+      color: white;
+    }
+    .streak-week-dot.hot {
+      background: #E67E22;
+      color: white;
+    }
+    .streak-week-dot.fire {
+      background: #E74C3C;
+      color: white;
+      box-shadow: 0 0 8px rgba(231, 76, 60, 0.3);
+    }
+    .streak-week-dot.today {
+      box-shadow: 0 0 0 2px var(--color-gold);
+    }
+    .streak-week-dot.future {
+      opacity: 0.35;
+    }
+
+    /* ── Fire border for active streaks ── */
+    .card-streak.streak-state-warm {
+      border-color: #E67E22;
+      box-shadow: 0 0 12px rgba(230, 126, 34, 0.15);
+    }
+    .card-streak.streak-state-fire {
+      border-color: #E74C3C;
+      box-shadow: 0 0 16px rgba(231, 76, 60, 0.2);
+      animation: fireGlow 2s ease-in-out infinite;
+    }
+    .card-streak.streak-state-blaze {
+      border-color: #E74C3C;
+      border-width: 2px;
+      box-shadow: 0 0 20px rgba(231, 76, 60, 0.3), 0 0 40px rgba(231, 76, 60, 0.1);
+      animation: fireGlow 1.5s ease-in-out infinite;
+    }
+    @keyframes fireGlow {
+      0%, 100% {
+        box-shadow: 0 0 16px rgba(231, 76, 60, 0.2), 0 0 32px rgba(231, 76, 60, 0.05);
+      }
+      50% {
+        box-shadow: 0 0 24px rgba(231, 76, 60, 0.35), 0 0 48px rgba(231, 76, 60, 0.1);
+      }
+    }
+
+    /* ── Ice state (5+ days inactive) ── */
+    .card-streak.streak-state-frozen {
+      border-color: #90CAF9;
+      background: linear-gradient(135deg, #E3F2FD 0%, var(--color-card-bg) 100%);
+      box-shadow: 0 0 12px rgba(144, 202, 249, 0.2);
+    }
+    .card-streak.streak-state-frozen .streak-current-icon {
+      color: #64B5F6;
+    }
+    .card-streak.streak-state-frozen .streak-current-number {
+      color: #64B5F6;
+    }
+    .card-streak.streak-state-frozen::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -75%;
+      width: 50%;
+      height: 200%;
+      background: linear-gradient(90deg, transparent 0%, rgba(144, 202, 249, 0.3) 50%, transparent 100%);
+      transform: skewX(-20deg);
+      animation: iceShimmer 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes iceShimmer {
+      0%, 100% { left: -75%; }
+      50% { left: 125%; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .card-streak.streak-state-frozen {
+        background: linear-gradient(135deg, rgba(30, 60, 90, 0.4) 0%, var(--color-card-bg) 100%);
+      }
+      .streak-best {
+        background: rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-streak.streak-state-fire,
+      .card-streak.streak-state-blaze {
+        animation: none;
+      }
+      .card-streak.streak-state-frozen::after {
+        animation: none;
+        display: none;
+      }
+    }
+
+    /* ── STREAK MODAL ── */
+    .streak-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 9998;
+      animation: fadeIn 0.2s ease;
+    }
+    .streak-modal-overlay.show { display: block; }
+
+    .streak-modal {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 480px;
+      max-height: 85vh;
+      background: var(--color-card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      z-index: 9999;
+      overflow: hidden;
+      animation: slideUp 0.3s ease;
+    }
+    .streak-modal.show {
+      display: flex;
+      flex-direction: column;
+    }
+    .streak-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 2px solid var(--color-border);
+      background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+      color: white;
+    }
+    .streak-modal-header h2 {
+      margin: 0;
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .streak-modal-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      line-height: 1;
+      transition: transform 0.2s;
+    }
+    .streak-modal-close:hover { transform: scale(1.2); }
+    .streak-modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Modal calendar month */
+    .modal-month {
+      margin-bottom: 2rem;
+    }
+    .modal-month:last-child {
+      margin-bottom: 0;
+    }
+    .modal-month-title {
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .modal-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+    .modal-day-header {
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      padding: 0.25rem 0;
+    }
+    .modal-day {
       aspect-ratio: 1;
       display: flex;
-      justify-content: center;
       align-items: center;
-      background-color: var(--color-bg);
-      border-radius: 3px;
-      font-size: 0.6rem;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 0.75rem;
       color: var(--color-text-light);
-      min-width: 0;
-      overflow: hidden;
     }
-    .streak-day.active {
-      background-color: var(--color-primary);
-      color: white;
-    }
-    .streak-day.streak-hot {
-      background-color: #E67E22;
+    .modal-day.practiced {
+      background: var(--color-primary);
       color: white;
       font-weight: 600;
     }
-    .streak-day.streak-fire {
-      background-color: #E74C3C;
-      color: white;
+    .modal-day.practiced.hot {
+      background: #E67E22;
+    }
+    .modal-day.practiced.fire {
+      background: #E74C3C;
+      box-shadow: 0 0 6px rgba(231, 76, 60, 0.3);
+    }
+    .modal-day.is-today {
+      box-shadow: 0 0 0 2px var(--color-gold);
+    }
+    .modal-day.future {
+      opacity: 0.3;
+    }
+    .modal-day.empty {
+      visibility: hidden;
+    }
+    .modal-streak-summary {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      background: var(--color-bg);
+      border-radius: 8px;
+    }
+    .modal-streak-stat {
+      text-align: center;
+    }
+    .modal-streak-stat-value {
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
       font-weight: 700;
-      box-shadow: 0 0 8px rgba(231, 76, 60, 0.4);
+      color: var(--color-text);
+      display: block;
     }
-    .streak-day.today {
-      border: 2px solid var(--color-gold);
+    .modal-streak-stat-label {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
     }
-    .streak-day.future {
-      opacity: 0.4;
+    @media (prefers-color-scheme: dark) {
+      .streak-modal { background: var(--color-card-bg); }
+      .modal-streak-summary { background: rgba(255, 255, 255, 0.05); }
+    }
+    @media (max-width: 768px) {
+      .streak-modal { width: 95%; max-height: 90vh; }
+      .streak-week-dot { width: 24px; height: 24px; font-size: 0.6rem; }
     }
 
     .no-lessons {

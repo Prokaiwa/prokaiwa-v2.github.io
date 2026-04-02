@@ -43,6 +43,22 @@
             </div>
         </div>
 
+        <!-- STREAK MODAL OVERLAY -->
+        <div class="streak-modal-overlay" id="streak-modal-overlay" onclick="closeStreakModal()"></div>
+
+        <!-- STREAK MODAL -->
+        <div class="streak-modal" id="streak-modal">
+            <div class="streak-modal-header">
+                <h2><i class="fas fa-fire"></i> <span id="streak-modal-title">練習カレンダー</span></h2>
+                <button class="streak-modal-close" onclick="closeStreakModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="streak-modal-body">
+                <div id="streak-modal-content"></div>
+            </div>
+        </div>
+
         <section id="dashboard">
             <div class="dashboard-container">
                 <!-- Loading State -->
@@ -181,17 +197,10 @@
                         </div>
 
                         <!-- Streak -->
-                        <div class="dashboard-card card-streak">
+                        <div class="dashboard-card card-streak" id="streak-card" onclick="openStreakModal(getCurrentLang())">
                             <h3><i class="fas fa-fire"></i><span data-i18n="headingStreak">練習継続記録</span></h3>
-                            <div class="streak-header">
-                                <span class="streak-fire" id="streak-emoji">🔥</span>
-                                <div>
-                                    <span class="streak-count" id="streak-count">0</span>
-                                    <span class="streak-label" data-i18n="streakSuffix">日連続！</span>
-                                </div>
-                            </div>
-                            <div class="streak-calendar" id="streak-calendar">
-                                <!-- Calendar will be populated by JavaScript -->
+                            <div id="streak-card-content">
+                                <!-- Populated by renderStreakCard() -->
                             </div>
                         </div>
 

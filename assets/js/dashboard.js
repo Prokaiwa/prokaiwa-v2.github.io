@@ -755,7 +755,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 
             // Streak calendar
-            renderStreakCalendar('streak-calendar', practiceDates, lang);
+            renderStreakCard(stats, practiceDates, lang);
 
             // Achievements
             renderAchievements('achievements', stats, lang);
@@ -1225,79 +1225,202 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         // UI RENDERING
         // =============================================
 
-        function renderStreakCalendar(containerId, practiceDates, lang) {
-            const container = document.getElementById(containerId);
-            const calendarId = `${containerId}-calendar-grid`;
+        function daysSinceLastPractice(practiceDates) {
+            if (!practiceDates || practiceDates.length === 0) return 999;
+            const sorted = [...practiceDates].sort((a, b) => b.localeCompare(a));
+            const last = new Date(sorted[0]);
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            last.setHours(0, 0, 0, 0);
+            return Math.floor((now - last) / (1000 * 60 * 60 * 24));
+        }
 
-            container.innerHTML = `<div id="${calendarId}" class="streak-calendar"></div>`;
+        function getStreakHeatClass(dateStr, practiceDates) {
+            const sorted = [...practiceDates].sort();
+            let len = 1;
+            const d = new Date(dateStr);
+            for (let i = 1; i <= 30; i++) {
+                const prev = new Date(d);
+                prev.setDate(prev.getDate() - i);
+                if (sorted.includes(prev.toISOString().split('T')[0])) { len++; } else { break; }
+            }
+            if (len >= 7) return 'fire';
+            if (len >= 3) return 'hot';
+            return 'active';
+        }
 
-            const calendarGrid = document.getElementById(calendarId);
+        function renderStreakCard(stats, practiceDates, lang) {
+            const container = document.getElementById('streak-card-content');
+            const card = document.getElementById('streak-card');
+            if (!container || !card) return;
 
-            const days = lang === 'ja' 
+            const current = stats.current;
+            const best = stats.maxStreak;
+            const inactive = daysSinceLastPractice(practiceDates);
+
+            // Fire/ice card state
+            card.classList.remove('streak-state-warm', 'streak-state-fire', 'streak-state-blaze', 'streak-state-frozen');
+            if (inactive >= 5) {
+                card.classList.add('streak-state-frozen');
+            } else if (current >= 14) {
+                card.classList.add('streak-state-blaze');
+            } else if (current >= 7) {
+                card.classList.add('streak-state-fire');
+            } else if (current >= 3) {
+                card.classList.add('streak-state-warm');
+            }
+
+            // Streak icon
+            let iconClass = 'fas fa-fist-raised';
+            let iconColor = 'var(--color-primary)';
+            if (inactive >= 5) { iconClass = 'fas fa-snowflake'; iconColor = '#64B5F6'; }
+            else if (current >= 7) { iconClass = 'fas fa-fire'; iconColor = '#E74C3C'; }
+            else if (current >= 3) { iconClass = 'fas fa-fire'; iconColor = '#E67E22'; }
+
+            const streakLabel = lang === 'ja' ? '日連続' : 'day streak';
+            const bestLabel = lang === 'ja' ? '最高' : 'Best';
+            const tapLabel = lang === 'ja' ? 'タップして詳細を見る' : 'Tap to see details';
+
+            // Build last 7 days
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const dayLabelsJa = ['日', '月', '火', '水', '木', '金', '土'];
+            const dayLabelsEn = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+            let weekHTML = '';
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now);
+                d.setDate(d.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                const dayNum = d.getDate();
+                const dayOfWeek = d.getDay();
+                const label = lang === 'ja' ? dayLabelsJa[dayOfWeek] : dayLabelsEn[dayOfWeek];
+
+                let dotClass = 'streak-week-dot';
+                if (dateStr === today) dotClass += ' today';
+                if (dateStr > today) dotClass += ' future';
+                if (practiceDates.includes(dateStr)) {
+                    dotClass += ' ' + getStreakHeatClass(dateStr, practiceDates);
+                }
+
+                weekHTML += `<div class="streak-week-day">
+                    <span class="streak-week-label">${label}</span>
+                    <span class="${dotClass}">${dayNum}</span>
+                </div>`;
+            }
+
+            container.innerHTML = `
+                <div class="streak-stats">
+                    <div class="streak-current">
+                        <span class="streak-current-icon"><i class="${iconClass}" style="color: ${iconColor};"></i></span>
+                        <div>
+                            <span class="streak-current-number" id="streak-count">${current}</span>
+                            <span class="streak-current-label">${streakLabel}</span>
+                        </div>
+                    </div>
+                    <div class="streak-best">
+                        <span class="streak-best-number">${best}</span>
+                        <span class="streak-best-label">${bestLabel}</span>
+                    </div>
+                </div>
+                <div class="streak-week">${weekHTML}</div>
+                <div class="streak-tap-hint"><i class="fas fa-hand-pointer"></i> ${tapLabel}</div>
+            `;
+        }
+
+        // ── STREAK MODAL ──
+        window.openStreakModal = function(lang) {
+            document.getElementById('streak-modal-title').textContent =
+                lang === 'ja' ? '練習カレンダー' : 'Practice Calendar';
+
+            renderStreakModalCalendar(lang);
+
+            document.getElementById('streak-modal-overlay').classList.add('show');
+            document.getElementById('streak-modal').classList.add('show');
+
+            const body = document.querySelector('.streak-modal-body');
+            if (body) body.scrollTop = 0;
+        };
+
+        window.closeStreakModal = function() {
+            document.getElementById('streak-modal-overlay').classList.remove('show');
+            document.getElementById('streak-modal').classList.remove('show');
+        };
+
+        function renderStreakModalCalendar(lang) {
+            const content = document.getElementById('streak-modal-content');
+            if (!content) return;
+
+            const stats = dashboardState.stats;
+            const practiceDates = dashboardState.practiceDates || [];
+            const current = stats ? stats.current : 0;
+            const best = stats ? stats.maxStreak : 0;
+            const total = stats ? stats.total : 0;
+
+            const currentLabel = lang === 'ja' ? '現在の連続' : 'Current';
+            const bestLabel = lang === 'ja' ? '最高記録' : 'Best';
+            const totalLabel = lang === 'ja' ? '合計日数' : 'Total Days';
+            const dayHeaders = lang === 'ja'
                 ? ['日', '月', '火', '水', '木', '金', '土']
                 : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-            days.forEach(day => {
-                const header = document.createElement('div');
-                header.className = 'streak-day-header';
-                header.textContent = day;
-                calendarGrid.appendChild(header);
-            });
-
             const now = new Date();
-            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-            const today = now.getDate();
+            const today = now.toISOString().split('T')[0];
 
-            const startDay = firstDay.getDay();
-            for (let i = 0; i < startDay; i++) {
-                const empty = document.createElement('div');
-                empty.className = 'streak-day';
-                empty.style.visibility = 'hidden';
-                calendarGrid.appendChild(empty);
+            // Show current month and 2 previous months
+            let monthsHTML = '';
+            for (let m = 2; m >= 0; m--) {
+                const monthDate = new Date(now.getFullYear(), now.getMonth() - m, 1);
+                const year = monthDate.getFullYear();
+                const month = monthDate.getMonth();
+                const lastDay = new Date(year, month + 1, 0).getDate();
+                const firstDayOfWeek = monthDate.getDay();
+
+                const monthName = monthDate.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US',
+                    { year: 'numeric', month: 'long' });
+
+                let gridHTML = dayHeaders.map(d => `<div class="modal-day-header">${d}</div>`).join('');
+
+                for (let i = 0; i < firstDayOfWeek; i++) {
+                    gridHTML += '<div class="modal-day empty"></div>';
+                }
+
+                const sorted = [...practiceDates].sort();
+                for (let d = 1; d <= lastDay; d++) {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    let cls = 'modal-day';
+                    if (dateStr === today) cls += ' is-today';
+                    if (dateStr > today) cls += ' future';
+                    if (practiceDates.includes(dateStr)) {
+                        cls += ' practiced ' + getStreakHeatClass(dateStr, practiceDates);
+                    }
+                    gridHTML += `<div class="${cls}">${d}</div>`;
+                }
+
+                monthsHTML += `
+                    <div class="modal-month">
+                        <div class="modal-month-title">${monthName}</div>
+                        <div class="modal-calendar-grid">${gridHTML}</div>
+                    </div>`;
             }
 
-            const sortedDates = [...practiceDates].sort();
-
-            for (let d = 1; d <= lastDay.getDate(); d++) {
-                const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                const day = document.createElement('div');
-                day.className = 'streak-day';
-                day.textContent = d;
-
-                if (practiceDates.includes(dateStr)) {
-                    let streakLength = 1;
-                    const currentDate = new Date(dateStr);
-
-                    for (let i = 1; i <= 30; i++) {
-                        const prevDate = new Date(currentDate);
-                        prevDate.setDate(prevDate.getDate() - i);
-                        const prevDateStr = prevDate.toISOString().split('T')[0];
-
-                        if (sortedDates.includes(prevDateStr)) {
-                            streakLength++;
-                        } else {
-                            break;
-                        }
-                    }
-
-                    if (streakLength >= 7) {
-                        day.classList.add('streak-fire');
-                    } else if (streakLength >= 3) {
-                        day.classList.add('streak-hot');
-                    } else {
-                        day.classList.add('active');
-                    }
-                }
-                if (d === today) {
-                    day.classList.add('today');
-                }
-                if (d > today) {
-                    day.classList.add('future');
-                }
-
-                calendarGrid.appendChild(day);
-            }
+            content.innerHTML = `
+                <div class="modal-streak-summary">
+                    <div class="modal-streak-stat">
+                        <span class="modal-streak-stat-value">${current}</span>
+                        <span class="modal-streak-stat-label">${currentLabel}</span>
+                    </div>
+                    <div class="modal-streak-stat">
+                        <span class="modal-streak-stat-value">${best}</span>
+                        <span class="modal-streak-stat-label">${bestLabel}</span>
+                    </div>
+                    <div class="modal-streak-stat">
+                        <span class="modal-streak-stat-value">${total}</span>
+                        <span class="modal-streak-stat-label">${totalLabel}</span>
+                    </div>
+                </div>
+                ${monthsHTML}
+            `;
         }
 
         function getAchievementProgress(achievement, stats) {
@@ -1715,13 +1838,7 @@ if (hasVideoAccess) {
                     document.getElementById('sessions-total').textContent = MONTHLY_GOAL;
                     // Progress ring and counts animated after content visible
 
-                    document.getElementById('streak-count').textContent = '0';
-                    document.getElementById('streak-emoji').innerHTML = stats.current >= 7
-                        ? '<i class="fas fa-fire" style="color: #E74C3C;"></i>'
-                        : stats.current >= 3
-                            ? '<i class="fas fa-fire" style="color: #E67E22;"></i>'
-                            : '<i class="fas fa-fist-raised" style="color: var(--color-primary);"></i>';
-                    renderStreakCalendar('streak-calendar', practiceDates, lang);
+                    renderStreakCard(stats, practiceDates, lang);
 
                     renderAchievements('achievements', stats, lang);
 
