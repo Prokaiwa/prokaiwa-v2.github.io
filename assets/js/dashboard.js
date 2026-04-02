@@ -680,6 +680,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
         const dashboardState = {
             loaded: false,
+            animationsReady: true,
             profile: null,
             stats: null,
             assessment: null,
@@ -747,8 +748,10 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 }
             }
 
-            // Progress ring
-            updateProgressRing(lang, progressPercent);
+            // Progress ring (skip during initial load — scroll observer handles it)
+            if (dashboardState.animationsReady) {
+                updateProgressRing(lang, progressPercent);
+            }
 
 
             // Streak calendar
@@ -1721,42 +1724,59 @@ if (hasVideoAccess) {
 
                     renderSkillsChart('skills-assessment', assessment, lang);
 
-                // Crossfade: loading → content
+                // ── Animation pipeline ──
+                const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                // Step 1: Apply card-animate WHILE content is still hidden
+                // (transitions don't fire on display:none elements, so no flash)
+                if (!prefersReduced) {
+                    [...contentDiv.querySelectorAll(
+                        '.dashboard-hero, .quick-actions, .dashboard-card, .cancellation-banner'
+                    )].filter(el => el.style.display !== 'none')
+                      .forEach(el => el.classList.add('card-animate'));
+                }
+
+                // Step 2: Crossfade loading → content
+                // Cards are already at opacity:0 so no visible flash
                 loadingDiv.classList.add('fade-out');
                 await new Promise(r => setTimeout(r, 300));
                 loadingDiv.style.display = 'none';
                 contentDiv.style.display = 'block';
 
-                // Apply language to all static elements
+                // Step 3: Apply language text
+                // animationsReady=false prevents refreshDynamicText from filling the ring
+                dashboardState.animationsReady = false;
                 applyDashboardLanguage(lang);
                 refreshDynamicText(lang);
 
-                // Animate cards in (staggered reveal)
-                initCardAnimations(contentDiv);
+                // Step 4: Reveal cards with staggered entrance
+                if (!prefersReduced) {
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            const animatables = [...contentDiv.querySelectorAll('.card-animate')];
+                            const observer = new IntersectionObserver((entries) => {
+                                const visible = entries.filter(e => e.isIntersecting);
+                                visible.forEach((entry, i) => {
+                                    setTimeout(() => {
+                                        entry.target.classList.add('card-revealed');
+                                    }, i * 180);
+                                    observer.unobserve(entry.target);
+                                });
+                            }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+                            animatables.forEach(el => observer.observe(el));
+                        });
+                    });
 
-                // Animate stats — hero above fold, others scroll-triggered
-                const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-                if (prefersReduced) {
-                    // Instant for reduced motion
-                    document.getElementById('stat-streak').textContent = stats.current;
-                    document.getElementById('stat-total').textContent = stats.total;
-                    document.getElementById('stat-month').textContent = stats.thisMonth;
-                    document.getElementById('streak-count').textContent = stats.current;
-                    document.getElementById('sessions-completed').textContent = stats.thisMonth;
-                    updateProgressRing(lang, progressPercent);
-                } else {
-                    // Hero stats: always above fold — animate after hero reveals
+                    // Step 5a: Hero stats — always above fold, animate after hero reveals
                     setTimeout(() => {
                         animateCountUp('stat-streak', stats.current, 700);
                         animateCountUp('stat-total', stats.total, 700);
                         animateCountUp('stat-month', stats.thisMonth, 700);
-                    }, 400);
+                    }, 600);
 
-                    // Below-fold cards: animate when scrolled into view
-                    // Delay observer setup so entrance animations finish first —
-                    // prevents ring/stats animating while cards are still invisible
+                    // Step 5b: Below-fold stats — scroll-triggered after card entrances finish
                     setTimeout(() => {
+                        dashboardState.animationsReady = true;
                         const scrollObserver = new IntersectionObserver((entries) => {
                             entries.forEach(entry => {
                                 if (!entry.isIntersecting) return;
@@ -1778,7 +1798,16 @@ if (hasVideoAccess) {
                         const streakCard = contentDiv.querySelector('.card-streak');
                         if (progressCard) scrollObserver.observe(progressCard);
                         if (streakCard) scrollObserver.observe(streakCard);
-                    }, 1500);
+                    }, 1800);
+                } else {
+                    // Reduced motion: everything instant
+                    dashboardState.animationsReady = true;
+                    document.getElementById('stat-streak').textContent = stats.current;
+                    document.getElementById('stat-total').textContent = stats.total;
+                    document.getElementById('stat-month').textContent = stats.thisMonth;
+                    document.getElementById('streak-count').textContent = stats.current;
+                    document.getElementById('sessions-completed').textContent = stats.thisMonth;
+                    updateProgressRing(lang, progressPercent);
                 }
 
                 // Initialize booking widget
