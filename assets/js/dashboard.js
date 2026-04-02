@@ -1305,11 +1305,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             const streakLabel = lang === 'ja' ? '日連続' : 'day streak';
             const bestLabel = lang === 'ja' ? '最高' : 'Best';
 
-            // Lottie fire (only when on active streak AND file is uploaded)
-            const lottieHTML = LOTTIE_FIRE_ENABLED && current >= 1 && inactive < 5
-                ? '<div class="streak-lottie-wrap"><dotlottie-player src="assets/lottie/fire.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>'
-                : '';
-
             // Build last 7 days
             const now = new Date();
             const today = now.toISOString().split('T')[0];
@@ -1340,7 +1335,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
             container.innerHTML = `
                 <div class="streak-stats">
-                    ${lottieHTML}
                     <div class="streak-current">
                         <span class="streak-current-icon"><i class="${iconClass}" style="color: ${iconColor};"></i></span>
                         <div>
@@ -1369,7 +1363,12 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
             document.getElementById('streak-modal-overlay').classList.add('show');
             document.getElementById('streak-modal').classList.add('show');
-            document.body.style.overflow = 'hidden';
+
+            // Lock body scroll (iOS-safe)
+            document.body.dataset.scrollY = window.scrollY;
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${window.scrollY}px`;
+            document.body.style.width = '100%';
 
             const body = document.querySelector('.streak-modal-body');
             if (body) body.scrollTop = 0;
@@ -1378,7 +1377,13 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         window.closeStreakModal = function() {
             document.getElementById('streak-modal-overlay').classList.remove('show');
             document.getElementById('streak-modal').classList.remove('show');
-            document.body.style.overflow = '';
+
+            // Restore body scroll
+            const scrollY = document.body.dataset.scrollY || '0';
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            window.scrollTo(0, parseInt(scrollY));
         };
 
         var streakModalMonth = null; // { year, month } for current modal view
@@ -1427,8 +1432,49 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     </div>
                 </div>`;
 
-            content.innerHTML = summaryHTML + '<div id="streak-modal-calendar-area"></div>';
+            // Lottie fire in modal (when on active streak)
+            const inactive = daysSinceLastPractice(practiceDates);
+            const lottieModalHTML = LOTTIE_FIRE_ENABLED && current >= 1 && inactive < 5
+                ? '<div class="streak-lottie-wrap" style="margin: 0 auto 1rem; width: 64px; height: 64px;"><dotlottie-player src="assets/lottie/fire.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>'
+                : '';
+
+            content.innerHTML = lottieModalHTML + summaryHTML + '<div id="streak-modal-calendar-area"></div>';
             renderStreakModalMonth(lang, streakMap);
+
+            // Touch swipe — attached once here, not in renderStreakModalMonth
+            const area = document.getElementById('streak-modal-calendar-area');
+            if (area) {
+                let touchStartX = 0;
+                let touchStartY = 0;
+
+                area.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                }, { passive: true });
+
+                area.addEventListener('touchend', (e) => {
+                    const deltaX = e.changedTouches[0].clientX - touchStartX;
+                    const deltaY = e.changedTouches[0].clientY - touchStartY;
+
+                    if (Math.abs(deltaX) < 50 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+
+                    const pDates = dashboardState.practiceDates || [];
+                    const earl = getEarliestPracticeMonth(pDates);
+                    const isEarl = earl && streakModalMonth.year === earl.year && streakModalMonth.month === earl.month;
+                    const n = new Date();
+                    const isCur = streakModalMonth.year === n.getFullYear() && streakModalMonth.month === n.getMonth();
+
+                    if (deltaX < 0 && !isCur) {
+                        streakModalMonth.month++;
+                        if (streakModalMonth.month > 11) { streakModalMonth.month = 0; streakModalMonth.year++; }
+                        renderStreakModalMonth(lang, streakMap);
+                    } else if (deltaX > 0 && !isEarl && earl) {
+                        streakModalMonth.month--;
+                        if (streakModalMonth.month < 0) { streakModalMonth.month = 11; streakModalMonth.year--; }
+                        renderStreakModalMonth(lang, streakMap);
+                    }
+                }, { passive: true });
+            }
         }
 
         function renderStreakModalMonth(lang, streakMap) {
@@ -1498,39 +1544,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 renderStreakModalMonth(lang, streakMap);
             });
 
-            // Touch swipe support for mobile
-            let touchStartX = 0;
-            let touchStartY = 0;
-            area.addEventListener('touchstart', (e) => {
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-            }, { passive: true });
-
-            area.addEventListener('touchend', (e) => {
-                const deltaX = e.changedTouches[0].clientX - touchStartX;
-                const deltaY = e.changedTouches[0].clientY - touchStartY;
-
-                // Only trigger if horizontal swipe > 50px and more horizontal than vertical
-                if (Math.abs(deltaX) < 50 || Math.abs(deltaX) < Math.abs(deltaY)) return;
-
-                const pDates = dashboardState.practiceDates || [];
-                const earliest = getEarliestPracticeMonth(pDates);
-                const isEarliest = earliest && streakModalMonth.year === earliest.year && streakModalMonth.month === earliest.month;
-                const now = new Date();
-                const isCurrent = streakModalMonth.year === now.getFullYear() && streakModalMonth.month === now.getMonth();
-
-                if (deltaX < 0 && !isCurrent) {
-                    // Swipe left → next month
-                    streakModalMonth.month++;
-                    if (streakModalMonth.month > 11) { streakModalMonth.month = 0; streakModalMonth.year++; }
-                    renderStreakModalMonth(lang, streakMap);
-                } else if (deltaX > 0 && !isEarliest && earliest) {
-                    // Swipe right → previous month
-                    streakModalMonth.month--;
-                    if (streakModalMonth.month < 0) { streakModalMonth.month = 11; streakModalMonth.year--; }
-                    renderStreakModalMonth(lang, streakMap);
-                }
-            }, { passive: true });
         }
 
         function getAchievementProgress(achievement, stats) {
