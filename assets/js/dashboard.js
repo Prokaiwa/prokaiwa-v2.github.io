@@ -1498,6 +1498,36 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 
 
+
+        // =============================================
+        // COUNT-UP ANIMATION
+        // =============================================
+
+        function animateCountUp(elementId, target, durationMs) {
+            const el = document.getElementById(elementId);
+            if (!el || target <= 0) { if (el) el.textContent = target; return; }
+
+            const startTime = performance.now();
+            const startVal = 0;
+
+            function tick(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / durationMs, 1);
+                // Expo-out easing: fast start, gentle finish
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(startVal + (target - startVal) * eased);
+                el.textContent = current;
+
+                if (progress < 1) {
+                    requestAnimationFrame(tick);
+                } else {
+                    el.textContent = target;
+                }
+            }
+
+            requestAnimationFrame(tick);
+        }
+
         // =============================================
         // CARD ENTRANCE ANIMATIONS
         // =============================================
@@ -1637,9 +1667,10 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     document.getElementById('welcome-name').textContent = greetingData.greeting;
                     document.getElementById('welcome-subtitle').textContent = greetingData.subtitle;
 
-                    document.getElementById('stat-streak').textContent = stats.current;
-                    document.getElementById('stat-total').textContent = stats.total;
-                    document.getElementById('stat-month').textContent = stats.thisMonth;
+                    // Hero stats start at 0 — animated after content is visible
+                    document.getElementById('stat-streak').textContent = '0';
+                    document.getElementById('stat-total').textContent = '0';
+                    document.getElementById('stat-month').textContent = '0';
 
 
 
@@ -1673,11 +1704,11 @@ if (hasVideoAccess) {
     }
 }
 
-                    document.getElementById('sessions-completed').textContent = stats.thisMonth;
+                    document.getElementById('sessions-completed').textContent = '0';
                     document.getElementById('sessions-total').textContent = MONTHLY_GOAL;
-                    updateProgressRing(lang, progressPercent);
+                    // Progress ring and counts animated after content visible
 
-                    document.getElementById('streak-count').textContent = stats.current;
+                    document.getElementById('streak-count').textContent = '0';
                     document.getElementById('streak-emoji').innerHTML = stats.current >= 7
                         ? '<i class="fas fa-fire" style="color: #E74C3C;"></i>'
                         : stats.current >= 3
@@ -1702,6 +1733,25 @@ if (hasVideoAccess) {
 
                 // Animate cards in (staggered reveal)
                 initCardAnimations(contentDiv);
+
+                // Animate stats & progress ring after hero reveals
+                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    setTimeout(() => {
+                        animateCountUp('stat-streak', stats.current, 700);
+                        animateCountUp('stat-total', stats.total, 700);
+                        animateCountUp('stat-month', stats.thisMonth, 700);
+                        animateCountUp('streak-count', stats.current, 700);
+                        animateCountUp('sessions-completed', stats.thisMonth, 700);
+                        updateProgressRing(lang, progressPercent);
+                    }, 400);
+                } else {
+                    document.getElementById('stat-streak').textContent = stats.current;
+                    document.getElementById('stat-total').textContent = stats.total;
+                    document.getElementById('stat-month').textContent = stats.thisMonth;
+                    document.getElementById('streak-count').textContent = stats.current;
+                    document.getElementById('sessions-completed').textContent = stats.thisMonth;
+                    updateProgressRing(lang, progressPercent);
+                }
 
                 // Initialize booking widget
                 await initializeBookingWidget(profile.id, user.id);
