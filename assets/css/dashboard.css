@@ -2397,3 +2397,163 @@
     transform: none;
     box-shadow: var(--shadow-sm);
 }
+
+
+/* ============================================================
+   DAILY CHECK-IN SEQUENCE
+   ============================================================ */
+
+.checkin-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    padding: 2rem;
+    text-align: center;
+}
+.checkin-overlay.visible {
+    opacity: 1;
+}
+
+.checkin-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 400px 300px at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 300px 200px at 80% 60%, rgba(212, 160, 23, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.checkin-stage {
+    position: relative;
+    z-index: 1;
+    max-width: 400px;
+}
+
+.checkin-greeting {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.checkin-greeting.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.checkin-subtitle {
+    font-size: 1rem;
+    opacity: 0;
+    transition: opacity 0.6s ease-out 0.3s;
+}
+.checkin-subtitle.show {
+    opacity: 0.85;
+}
+
+.checkin-streak-display {
+    margin-top: 2rem;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.checkin-streak-display.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.checkin-streak-number {
+    font-family: var(--font-heading);
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    display: block;
+}
+
+.checkin-streak-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.checkin-streak-message {
+    font-size: 0.95rem;
+    opacity: 0.8;
+    margin-top: 1rem;
+    line-height: 1.5;
+}
+
+.checkin-badge-reveal {
+    margin-top: 2rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.checkin-badge-reveal.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.checkin-badge-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.checkin-badge-congrats {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-gold);
+}
+
+.checkin-badge-name {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin-top: 0.25rem;
+}
+
+.checkin-skip {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.5s ease-out 1s;
+    z-index: 1;
+    cursor: pointer;
+}
+.checkin-overlay.visible .checkin-skip {
+    opacity: 0.5;
+}
+.checkin-skip:hover {
+    opacity: 0.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .checkin-overlay,
+    .checkin-greeting,
+    .checkin-subtitle,
+    .checkin-streak-display,
+    .checkin-badge-reveal {
+        transition: none;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .checkin-overlay {
+        background: linear-gradient(135deg, #1a3a3a 0%, #0d2626 100%);
+    }
+}

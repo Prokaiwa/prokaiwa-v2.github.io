@@ -1753,6 +1753,225 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 
 
+
+        // =============================================
+        // DAILY CHECK-IN SEQUENCE
+        // =============================================
+
+        const checkinMessages = {
+            streakGrow: {
+                ja: [
+                    { text: 'すごい！{n}日連続達成！', sub: 'Keep it up! この調子！' },
+                    { text: '素晴らしい！{n}日連続！', sub: "You're on fire! 燃えてます！" },
+                    { text: '{n}日連続達成！', sub: 'Amazing consistency! 毎日の努力が光ってます！' },
+                ],
+                en: [
+                    { text: '{n}-day streak!', sub: "You're on fire!" },
+                    { text: 'Amazing — {n} days!', sub: 'Keep the momentum going!' },
+                    { text: '{n} days in a row!', sub: 'Incredible dedication!' },
+                ]
+            },
+            streakBroken: {
+                ja: [
+                    { text: 'お帰りなさい！', sub: '大丈夫！Everyone needs a break sometimes. Let's start fresh!' },
+                    { text: 'また会えて嬉しいです！', sub: '人生いろいろありますね。また一緒に頑張りましょう！' },
+                    { text: 'おかえり！', sub: '頑張って！Every day is a new beginning!' },
+                    { text: '戻ってきてくれてありがとう！', sub: '休憩も大事です。Ready to start again? 💪' },
+                ],
+                en: [
+                    { text: 'Welcome back!', sub: 'Life happens! Let's build a fresh streak!' },
+                    { text: 'Good to see you!', sub: 'Every day is a new start. Let's go!' },
+                    { text: 'Hey, you're back!', sub: 'No worries — the best time to restart is now!' },
+                    { text: 'Welcome back!', sub: 'A break doesn't erase your progress. Let's keep going!' },
+                ]
+            },
+            recovery: {
+                ja: [
+                    { text: '復活！1日目スタート！', sub: 'お帰りなさい！Welcome back! 新しい旅の始まりです！' },
+                    { text: '再スタート！', sub: 'Let's go! 新しいストリークを作りましょう！' },
+                ],
+                en: [
+                    { text: 'Day 1 — you're back!', sub: 'Fresh start! Let's build from here!' },
+                    { text: 'New streak begins!', sub: 'Welcome back! The journey continues!' },
+                ]
+            },
+            badgeCelebration: {
+                ja: ['おめでとうございます！Congratulations!', 'やったね！You earned it!', 'すごい！New badge unlocked!'],
+                en: ['Congratulations!', 'You earned it!', 'Badge unlocked!']
+            }
+        };
+
+        function getCheckinState(stats, practicedToday) {
+            const today = new Date().toISOString().split('T')[0];
+            const lastCheckin = localStorage.getItem('prokaiwa-checkin-date');
+            const alreadySeen = lastCheckin === today;
+
+            if (alreadySeen) return { shouldPlay: false };
+
+            const lastStreak = parseInt(localStorage.getItem('prokaiwa-last-streak') || '0');
+            const streakBroken = lastStreak > 0 && stats.current < lastStreak && stats.current <= 1;
+
+            // Scenario 1: Practiced today — celebrate
+            if (practicedToday) {
+                // Check for new badges
+                const currentBadges = getEarnedBadgeCodes(stats);
+                const storedBadges = JSON.parse(localStorage.getItem('prokaiwa-earned-badges') || '[]');
+                const newBadges = currentBadges.filter(b => !storedBadges.includes(b));
+
+                if (streakBroken && stats.current === 1) {
+                    return { shouldPlay: true, type: 'recovery', newBadges };
+                }
+                return { shouldPlay: true, type: 'celebration', newBadges };
+            }
+
+            // Scenario 2: Streak broken, hasn't practiced yet
+            if (streakBroken) {
+                return { shouldPlay: true, type: 'broken', newBadges: [] };
+            }
+
+            return { shouldPlay: false };
+        }
+
+        function getEarnedBadgeCodes(stats) {
+            return achievements
+                .filter(a => a.condition(stats))
+                .map(a => a.code);
+        }
+
+        function saveCheckinState(stats) {
+            const today = new Date().toISOString().split('T')[0];
+            localStorage.setItem('prokaiwa-checkin-date', today);
+            localStorage.setItem('prokaiwa-last-streak', String(stats.current));
+            localStorage.setItem('prokaiwa-earned-badges', JSON.stringify(getEarnedBadgeCodes(stats)));
+        }
+
+        function pickRandom(arr) {
+            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+            return arr[dayOfYear % arr.length];
+        }
+
+        function playCheckinSequence(checkinState, lang, stats, profile) {
+            return new Promise((resolve) => {
+                const heroName = profile.given_name_romaji || profile.name;
+                const hour = new Date().getHours();
+                let timeGreeting;
+                if (lang === 'ja') {
+                    timeGreeting = hour < 12 ? 'おはようございます' : hour < 18 ? 'こんにちは' : 'こんばんは';
+                    timeGreeting += `、${heroName}さん！`;
+                } else {
+                    timeGreeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+                    timeGreeting += `, ${heroName}!`;
+                }
+
+                // Create overlay
+                const overlay = document.createElement('div');
+                overlay.className = 'checkin-overlay';
+                overlay.innerHTML = `
+                    <div class="checkin-stage" id="checkin-stage">
+                        <div class="checkin-greeting" id="checkin-greeting">${timeGreeting}</div>
+                        <div class="checkin-subtitle" id="checkin-subtitle"></div>
+                        <div class="checkin-streak-display" id="checkin-streak"></div>
+                        <div class="checkin-badge-reveal" id="checkin-badge"></div>
+                    </div>
+                    <div class="checkin-skip">${lang === 'ja' ? 'タップしてスキップ' : 'Tap to skip'}</div>
+                `;
+                document.body.appendChild(overlay);
+
+                let completed = false;
+                function finish() {
+                    if (completed) return;
+                    completed = true;
+                    saveCheckinState(stats);
+                    overlay.classList.remove('visible');
+                    setTimeout(() => {
+                        overlay.remove();
+                        resolve();
+                    }, 500);
+                }
+
+                // Tap to skip
+                overlay.addEventListener('click', finish);
+
+                // Show overlay
+                requestAnimationFrame(() => {
+                    overlay.classList.add('visible');
+                });
+
+                const greetingEl = document.getElementById('checkin-greeting');
+                const subtitleEl = document.getElementById('checkin-subtitle');
+                const streakEl = document.getElementById('checkin-streak');
+                const badgeEl = document.getElementById('checkin-badge');
+
+                // Stage 1: Greeting (300ms delay)
+                setTimeout(() => {
+                    if (completed) return;
+                    greetingEl.classList.add('show');
+                }, 300);
+
+                // Build streak content based on type
+                let streakMsg;
+                if (checkinState.type === 'celebration') {
+                    streakMsg = pickRandom(checkinMessages.streakGrow[lang]);
+                } else if (checkinState.type === 'recovery') {
+                    streakMsg = pickRandom(checkinMessages.recovery[lang]);
+                } else {
+                    streakMsg = pickRandom(checkinMessages.streakBroken[lang]);
+                }
+
+                const streakText = streakMsg.text.replace('{n}', stats.current);
+                const streakIcon = checkinState.type === 'broken' ? '💪' : '🔥';
+
+                // Stage 2: Streak (1.5s)
+                setTimeout(() => {
+                    if (completed) return;
+                    subtitleEl.classList.add('show');
+
+                    if (checkinState.type === 'broken') {
+                        subtitleEl.textContent = streakText;
+                        streakEl.innerHTML = `
+                            <div class="checkin-streak-message">${streakMsg.sub}</div>
+                        `;
+                    } else {
+                        streakEl.innerHTML = `
+                            <span class="checkin-streak-number">${streakIcon} ${stats.current}</span>
+                            <span class="checkin-streak-label">${streakText}</span>
+                            <div class="checkin-streak-message">${streakMsg.sub}</div>
+                        `;
+                    }
+                    streakEl.classList.add('show');
+                }, 1500);
+
+                // Stage 3: Badge celebration (3.5s) — if any new badges
+                const badgeDelay = checkinState.newBadges.length > 0 ? 3500 : 0;
+                if (checkinState.newBadges.length > 0) {
+                    setTimeout(() => {
+                        if (completed) return;
+                        const firstBadge = achievements.find(a => a.code === checkinState.newBadges[0]);
+                        if (firstBadge) {
+                            const congratsMsg = pickRandom(checkinMessages.badgeCelebration[lang]);
+                            const badgeName = lang === 'ja' ? firstBadge.name_ja : firstBadge.name_en;
+                            const moreCount = checkinState.newBadges.length - 1;
+                            const moreText = moreCount > 0
+                                ? `<div style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.7;">+${moreCount} ${lang === 'ja' ? 'つのバッジも獲得' : 'more badge' + (moreCount > 1 ? 's' : '')}</div>`
+                                : '';
+
+                            badgeEl.innerHTML = `
+                                <span class="checkin-badge-icon"><i class="${firstBadge.icon}"></i></span>
+                                <div class="checkin-badge-congrats">${congratsMsg}</div>
+                                <div class="checkin-badge-name">${badgeName}</div>
+                                ${moreText}
+                            `;
+                            badgeEl.classList.add('show');
+                        }
+                    }, 3500);
+                }
+
+                // Auto-finish after sequence completes
+                const totalDuration = checkinState.newBadges.length > 0 ? 6500 : 4500;
+                setTimeout(finish, totalDuration);
+            });
+        }
+
         // =============================================
         // COUNT-UP ANIMATION
         // =============================================
@@ -1869,7 +2088,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 const realProgress = await loadRealProgress(user.id, lang);
                 const assessment = await loadLatestAssessment(user.id);
 
-                await checkTodaysPractice(user.id, lang);
+                const practicedToday = await checkTodaysPractice(user.id, lang);
 
                 let stats = {
                     current: 0,
@@ -1993,6 +2212,19 @@ if (hasVideoAccess) {
                 dashboardState.animationsReady = false;
                 applyDashboardLanguage(lang);
                 refreshDynamicText(lang);
+
+                // Step 3.5: Daily check-in sequence
+                if (!prefersReduced) {
+                    const checkinState = getCheckinState(stats, practicedToday);
+                    if (checkinState.shouldPlay) {
+                        await playCheckinSequence(checkinState, lang, stats, profile);
+                    } else {
+                        // No sequence — still save state for badge tracking
+                        saveCheckinState(stats);
+                    }
+                } else {
+                    saveCheckinState(stats);
+                }
 
                 // Step 4: Reveal cards with staggered entrance
                 if (!prefersReduced) {
