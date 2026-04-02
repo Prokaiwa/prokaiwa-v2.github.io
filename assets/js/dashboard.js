@@ -1553,7 +1553,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                         visible.forEach((entry, i) => {
                             setTimeout(() => {
                                 entry.target.classList.add('card-revealed');
-                            }, i * 120);
+                            }, i * 180);
                             observer.unobserve(entry.target);
                         });
                     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
@@ -1734,23 +1734,47 @@ if (hasVideoAccess) {
                 // Animate cards in (staggered reveal)
                 initCardAnimations(contentDiv);
 
-                // Animate stats & progress ring after hero reveals
-                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                    setTimeout(() => {
-                        animateCountUp('stat-streak', stats.current, 700);
-                        animateCountUp('stat-total', stats.total, 700);
-                        animateCountUp('stat-month', stats.thisMonth, 700);
-                        animateCountUp('streak-count', stats.current, 700);
-                        animateCountUp('sessions-completed', stats.thisMonth, 700);
-                        updateProgressRing(lang, progressPercent);
-                    }, 400);
-                } else {
+                // Animate stats — hero above fold, others scroll-triggered
+                const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                if (prefersReduced) {
+                    // Instant for reduced motion
                     document.getElementById('stat-streak').textContent = stats.current;
                     document.getElementById('stat-total').textContent = stats.total;
                     document.getElementById('stat-month').textContent = stats.thisMonth;
                     document.getElementById('streak-count').textContent = stats.current;
                     document.getElementById('sessions-completed').textContent = stats.thisMonth;
                     updateProgressRing(lang, progressPercent);
+                } else {
+                    // Hero stats: always above fold — animate after hero reveals
+                    setTimeout(() => {
+                        animateCountUp('stat-streak', stats.current, 700);
+                        animateCountUp('stat-total', stats.total, 700);
+                        animateCountUp('stat-month', stats.thisMonth, 700);
+                    }, 400);
+
+                    // Below-fold cards: animate when scrolled into view
+                    const scrollObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (!entry.isIntersecting) return;
+                            const card = entry.target;
+
+                            if (card.classList.contains('card-progress')) {
+                                animateCountUp('sessions-completed', stats.thisMonth, 700);
+                                updateProgressRing(lang, progressPercent);
+                            }
+                            if (card.classList.contains('card-streak')) {
+                                animateCountUp('streak-count', stats.current, 700);
+                            }
+
+                            scrollObserver.unobserve(card);
+                        });
+                    }, { threshold: 0.2 });
+
+                    const progressCard = contentDiv.querySelector('.card-progress');
+                    const streakCard = contentDiv.querySelector('.card-streak');
+                    if (progressCard) scrollObserver.observe(progressCard);
+                    if (streakCard) scrollObserver.observe(streakCard);
                 }
 
                 // Initialize booking widget
