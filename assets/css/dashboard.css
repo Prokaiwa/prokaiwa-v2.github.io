@@ -329,7 +329,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
     .modal-month-nav-title {
       font-family: var(--font-heading);
@@ -649,8 +649,8 @@
       display: flex;
       justify-content: center;
       gap: 2rem;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
       background: var(--color-bg);
       border-radius: 8px;
     }
