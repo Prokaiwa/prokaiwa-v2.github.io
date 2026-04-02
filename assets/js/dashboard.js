@@ -1415,9 +1415,16 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             const bestLabel = lang === 'ja' ? '最高記録' : 'Best';
             const totalLabel = lang === 'ja' ? '合計日数' : 'Total Days';
 
+            // Lottie fire (inline with summary stats)
+            const inactive = daysSinceLastPractice(practiceDates);
+            const lottieInlineHTML = LOTTIE_FIRE_ENABLED && current >= 1 && inactive < 5
+                ? '<div class="streak-lottie-wrap"><dotlottie-player src="assets/lottie/fire.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>'
+                : '';
+
             // Summary bar
             const summaryHTML = `
                 <div class="modal-streak-summary">
+                    ${lottieInlineHTML}
                     <div class="modal-streak-stat">
                         <span class="modal-streak-stat-value">${current}</span>
                         <span class="modal-streak-stat-label">${currentLabel}</span>
@@ -1432,13 +1439,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     </div>
                 </div>`;
 
-            // Lottie fire in modal (when on active streak)
-            const inactive = daysSinceLastPractice(practiceDates);
-            const lottieModalHTML = LOTTIE_FIRE_ENABLED && current >= 1 && inactive < 5
-                ? '<div class="streak-lottie-wrap" style="margin: 0 auto 1rem; width: 64px; height: 64px;"><dotlottie-player src="assets/lottie/fire.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>'
-                : '';
-
-            content.innerHTML = lottieModalHTML + summaryHTML + '<div id="streak-modal-calendar-area"></div>';
+            content.innerHTML = summaryHTML + '<div id="streak-modal-calendar-area"></div>';
             renderStreakModalMonth(lang, streakMap);
 
             // Touch swipe — attached once here, not in renderStreakModalMonth
