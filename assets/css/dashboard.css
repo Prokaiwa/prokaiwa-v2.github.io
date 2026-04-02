@@ -546,8 +546,8 @@
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       width: 90%;
-      max-width: 480px;
-      max-height: 85vh;
+      max-width: 520px;
+      max-height: 92vh;
       background: var(--color-card-bg);
       border-radius: var(--border-radius);
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
