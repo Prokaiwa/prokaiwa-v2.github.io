@@ -2626,6 +2626,99 @@
 .checkin-badge-name { font-size: 0.95rem; opacity: 0.9; margin-top: 0.25rem; }
 
 /* Skip hint */
+
+/* Check-in badge tier styles (mirrors achievements page) */
+.checkin-badge-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.checkin-badge-circle.tier-bronze {
+    background: linear-gradient(145deg, #f5e6d3 0%, #e8d5c0 100%);
+    color: #8b5e3c;
+    border: 3px solid #cd7f32;
+    box-shadow: 0 0 0 2px rgba(205, 127, 50, 0.25), 0 0 16px rgba(205, 127, 50, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.checkin-badge-circle.tier-silver {
+    background: linear-gradient(145deg, #f0f0f0 0%, #d8d8d8 50%, #e8e8e8 100%);
+    color: #606060;
+    border: 3px solid #b0b0b0;
+    box-shadow: 0 0 0 2px rgba(192, 192, 192, 0.35), 0 0 16px rgba(160, 160, 160, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.checkin-badge-circle.tier-gold {
+    background: linear-gradient(145deg, #fff8e1 0%, #ffe082 40%, #ffd54f 100%);
+    color: #b8860b;
+    border: 3px solid var(--color-gold);
+    box-shadow: 0 0 0 2px rgba(212, 160, 23, 0.3), 0 0 20px rgba(212, 160, 23, 0.3), 0 4px 18px rgba(212, 160, 23, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    animation: checkinBadgeGlow 2s ease-in-out infinite;
+}
+
+.checkin-badge-circle.tier-platinum {
+    background: linear-gradient(145deg, #E8EEF4 0%, #B8C9DB 40%, #D4E0EC 100%);
+    color: #4A6A8A;
+    border: 3px solid #8EAAC4;
+    box-shadow: 0 0 0 2px rgba(142, 170, 196, 0.3), 0 0 18px rgba(142, 170, 196, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    animation: checkinBadgeGlow 2s ease-in-out infinite;
+}
+
+.checkin-badge-circle.tier-legendary {
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #FFD700;
+    border: 3px solid #FFD700;
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3), 0 0 24px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 107, 107, 0.15);
+    animation: checkinBadgeGlow 1.5s ease-in-out infinite;
+}
+
+.checkin-badge-circle.tier-themed {
+    background: var(--badge-bg, #666);
+    color: var(--badge-fg, white);
+    border: 3px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.25);
+}
+
+@keyframes checkinBadgeGlow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.15); }
+}
+
+/* Shimmer sweep on check-in badge */
+.checkin-badge-circle::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -75%;
+    width: 50%;
+    height: 200%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+    transform: skewX(-20deg);
+    animation: checkinShimmer 2s ease-in-out infinite;
+}
+
+@keyframes checkinShimmer {
+    0%, 100% { left: -75%; }
+    50% { left: 125%; }
+}
+
+.checkin-badge-desc {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-top: 0.35rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .checkin-badge-circle { animation: none; }
+    .checkin-badge-circle::after { animation: none; display: none; }
+}
 .checkin-skip {
     position: absolute;
     bottom: 2rem;

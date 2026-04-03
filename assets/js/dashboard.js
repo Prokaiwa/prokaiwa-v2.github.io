@@ -1990,15 +1990,21 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                         if (firstBadge) {
                             var congratsMsg = pickRandom(checkinMessages.badgeCelebration[lang]);
                             var badgeName = lang === "ja" ? firstBadge.name_ja : firstBadge.name_en;
+                            var badgeDesc = lang === "ja" ? firstBadge.desc_ja : firstBadge.desc_en;
+                            var tierClass = "tier-" + firstBadge.tier;
+                            var themeStyle = firstBadge.colors
+                                ? ' style="--badge-bg: ' + firstBadge.colors.bg + '; --badge-fg: ' + firstBadge.colors.fg + ';"'
+                                : "";
                             var moreCount = checkinState.newBadges.length - 1;
                             var moreText = moreCount > 0
-                                ? '<div style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.7;">+' + moreCount + " " + (lang === "ja" ? "つのバッジも獲得" : "more badge" + (moreCount > 1 ? "s" : "")) + '</div>'
+                                ? '<div style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.7;">+' + moreCount + " " + (lang === "ja" ? "つのバッジも獲得" : "more badge" + (moreCount > 1 ? "s" : "")) + '</div>'
                                 : "";
                             var badgeEl = document.getElementById("checkin-badge");
                             badgeEl.innerHTML =
-                                '<span class="checkin-badge-icon"><i class="' + firstBadge.icon + '"></i></span>' +
+                                '<div class="checkin-badge-circle ' + tierClass + '"' + themeStyle + '><i class="' + firstBadge.icon + '"></i></div>' +
                                 '<div class="checkin-badge-congrats">' + congratsMsg + '</div>' +
-                                '<div class="checkin-badge-name">' + badgeName + '</div>' + moreText;
+                                '<div class="checkin-badge-name">' + badgeName + '</div>' +
+                                '<div class="checkin-badge-desc">' + badgeDesc + '</div>' + moreText;
                             badgeEl.classList.add("show");
                         }
                     }, streakDelay + 1200);
