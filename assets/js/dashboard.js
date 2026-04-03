@@ -1875,7 +1875,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             },
             streak_7: {
                 ja: ["1週間毎日！すごい！A full week of dedication!", "7日間休まず頑張った！That takes real willpower!"],
-                en: ["A full week! Seven days of showing up. Remarkable!", "One week straight! Most people never make it this far."]
+                en: ["A full week! Seven days of showing up. Remarkable!", "One week straight! Most people struggle to get this far."]
             },
             streak_14: {
                 ja: ["2週間連続！本気だね！You're serious about this!", "14日間の努力！This is real commitment!"],
@@ -1968,7 +1968,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 en: ["April complete! Spring is in full bloom and so are your skills!", "April done! Fresh energy, fresh progress!"]
             },
             may_2026: {
-                ja: ["5月達成！ゴールデンウィークも乗り越えた！", "5月クリア！新緑の季節に実力も成長中！"],
+                ja: ["5月達成！ゴールデンウィークも乗り越えた！You powered through!", "5月クリア！新緑の季節に実力も成長中！Growing with the greenery!"],
                 en: ["May complete! You powered through Golden Week!", "May done! Your skills are growing like the spring leaves!"]
             },
             jun_2026: {
@@ -1984,11 +1984,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 en: ["August complete! Summer heat, summer learning, summer achievement!", "August done! While others took vacation, you kept growing!"]
             },
             sep_2026: {
-                ja: ["9月達成！秋の始まりと共に実力アップ！", "9月クリア！涼しくなってきた季節に熱い努力！"],
+                ja: ["9月達成！秋の始まりと共に実力アップ！Fall into learning!", "9月クリア！涼しくなってきた季節に熱い努力！Cool weather, hot effort!"],
                 en: ["September complete! Fall begins and your skills keep rising!", "September done! Cooling weather, warming skills!"]
             },
             oct_2026: {
-                ja: ["10月達成！秋深まる中、英語力も深まる！", "10月クリア！ハロウィンシーズンも怖いくらい頑張った！"],
+                ja: ["10月達成！秋深まる中、英語力も深まる！Deeper into fall, deeper into English!", "10月クリア！ハロウィンシーズンも怖いくらい頑張った！Scary good effort!"],
                 en: ["October complete! Your skills are scary good this Halloween season!", "October done! Falling leaves, rising skills!"]
             },
             nov_2026: {
@@ -2017,11 +2017,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 en: ["Valentine's Day practice! Showing love for learning!", "Love is in the air, and so is your dedication! Happy Valentine's Day!"]
             },
             hinamatsuri: {
-                ja: ["ひな祭りに練習！Beautiful dedication!", "お雛様のように美しい努力！Elegant and dedicated!"],
+                ja: ["ひな祭りに練習！Beautiful dedication! Elegant and strong!", "お雛様のように美しい努力！Elegant and dedicated!"],
                 en: ["Hinamatsuri! Japan's Doll Festival celebrates girls and springtime. And we celebrate YOU!", "Practicing on Hinamatsuri! Tradition and growth go hand in hand."]
             },
             golden_week: {
-                ja: ["ゴールデンウィークも英語！休みの日も成長中！", "GW中に5日も練習！True golden effort!"],
+                ja: ["ゴールデンウィークも英語！休みの日も成長中！No days off from greatness!", "GW中に5日も練習！True golden effort!"],
                 en: ["Golden Week warrior! While Japan takes a holiday break, you kept learning!", "5 days of practice during Golden Week! That's truly golden!"]
             },
             cinco_de_mayo: {
@@ -2029,11 +2029,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 en: ["Cinco de Mayo! This day celebrates Mexican culture and the victory at the Battle of Puebla in 1862. Learning never stops!", "Happy Cinco de Mayo! A celebration of culture, resilience, and pride. Just like your English journey!"]
             },
             tanabata: {
-                ja: ["七夕に練習！あなたの英語の願い、きっと叶う！", "星に願いを！Your English dreams are coming true!"],
+                ja: ["七夕に練習！あなたの英語の願い、きっと叶う！May your wishes come true!", "星に願いを！Your English dreams are coming true!"],
                 en: ["Tanabata! On this day, Japanese people write wishes on paper and hang them on bamboo. Your wish for better English is coming true!", "The Star Festival! Making wishes and making progress!"]
             },
             obon: {
-                ja: ["お盆も練習！ご先祖様も誇りに思ってる！", "お盆休みも英語学習！Incredible dedication!"],
+                ja: ["お盆も練習！ご先祖様も誇りに思ってる！Your ancestors would be proud!", "お盆休みも英語学習！Incredible dedication! Rest and grow!"],
                 en: ["Practicing during Obon! This is a time to honor ancestors in Japan. They'd be proud of your dedication!", "Obon practice! Honoring tradition while building your future."]
             },
             sports_day: {
@@ -2057,7 +2057,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 en: ["Christmas Eve practice! The gift of learning is one you give yourself!", "Eve of Christmas and you're here learning! That's the true holiday spirit!"]
             },
             christmas_day: {
-                ja: ["メリークリスマス！Merry Christmas from Prokaiwa! 素晴らしいプレゼントは自分への投資！", "クリスマスに練習！Prokaiwaからのプレゼントは、あなたの成長です！"],
+                ja: ["Merry Christmas! メリークリスマス！Prokaiwaから素敵なクリスマスを！The best gift is growing every day!", "クリスマスに練習！Merry Christmas from Prokaiwa! あなたの成長が最高のプレゼント！"],
                 en: ["Merry Christmas from Prokaiwa! The best gift is the one you give yourself - growth!", "Merry Christmas! Practicing today? You're on the nice list for sure!"]
             }
         };
@@ -2325,7 +2325,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     }, badgeTransitionStart + 600);
 
                     // Auto-finish after badge shows
-                    setTimeout(finish, badgeTransitionStart + 3500);
+                    setTimeout(finish, badgeTransitionStart + 5500);
                 } else {
                     // No badge — finish after streak display
                     setTimeout(finish, streakDelay + 2000);
