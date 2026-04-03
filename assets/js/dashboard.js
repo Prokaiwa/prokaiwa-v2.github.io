@@ -1896,13 +1896,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     let dotCls = "checkin-ring-dot";
                     if (isToday) dotCls += " dot-today";
 
-                    // Lottie burst above today
-                    let lottieBurst = "";
-                    if (isToday && LOTTIE_FIRE_ENABLED && checkinState.type !== "broken") {
-                        lottieBurst = '<div class="checkin-dot-lottie" id="checkin-dot-lottie"><dotlottie-player src="assets/lottie/fire.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>';
-                    }
-
-                    dotsHTML += '<div class="checkin-ring-day">' + lottieBurst +
+                    dotsHTML += '<div class="checkin-ring-day">' +
                         '<div class="' + dotCls + '" data-idx="' + (dotCount - 1 - di) + '">' +
                         '<svg width="36" height="36"><circle cx="18" cy="18" r="15" class="ring-bg"/><circle cx="18" cy="18" r="15" class="ring-fill"/></svg>' +
                         '<span class="ring-number">' + dayNum + '</span>' +
