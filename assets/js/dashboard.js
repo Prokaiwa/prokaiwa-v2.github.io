@@ -1921,24 +1921,80 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 const streakText = streakMsg.text.replace('{n}', stats.current);
                 const streakIcon = checkinState.type === 'broken' ? '💪' : '🔥';
 
-                // Stage 2: Streak (1.5s)
+                // Build week calendar HTML
+                const weekNow = new Date();
+                const weekToday = weekNow.toISOString().split('T')[0];
+                const wkLabelsJa = ['日', '月', '火', '水', '木', '金', '土'];
+                const wkLabelsEn = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                const pDates = dashboardState.practiceDates || [];
+                const sMap = buildStreakMap(pDates);
+
+                let weekDotsHTML = '';
+                for (let wi = 6; wi >= 0; wi--) {
+                    const wd = new Date(weekNow);
+                    wd.setDate(wd.getDate() - wi);
+                    const wDateStr = wd.toISOString().split('T')[0];
+                    const wDayNum = wd.getDate();
+                    const wDow = wd.getDay();
+                    const wLabel = lang === 'ja' ? wkLabelsJa[wDow] : wkLabelsEn[wDow];
+                    const isToday = wDateStr === weekToday;
+                    const isPracticed = pDates.includes(wDateStr);
+
+                    let dotCls = 'checkin-week-dot';
+                    if (isToday) dotCls += ' dot-today';
+                    if (isPracticed && !isToday) {
+                        const heat = getStreakHeatClass(wDateStr, sMap);
+                        dotCls += heat === 'fire' ? ' dot-fire' : heat === 'hot' ? ' dot-hot' : ' dot-practiced';
+                    }
+
+                    weekDotsHTML += '<div class="checkin-week-day">' +
+                        '<span class="checkin-week-day-label">' + wLabel + '</span>' +
+                        '<span class="' + dotCls + '" data-idx="' + (6 - wi) + '">' + wDayNum + '</span>' +
+                        '</div>';
+                }
+
+                const todayLottieHTML = LOTTIE_FIRE_ENABLED && checkinState.type !== 'broken'
+                    ? '<div class="checkin-today-lottie" id="checkin-today-lottie"><dotlottie-player src="assets/lottie/fire.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>'
+                    : '';
+
+                // Stage 2: Streak + Week (1.5s)
                 setTimeout(() => {
                     if (completed) return;
                     subtitleEl.classList.add('show');
 
                     if (checkinState.type === 'broken') {
                         subtitleEl.textContent = streakText;
-                        streakEl.innerHTML = `
-                            <div class="checkin-streak-message">${streakMsg.sub}</div>
-                        `;
+                        streakEl.innerHTML =
+                            '<div class="checkin-streak-message">' + streakMsg.sub + '</div>' +
+                            '<div class="checkin-week">' + weekDotsHTML + '</div>';
                     } else {
-                        streakEl.innerHTML = `
-                            <span class="checkin-streak-number">${streakIcon} ${stats.current}</span>
-                            <span class="checkin-streak-label">${streakText}</span>
-                            <div class="checkin-streak-message">${streakMsg.sub}</div>
-                        `;
+                        streakEl.innerHTML =
+                            '<span class="checkin-streak-number">' + streakIcon + ' ' + stats.current + '</span>' +
+                            '<span class="checkin-streak-label">' + streakText + '</span>' +
+                            '<div class="checkin-streak-message">' + streakMsg.sub + '</div>' +
+                            todayLottieHTML +
+                            '<div class="checkin-week">' + weekDotsHTML + '</div>';
                     }
                     streakEl.classList.add('show');
+
+                    // Stagger the week dots
+                    const dots = streakEl.querySelectorAll('.checkin-week-dot');
+                    dots.forEach((dot, i) => {
+                        const idx = parseInt(dot.dataset.idx);
+                        const isLast = idx === 6;
+                        setTimeout(() => {
+                            if (completed) return;
+                            dot.classList.add('dot-visible');
+                            // Today's dot: also show lottie burst
+                            if (isLast && checkinState.type !== 'broken') {
+                                dot.classList.add('dot-practiced', 'dot-fire');
+                                const lottieEl = document.getElementById('checkin-today-lottie');
+                                if (lottieEl) {
+                                    setTimeout(() => lottieEl.classList.add('show'), 100);
+                                }
+                            }
+                        }, idx * 120);
+                    });
                 }, 1500);
 
                 // Stage 3: Badge celebration (3.5s) — if any new badges
@@ -1967,7 +2023,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 }
 
                 // Auto-finish after sequence completes
-                const totalDuration = checkinState.newBadges.length > 0 ? 6500 : 4500;
+                const totalDuration = checkinState.newBadges.length > 0 ? 7500 : 5500;
                 setTimeout(finish, totalDuration);
             });
         }
@@ -2387,6 +2443,13 @@ if (hasVideoAccess) {
             else card.classList.add('streak-state-warm');
             console.log('🔥 Fire state applied: ' + (level || 'warm') + '. Reload to reset.');
         };
+        // ?replay support — clear checkin date to replay sequence
+        if (new URLSearchParams(window.location.search).has('replay')) {
+            localStorage.removeItem('prokaiwa-checkin-date');
+            // Clean URL without reload
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+
         loadDashboard();
 
         const yearEl = document.getElementById('year'); if (yearEl) yearEl.textContent = new Date().getFullYear();
