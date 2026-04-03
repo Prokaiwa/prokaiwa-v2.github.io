@@ -2411,6 +2411,32 @@ if (hasVideoAccess) {
         // =============================================
         // CONSOLE HELPERS (testing card states)
         // =============================================
+
+        // Console helpers for testing check-in sequence
+        window.testCheckin = function(streakCount, showBadge) {
+            var lang = getCurrentLang();
+            var fakeStats = {
+                current: streakCount || 7,
+                maxStreak: Math.max(streakCount || 7, dashboardState.stats?.maxStreak || 0),
+                total: dashboardState.stats?.total || 10,
+                thisMonth: dashboardState.stats?.thisMonth || 5,
+                practiceDates: dashboardState.practiceDates || []
+            };
+            var fakeState = {
+                shouldPlay: true,
+                type: "celebration",
+                newBadges: showBadge ? ["streak_7"] : []
+            };
+            playCheckinSequence(fakeState, lang, fakeStats, dashboardState.profile);
+            console.log("🎬
+        };
+        window.testCheckinBroken = function() {
+            var lang = getCurrentLang();
+            var fakeStats = { current: 0, maxStreak: 14, total: 20, thisMonth: 5, practiceDates: [] };
+            var fakeState = { shouldPlay: true, type: "broken", newBadges: [] };
+            playCheckinSequence(fakeState, lang, fakeStats, dashboardState.profile);
+            console.log("🎬 Test broken streak check-in");
+        };
         window.testIceState = function() {
             const card = document.getElementById('streak-card');
             card.classList.remove('streak-state-warm', 'streak-state-fire', 'streak-state-blaze');
