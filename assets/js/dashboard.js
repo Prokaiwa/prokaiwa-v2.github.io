@@ -1949,11 +1949,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     if (isToday) dotCls += " dot-today";
 
                     dotsHTML += '<div class="checkin-ring-day">' +
+                        '<span class="checkin-ring-label">' + label + '</span>' +
                         '<div class="' + dotCls + '" data-idx="' + (dotCount - 1 - di) + '">' +
                         '<svg width="36" height="36"><circle cx="18" cy="18" r="15" class="ring-bg"/><circle cx="18" cy="18" r="15" class="ring-fill"/></svg>' +
                         '<span class="ring-number">' + dayNum + '</span>' +
                         '</div>' +
-                        '<span class="checkin-ring-label">' + label + '</span>' +
                         '</div>';
                 }
 
