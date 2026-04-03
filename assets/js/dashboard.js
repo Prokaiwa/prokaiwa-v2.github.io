@@ -1854,6 +1854,245 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             return pickRandom(tier);
         }
 
+
+        // =============================================
+        // BADGE-SPECIFIC CELEBRATION MESSAGES
+        // =============================================
+
+        const badgePhrases = {
+            // ── CORE MILESTONES ──
+            first_session: {
+                ja: ["初めての一歩！The first step is always the bravest!", "記念すべき瞬間！Your English journey starts now!"],
+                en: ["Your very first session! The journey of a thousand miles begins here.", "You showed up! That's the hardest part. Welcome to your journey!"]
+            },
+            streak_3: {
+                ja: ["3日連続！習慣の始まり！A habit is born!", "3日間頑張った！You're building something special!"],
+                en: ["Three days in! A habit takes shape one day at a time.", "You showed up three days straight. That takes real intention!"]
+            },
+            sessions_10: {
+                ja: ["10回達成！もう立派な学習者！You're officially a learner!", "10回の努力が積み重なった！Every session counts!"],
+                en: ["Double digits! 10 sessions of real progress.", "10 sessions done! You're building a foundation that lasts."]
+            },
+            streak_7: {
+                ja: ["1週間毎日！すごい！A full week of dedication!", "7日間休まず頑張った！That takes real willpower!"],
+                en: ["A full week! Seven days of showing up. Remarkable!", "One week straight! Most people never make it this far."]
+            },
+            streak_14: {
+                ja: ["2週間連続！本気だね！You're serious about this!", "14日間の努力！This is real commitment!"],
+                en: ["Two full weeks! This is no longer a phase, it's a lifestyle.", "14 days! You've proven this isn't luck - it's dedication."]
+            },
+            sessions_50: {
+                ja: ["50回達成！もう初心者じゃない！You've outgrown beginner!", "半世紀のセッション！What a milestone!"],
+                en: ["50 sessions! You've officially left beginner territory.", "Half a hundred! Your dedication is paying off."]
+            },
+            streak_30: {
+                ja: ["1ヶ月毎日！信じられない！A whole month!", "30日連続！あなたの意志の強さに感動！"],
+                en: ["A full month! 30 days of unwavering commitment.", "30 days straight. You've built a real habit!"]
+            },
+            streak_60: {
+                ja: ["2ヶ月連続！驚異的！Two months of daily practice!", "60日連続！あなたの努力は本物！Your effort is the real deal!"],
+                en: ["Two months! 60 days of daily dedication. Extraordinary!", "60 days! At this point, English is part of who you are."]
+            },
+            streak_90: {
+                ja: ["3ヶ月連続！英語学習のプロ！A true English learning pro!", "90日達成！ゴールドの実力！Gold-level commitment!"],
+                en: ["90 days! Three months of daily practice. You're gold!", "A full quarter of the year! This level of commitment is rare."]
+            },
+            streak_120: {
+                ja: ["4ヶ月連続！止められない！Nothing can stop you now!", "120日達成！あなたの情熱は本物！Your passion is undeniable!"],
+                en: ["120 days! Four months of daily practice. Incredible discipline!", "Four months straight. You're in elite territory now!"]
+            },
+            sessions_100: {
+                ja: ["100回達成！素晴らしい節目！What a milestone!", "100セッション！一つ一つの積み重ね！Each one brought you here!"],
+                en: ["100 sessions! Triple digits. What an achievement!", "One hundred sessions of growth. That's truly something special."]
+            },
+            streak_240: {
+                ja: ["8ヶ月連続！プラチナの輝き！Platinum dedication!", "240日達成！ほとんどの人が想像もできない記録！"],
+                en: ["240 days! Eight months of daily practice. Platinum level!", "Eight months straight. You're in a league of your own!"]
+            },
+            sessions_250: {
+                ja: ["250回達成！プラチナレベル！Very few reach this far!", "250セッション！あなたの英語力は確実に変わった！"],
+                en: ["250 sessions! Platinum level. The transformation is real!", "A quarter thousand sessions. Elite doesn't even begin to describe this."]
+            },
+            sessions_500: {
+                ja: ["500回達成！伝説です！あなたの努力と commitment に心から感謝します。Prokaiwaはあなたのような学習者がいることを誇りに思います。", "500セッション！LEGENDARY! ここまで来るのは並大抵のことじゃない。あなたの journey を見守れて本当に光栄です。Thank you for being incredible!"],
+                en: ["500 SESSIONS! You are LEGENDARY! Thank you for your incredible dedication to learning English. Prokaiwa is honored to be part of your journey.", "FIVE HUNDRED! This achievement speaks to who you are as a person. Thank you for trusting us with your growth. You inspire everyone around you!"]
+            },
+            streak_365: {
+                ja: ["365日連続！1年間毎日！これは伝説です。あなたの commitment と情熱に心から感謝します。この記録は永遠に輝き続けます。Thank you for being absolutely extraordinary!", "1年間毎日休まず！LEGENDARY! 言葉では表せないほどの努力。Prokaiwaファミリーの一員でいてくれて、ありがとうございます。You are truly one of a kind!"],
+                en: ["365 DAYS! A FULL YEAR of daily practice! This is LEGENDARY. Thank you from the bottom of our hearts for your extraordinary commitment. You've achieved what most only dream of!", "ONE YEAR STRAIGHT! There are no words big enough. Thank you for your incredible journey with Prokaiwa. You haven't just learned English - you've proven what dedication looks like!"]
+            },
+            // ── SPEED & STYLE ──
+            weekend_warrior: {
+                ja: ["週末も頑張る！Weekends are for growing!", "休日返上で英語学習！That's the warrior spirit!"],
+                en: ["Weekends are for warriors! While others rest, you grow.", "A true weekend warrior! No days off from greatness."]
+            },
+            blitz: {
+                ja: ["素早い回答！Lightning fast!", "電光石火！Quick thinking is a real skill!"],
+                en: ["Lightning fast! Speed shows confidence.", "Blitz mode! Quick responses mean the language is sinking in."]
+            },
+            morning_person: {
+                ja: ["朝活英語！In America we say 'the early bird catches the worm' - 早起きは三文の徳！", "朝から英語学習！Morning practice sets the tone for the whole day!"],
+                en: ["Rise and shine! We call this being an 'early bird' - and the early bird catches the worm!", "Morning learner! Starting your day with English sets you up for success."]
+            },
+            lunch_learner: {
+                ja: ["ランチタイムに英語！Making lunch productive AND fun!", "お昼休みを有効活用！Turning break time into brain time!"],
+                en: ["Lunch break learning! We love helping make your lunch productive and fun!", "Midday practice! A brain workout is the best lunch companion."]
+            },
+            commuter_crunch: {
+                ja: ["通勤時間を活用！Making every minute count!", "電車の中でも英語学習！Turning commute time into growth time!"],
+                en: ["Commuter learner! Making dead time into growth time.", "Learning on the go! Every minute counts when you're dedicated."]
+            },
+            consistency_champion: {
+                ja: ["安定の練習リズム！Consistency is key to improving any skill!", "毎日コツコツ！That's the real secret to mastery!"],
+                en: ["Consistency champion! Consistency is the key to improving any skill.", "Steady and reliable! The tortoise always beats the hare."]
+            },
+            perfect_month: {
+                ja: ["完璧な1ヶ月！Not a single day missed!", "パーフェクト月間！Every single day! 信じられない！"],
+                en: ["A PERFECT month! Not a single day missed. Flawless!", "Every. Single. Day. That's what perfection looks like!"]
+            },
+            // ── SEASONAL ──
+            jan_2026: {
+                ja: ["1月達成！寒い冬も頑張った！Hope you're staying warm this winter!", "新年からのスタート！A strong start to 2026!"],
+                en: ["January complete! Staying warm and staying sharp this winter!", "New year, new dedication! What a way to start 2026!"]
+            },
+            feb_2026: {
+                ja: ["2月達成！短い月でも頑張った！Every day of February counted!", "2月クリア！Winter is almost over, but your fire burns bright!"],
+                en: ["February done! The shortest month but your effort was full-sized!", "February complete! Love is in the air, and so is your dedication!"]
+            },
+            mar_2026: {
+                ja: ["3月達成！Spring is here! 春の訪れと一緒に成長中！", "3月クリア！桜の季節に素晴らしい成果！"],
+                en: ["March complete! Spring is here, and so is your growth!", "March done! New season, new blossoms, new achievements!"]
+            },
+            apr_2026: {
+                ja: ["4月達成！新年度も絶好調！New school year energy!", "4月クリア！Fresh starts are beautiful!"],
+                en: ["April complete! Spring is in full bloom and so are your skills!", "April done! Fresh energy, fresh progress!"]
+            },
+            may_2026: {
+                ja: ["5月達成！ゴールデンウィークも乗り越えた！", "5月クリア！新緑の季節に実力も成長中！"],
+                en: ["May complete! You powered through Golden Week!", "May done! Your skills are growing like the spring leaves!"]
+            },
+            jun_2026: {
+                ja: ["6月達成！梅雨にも負けない！Rain can't stop you!", "6月クリア！ジメジメした季節でもモチベーション維持！"],
+                en: ["June complete! Not even the rainy season could slow you down!", "June done! Sunshine or rain, you showed up!"]
+            },
+            jul_2026: {
+                ja: ["7月達成！夏本番！Beach time! 暑い夏も英語も熱い！", "7月クリア！夏を楽しみながら成長中！"],
+                en: ["July complete! It's beach time! Enjoying the warm weather AND learning!", "July done! Hot summer, hotter dedication!"]
+            },
+            aug_2026: {
+                ja: ["8月達成！夏休みも練習を続けた！Incredible!", "8月クリア！真夏の暑さにも負けない情熱！"],
+                en: ["August complete! Summer heat, summer learning, summer achievement!", "August done! While others took vacation, you kept growing!"]
+            },
+            sep_2026: {
+                ja: ["9月達成！秋の始まりと共に実力アップ！", "9月クリア！涼しくなってきた季節に熱い努力！"],
+                en: ["September complete! Fall begins and your skills keep rising!", "September done! Cooling weather, warming skills!"]
+            },
+            oct_2026: {
+                ja: ["10月達成！秋深まる中、英語力も深まる！", "10月クリア！ハロウィンシーズンも怖いくらい頑張った！"],
+                en: ["October complete! Your skills are scary good this Halloween season!", "October done! Falling leaves, rising skills!"]
+            },
+            nov_2026: {
+                ja: ["11月達成！In November, Americans celebrate Thanksgiving - 感謝の季節。今日はあなたに感謝！Thank you!", "11月クリア！秋の終わりも最後まで走り抜けた！"],
+                en: ["November complete! In the spirit of Thanksgiving, we're thankful for YOU and your dedication!", "November done! Gratitude season, and we're grateful for learners like you!"]
+            },
+            dec_2026: {
+                ja: ["12月達成！年末まで走り抜けた！What a year!", "12月クリア！最高の形で2026年を締めくくった！"],
+                en: ["December complete! You finished the year strong!", "December done! What an incredible way to close out 2026!"]
+            },
+            // ── HOLIDAYS ──
+            new_years_day: {
+                ja: ["明けましておめでとう！Happy New Year! Prokaiwaから素晴らしい1年を祈っています！", "元日から練習！New year, new you! 最高のスタート！"],
+                en: ["Happy New Year! Prokaiwa wishes you an absolutely amazing year ahead!", "Practicing on New Year's Day! Now THAT's how you start a year!"]
+            },
+            coming_of_age: {
+                ja: ["成人の日おめでとう！A day celebrating adulthood in Japan!", "大人への一歩！Growing up AND growing your English!"],
+                en: ["Coming of Age Day! In Japan, this day celebrates becoming an adult. And you're growing too!", "A celebration of growth and maturity - just like your English skills!"]
+            },
+            setsubun: {
+                ja: ["鬼は外、福は内！And English skills are IN!", "節分に練習！Throwing out bad habits, inviting good ones!"],
+                en: ["Setsubun! In Japan, people throw beans to chase away bad luck. You're throwing away excuses!", "On Setsubun, we say 'out with the bad, in with the good' - like your improving English!"]
+            },
+            valentines_day: {
+                ja: ["バレンタインに英語学習！Love your dedication!", "英語学習への愛！We love your commitment!"],
+                en: ["Valentine's Day practice! Showing love for learning!", "Love is in the air, and so is your dedication! Happy Valentine's Day!"]
+            },
+            hinamatsuri: {
+                ja: ["ひな祭りに練習！Beautiful dedication!", "お雛様のように美しい努力！Elegant and dedicated!"],
+                en: ["Hinamatsuri! Japan's Doll Festival celebrates girls and springtime. And we celebrate YOU!", "Practicing on Hinamatsuri! Tradition and growth go hand in hand."]
+            },
+            golden_week: {
+                ja: ["ゴールデンウィークも英語！休みの日も成長中！", "GW中に5日も練習！True golden effort!"],
+                en: ["Golden Week warrior! While Japan takes a holiday break, you kept learning!", "5 days of practice during Golden Week! That's truly golden!"]
+            },
+            cinco_de_mayo: {
+                ja: ["シンコ・デ・マヨ！This holiday celebrates Mexican culture and heritage. Olé!", "5月5日に練習！Cinco de Mayo is a celebration of Mexican pride and culture!"],
+                en: ["Cinco de Mayo! This day celebrates Mexican culture and the victory at the Battle of Puebla in 1862. Learning never stops!", "Happy Cinco de Mayo! A celebration of culture, resilience, and pride. Just like your English journey!"]
+            },
+            tanabata: {
+                ja: ["七夕に練習！あなたの英語の願い、きっと叶う！", "星に願いを！Your English dreams are coming true!"],
+                en: ["Tanabata! On this day, Japanese people write wishes on paper and hang them on bamboo. Your wish for better English is coming true!", "The Star Festival! Making wishes and making progress!"]
+            },
+            obon: {
+                ja: ["お盆も練習！ご先祖様も誇りに思ってる！", "お盆休みも英語学習！Incredible dedication!"],
+                en: ["Practicing during Obon! This is a time to honor ancestors in Japan. They'd be proud of your dedication!", "Obon practice! Honoring tradition while building your future."]
+            },
+            sports_day: {
+                ja: ["スポーツの日に脳トレ！Train your brain, improve your English!", "体だけじゃなく脳も鍛える！Mental fitness counts too!"],
+                en: ["Sports Day! Train your brain, improve your English skills! Mental fitness is just as important!", "It's Sports Day in Japan! Your brain is getting the ultimate workout!"]
+            },
+            halloween: {
+                ja: ["Boo! Trick or treat! ハロウィンも英語学習！", "トリック・オア・トリート！The only thing scary is how good your English is getting!"],
+                en: ["Boo! Trick or treat! The only thing scary here is your amazing dedication!", "Happy Halloween! No tricks, just the treat of learning English!"]
+            },
+            culture_day: {
+                ja: ["文化の日に文化交流！Learning English IS cultural exchange!", "言語学習は最高の文化活動！Language is culture!"],
+                en: ["Culture Day! In Japan, this day celebrates arts and culture. Learning a language is the ultimate cultural activity!", "Happy Culture Day! Language connects cultures, and you're building that bridge!"]
+            },
+            labor_thanksgiving: {
+                ja: ["勤労感謝の日！Your hard work in English deserves appreciation too!", "今日はあなたの努力に感謝！Thank you for your dedication!"],
+                en: ["Labor Thanksgiving Day! Your hard work on English deserves to be celebrated!", "A day to appreciate hard work - and nobody works harder than you!"]
+            },
+            christmas_eve: {
+                ja: ["クリスマスイブも練習！What a gift to yourself!", "イブの夜も英語学習！The best present is self-improvement!"],
+                en: ["Christmas Eve practice! The gift of learning is one you give yourself!", "Eve of Christmas and you're here learning! That's the true holiday spirit!"]
+            },
+            christmas_day: {
+                ja: ["メリークリスマス！Merry Christmas from Prokaiwa! 素晴らしいプレゼントは自分への投資！", "クリスマスに練習！Prokaiwaからのプレゼントは、あなたの成長です！"],
+                en: ["Merry Christmas from Prokaiwa! The best gift is the one you give yourself - growth!", "Merry Christmas! Practicing today? You're on the nice list for sure!"]
+            }
+        };
+
+        function getBadgePhrase(badgeCode, lang) {
+            var phrases = badgePhrases[badgeCode];
+            if (phrases && phrases[lang] && phrases[lang].length > 0) {
+                return pickRandom(phrases[lang]);
+            }
+            // Fallback to generic
+            return pickRandom(checkinMessages.badgeCelebration[lang]);
+        }
+
+        function showConfetti() {
+            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            var container = document.createElement("div");
+            container.className = "confetti-container";
+            var colors = ["#FFD700", "#E74C3C", "#3498DB", "#2ECC71", "#9B59B6", "#E67E22", "#1ABC9C", "#FF6B9D"];
+            for (var i = 0; i < 40; i++) {
+                var piece = document.createElement("div");
+                piece.className = "confetti-piece";
+                piece.style.left = Math.random() * 100 + "%";
+                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.setProperty("--fall-duration", (2 + Math.random() * 2) + "s");
+                piece.style.setProperty("--fall-delay", (Math.random() * 1.5) + "s");
+                piece.style.setProperty("--spin", (360 + Math.random() * 720) + "deg");
+                piece.style.width = (6 + Math.random() * 8) + "px";
+                piece.style.height = (6 + Math.random() * 8) + "px";
+                if (Math.random() > 0.5) piece.style.borderRadius = "50%";
+                container.appendChild(piece);
+            }
+            document.body.appendChild(container);
+            setTimeout(function() { container.remove(); }, 5000);
+        }
+
         function getCheckinState(stats, practicedToday) {
             const today = new Date().toISOString().split('T')[0];
             const lastCheckin = localStorage.getItem('prokaiwa-checkin-date');
@@ -1968,7 +2207,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 if (hasBadge) {
                     var firstBadge = achievements.find(function(a) { return a.code === checkinState.newBadges[0]; });
                     if (firstBadge) {
-                        var congratsMsg = pickRandom(checkinMessages.badgeCelebration[lang]);
+                        var congratsMsg = getBadgePhrase(firstBadge.code, lang);
                         var badgeName = lang === "ja" ? firstBadge.name_ja : firstBadge.name_en;
                         var badgeDesc = lang === "ja" ? firstBadge.desc_ja : firstBadge.desc_en;
                         var tierClass = "tier-" + firstBadge.tier;
@@ -2077,6 +2316,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                             badgeScreen.style.display = "block";
                             var badgeReveal = document.getElementById("checkin-badge");
                             if (badgeReveal) {
+                                showConfetti();
                                 requestAnimationFrame(function() {
                                     badgeReveal.classList.add("show");
                                 });
