@@ -2522,7 +2522,7 @@ if (hasVideoAccess) {
             var fakeState = {
                 shouldPlay: true,
                 type: "celebration",
-                newBadges: showBadge ? ["streak_7"] : []
+                newBadges: showBadge ? [typeof showBadge === "string" ? showBadge : "streak_7"] : []
             };
             playCheckinSequence(fakeState, lang, fakeStats, dashboardState.profile);
             console.log("Test check-in: streak=" + sc + ", badge=" + !!showBadge);
