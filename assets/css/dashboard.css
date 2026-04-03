@@ -2418,9 +2418,7 @@
     padding: 2rem;
     text-align: center;
 }
-.checkin-overlay.visible {
-    opacity: 1;
-}
+.checkin-overlay.visible { opacity: 1; }
 
 .checkin-overlay::before {
     content: '';
@@ -2435,34 +2433,118 @@
 .checkin-stage {
     position: relative;
     z-index: 1;
-    max-width: 400px;
+    max-width: 420px;
+    width: 100%;
 }
 
+/* Greeting — fades in place, no vertical jump */
 .checkin-greeting {
     font-family: var(--font-heading);
     font-size: 1.75rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.8s ease-out;
 }
-.checkin-greeting.show {
+.checkin-greeting.show { opacity: 1; }
+
+/* Week ring dots */
+.checkin-week {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.checkin-ring-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.checkin-ring-label {
+    font-size: 0.6rem;
+    opacity: 0.5;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.checkin-ring-dot {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.checkin-ring-dot.dot-visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
 }
 
-.checkin-subtitle {
-    font-size: 1rem;
+.checkin-ring-dot svg {
+    transform: rotate(-90deg);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.checkin-ring-dot .ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.15);
+    stroke-width: 3;
+}
+.checkin-ring-dot .ring-fill {
+    fill: none;
+    stroke: #E67E22;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 94.25;
+    stroke-dashoffset: 94.25;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.checkin-ring-dot.dot-filled .ring-fill {
+    stroke-dashoffset: 0;
+}
+
+.checkin-ring-dot .ring-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    z-index: 1;
+}
+.checkin-ring-dot.dot-filled .ring-number {
+    color: white;
+}
+
+.checkin-ring-dot.dot-today .ring-fill {
+    stroke: var(--color-gold);
+}
+.checkin-ring-dot.dot-today.dot-filled {
+    filter: drop-shadow(0 0 8px rgba(212, 160, 23, 0.5));
+}
+
+/* Lottie burst above today dot */
+.checkin-dot-lottie {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto -0.5rem;
     opacity: 0;
-    transition: opacity 0.6s ease-out 0.3s;
+    transform: scale(0);
+    transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.checkin-subtitle.show {
-    opacity: 0.85;
+.checkin-dot-lottie.show {
+    opacity: 1;
+    transform: scale(1);
 }
 
+/* Streak display — number + lottie fire */
 .checkin-streak-display {
-    margin-top: 2rem;
+    margin-bottom: 0.75rem;
     opacity: 0;
     transform: scale(0.8);
     transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2472,30 +2554,55 @@
     transform: scale(1);
 }
 
+.checkin-streak-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.checkin-streak-lottie {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+}
+
 .checkin-streak-number {
     font-family: var(--font-heading);
     font-size: 4rem;
     font-weight: 700;
     line-height: 1;
-    display: block;
 }
 
 .checkin-streak-label {
-    font-size: 1.1rem;
-    opacity: 0.9;
-    margin-top: 0.25rem;
+    font-size: 1rem;
+    opacity: 0.85;
     display: block;
+    margin-top: 0.15rem;
 }
+
+/* Subtitle — bigger and bolder */
+.checkin-subtitle {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.6s ease-out;
+    margin-bottom: 0.5rem;
+}
+.checkin-subtitle.show { opacity: 0.95; }
 
 .checkin-streak-message {
     font-size: 0.95rem;
-    opacity: 0.8;
-    margin-top: 1rem;
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
     line-height: 1.5;
 }
+.checkin-streak-message.show { opacity: 0.8; }
 
+/* Badge celebration */
 .checkin-badge-reveal {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2504,114 +2611,16 @@
     opacity: 1;
     transform: translateY(0);
 }
-
-.checkin-badge-icon {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
+.checkin-badge-icon { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; }
 .checkin-badge-congrats {
     font-family: var(--font-heading);
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--color-gold);
 }
+.checkin-badge-name { font-size: 0.95rem; opacity: 0.9; margin-top: 0.25rem; }
 
-.checkin-badge-name {
-    font-size: 0.95rem;
-    opacity: 0.9;
-    margin-top: 0.25rem;
-}
-
-
-/* Check-in week calendar */
-.checkin-week {
-    display: flex;
-    justify-content: center;
-    gap: 0.6rem;
-    margin-top: 1.5rem;
-}
-
-.checkin-week-day {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.checkin-week-day-label {
-    font-size: 0.6rem;
-    opacity: 0.5;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.checkin-week-dot {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.4);
-    opacity: 0;
-    transform: scale(0.5);
-    transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.checkin-week-dot.dot-visible {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.checkin-week-dot.dot-practiced {
-    background: rgba(255, 255, 255, 0.25);
-    color: white;
-}
-
-.checkin-week-dot.dot-hot {
-    background: #E67E22;
-    color: white;
-}
-
-.checkin-week-dot.dot-fire {
-    background: #E74C3C;
-    color: white;
-    box-shadow: 0 0 12px rgba(231, 76, 60, 0.4);
-}
-
-.checkin-week-dot.dot-today {
-    box-shadow: 0 0 0 2px var(--color-gold), 0 0 16px rgba(212, 160, 23, 0.4);
-}
-
-.checkin-today-lottie {
-    width: 48px;
-    height: 48px;
-    margin: 0 auto;
-    opacity: 0;
-    transform: scale(0);
-    transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.checkin-today-lottie.show {
-    opacity: 1;
-    transform: scale(1);
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .checkin-week-dot {
-        transition: none;
-        opacity: 1;
-        transform: none;
-    }
-    .checkin-today-lottie {
-        transition: none;
-    }
-}
+/* Skip hint */
 .checkin-skip {
     position: absolute;
     bottom: 2rem;
@@ -2623,25 +2632,19 @@
     z-index: 1;
     cursor: pointer;
 }
-.checkin-overlay.visible .checkin-skip {
-    opacity: 0.5;
-}
-.checkin-skip:hover {
-    opacity: 0.8;
-}
+.checkin-overlay.visible .checkin-skip { opacity: 0.5; }
+.checkin-skip:hover { opacity: 0.8; }
 
 @media (prefers-reduced-motion: reduce) {
-    .checkin-overlay,
-    .checkin-greeting,
-    .checkin-subtitle,
-    .checkin-streak-display,
-    .checkin-badge-reveal {
-        transition: none;
-    }
+    .checkin-overlay, .checkin-greeting, .checkin-subtitle,
+    .checkin-streak-display, .checkin-badge-reveal,
+    .checkin-ring-dot, .checkin-dot-lottie, .checkin-streak-message { transition: none; }
+    .checkin-ring-dot .ring-fill { transition: none; }
 }
 
 @media (prefers-color-scheme: dark) {
     .checkin-overlay {
         background: linear-gradient(135deg, #1a3a3a 0%, #0d2626 100%);
     }
+}
 }
