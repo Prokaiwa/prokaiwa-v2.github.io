@@ -1759,47 +1759,100 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         // =============================================
 
         const checkinMessages = {
-            streakGrow: {
-                ja: [
-                    { text: 'すごい！{n}日連続達成！', sub: 'Keep it up! この調子！' },
-                    { text: '素晴らしい！{n}日連続！', sub: "You\'re on fire! 燃えてます！" },
-                    { text: '{n}日連続達成！', sub: 'Amazing consistency! 毎日の努力が光ってます！' },
-                ],
-                en: [
-                    { text: '{n}-day streak!', sub: "You\'re on fire!" },
-                    { text: 'Amazing — {n} days!', sub: 'Keep the momentum going!' },
-                    { text: '{n} days in a row!', sub: 'Incredible dedication!' },
-                ]
+            streakMilestones: {
+                ja: {
+                    early: [
+                        { text: "{n}日連続！", sub: "Great start! 新しい一歩！" },
+                        { text: "{n}日目！", sub: "いいスタート！Keep it going!" },
+                    ],
+                    building: [
+                        { text: "{n}日連続達成！", sub: "習慣になってきた！A habit is forming!" },
+                        { text: "すごい！{n}日連続！", sub: "Momentum is building! この調子！" },
+                        { text: "{n}日連続！", sub: "どんどん上達してる！You're growing!" },
+                    ],
+                    week: [
+                        { text: "{n}日連続達成！", sub: "1週間超え！Incredible focus!" },
+                        { text: "素晴らしい！{n}日連続！", sub: "すごい集中力！What dedication!" },
+                        { text: "{n}日連続！", sub: "本当にすごい！You're truly committed!" },
+                    ],
+                    twoWeeks: [
+                        { text: "{n}日連続達成！", sub: "2週間突破！Real dedication!" },
+                        { text: "驚異的！{n}日連続！", sub: "本物の commitment！You're inspiring!" },
+                        { text: "{n}日連続！", sub: "誰にも止められない！Unstoppable!" },
+                    ],
+                    month: [
+                        { text: "{n}日連続達成！", sub: "信じられない！A whole month! You're a legend!" },
+                        { text: "伝説的！{n}日連続！", sub: "英語マスターへの道！The path to mastery!" },
+                        { text: "{n}日連続！", sub: "もう止まらない！Absolutely incredible!" },
+                    ]
+                },
+                en: {
+                    early: [
+                        { text: "{n}-day streak!", sub: "Great start! Every journey begins with one step." },
+                        { text: "Day {n}!", sub: "You showed up! That's what matters." },
+                    ],
+                    building: [
+                        { text: "{n} days in a row!", sub: "A habit is forming! Keep it going!" },
+                        { text: "{n}-day streak!", sub: "Momentum is building! Amazing!" },
+                        { text: "{n} days strong!", sub: "You're growing every day!" },
+                    ],
+                    week: [
+                        { text: "{n}-day streak!", sub: "Over a week! Incredible focus!" },
+                        { text: "Amazing — {n} days!", sub: "What dedication! Keep going!" },
+                        { text: "{n} days in a row!", sub: "You're truly committed!" },
+                    ],
+                    twoWeeks: [
+                        { text: "{n}-day streak!", sub: "Two weeks strong! Real dedication!" },
+                        { text: "Incredible — {n} days!", sub: "You're an inspiration!" },
+                        { text: "{n} days and counting!", sub: "Nothing can stop you!" },
+                    ],
+                    month: [
+                        { text: "{n}-day streak!", sub: "A whole month! You're a legend!" },
+                        { text: "Legendary — {n} days!", sub: "The path to mastery!" },
+                        { text: "{n} days!", sub: "Absolutely incredible! No words!" },
+                    ]
+                }
             },
             streakBroken: {
                 ja: [
-                    { text: 'お帰りなさい！', sub: '大丈夫！Everyone needs a break sometimes. Let\'s start fresh!' },
-                    { text: 'また会えて嬉しいです！', sub: '人生いろいろありますね。また一緒に頑張りましょう！' },
-                    { text: 'おかえり！', sub: '頑張って！Every day is a new beginning!' },
-                    { text: '戻ってきてくれてありがとう！', sub: '休憩も大事です。Ready to start again? 💪' },
+                    { text: "お帰りなさい！", sub: "大丈夫！Everyone needs a break sometimes. Let's start fresh!" },
+                    { text: "また会えて嬉しいです！", sub: "人生いろいろありますね。また一緒に頑張りましょう！" },
+                    { text: "おかえり！", sub: "頑張って！Every day is a new beginning!" },
+                    { text: "戻ってきてくれてありがとう！", sub: "休憩も大事です。Ready to start again?" },
                 ],
                 en: [
-                    { text: 'Welcome back!', sub: 'Life happens! Let\'s build a fresh streak!' },
-                    { text: 'Good to see you!', sub: 'Every day is a new start. Let\'s go!' },
-                    { text: 'Hey, you\'re back!', sub: 'No worries — the best time to restart is now!' },
-                    { text: 'Welcome back!', sub: "A break doesn't erase your progress. Let's keep going!" },
+                    { text: "Welcome back!", sub: "Life happens! Let's build a fresh streak!" },
+                    { text: "Good to see you!", sub: "Every day is a new start. Let's go!" },
+                    { text: "Hey, you're back!", sub: "No worries - the best time to restart is now!" },
+                    { text: "Welcome back!", sub: "A break doesn't erase your progress. Let's keep going!" },
                 ]
             },
             recovery: {
                 ja: [
-                    { text: '復活！1日目スタート！', sub: 'お帰りなさい！Welcome back! 新しい旅の始まりです！' },
-                    { text: '再スタート！', sub: "Let's go! 新しいストリークを作りましょう！" },
+                    { text: "復活！1日目スタート！", sub: "お帰りなさい！Welcome back! 新しい旅の始まりです！" },
+                    { text: "再スタート！", sub: "Let's go! 新しいストリークを作りましょう！" },
                 ],
                 en: [
-                    { text: 'Day 1 — you\'re back!', sub: 'Fresh start! Let\'s build from here!' },
-                    { text: 'New streak begins!', sub: 'Welcome back! The journey continues!' },
+                    { text: "Day 1 - you're back!", sub: "Fresh start! Let's build from here!" },
+                    { text: "New streak begins!", sub: "Welcome back! The journey continues!" },
                 ]
             },
             badgeCelebration: {
-                ja: ['おめでとうございます！Congratulations!', 'やったね！You earned it!', 'すごい！New badge unlocked!'],
-                en: ['Congratulations!', 'You earned it!', 'Badge unlocked!']
+                ja: ["おめでとうございます！Congratulations!", "やったね！You earned it!", "すごい！New badge unlocked!"],
+                en: ["Congratulations!", "You earned it!", "Badge unlocked!"]
             }
         };
+
+        function getStreakMessage(lang, streakCount) {
+            var milestones = checkinMessages.streakMilestones[lang];
+            var tier;
+            if (streakCount >= 30) tier = milestones.month;
+            else if (streakCount >= 14) tier = milestones.twoWeeks;
+            else if (streakCount >= 7) tier = milestones.week;
+            else if (streakCount >= 3) tier = milestones.building;
+            else tier = milestones.early;
+            return pickRandom(tier);
+        }
 
         function getCheckinState(stats, practicedToday) {
             const today = new Date().toISOString().split('T')[0];
@@ -1851,11 +1904,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         }
 
         function playCheckinSequence(checkinState, lang, stats, profile) {
-            return new Promise((resolve) => {
-                const heroName = profile.given_name_romaji || profile.name;
-                const hour = new Date().getHours();
-                let timeGreeting;
-                if (lang === 'ja') {
+            return new Promise(function(resolve) {
+                var heroName = profile.given_name_romaji || profile.name;
+                var hour = new Date().getHours();
+                var timeGreeting;
+                if (lang === "ja") {
                     timeGreeting = hour < 12 ? "おはようございます" : hour < 18 ? "こんにちは" : "こんばんは";
                     timeGreeting += "、" + heroName + "さん！";
                 } else {
@@ -1863,37 +1916,36 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     timeGreeting += ", " + heroName + "!";
                 }
 
-                // Pick message
-                let streakMsg;
+                // Pick message based on milestone
+                var streakMsg;
                 if (checkinState.type === "celebration") {
-                    streakMsg = pickRandom(checkinMessages.streakGrow[lang]);
+                    streakMsg = getStreakMessage(lang, stats.current);
                 } else if (checkinState.type === "recovery") {
                     streakMsg = pickRandom(checkinMessages.recovery[lang]);
                 } else {
                     streakMsg = pickRandom(checkinMessages.streakBroken[lang]);
                 }
-                const streakText = streakMsg.text.replace("{n}", stats.current);
+                var streakText = streakMsg.text.replace("{n}", stats.current);
 
-                // Build streak dots (up to 7 days of current streak)
-                const pDates = dashboardState.practiceDates || [];
-                const weekNow = new Date();
-                const weekToday = weekNow.toISOString().split("T")[0];
-                const dayLabelsJa = ["日", "月", "火", "水", "木", "金", "土"];
-                const dayLabelsEn = ["S", "M", "T", "W", "T", "F", "S"];
-                const dotCount = Math.min(stats.current, 7);
+                // Build streak dots
+                var pDates = dashboardState.practiceDates || [];
+                var weekNow = new Date();
+                var weekToday = weekNow.toISOString().split("T")[0];
+                var dayLabelsJa = ["日", "月", "火", "水", "木", "金", "土"];
+                var dayLabelsEn = ["S", "M", "T", "W", "T", "F", "S"];
+                var dotCount = Math.min(stats.current, 7);
 
-                // Ring circumference: 2 * PI * 15 = 94.25
-                let dotsHTML = "";
-                for (let di = dotCount - 1; di >= 0; di--) {
-                    const dd = new Date(weekNow);
+                var dotsHTML = "";
+                for (var di = dotCount - 1; di >= 0; di--) {
+                    var dd = new Date(weekNow);
                     dd.setDate(dd.getDate() - di);
-                    const dateStr = dd.toISOString().split("T")[0];
-                    const dayNum = dd.getDate();
-                    const dow = dd.getDay();
-                    const label = lang === "ja" ? dayLabelsJa[dow] : dayLabelsEn[dow];
-                    const isToday = dateStr === weekToday;
+                    var dateStr = dd.toISOString().split("T")[0];
+                    var dayNum = dd.getDate();
+                    var dow = dd.getDay();
+                    var label = lang === "ja" ? dayLabelsJa[dow] : dayLabelsEn[dow];
+                    var isToday = dateStr === weekToday;
 
-                    let dotCls = "checkin-ring-dot";
+                    var dotCls = "checkin-ring-dot";
                     if (isToday) dotCls += " dot-today";
 
                     dotsHTML += '<div class="checkin-ring-day">' +
@@ -1906,31 +1958,61 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 }
 
                 // Lottie fire next to streak number
-                const streakLottie = LOTTIE_FIRE_ENABLED && checkinState.type !== "broken"
+                var streakLottie = LOTTIE_FIRE_ENABLED && checkinState.type !== "broken"
                     ? '<div class="checkin-streak-lottie"><dotlottie-player src="assets/lottie/fire.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>'
                     : "";
 
-                // Create overlay
-                const overlay = document.createElement("div");
+                // Build badge screen HTML (hidden initially)
+                var hasBadge = checkinState.newBadges && checkinState.newBadges.length > 0;
+                var badgeScreenHTML = "";
+                if (hasBadge) {
+                    var firstBadge = achievements.find(function(a) { return a.code === checkinState.newBadges[0]; });
+                    if (firstBadge) {
+                        var congratsMsg = pickRandom(checkinMessages.badgeCelebration[lang]);
+                        var badgeName = lang === "ja" ? firstBadge.name_ja : firstBadge.name_en;
+                        var badgeDesc = lang === "ja" ? firstBadge.desc_ja : firstBadge.desc_en;
+                        var tierClass = "tier-" + firstBadge.tier;
+                        var themeStyle = firstBadge.colors
+                            ? ' style="--badge-bg: ' + firstBadge.colors.bg + '; --badge-fg: ' + firstBadge.colors.fg + ';"'
+                            : "";
+                        var moreCount = checkinState.newBadges.length - 1;
+                        var moreText = moreCount > 0
+                            ? '<div style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.7;">+' + moreCount + " " + (lang === "ja" ? "つのバッジも獲得" : "more badge" + (moreCount > 1 ? "s" : "")) + '</div>'
+                            : "";
+                        badgeScreenHTML =
+                            '<div class="checkin-screen checkin-badge-screen" id="checkin-badge-screen" style="display:none;">' +
+                            '  <div class="checkin-badge-reveal" id="checkin-badge">' +
+                            '    <div class="checkin-badge-circle ' + tierClass + '"' + themeStyle + '><i class="' + firstBadge.icon + '"></i></div>' +
+                            '    <div class="checkin-badge-congrats">' + congratsMsg + '</div>' +
+                            '    <div class="checkin-badge-name">' + badgeName + '</div>' +
+                            '    <div class="checkin-badge-desc">' + badgeDesc + '</div>' + moreText +
+                            '  </div>' +
+                            '</div>';
+                    }
+                }
+
+                // Create overlay with two screens
+                var overlay = document.createElement("div");
                 overlay.className = "checkin-overlay";
                 overlay.innerHTML =
                     '<div class="checkin-stage">' +
-                    '  <div class="checkin-greeting" id="checkin-greeting">' + timeGreeting + '</div>' +
-                    '  <div class="checkin-week" id="checkin-week">' + dotsHTML + '</div>' +
-                    '  <div class="checkin-streak-display" id="checkin-streak">' +
-                    '    <div class="checkin-streak-row">' + streakLottie +
-                    '      <span class="checkin-streak-number">' + stats.current + '</span>' +
+                    '  <div class="checkin-screen" id="checkin-streak-screen">' +
+                    '    <div class="checkin-greeting" id="checkin-greeting">' + timeGreeting + '</div>' +
+                    '    <div class="checkin-week" id="checkin-week">' + dotsHTML + '</div>' +
+                    '    <div class="checkin-streak-display" id="checkin-streak">' +
+                    '      <div class="checkin-streak-row">' + streakLottie +
+                    '        <span class="checkin-streak-number">' + stats.current + '</span>' +
+                    '      </div>' +
+                    '      <span class="checkin-streak-label">' + streakText + '</span>' +
                     '    </div>' +
-                    '    <span class="checkin-streak-label">' + streakText + '</span>' +
+                    '    <div class="checkin-subtitle" id="checkin-subtitle">' + streakMsg.sub + '</div>' +
                     '  </div>' +
-                    '  <div class="checkin-subtitle" id="checkin-subtitle">' + streakMsg.sub + '</div>' +
-                    '  <div class="checkin-streak-message" id="checkin-message"></div>' +
-                    '  <div class="checkin-badge-reveal" id="checkin-badge"></div>' +
+                    badgeScreenHTML +
                     '</div>' +
                     '<div class="checkin-skip">' + (lang === "ja" ? "タップしてスキップ" : "Tap to skip") + '</div>';
                 document.body.appendChild(overlay);
 
-                let completed = false;
+                var completed = false;
                 function finish() {
                     if (completed) return;
                     completed = true;
@@ -1957,20 +2039,12 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                         setTimeout(function() {
                             if (completed) return;
                             dot.classList.add("dot-visible");
-                            // Small delay then fill the ring
-                            setTimeout(function() {
-                                dot.classList.add("dot-filled");
-                                // Today lottie burst
-                                if (dot.classList.contains("dot-today")) {
-                                    var lb = document.getElementById("checkin-dot-lottie");
-                                    if (lb) setTimeout(function() { lb.classList.add("show"); }, 200);
-                                }
-                            }, 150);
+                            setTimeout(function() { dot.classList.add("dot-filled"); }, 150);
                         }, idx * 200);
                     });
                 }, 1200);
 
-                // Stage 3: Streak number + subtitle (after dots finish)
+                // Stage 3: Streak number + subtitle
                 var streakDelay = 1200 + (dotCount * 200) + 500;
                 setTimeout(function() {
                     if (completed) return;
@@ -1982,37 +2056,40 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     document.getElementById("checkin-subtitle").classList.add("show");
                 }, streakDelay + 400);
 
-                // Stage 4: Badge celebration
-                if (checkinState.newBadges.length > 0) {
+                // Stage 4: If badge — fade out streak screen, fade in badge screen
+                if (hasBadge) {
+                    var badgeTransitionStart = streakDelay + 2000;
+
+                    // Fade out streak screen
                     setTimeout(function() {
                         if (completed) return;
-                        var firstBadge = achievements.find(function(a) { return a.code === checkinState.newBadges[0]; });
-                        if (firstBadge) {
-                            var congratsMsg = pickRandom(checkinMessages.badgeCelebration[lang]);
-                            var badgeName = lang === "ja" ? firstBadge.name_ja : firstBadge.name_en;
-                            var badgeDesc = lang === "ja" ? firstBadge.desc_ja : firstBadge.desc_en;
-                            var tierClass = "tier-" + firstBadge.tier;
-                            var themeStyle = firstBadge.colors
-                                ? ' style="--badge-bg: ' + firstBadge.colors.bg + '; --badge-fg: ' + firstBadge.colors.fg + ';"'
-                                : "";
-                            var moreCount = checkinState.newBadges.length - 1;
-                            var moreText = moreCount > 0
-                                ? '<div style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.7;">+' + moreCount + " " + (lang === "ja" ? "つのバッジも獲得" : "more badge" + (moreCount > 1 ? "s" : "")) + '</div>'
-                                : "";
-                            var badgeEl = document.getElementById("checkin-badge");
-                            badgeEl.innerHTML =
-                                '<div class="checkin-badge-circle ' + tierClass + '"' + themeStyle + '><i class="' + firstBadge.icon + '"></i></div>' +
-                                '<div class="checkin-badge-congrats">' + congratsMsg + '</div>' +
-                                '<div class="checkin-badge-name">' + badgeName + '</div>' +
-                                '<div class="checkin-badge-desc">' + badgeDesc + '</div>' + moreText;
-                            badgeEl.classList.add("show");
-                        }
-                    }, streakDelay + 1200);
-                }
+                        var streakScreen = document.getElementById("checkin-streak-screen");
+                        if (streakScreen) streakScreen.classList.add("fade-out");
+                    }, badgeTransitionStart);
 
-                // Auto-finish
-                var totalDuration = streakDelay + (checkinState.newBadges.length > 0 ? 3500 : 2000);
-                setTimeout(finish, totalDuration);
+                    // Show badge screen after streak fades
+                    setTimeout(function() {
+                        if (completed) return;
+                        var streakScreen = document.getElementById("checkin-streak-screen");
+                        if (streakScreen) streakScreen.style.display = "none";
+                        var badgeScreen = document.getElementById("checkin-badge-screen");
+                        if (badgeScreen) {
+                            badgeScreen.style.display = "block";
+                            var badgeReveal = document.getElementById("checkin-badge");
+                            if (badgeReveal) {
+                                requestAnimationFrame(function() {
+                                    badgeReveal.classList.add("show");
+                                });
+                            }
+                        }
+                    }, badgeTransitionStart + 600);
+
+                    // Auto-finish after badge shows
+                    setTimeout(finish, badgeTransitionStart + 3500);
+                } else {
+                    // No badge — finish after streak display
+                    setTimeout(finish, streakDelay + 2000);
+                }
             });
         }
 

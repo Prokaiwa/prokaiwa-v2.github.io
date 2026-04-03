@@ -2719,6 +2719,15 @@
     .checkin-badge-circle { animation: none; }
     .checkin-badge-circle::after { animation: none; display: none; }
 }
+
+/* Two-screen check-in transition */
+.checkin-screen {
+    transition: opacity 0.5s ease-out;
+}
+.checkin-screen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
 .checkin-skip {
     position: absolute;
     bottom: 2rem;
