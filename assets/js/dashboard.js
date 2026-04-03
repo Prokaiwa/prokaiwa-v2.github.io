@@ -2408,18 +2408,32 @@ if (hasVideoAccess) {
 
 
 
-        // =============================================
-        // CONSOLE HELPERS (testing card states)
-        // =============================================
 
-        // Console helpers for testing check-in sequence
+        // =============================================
+        // CONSOLE HELPERS (testing)
+        // =============================================
+        window.testIceState = function() {
+            var card = document.getElementById("streak-card");
+            card.classList.remove("streak-state-warm", "streak-state-fire", "streak-state-blaze");
+            card.classList.add("streak-state-frozen");
+            console.log("Ice state applied. Reload to reset.");
+        };
+        window.testFireState = function(level) {
+            var card = document.getElementById("streak-card");
+            card.classList.remove("streak-state-warm", "streak-state-fire", "streak-state-blaze", "streak-state-frozen");
+            if (level === "blaze") card.classList.add("streak-state-blaze");
+            else if (level === "fire") card.classList.add("streak-state-fire");
+            else card.classList.add("streak-state-warm");
+            console.log("Fire state applied: " + (level || "warm") + ". Reload to reset.");
+        };
         window.testCheckin = function(streakCount, showBadge) {
             var lang = getCurrentLang();
+            var sc = streakCount || 7;
             var fakeStats = {
-                current: streakCount || 7,
-                maxStreak: Math.max(streakCount || 7, dashboardState.stats?.maxStreak || 0),
-                total: dashboardState.stats?.total || 10,
-                thisMonth: dashboardState.stats?.thisMonth || 5,
+                current: sc,
+                maxStreak: Math.max(sc, dashboardState.stats ? dashboardState.stats.maxStreak : 0),
+                total: dashboardState.stats ? dashboardState.stats.total : 10,
+                thisMonth: dashboardState.stats ? dashboardState.stats.thisMonth : 5,
                 practiceDates: dashboardState.practiceDates || []
             };
             var fakeState = {
@@ -2428,28 +2442,14 @@ if (hasVideoAccess) {
                 newBadges: showBadge ? ["streak_7"] : []
             };
             playCheckinSequence(fakeState, lang, fakeStats, dashboardState.profile);
-            console.log("🎬
+            console.log("Test check-in: streak=" + sc + ", badge=" + !!showBadge);
         };
         window.testCheckinBroken = function() {
             var lang = getCurrentLang();
             var fakeStats = { current: 0, maxStreak: 14, total: 20, thisMonth: 5, practiceDates: [] };
             var fakeState = { shouldPlay: true, type: "broken", newBadges: [] };
             playCheckinSequence(fakeState, lang, fakeStats, dashboardState.profile);
-            console.log("🎬 Test broken streak check-in");
-        };
-        window.testIceState = function() {
-            const card = document.getElementById('streak-card');
-            card.classList.remove('streak-state-warm', 'streak-state-fire', 'streak-state-blaze');
-            card.classList.add('streak-state-frozen');
-            console.log('❄️ Ice state applied. Run testFireState() or reload to reset.');
-        };
-        window.testFireState = function(level) {
-            const card = document.getElementById('streak-card');
-            card.classList.remove('streak-state-warm', 'streak-state-fire', 'streak-state-blaze', 'streak-state-frozen');
-            if (level === 'blaze') card.classList.add('streak-state-blaze');
-            else if (level === 'fire') card.classList.add('streak-state-fire');
-            else card.classList.add('streak-state-warm');
-            console.log('🔥 Fire state applied: ' + (level || 'warm') + '. Reload to reset.');
+            console.log("Test broken streak check-in");
         };
         // ?replay support — clear checkin date to replay sequence
         if (new URLSearchParams(window.location.search).has('replay')) {
