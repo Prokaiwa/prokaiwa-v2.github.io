@@ -685,6 +685,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             profile: null,
             stats: null,
             assessment: null,
+            previousAssessment: null,
             practiceDates: [],
             progressPercent: 0,
             hasVideoAccess: false,
@@ -698,7 +699,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
         function refreshDynamicText(lang) {
             if (!dashboardState.loaded) return;
-            const { profile, stats, assessment, practiceDates, practiceTimestamps, progressPercent, hasVideoAccess, hasVideoAddon } = dashboardState;
+            const { profile, stats, assessment, previousAssessment, practiceDates, practiceTimestamps, progressPercent, hasVideoAccess, hasVideoAddon } = dashboardState;
 
             // Welcome text (contextual greeting)
             const heroName = profile.given_name_romaji || profile.name;
@@ -762,7 +763,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             renderAchievements('achievements', stats, lang);
 
             // Skills chart
-            renderSkillsChart('skills-assessment', assessment, lang);
+            renderSkillsChart('skills-assessment', assessment, previousAssessment, lang);
 
             // Practice status
             checkTodaysPractice(dashboardState.userId, lang);
@@ -803,7 +804,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         // PENTAGON RADAR CHART
         // =============================================
 
-        function renderSkillsChart(containerId, assessment, lang) {
+        function renderSkillsChart(containerId, assessment, previousAssessment, lang) {
             const container = document.getElementById(containerId);
 
             if (!assessment) {
@@ -868,10 +869,39 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
             const archetype = getLearningArchetype(skillsData);
 
+            // Growth indicators (compare current vs previous assessment)
+            const skillKeys = ['fluency', 'grammar', 'comprehension', 'vocabulary', 'pronunciation'];
+            const skillColorArray = [skillColors.fluency, skillColors.grammar, skillColors.comprehension, skillColors.vocabulary, skillColors.pronunciation];
+            let growthHtml = '';
+            if (previousAssessment) {
+                const pills = skillKeys.map((key, i) => {
+                    const current = skillsData[key];
+                    const prev = previousAssessment[key] || 0;
+                    const delta = current - prev;
+                    let arrow, deltaText, stateClass;
+                    if (delta > 0) {
+                        arrow = '\u2191';
+                        deltaText = "+" + delta;
+                        stateClass = 'growth-pill-up';
+                    } else if (delta < 0) {
+                        arrow = '\u2193';
+                        deltaText = "" + delta;
+                        stateClass = 'growth-pill-down';
+                    } else {
+                        arrow = '\u2192';
+                        deltaText = '';
+                        stateClass = 'growth-pill-same';
+                    }
+                    return "<span class=\"growth-pill " + stateClass + "\" style=\"border-left-color: " + skillColorArray[i] + "\">" + skillLabels[i] + " " + arrow + (deltaText ? " " + deltaText : "") + "</span>";
+                }).join("");
+                growthHtml = "<div class=\"growth-indicators\"><span class=\"growth-label\">" + (lang === 'ja' ? '\u524d\u56de\u6bd4\uff1a' : 'vs. previous:') + "</span>" + pills + "</div>";
+            }
+
             container.innerHTML = `
                 <div class="skills-chart-container">
                     <canvas id="${containerId}-canvas"></canvas>
                 </div>
+                ${growthHtml}
                 <div class="assessment-info">
                     <span class="assessment-date">
                         ${lang === 'ja' ? '評価日：' : 'Assessed: '}
@@ -915,7 +945,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: {
-                        padding: 10
+                        padding: 20
                     },
                     scales: {
                         r: {
@@ -938,7 +968,10 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                                 color: '#666'
                             },
                             pointLabels: {
-                                display: false
+                                display: true,
+                                color: pointColors,
+                                font: { size: 13, weight: '600', family: "Outfit, sans-serif" },
+                                padding: 8
                             },
                             grid: {
     color: window.matchMedia('(prefers-color-scheme: dark)').matches 
@@ -1129,37 +1162,42 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             debugLog('User ID:', userId);
 
             try {
-                const { data: assessment, error } = await supabase
+                const { data: assessments, error } = await supabase
                     .from('student_assessments')
                     .select('*')
                     .eq('user_id', userId)
                     .order('assessed_at', { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
+                    .limit(2);
 
-                debugLog('student_assessments result:', { data: assessment, error });
+                debugLog('student_assessments result:', { data: assessments, error });
 
-                if (error && error.code !== 'PGRST116') {
+                if (error) {
                     console.error('❌ Error loading assessment:', error);
-                    return null;
+                    return { current: null, previous: null };
                 }
 
-                if (assessment) {
+                const current = assessments && assessments.length > 0 ? assessments[0] : null;
+                const previous = assessments && assessments.length > 1 ? assessments[1] : null;
+
+                if (current) {
                     debugLog('✅ Assessment found:', {
-                        assessed_at: assessment.assessed_at,
-                        band_level: assessment.band_level,
-                        total_score: assessment.total_score
+                        assessed_at: current.assessed_at,
+                        band_level: current.band_level,
+                        total_score: current.total_score
                     });
+                    if (previous) {
+                        debugLog('✅ Previous assessment found:', { assessed_at: previous.assessed_at });
+                    }
                 } else {
                     debugLog('ℹ️ No assessment found yet');
                 }
 
                 debugLog('=== loadLatestAssessment END ===');
-                return assessment;
+                return { current, previous };
 
             } catch (err) {
                 console.error('❌ ERROR in loadLatestAssessment:', err);
-                return null;
+                return { current: null, previous: null };
             }
         }
 
@@ -2447,7 +2485,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 }
 
                 const realProgress = await loadRealProgress(user.id, lang);
-                const assessment = await loadLatestAssessment(user.id);
+                const { current: assessment, previous: previousAssessment } = await loadLatestAssessment(user.id);
 
                 const practicedToday = await checkTodaysPractice(user.id, lang);
 
@@ -2483,6 +2521,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 dashboardState.profile = profile;
                 dashboardState.stats = stats;
                 dashboardState.assessment = assessment;
+                dashboardState.previousAssessment = previousAssessment;
                 dashboardState.practiceDates = practiceDates;
                 dashboardState.practiceTimestamps = stats.practiceTimestamps || [];
                 dashboardState.progressPercent = progressPercent;
@@ -2547,7 +2586,7 @@ if (hasVideoAccess) {
                     renderAchievements('achievements', stats, lang);
 
 
-                    renderSkillsChart('skills-assessment', assessment, lang);
+                    renderSkillsChart('skills-assessment', assessment, previousAssessment, lang);
 
                 // ── Animation pipeline ──
                 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

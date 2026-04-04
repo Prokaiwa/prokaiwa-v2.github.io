@@ -207,6 +207,43 @@
       font-size: 0.95rem;
     }
 
+    /* Growth Indicator Pills */
+    .growth-indicators {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 0;
+      border-top: 1px solid var(--color-border);
+    }
+    .growth-label {
+      font-size: 0.75rem;
+      color: var(--color-text-light);
+      font-weight: 500;
+      margin-right: 0.15rem;
+    }
+    .growth-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      padding: 0.2rem 0.5rem;
+      border-left: 3px solid transparent;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: var(--font-heading);
+      background: rgba(0, 0, 0, 0.03);
+    }
+    .growth-pill-up {
+      color: #1a8a4a;
+    }
+    .growth-pill-down {
+      color: #c0392b;
+    }
+    .growth-pill-same {
+      color: var(--color-text-light);
+    }
+
     /* Learning Archetype Display */
     .learning-archetype {
       display: flex;
@@ -2794,3 +2831,17 @@
     }
 }
 }
+
+
+    /* Growth Pills — Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      .growth-pill {
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .growth-pill-up {
+        color: #4cd97b;
+      }
+      .growth-pill-down {
+        color: #e87d73;
+      }
+    }
