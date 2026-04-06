@@ -2146,7 +2146,14 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 // Check for new badges
                 const currentBadges = getEarnedBadgeCodes(stats);
                 const storedBadges = JSON.parse(localStorage.getItem('prokaiwa-earned-badges') || '[]');
-                const newBadges = currentBadges.filter(b => !storedBadges.includes(b));
+                let newBadges = currentBadges.filter(b => !storedBadges.includes(b));
+
+                // Test badges from URL parameter
+                var testBadgeStr = localStorage.getItem("prokaiwa-test-badges");
+                if (testBadgeStr) {
+                    newBadges = testBadgeStr.split(",");
+                    localStorage.removeItem("prokaiwa-test-badges");
+                }
 
                 if (streakBroken && stats.current === 1) {
                     return { shouldPlay: true, type: 'recovery', newBadges };
@@ -2844,9 +2851,14 @@ if (hasVideoAccess) {
             console.log("Test broken streak check-in");
         };
         // ?replay support — clear checkin date to replay sequence
-        if (new URLSearchParams(window.location.search).has('replay')) {
+        // Usage: ?replay or ?replay&badges=streak_3,halloween,sessions_50
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('replay')) {
             localStorage.removeItem('prokaiwa-checkin-date');
-            // Clean URL without reload
+            var testBadges = urlParams.get('badges');
+            if (testBadges) {
+                localStorage.setItem('prokaiwa-test-badges', testBadges);
+            }
             window.history.replaceState({}, '', window.location.pathname);
         }
 
