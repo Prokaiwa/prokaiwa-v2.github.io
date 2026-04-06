@@ -2193,7 +2193,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     timeGreeting += ", " + heroName + "!";
                 }
 
-                // Pick message based on milestone
+                // Pick streak message based on milestone
                 var streakMsg;
                 if (checkinState.type === "celebration") {
                     streakMsg = getStreakMessage(lang, stats.current);
@@ -2239,36 +2239,37 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     ? '<div class="checkin-streak-lottie"><dotlottie-player src="assets/lottie/fire.lottie" background="transparent" speed="1" loop autoplay></dotlottie-player></div>'
                     : "";
 
-                // Build badge screen HTML (hidden initially)
-                var hasBadge = checkinState.newBadges && checkinState.newBadges.length > 0;
-                var badgeScreenHTML = "";
-                if (hasBadge) {
-                    var firstBadge = achievements.find(function(a) { return a.code === checkinState.newBadges[0]; });
-                    if (firstBadge) {
-                        var congratsMsg = getBadgePhrase(firstBadge.code, lang);
-                        var badgeName = lang === "ja" ? firstBadge.name_ja : firstBadge.name_en;
-                        var badgeDesc = lang === "ja" ? firstBadge.desc_ja : firstBadge.desc_en;
-                        var tierClass = "tier-" + firstBadge.tier;
-                        var themeStyle = firstBadge.colors
-                            ? ' style="--badge-bg: ' + firstBadge.colors.bg + '; --badge-fg: ' + firstBadge.colors.fg + ';"'
-                            : "";
-                        var moreCount = checkinState.newBadges.length - 1;
-                        var moreText = moreCount > 0
-                            ? '<div style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.7;">+' + moreCount + " " + (lang === "ja" ? "つのバッジも獲得" : "more badge" + (moreCount > 1 ? "s" : "")) + '</div>'
-                            : "";
-                        badgeScreenHTML =
-                            '<div class="checkin-screen checkin-badge-screen" id="checkin-badge-screen" style="display:none;">' +
-                            '  <div class="checkin-badge-reveal" id="checkin-badge">' +
-                            '    <div class="checkin-badge-circle ' + tierClass + '"' + themeStyle + '><i class="' + firstBadge.icon + '"></i></div>' +
-                            '    <div class="checkin-badge-congrats">' + congratsMsg + '</div>' +
-                            '    <div class="checkin-badge-name">' + badgeName + '</div>' +
-                            '    <div class="checkin-badge-desc">' + badgeDesc + '</div>' + moreText +
-                            '  </div>' +
-                            '</div>';
-                    }
+                // Build badge screens — one per badge, each gets its own moment
+                var badgeList = checkinState.newBadges || [];
+                var badgeScreensHTML = "";
+                var badgeData = [];
+                for (var bi = 0; bi < badgeList.length; bi++) {
+                    var badge = achievements.find(function(a) { return a.code === badgeList[bi]; });
+                    if (!badge) continue;
+                    var bPhrase = getBadgePhrase(badge.code, lang);
+                    var bName = lang === "ja" ? badge.name_ja : badge.name_en;
+                    var bDesc = lang === "ja" ? badge.desc_ja : badge.desc_en;
+                    var bTier = "tier-" + badge.tier;
+                    var bStyle = badge.colors
+                        ? ' style="--badge-bg: ' + badge.colors.bg + '; --badge-fg: ' + badge.colors.fg + ';"'
+                        : "";
+                    var bCount = badgeList.length > 1
+                        ? '<div style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.5;">' + (bi + 1) + ' / ' + badgeList.length + '</div>'
+                        : "";
+
+                    badgeScreensHTML +=
+                        '<div class="checkin-screen checkin-badge-screen" id="checkin-badge-screen-' + bi + '" style="display:none;">' +
+                        '  <div class="checkin-badge-reveal" id="checkin-badge-' + bi + '">' +
+                        '    <div class="checkin-badge-circle ' + bTier + '"' + bStyle + '><i class="' + badge.icon + '"></i></div>' +
+                        '    <div class="checkin-badge-congrats">' + bPhrase + '</div>' +
+                        '    <div class="checkin-badge-name">' + bName + '</div>' +
+                        '    <div class="checkin-badge-desc">' + bDesc + '</div>' + bCount +
+                        '  </div>' +
+                        '</div>';
+                    badgeData.push({ index: bi });
                 }
 
-                // Create overlay with two screens
+                // Create overlay
                 var overlay = document.createElement("div");
                 overlay.className = "checkin-overlay";
                 overlay.innerHTML =
@@ -2284,7 +2285,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     '    </div>' +
                     '    <div class="checkin-subtitle" id="checkin-subtitle">' + streakMsg.sub + '</div>' +
                     '  </div>' +
-                    badgeScreenHTML +
+                    badgeScreensHTML +
                     '</div>' +
                     '<div class="checkin-skip">' + (lang === "ja" ? "タップしてスキップ" : "Tap to skip") + '</div>';
                 document.body.appendChild(overlay);
@@ -2333,9 +2334,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     document.getElementById("checkin-subtitle").classList.add("show");
                 }, streakDelay + 400);
 
-                // Stage 4: If badge — fade out streak screen, fade in badge screen
-                if (hasBadge) {
-                    var badgeTransitionStart = streakDelay + 2000;
+                // Stage 4: Badge cycling — each badge gets its own screen
+                if (badgeData.length > 0) {
+                    var badgeTransitionStart = streakDelay + 3000;
+                    var badgeDuration = 5500;
+                    var badgeFadeTime = 600;
 
                     // Fade out streak screen
                     setTimeout(function() {
@@ -2344,29 +2347,56 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                         if (streakScreen) streakScreen.classList.add("fade-out");
                     }, badgeTransitionStart);
 
-                    // Show badge screen after streak fades
+                    // Hide streak screen after fade
                     setTimeout(function() {
                         if (completed) return;
                         var streakScreen = document.getElementById("checkin-streak-screen");
                         if (streakScreen) streakScreen.style.display = "none";
-                        var badgeScreen = document.getElementById("checkin-badge-screen");
-                        if (badgeScreen) {
-                            badgeScreen.style.display = "block";
-                            var badgeReveal = document.getElementById("checkin-badge");
-                            if (badgeReveal) {
-                                showConfetti();
-                                requestAnimationFrame(function() {
-                                    badgeReveal.classList.add("show");
-                                });
-                            }
-                        }
-                    }, badgeTransitionStart + 600);
+                    }, badgeTransitionStart + badgeFadeTime);
 
-                    // Auto-finish after badge shows
-                    setTimeout(finish, badgeTransitionStart + 5500);
+                    // Show each badge in sequence
+                    for (var bIdx = 0; bIdx < badgeData.length; bIdx++) {
+                        (function(idx) {
+                            var showAt = badgeTransitionStart + badgeFadeTime + (idx * (badgeDuration + badgeFadeTime));
+
+                            // Show this badge screen
+                            setTimeout(function() {
+                                if (completed) return;
+                                // Hide previous badge screen if exists
+                                if (idx > 0) {
+                                    var prevScreen = document.getElementById("checkin-badge-screen-" + (idx - 1));
+                                    if (prevScreen) prevScreen.style.display = "none";
+                                }
+                                var screen = document.getElementById("checkin-badge-screen-" + idx);
+                                if (screen) {
+                                    screen.style.display = "block";
+                                    showConfetti();
+                                    var reveal = document.getElementById("checkin-badge-" + idx);
+                                    if (reveal) {
+                                        requestAnimationFrame(function() {
+                                            reveal.classList.add("show");
+                                        });
+                                    }
+                                }
+                            }, showAt);
+
+                            // Fade out this badge (unless it is the last one)
+                            if (idx < badgeData.length - 1) {
+                                setTimeout(function() {
+                                    if (completed) return;
+                                    var screen = document.getElementById("checkin-badge-screen-" + idx);
+                                    if (screen) screen.classList.add("fade-out");
+                                }, showAt + badgeDuration);
+                            }
+                        })(bIdx);
+                    }
+
+                    // Auto-finish after last badge
+                    var totalBadgeTime = badgeTransitionStart + badgeFadeTime + (badgeData.length * (badgeDuration + badgeFadeTime));
+                    setTimeout(finish, totalBadgeTime);
                 } else {
-                    // No badge — finish after streak display
-                    setTimeout(finish, streakDelay + 2000);
+                    // No badges — finish after streak display
+                    setTimeout(finish, streakDelay + 3000);
                 }
             });
         }
@@ -2801,7 +2831,7 @@ if (hasVideoAccess) {
             var fakeState = {
                 shouldPlay: true,
                 type: "celebration",
-                newBadges: showBadge ? [typeof showBadge === "string" ? showBadge : "streak_7"] : []
+                newBadges: showBadge ? (Array.isArray(showBadge) ? showBadge : [typeof showBadge === "string" ? showBadge : "streak_7"]) : []
             };
             playCheckinSequence(fakeState, lang, fakeStats, dashboardState.profile);
             console.log("Test check-in: streak=" + sc + ", badge=" + !!showBadge);
