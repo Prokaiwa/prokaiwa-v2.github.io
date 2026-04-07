@@ -1575,6 +1575,33 @@ main .container:not(.legal-page-container) {
 /* =============================================================================
    19. UTILITY CLASSES
    ============================================================================= */
+/* Back Link — Shared navigation component */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--color-primary);
+    border-radius: 25px;
+    transition: all 0.2s ease;
+}
+
+.back-link:hover {
+    background: var(--color-primary);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 128, 128, 0.3);
+}
+
+.back-link .fa-arrow-left {
+    font-size: 0.8rem;
+}
+
 .close-button {
     position: absolute;
     top: 15px;

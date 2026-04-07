@@ -768,9 +768,9 @@
       cursor: pointer;
       padding: 0.5rem;
       line-height: 1;
-      transition: transform 0.2s;
+      transition: color 0.2s ease, transform 0.2s ease;
     }
-    .streak-modal-close:hover { transform: scale(1.2); }
+    .streak-modal-close:hover { transform: rotate(90deg) scale(1.1); }
     .streak-modal-body {
       padding: 1.5rem;
       overflow-y: auto;
@@ -1238,11 +1238,11 @@
   cursor: pointer;
   padding: 0.5rem;
   line-height: 1;
-  transition: transform 0.2s;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .booking-modal-close:hover {
-  transform: scale(1.2);
+  transform: rotate(90deg) scale(1.1);
 }
 
 .booking-modal-body {
