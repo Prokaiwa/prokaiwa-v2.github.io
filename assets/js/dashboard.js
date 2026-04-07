@@ -856,27 +856,29 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 skillsData.pronunciation
             ];
 
-            const pointColors = [
-                skillColors.fluency,
-                skillColors.grammar,
-                skillColors.comprehension,
-                skillColors.vocabulary,
-                skillColors.pronunciation
-            ];
+            const pointColors = allPerfect
+                ? ['#D4AF37', '#D4AF37', '#D4AF37', '#D4AF37', '#D4AF37']
+                : [
+                    skillColors.fluency,
+                    skillColors.grammar,
+                    skillColors.comprehension,
+                    skillColors.vocabulary,
+                    skillColors.pronunciation
+                ];
 
-            const borderColor = allPerfect ? '#008080' : 'rgba(74, 144, 226, 0.6)';
-            const backgroundColor = allPerfect ? 'rgba(0, 128, 128, 0.3)' : 'rgba(74, 144, 226, 0.1)';
+            const borderColor = allPerfect ? '#D4AF37' : 'rgba(74, 144, 226, 0.6)';
+            const backgroundColor = allPerfect ? 'rgba(212, 175, 55, 0.2)' : 'rgba(74, 144, 226, 0.1)';
 
             const archetype = getLearningArchetype(skillsData);
 
             // Archetype accent colors
             const archetypeColors = {
                 perfect_master: '#D4AF37',
-                advanced_achiever: '#E8A817',
+                advanced_achiever: '#B87333',
                 natural_speaker: '#2BA5A5',
                 grammar_guru: '#9B59B6',
                 comprehension_champion: '#27AE60',
-                rising_star: '#E67E22',
+                rising_star: '#EAB308',
                 foundation_builder: '#4A90E2',
                 balanced_learner: '#008080'
             };
@@ -921,7 +923,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     </span>
                     <span class="assessment-band">${assessment.band_level || '-'}</span>
                 </div>
-                <div class="learning-archetype" style="--archetype-color: ${archetypeColor}">
+                <div class="learning-archetype" style="--archetype-color: ${archetypeColor}" data-archetype="${archetype.code}">
                     <div class="archetype-badge">
                         <i class="${archetype.icon}"></i>
                     </div>
@@ -929,6 +931,13 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     <div class="archetype-description">${lang === 'ja' ? archetype.description_ja : archetype.description_en}</div>
                 </div>
             `;
+
+            // Gold treatment on card for Perfect Master
+            const skillsCard = container.closest('.card-skills');
+            if (skillsCard) {
+                if (allPerfect) skillsCard.classList.add('skills-perfect');
+                else skillsCard.classList.remove('skills-perfect');
+            }
 
             const ctx = document.getElementById(`${containerId}-canvas`).getContext('2d');
 
@@ -1061,7 +1070,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 comprehension_champion:  { fluency: 5,  grammar: 5,  comprehension: 8,  vocabulary: 5,  pronunciation: 5 },
                 rising_star:             { fluency: 5,  grammar: 6,  comprehension: 5,  vocabulary: 6,  pronunciation: 5 },
                 foundation_builder:      { fluency: 2,  grammar: 3,  comprehension: 2,  vocabulary: 3,  pronunciation: 2 },
-                balanced_learner:        { fluency: 8,  grammar: 3,  comprehension: 8,  vocabulary: 3,  pronunciation: 5 }
+                balanced_learner:        { fluency: 5,  grammar: 8,  comprehension: 5,  vocabulary: 5,  pronunciation: 8 }
             };
             if (!code) {
                 if (!window._archIdx) window._archIdx = 0;

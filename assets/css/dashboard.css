@@ -128,6 +128,24 @@
       background: linear-gradient(135deg, rgba(0, 128, 128, 0.05) 0%, rgba(0, 128, 128, 0.02) 100%);
       border: 2px solid var(--color-primary);
       box-shadow: 0 8px 24px rgba(0, 128, 128, 0.15);
+    }
+
+    /* Gold treatment for Perfect Master */
+    .card-skills.skills-perfect {
+      border-color: var(--color-gold);
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(244, 197, 66, 0.03) 100%);
+      box-shadow: 0 8px 24px rgba(212, 175, 55, 0.2);
+      animation: goldCardGlow 3s ease-in-out infinite;
+    }
+    @keyframes goldCardGlow {
+      0%, 100% {
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.2);
+      }
+      50% {
+        box-shadow:
+          0 8px 28px rgba(212, 175, 55, 0.3),
+          0 0 16px rgba(212, 175, 55, 0.1);
+      }
     }    .card-lessons {
       grid-column: 1 / -1;
     }    .card-upgrade {
@@ -332,6 +350,51 @@
       background: color-mix(in srgb, var(--archetype-color) 12%, transparent);
       border: 2px solid color-mix(in srgb, var(--archetype-color) 25%, transparent);
       margin-bottom: 0.6rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Perfect Master: gold badge with shimmer sweep */
+    [data-archetype="perfect_master"] .archetype-badge {
+      background: linear-gradient(145deg, #fff8e1 0%, #ffe082 40%, #ffd54f 100%);
+      color: #b8860b;
+      border: 3px solid var(--color-gold);
+      box-shadow:
+        0 0 0 2px rgba(212, 160, 23, 0.2),
+        0 0 12px rgba(212, 160, 23, 0.15);
+      animation: goldBadgeGlow 2.5s ease-in-out infinite;
+    }
+    [data-archetype="perfect_master"] .archetype-badge::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -75%;
+      width: 50%;
+      height: 200%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.5) 50%,
+        transparent 100%
+      );
+      transform: skewX(-20deg);
+      animation: shimmerSweep 3s ease-in-out infinite;
+    }
+    @keyframes shimmerSweep {
+      0%, 100% { left: -75%; }
+      50% { left: 125%; }
+    }
+    @keyframes goldBadgeGlow {
+      0%, 100% {
+        box-shadow:
+          0 0 0 2px rgba(212, 160, 23, 0.2),
+          0 0 12px rgba(212, 160, 23, 0.15);
+      }
+      50% {
+        box-shadow:
+          0 0 0 3px rgba(212, 160, 23, 0.3),
+          0 0 20px rgba(212, 160, 23, 0.25);
+      }
     }
     .archetype-name {
       font-family: var(--font-heading);
@@ -1058,6 +1121,15 @@
       .archetype-badge {
         background: color-mix(in srgb, var(--archetype-color) 15%, transparent);
         border-color: color-mix(in srgb, var(--archetype-color) 30%, transparent);
+      }
+      .card-skills.skills-perfect {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.03) 100%);
+        border-color: var(--color-gold);
+      }
+      [data-archetype="perfect_master"] .archetype-badge {
+        background: linear-gradient(145deg, #4a3f1a 0%, #6b5a1e 40%, #8a7425 100%);
+        color: #ffd54f;
+        border-color: #b8960b;
       }
       .archetype-description {
         color: var(--color-text-light);
