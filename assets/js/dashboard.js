@@ -1008,17 +1008,21 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                                     return '';
                                 },
                                 font: { size: 12, weight: 'bold' },
-                                color: '#666'
+                                color: isDark ? '#999' : '#666'
                             },
                             pointLabels: {
                                 display: false
                             },
+                            angleLines: {
+                                color: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)',
+                                lineWidth: 1
+                            },
                             grid: {
-    color: window.matchMedia('(prefers-color-scheme: dark)').matches 
-        ? 'rgba(255, 255, 255, 0.15)'  // Light grey in dark mode
-        : 'rgba(0, 0, 0, 0.1)',         // Dark grey in light mode
-    lineWidth: 1
-}
+                                color: isDark
+                                    ? 'rgba(255, 255, 255, 0.15)'
+                                    : 'rgba(0, 0, 0, 0.1)',
+                                lineWidth: 1
+                            }
                         }
                     },
                     plugins: {

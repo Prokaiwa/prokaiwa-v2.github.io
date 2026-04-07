@@ -679,9 +679,25 @@
     @media (prefers-color-scheme: dark) {
       .card-streak.streak-state-frozen {
         background: linear-gradient(135deg, rgba(30, 60, 90, 0.4) 0%, var(--color-card-bg) 100%);
+        border-color: #5c9fd4;
+      }
+      .card-streak.streak-state-frozen .streak-current-icon,
+      .card-streak.streak-state-frozen .streak-current-number {
+        color: #90CAF9;
+      }
+      .card-streak.streak-state-warm {
+        border-color: #d4853a;
+        box-shadow: 0 0 12px rgba(230, 126, 34, 0.2);
+      }
+      .card-streak.streak-state-fire,
+      .card-streak.streak-state-blaze {
+        border-color: #d44a3a;
       }
       .streak-best {
         background: rgba(255, 255, 255, 0.05);
+      }
+      .streak-week-dot {
+        background: rgba(255, 255, 255, 0.08);
       }
     }
 
@@ -839,6 +855,9 @@
     @media (prefers-color-scheme: dark) {
       .streak-modal { background: var(--color-card-bg); }
       .modal-streak-summary { background: rgba(255, 255, 255, 0.05); }
+      .modal-day {
+        color: var(--color-text-light);
+      }
     }
     @media (max-width: 768px) {
       .streak-modal { width: 95%; max-height: 90vh; }
@@ -1110,7 +1129,8 @@
     @media (prefers-color-scheme: dark) {
       .tip-box {
         background-color: var(--color-card-bg);
-      }      .learning-archetype {
+      }
+      .learning-archetype {
         background: linear-gradient(
           135deg,
           color-mix(in srgb, var(--archetype-color) 10%, var(--color-card-bg)) 0%,
@@ -3006,3 +3026,56 @@
         );
       }
     }
+
+/* ── Dashboard Dark Mode Polish (4.6) ── */
+@media (prefers-color-scheme: dark) {
+    /* Card-skills: stronger teal tint on dark */
+    .card-skills {
+        background: linear-gradient(135deg, rgba(0, 168, 168, 0.1) 0%, rgba(0, 168, 168, 0.04) 100%);
+        box-shadow: 0 8px 24px rgba(0, 168, 168, 0.1);
+    }
+
+    /* Dashboard cards: subtle shadow + border refinement */
+    .dashboard-card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    .dashboard-card h3 {
+        border-bottom-color: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Quick action buttons */
+    .quick-action-btn:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Cancellation banner */
+    .cancellation-banner {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.12) 0%, rgba(255, 193, 7, 0.06) 100%);
+        border-color: rgba(255, 193, 7, 0.4);
+    }
+    .cancellation-banner-content h3,
+    .cancellation-banner-content p {
+        color: #ffd54f;
+    }
+    .countdown-timer {
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffd54f;
+    }
+    .countdown-number {
+        color: #ffc107;
+    }
+    .cancellation-banner.expired {
+        background: linear-gradient(135deg, rgba(220, 53, 69, 0.12) 0%, rgba(220, 53, 69, 0.06) 100%);
+        border-color: rgba(220, 53, 69, 0.4);
+    }
+    .cancellation-banner.expired .cancellation-banner-content h3,
+    .cancellation-banner.expired .cancellation-banner-content p {
+        color: #e87d73;
+    }
+    .cancellation-banner.expired .countdown-timer {
+        color: #e87d73;
+    }
+    .cancellation-banner.expired .countdown-number {
+        color: #dc3545;
+    }
+}
