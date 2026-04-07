@@ -1048,6 +1048,47 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         }
 
         // =============================================
+        // CONSOLE TEST: ARCHETYPE PREVIEW
+        // =============================================
+        // Usage: testArchetype('rising_star') or testArchetype() for all
+        window.testArchetype = function(code) {
+            const lang = document.documentElement.lang === 'ja' ? 'ja' : 'en';
+            const presets = {
+                perfect_master:          { fluency: 10, grammar: 10, comprehension: 10, vocabulary: 10, pronunciation: 10 },
+                advanced_achiever:       { fluency: 8,  grammar: 7,  comprehension: 8,  vocabulary: 6,  pronunciation: 5 },
+                natural_speaker:         { fluency: 8,  grammar: 4,  comprehension: 4,  vocabulary: 4,  pronunciation: 8 },
+                grammar_guru:            { fluency: 4,  grammar: 8,  comprehension: 4,  vocabulary: 7,  pronunciation: 3 },
+                comprehension_champion:  { fluency: 5,  grammar: 5,  comprehension: 8,  vocabulary: 5,  pronunciation: 5 },
+                rising_star:             { fluency: 5,  grammar: 6,  comprehension: 5,  vocabulary: 6,  pronunciation: 5 },
+                foundation_builder:      { fluency: 2,  grammar: 3,  comprehension: 2,  vocabulary: 3,  pronunciation: 2 },
+                balanced_learner:        { fluency: 8,  grammar: 3,  comprehension: 8,  vocabulary: 3,  pronunciation: 5 }
+            };
+                const codes = Object.keys(presets);
+                let i = 0;
+                console.log("🎭 Cycling all archetypes — press Enter in console to advance");
+                const show = () => {
+                    if (i >= codes.length) { console.log("✅
+                    const c = codes[i++];
+                    const skills = presets[c];
+                    const fakeAssessment = { ...skills, assessed_at: new Date().toISOString(), band_level: "Test" };
+                    renderSkillsChart("skills-assessment", fakeAssessment, null, lang);
+                    console.log("🎯 Showing: " + c + " (" + i + "/" + codes.length + ") — run testArchetype() again for next");
+                };
+                const c = codes[window._archIdx % codes.length];
+                const skills = presets[c];
+                const fakeAssessment = { ...skills, assessed_at: new Date().toISOString(), band_level: "Test" };
+                renderSkillsChart("skills-assessment", fakeAssessment, null, lang);
+                console.log("🎯 Showing: " + c + " (" + (window._archIdx + 1) + "/" + codes.length + ")");
+                window._archIdx++;
+                return;
+            }
+            const skills = presets[code];
+            const fakeAssessment = { ...skills, assessed_at: new Date().toISOString(), band_level: "Test" };
+            renderSkillsChart("skills-assessment", fakeAssessment, null, lang);
+            console.log("🎯 Showing: " + code);
+        };
+
+        // =============================================
         // AUTO-DETECT TODAY'S PRACTICE
         // =============================================
 
