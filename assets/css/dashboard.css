@@ -232,41 +232,39 @@
       flex-shrink: 0;
     }
 
-    /* Growth Indicator Pills */
-    .growth-indicators {
+    /* Chart Date Legend (before/after) */
+    .chart-date-legend {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.4rem 0 0.5rem;
-      border-top: 1px solid var(--color-border);
-    }
-    .growth-label {
-      font-size: 0.75rem;
+      justify-content: center;
+      gap: 1.25rem;
+      padding: 0.25rem 0 0.4rem;
+      font-size: 0.72rem;
       color: var(--color-text-light);
-      font-weight: 500;
-      margin-right: 0.15rem;
+      font-family: var(--font-heading);
     }
-    .growth-pill {
+    .chart-date-current,
+    .chart-date-previous {
       display: inline-flex;
       align-items: center;
-      gap: 0.2rem;
-      padding: 0.2rem 0.5rem;
-      border-left: 3px solid transparent;
-      border-radius: 0 4px 4px 0;
-      font-size: 0.75rem;
-      font-weight: 600;
-      font-family: var(--font-heading);
-      background: rgba(0, 0, 0, 0.03);
+      gap: 0.4rem;
     }
-    .growth-pill-up {
-      color: #1a8a4a;
+    .chart-date-line {
+      display: inline-block;
+      width: 18px;
+      height: 2px;
+      vertical-align: middle;
     }
-    .growth-pill-down {
-      color: #c0392b;
+    .chart-date-line-solid {
+      background: rgba(74, 144, 226, 0.6);
     }
-    .growth-pill-same {
-      color: var(--color-text-light);
+    .chart-date-line-dashed {
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.25) 0px,
+        rgba(0, 0, 0, 0.25) 5px,
+        transparent 5px,
+        transparent 9px
+      );
     }
 
     /* Growth Indicator Pills */
@@ -2908,18 +2906,18 @@
       }
     }
 
-    /* Skill Legend & Growth Pills — Dark Mode */
+    /* Skill Legend & Chart Date Legend — Dark Mode */
     @media (prefers-color-scheme: dark) {
       .skill-legend-item {
         color: var(--color-text-dark, #e0e0e0);
       }
-      .growth-pill {
-        background: rgba(255, 255, 255, 0.06);
-      }
-      .growth-pill-up {
-        color: #4cd97b;
-      }
-      .growth-pill-down {
-        color: #e87d73;
+      .chart-date-line-dashed {
+        background: repeating-linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.3) 0px,
+          rgba(255, 255, 255, 0.3) 5px,
+          transparent 5px,
+          transparent 9px
+        );
       }
     }

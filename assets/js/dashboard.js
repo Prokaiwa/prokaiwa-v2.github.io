@@ -869,38 +869,30 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
             const archetype = getLearningArchetype(skillsData);
 
-            // Growth indicators (compare current vs previous assessment)
-            const skillKeys = ['fluency', 'grammar', 'comprehension', 'vocabulary', 'pronunciation'];
-            const skillColorArray = [skillColors.fluency, skillColors.grammar, skillColors.comprehension, skillColors.vocabulary, skillColors.pronunciation];
             // Skill legend (color-coded labels below chart)
+            const skillColorArray = [skillColors.fluency, skillColors.grammar, skillColors.comprehension, skillColors.vocabulary, skillColors.pronunciation];
             const legendSize = lang === 'ja' ? '0.8rem' : '0.7rem';
             const legendHtml = '<div class="skill-legend">' + skillLabels.map((label, i) => {
                 return "<span class=\"skill-legend-item\" style=\"font-size:" + legendSize + "\"><span class=\"skill-dot\" style=\"background:" + skillColorArray[i] + "\"></span>" + label + "</span>";
             }).join("") + "</div>";
 
-            let growthHtml = '';
+            // Previous assessment data for ghost overlay
+            let previousValues = null;
+            let chartDateLegend = '';
             if (previousAssessment) {
-                const pills = skillKeys.map((key, i) => {
-                    const current = skillsData[key];
-                    const prev = previousAssessment[key] || 0;
-                    const delta = current - prev;
-                    let arrow, deltaText, stateClass;
-                    if (delta > 0) {
-                        arrow = '\u2191';
-                        deltaText = "+" + delta;
-                        stateClass = 'growth-pill-up';
-                    } else if (delta < 0) {
-                        arrow = '\u2193';
-                        deltaText = "" + delta;
-                        stateClass = 'growth-pill-down';
-                    } else {
-                        arrow = '\u2192';
-                        deltaText = '';
-                        stateClass = 'growth-pill-same';
-                    }
-                    return "<span class=\"growth-pill " + stateClass + "\" style=\"border-left-color: " + skillColorArray[i] + "\">" + skillLabels[i] + " " + arrow + (deltaText ? " " + deltaText : "") + "</span>";
-                }).join("");
-                growthHtml = "<div class=\"growth-indicators\"><span class=\"growth-label\">" + (lang === 'ja' ? '\u524d\u56de\u6bd4\uff1a' : 'vs. previous:') + "</span>" + pills + "</div>";
+                previousValues = [
+                    previousAssessment.fluency || 0,
+                    previousAssessment.grammar || 0,
+                    previousAssessment.comprehension || 0,
+                    previousAssessment.vocabulary || 0,
+                    previousAssessment.pronunciation || 0
+                ];
+                const prevDate = new Date(previousAssessment.assessed_at).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', { month: 'short', day: 'numeric' });
+                const currDate = new Date(assessment.assessed_at).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', { month: 'short', day: 'numeric' });
+                chartDateLegend = '<div class="chart-date-legend">'
+                    + '<span class="chart-date-current"><span class="chart-date-line chart-date-line-solid"></span>' + (lang === 'ja' ? '最新' : 'Latest') + ' (' + currDate + ')</span>'
+                    + '<span class="chart-date-previous"><span class="chart-date-line chart-date-line-dashed"></span>' + (lang === 'ja' ? '前回' : 'Previous') + ' (' + prevDate + ')</span>'
+                    + '</div>';
             }
 
             container.innerHTML = `
@@ -908,7 +900,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     <canvas id="${containerId}-canvas"></canvas>
                 </div>
                 ${legendHtml}
-                ${growthHtml}
+                ${chartDateLegend}
                 <div class="assessment-info">
                     <span class="assessment-date">
                         ${lang === 'ja' ? '評価日：' : 'Assessed: '}
@@ -931,22 +923,44 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             const chartData = dashboardState.animationsReady ? skillValues : [0, 0, 0, 0, 0];
             dashboardState.skillsChartRealData = skillValues;
 
+            // Build datasets — add ghost overlay if previous assessment exists
+            const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            const datasets = [{
+                label: lang === 'ja' ? '最新' : 'Latest',
+                data: chartData,
+                borderColor: borderColor,
+                backgroundColor: backgroundColor,
+                borderWidth: allPerfect ? 3 : 2,
+                pointBackgroundColor: pointColors,
+                pointBorderColor: pointColors,
+                pointBorderWidth: 2,
+                pointRadius: 8,
+                pointHoverRadius: 10,
+                order: 1
+            }];
+
+            if (previousValues) {
+                datasets.push({
+                    label: lang === 'ja' ? '前回' : 'Previous',
+                    data: previousValues,
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.25)',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1.5,
+                    borderDash: [6, 4],
+                    pointBackgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)',
+                    pointBorderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)',
+                    pointBorderWidth: 1,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    order: 2
+                });
+            }
+
             dashboardState.skillsChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
                     labels: skillLabels,
-                    datasets: [{
-                        label: lang === 'ja' ? 'スキルレベル' : 'Skill Level',
-                        data: chartData,
-                        borderColor: borderColor,
-                        backgroundColor: backgroundColor,
-                        borderWidth: allPerfect ? 3 : 2,
-                        pointBackgroundColor: pointColors,
-                        pointBorderColor: pointColors,
-                        pointBorderWidth: 2,
-                        pointRadius: 8,
-                        pointHoverRadius: 10
-                    }]
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
@@ -1001,6 +1015,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                                 },
                                 label: function(context) {
                                     const score = context.parsed.r;
+                                    const datasetLabel = context.dataset.label;
                                     let level = '';
                                     if (score === 0) level = lang === 'ja' ? '未評価' : 'Not Rated';
                                     else if (score <= 2) level = lang === 'ja' ? '超初級' : 'Super Beginner';
@@ -1010,7 +1025,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                                     else if (score < 10) level = lang === 'ja' ? '上級+' : 'Advanced+';
                                     else level = lang === 'ja' ? '完璧！' : 'Perfect!';
 
-                                    return `${score}/10 (${level})`;
+                                    return `${datasetLabel}: ${score}/10 (${level})`;
                                 }
                             }
                         }
