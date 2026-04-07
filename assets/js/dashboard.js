@@ -869,6 +869,19 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
             const archetype = getLearningArchetype(skillsData);
 
+            // Archetype accent colors
+            const archetypeColors = {
+                perfect_master: '#D4AF37',
+                advanced_achiever: '#E8A817',
+                natural_speaker: '#2BA5A5',
+                grammar_guru: '#9B59B6',
+                comprehension_champion: '#27AE60',
+                rising_star: '#E67E22',
+                foundation_builder: '#4A90E2',
+                balanced_learner: '#008080'
+            };
+            const archetypeColor = archetypeColors[archetype.code] || '#008080';
+
             // Skill legend (color-coded labels below chart)
             const skillColorArray = [skillColors.fluency, skillColors.grammar, skillColors.comprehension, skillColors.vocabulary, skillColors.pronunciation];
             const legendSize = lang === 'ja' ? '0.8rem' : '0.7rem';
@@ -908,12 +921,12 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     </span>
                     <span class="assessment-band">${assessment.band_level || '-'}</span>
                 </div>
-                <div class="learning-archetype">
-                    <div class="archetype-icon"><i class="${archetype.icon}"></i></div>
-                    <div class="archetype-content">
-                        <div class="archetype-name">${lang === 'ja' ? archetype.name_ja : archetype.name_en}</div>
-                        <div class="archetype-description">${lang === 'ja' ? archetype.description_ja : archetype.description_en}</div>
+                <div class="learning-archetype" style="--archetype-color: ${archetypeColor}">
+                    <div class="archetype-badge">
+                        <i class="${archetype.icon}"></i>
                     </div>
+                    <div class="archetype-name">${lang === 'ja' ? archetype.name_ja : archetype.name_en}</div>
+                    <div class="archetype-description">${lang === 'ja' ? archetype.description_ja : archetype.description_en}</div>
                 </div>
             `;
 
