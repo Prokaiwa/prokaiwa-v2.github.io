@@ -1050,10 +1050,10 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         // =============================================
         // CONSOLE TEST: ARCHETYPE PREVIEW
         // =============================================
-        // Usage: testArchetype('rising_star') or testArchetype() for all
+        // Usage: testArchetype("rising_star") or testArchetype() to cycle
         window.testArchetype = function(code) {
-            const lang = document.documentElement.lang === 'ja' ? 'ja' : 'en';
-            const presets = {
+            var lang = document.documentElement.lang === "ja" ? "ja" : "en";
+            var presets = {
                 perfect_master:          { fluency: 10, grammar: 10, comprehension: 10, vocabulary: 10, pronunciation: 10 },
                 advanced_achiever:       { fluency: 8,  grammar: 7,  comprehension: 8,  vocabulary: 6,  pronunciation: 5 },
                 natural_speaker:         { fluency: 8,  grammar: 4,  comprehension: 4,  vocabulary: 4,  pronunciation: 8 },
@@ -1063,29 +1063,17 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 foundation_builder:      { fluency: 2,  grammar: 3,  comprehension: 2,  vocabulary: 3,  pronunciation: 2 },
                 balanced_learner:        { fluency: 8,  grammar: 3,  comprehension: 8,  vocabulary: 3,  pronunciation: 5 }
             };
-                const codes = Object.keys(presets);
-                let i = 0;
-                console.log("🎭 Cycling all archetypes — press Enter in console to advance");
-                const show = () => {
-                    if (i >= codes.length) { console.log("✅
-                    const c = codes[i++];
-                    const skills = presets[c];
-                    const fakeAssessment = { ...skills, assessed_at: new Date().toISOString(), band_level: "Test" };
-                    renderSkillsChart("skills-assessment", fakeAssessment, null, lang);
-                    console.log("🎯 Showing: " + c + " (" + i + "/" + codes.length + ") — run testArchetype() again for next");
-                };
-                const c = codes[window._archIdx % codes.length];
-                const skills = presets[c];
-                const fakeAssessment = { ...skills, assessed_at: new Date().toISOString(), band_level: "Test" };
-                renderSkillsChart("skills-assessment", fakeAssessment, null, lang);
-                console.log("🎯 Showing: " + c + " (" + (window._archIdx + 1) + "/" + codes.length + ")");
+            if (!code) {
+                if (!window._archIdx) window._archIdx = 0;
+                var codes = Object.keys(presets);
+                code = codes[window._archIdx % codes.length];
+                console.log("[" + (window._archIdx % codes.length + 1) + "/" + codes.length + "] " + code);
                 window._archIdx++;
-                return;
             }
-            const skills = presets[code];
-            const fakeAssessment = { ...skills, assessed_at: new Date().toISOString(), band_level: "Test" };
+            var skills = presets[code];
+            if (!skills) { console.error("Unknown archetype. Options: " + Object.keys(presets).join(", ")); return; }
+            var fakeAssessment = Object.assign({}, skills, { assessed_at: new Date().toISOString(), band_level: "Test" });
             renderSkillsChart("skills-assessment", fakeAssessment, null, lang);
-            console.log("🎯 Showing: " + code);
         };
 
         // =============================================
