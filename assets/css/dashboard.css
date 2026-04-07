@@ -1785,8 +1785,8 @@
 }
 
 .lesson-item {
-    background: #f8f9fa;
-    border: 1px solid #e0e0e0;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 1.25rem;
     transition: all 0.3s ease;
@@ -1873,7 +1873,7 @@
 }
 
 .google-meet-btn:hover {
-    background: #f8f9fa;
+    background: var(--color-bg);
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     transform: translateY(-1px);
 }
@@ -1995,8 +1995,8 @@
 }
 
 .toggle-lessons-btn:hover {
-    background: #f8f9fa;
-    border-color: #c4c7c9;
+    background: var(--color-bg);
+    border-color: var(--color-border);
 }
 
 /* Divider before book another */
@@ -2058,27 +2058,27 @@
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
     .lesson-item {
-        background: #2d2d2d;
-        border-color: #404040;
+        background: var(--color-card-bg);
+        border-color: var(--color-border);
     }
 
     .lesson-item:not(.lesson-next) .lesson-datetime,
     .lesson-item:not(.lesson-next) .lesson-countdown {
-        color: #e0e0e0;
+        color: var(--color-text);
     }
 
     .google-meet-btn,
     .lesson-action-btn,
     .toggle-lessons-btn {
-        background: #2d2d2d;
-        border-color: #404040;
-        color: #e0e0e0;
+        background: var(--color-card-bg);
+        border-color: var(--color-border);
+        color: var(--color-text);
     }
 
     .google-meet-btn:hover,
     .lesson-action-btn:hover,
     .toggle-lessons-btn:hover {
-        background: #353535;
+        background: var(--color-surface);
     }
 
     .meet-link-status {
