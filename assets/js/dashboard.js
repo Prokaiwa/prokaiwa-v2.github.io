@@ -1052,7 +1052,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         // =============================================
         // Usage: testArchetype("rising_star") or testArchetype() to cycle
         window.testArchetype = function(code) {
-            var lang = document.documentElement.lang === "ja" ? "ja" : "en";
+            var lang = getCurrentLang();
             var presets = {
                 perfect_master:          { fluency: 10, grammar: 10, comprehension: 10, vocabulary: 10, pronunciation: 10 },
                 advanced_achiever:       { fluency: 8,  grammar: 7,  comprehension: 8,  vocabulary: 6,  pronunciation: 5 },
