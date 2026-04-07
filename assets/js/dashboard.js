@@ -952,7 +952,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: {
-                        padding: 20
+                        padding: 12
                     },
                     scales: {
                         r: {
@@ -975,10 +975,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                                 color: '#666'
                             },
                             pointLabels: {
-                                display: true,
-                                color: pointColors,
-                                font: { size: 13, weight: '600', family: "Outfit, sans-serif" },
-                                padding: 8
+                                display: false
                             },
                             grid: {
     color: window.matchMedia('(prefers-color-scheme: dark)').matches 
