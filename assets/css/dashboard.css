@@ -207,6 +207,68 @@
       font-size: 0.95rem;
     }
 
+    /* Skill Legend (below chart) */
+    .skill-legend {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+      padding: 0.4rem 0 0.5rem;
+    }
+    .skill-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      color: var(--color-text);
+      white-space: nowrap;
+    }
+    .skill-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Growth Indicator Pills */
+    .growth-indicators {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0 0.5rem;
+      border-top: 1px solid var(--color-border);
+    }
+    .growth-label {
+      font-size: 0.75rem;
+      color: var(--color-text-light);
+      font-weight: 500;
+      margin-right: 0.15rem;
+    }
+    .growth-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      padding: 0.2rem 0.5rem;
+      border-left: 3px solid transparent;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: var(--font-heading);
+      background: rgba(0, 0, 0, 0.03);
+    }
+    .growth-pill-up {
+      color: #1a8a4a;
+    }
+    .growth-pill-down {
+      color: #c0392b;
+    }
+    .growth-pill-same {
+      color: var(--color-text-light);
+    }
+
     /* Growth Indicator Pills */
     .growth-indicators {
       display: flex;
@@ -2835,6 +2897,22 @@
 
     /* Growth Pills — Dark Mode */
     @media (prefers-color-scheme: dark) {
+      .growth-pill {
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .growth-pill-up {
+        color: #4cd97b;
+      }
+      .growth-pill-down {
+        color: #e87d73;
+      }
+    }
+
+    /* Skill Legend & Growth Pills — Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      .skill-legend-item {
+        color: var(--color-text-dark, #e0e0e0);
+      }
       .growth-pill {
         background: rgba(255, 255, 255, 0.06);
       }

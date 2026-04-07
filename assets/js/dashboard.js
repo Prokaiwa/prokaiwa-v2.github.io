@@ -872,6 +872,12 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             // Growth indicators (compare current vs previous assessment)
             const skillKeys = ['fluency', 'grammar', 'comprehension', 'vocabulary', 'pronunciation'];
             const skillColorArray = [skillColors.fluency, skillColors.grammar, skillColors.comprehension, skillColors.vocabulary, skillColors.pronunciation];
+            // Skill legend (color-coded labels below chart)
+            const legendSize = lang === 'ja' ? '0.8rem' : '0.7rem';
+            const legendHtml = '<div class="skill-legend">' + skillLabels.map((label, i) => {
+                return "<span class=\"skill-legend-item\" style=\"font-size:" + legendSize + "\"><span class=\"skill-dot\" style=\"background:" + skillColorArray[i] + "\"></span>" + label + "</span>";
+            }).join("") + "</div>";
+
             let growthHtml = '';
             if (previousAssessment) {
                 const pills = skillKeys.map((key, i) => {
@@ -901,6 +907,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 <div class="skills-chart-container">
                     <canvas id="${containerId}-canvas"></canvas>
                 </div>
+                ${legendHtml}
                 ${growthHtml}
                 <div class="assessment-info">
                     <span class="assessment-date">
