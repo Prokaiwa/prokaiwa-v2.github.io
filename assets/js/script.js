@@ -505,56 +505,6 @@ if (sessionStorage.getItem('scrollToFAQ') === 'true') {
     // Console message for debugging (can be removed in production)
     // console.log("Prokaiwa script loaded");
     
-    // ==========================================================================
-    // DYNAMIC NAV: Show Dashboard if logged in, Login if not
-    // ==========================================================================
-    
-    async function updateNavForAuthState() {
-        try {
-            const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm');
-            
-            const supabase = createClient(
-                'https://luyzyzefgintksydmwoh.supabase.co',
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg',
-                {
-                    auth: {
-                        persistSession: true,
-                        storageKey: 'prokaiwa-supabase-auth',
-                        storage: window.localStorage,
-                        autoRefreshToken: true,
-                        detectSessionInUrl: true
-                    }
-                }
-            );
-            
-            const { data: { session } } = await supabase.auth.getSession();
-            const loginLink = document.querySelector('#auth-nav-link');
-            
-            if (loginLink) {
-                if (session) {
-                    // User is logged in
-                    loginLink.href = '/dashboard.html';
-                    loginLink.textContent = 'Dashboard';
-                } else {
-                    // User is not logged in
-                    loginLink.href = '/login.html';
-                    loginLink.textContent = 'Log In';
-                }
-                // Reveal the link after decision is made
-                loginLink.style.visibility = 'visible';
-            }
-            
-        } catch (error) {
-            // On error, default to Log In and show it
-            const loginLink = document.querySelector('#auth-nav-link');
-            if (loginLink) {
-                loginLink.href = '/login.html';
-                loginLink.textContent = 'Log In';
-                loginLink.style.visibility = 'visible';
-            }
-        }
-    }
-    
-    updateNavForAuthState();
+    // Nav auth state is handled by components.js
 
 });
