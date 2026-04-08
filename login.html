@@ -124,8 +124,8 @@
                     </div>
                     <div class="form-group">
                         <label for="ja-signup-password">パスワード</label>
-                        <input type="password" id="ja-signup-password" required autocomplete="new-password" minlength="6">
-                        <p class="password-hint">※6文字以上で設定してください</p>
+                        <input type="password" id="ja-signup-password" required autocomplete="new-password">
+                        <p class="password-hint">※8文字以上、大文字・小文字・数字・記号をそれぞれ1つ以上含めてください</p>
                     </div>
                     <button type="submit" class="cta-button" style="width:100%;">
                         <span class="btn-text">アカウントを作成</span>
@@ -170,8 +170,8 @@
                     </div>
                     <div class="form-group">
                         <label for="en-signup-password">Password</label>
-                        <input type="password" id="en-signup-password" required autocomplete="new-password" minlength="6">
-                        <p class="password-hint">Must be at least 6 characters</p>
+                        <input type="password" id="en-signup-password" required autocomplete="new-password">
+                        <p class="password-hint">Must be at least 8 characters with uppercase, lowercase, number, and symbol</p>
                     </div>
                     <button type="submit" class="cta-button" style="width:100%;">
                         <span class="btn-text">Create Account</span>
@@ -300,7 +300,7 @@
             ja: {
                 invalidCredentials: 'メールアドレスまたはパスワードが正しくありません。',
                 emailInUse: 'このメールアドレスは既に登録されています。',
-                weakPassword: 'パスワードは6文字以上で設定してください。',
+                weakPassword: 'パスワードは8文字以上で、大文字・小文字・数字・記号をそれぞれ1つ以上含めてください。',
                 enterEmail: 'パスワードをリセットするには、メールアドレスを入力してください。',
                 resetSent: 'パスワードリセットのメールを送信しました。メールをご確認ください。',
                 genericError: 'エラーが発生しました。もう一度お試しください。',
@@ -309,7 +309,7 @@
             en: {
                 invalidCredentials: 'Invalid email or password.',
                 emailInUse: 'This email is already registered.',
-                weakPassword: 'Password must be at least 6 characters.',
+                weakPassword: 'Password must be at least 8 characters with uppercase, lowercase, number, and symbol.',
                 enterEmail: 'Please enter your email address to reset your password.',
                 resetSent: 'Password reset link sent! Please check your email.',
                 genericError: 'An error occurred. Please try again.',
@@ -397,6 +397,28 @@
                 try {
                     debugLog('Attempting signup for:', email);
                     
+                    // Validate password before sending to Supabase
+                    const hasUpper = /[A-Z]/.test(password);
+                    const hasLower = /[a-z]/.test(password);
+                    const hasDigit = /[0-9]/.test(password);
+                    const hasSymbol = /[^A-Za-z0-9]/.test(password);
+                    const isLongEnough = password.length >= 8;
+
+                    if (!isLongEnough || !hasUpper || !hasLower || !hasDigit || !hasSymbol) {
+                        setButtonLoading(submitBtn, false);
+                        const missing = [];
+                        if (!isLongEnough) missing.push(lang === 'ja' ? '8文字以上' : '8+ characters');
+                        if (!hasUpper) missing.push(lang === 'ja' ? '大文字' : 'uppercase letter');
+                        if (!hasLower) missing.push(lang === 'ja' ? '小文字' : 'lowercase letter');
+                        if (!hasDigit) missing.push(lang === 'ja' ? '数字' : 'number');
+                        if (!hasSymbol) missing.push(lang === 'ja' ? '記号' : 'symbol');
+                        const msg = lang === 'ja'
+                            ? `パスワードに必要: ${missing.join('、')}`
+                            : `Password needs: ${missing.join(', ')}`;
+                        showMessage(msg);
+                        return;
+                    }
+
                     const { data, error } = await supabase.auth.signUp({ 
                         email, 
                         password,
