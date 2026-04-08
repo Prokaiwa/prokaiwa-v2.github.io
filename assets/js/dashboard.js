@@ -1238,7 +1238,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             try {
                 const { data: assessments, error } = await supabase
                     .from('student_assessments')
-                    .select('*')
+                    .select('assessed_at, fluency, grammar, comprehension, vocabulary, pronunciation, band_level, total_score')
                     .eq('user_id', userId)
                     .order('assessed_at', { ascending: false })
                     .limit(2);
@@ -2576,7 +2576,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
                 const { data: profile, error: profileError } = await supabase
                     .from('questionnaire_responses')
-                    .select('*')
+                    .select('id, given_name_romaji, name, plan, subscription_status, had_video_access, cancelled_at, dashboard_access_expires_at')
                     .eq('user_id', user.id)
                     .single();
 
