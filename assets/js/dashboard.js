@@ -921,7 +921,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                         ${lang === 'ja' ? '評価日：' : 'Assessed: '}
                         ${new Date(assessment.assessed_at).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US')}
                     </span>
-                    <span class="assessment-band">${assessment.band_level || '-'}</span>
+                    <span class="assessment-band">${assessment.band || '-'}</span>
                 </div>
                 <div class="learning-archetype" style="--archetype-color: ${archetypeColor}" data-archetype="${archetype.code}">
                     <div class="archetype-badge">
@@ -1085,7 +1085,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             }
             var skills = presets[code];
             if (!skills) { console.error("Unknown archetype. Options: " + Object.keys(presets).join(", ")); return; }
-            var fakeAssessment = Object.assign({}, skills, { assessed_at: new Date().toISOString(), band_level: "Test" });
+            var fakeAssessment = Object.assign({}, skills, { assessed_at: new Date().toISOString(), band: "Test" });
             renderSkillsChart("skills-assessment", fakeAssessment, null, lang);
         };
 
@@ -1238,7 +1238,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             try {
                 const { data: assessments, error } = await supabase
                     .from('student_assessments')
-                    .select('assessed_at, fluency, grammar, comprehension, vocabulary, pronunciation, band_level, total_score')
+                    .select('assessed_at, fluency, grammar, comprehension, vocabulary, pronunciation, band, total_score')
                     .eq('user_id', userId)
                     .order('assessed_at', { ascending: false })
                     .limit(2);
@@ -1256,7 +1256,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 if (current) {
                     debugLog('✅ Assessment found:', {
                         assessed_at: current.assessed_at,
-                        band_level: current.band_level,
+                        band: current.band,
                         total_score: current.total_score
                     });
                     if (previous) {
