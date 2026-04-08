@@ -925,32 +925,27 @@
 
 // Load lesson credits from lesson_credits table (after profile loop)
 debugLog('💳 Loading lesson credits...');
+// Get current month's credits only (matches use_lesson_credit logic)
+const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
 const { data: creditsData, error: creditsError } = await supabase
     .from('lesson_credits')
     .select('*')
     .eq('user_id', session.user.id)
-    .gte('expires_at', new Date().toISOString().split('T')[0]) // Only non-expired credits
-    .order('expires_at', { ascending: true });
+    .eq('month', currentMonth)
+    .maybeSingle();
 
 if (creditsError) {
     console.error('❌ Credits error:', creditsError);
 } else {
     debugLog('✅ Credits loaded:', creditsData);
     
-    // Calculate total available credits
+    // Current month credits only
     let totalAvailable = 0;
-    let earliestExpiry = null;
+    let expiryDate = null;
     
-    if (creditsData && creditsData.length > 0) {
-        creditsData.forEach(record => {
-            const available = record.total_credits - record.used_credits;
-            totalAvailable += available;
-            
-            // Track earliest expiry
-            if (!earliestExpiry || record.expires_at < earliestExpiry) {
-                earliestExpiry = record.expires_at;
-            }
-        });
+    if (creditsData) {
+        totalAvailable = creditsData.total_credits + creditsData.rolled_from_previous - creditsData.used_credits;
+        expiryDate = creditsData.expires_at;
     }
     
     // Update UI for both languages
@@ -958,9 +953,9 @@ if (creditsError) {
         document.getElementById(`${lang}-credits-count`).textContent = totalAvailable.toString();
         
         // Show expiry if credits exist
-        if (totalAvailable > 0 && earliestExpiry) {
-            const expiryDate = new Date(earliestExpiry);
-            const formattedExpiry = expiryDate.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US');
+        if (totalAvailable > 0 && expiryDate) {
+            const expiry = new Date(expiryDate);
+            const formattedExpiry = expiry.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US');
             
             document.getElementById(`${lang}-credits-expiry-row`).style.display = 'flex';
             document.getElementById(`${lang}-credits-expiry`).textContent = formattedExpiry;
