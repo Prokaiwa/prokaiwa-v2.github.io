@@ -885,7 +885,7 @@
             debugLog('👤 Loading profile...');
             const { data: profile, error: profileError } = await supabase
                 .from('questionnaire_responses')
-                .select('*')
+                .select('name, email, level, created_at, plan, payment_status')
                 .eq('user_id', session.user.id)
                 .single();
 
