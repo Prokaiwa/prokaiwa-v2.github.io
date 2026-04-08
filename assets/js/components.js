@@ -27,7 +27,8 @@
       const loginLink = document.querySelector('#auth-nav-link');
       if (loginLink) {
         const isAuthPage = window.location.pathname.includes('dashboard') || 
-                           window.location.pathname.includes('account-settings');
+                           window.location.pathname.includes('account-settings') ||
+                           window.location.pathname.includes('questionnaire');
         if (session && isAuthPage) {
           loginLink.textContent = 'Log Out';
           loginLink.href = '#';
