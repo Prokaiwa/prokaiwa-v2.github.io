@@ -491,7 +491,7 @@
                 </div>
                 <div class="settings-row" id="ja-credits-expiry-row" style="display: none;">
                     <span class="settings-label">
-                        <span class="settings-label-main">有効期限</span>
+                        <span class="settings-label-main">対象月</span>
                     </span>
                     <span class="settings-value credit-expiry" id="ja-credits-expiry">-</span>
                 </div>
@@ -687,7 +687,7 @@
                 </div>
                 <div class="settings-row" id="en-credits-expiry-row" style="display: none;">
                     <span class="settings-label">
-                        <span class="settings-label-main">Expiry Date</span>
+                        <span class="settings-label-main">Credit Period</span>
                     </span>
                     <span class="settings-value credit-expiry" id="en-credits-expiry">-</span>
                 </div>
@@ -952,13 +952,15 @@ if (creditsError) {
     ['ja', 'en'].forEach(lang => {
         document.getElementById(`${lang}-credits-count`).textContent = totalAvailable.toString();
         
-        // Show expiry if credits exist
-        if (totalAvailable > 0 && expiryDate) {
-            const expiry = new Date(expiryDate);
-            const formattedExpiry = expiry.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US');
+        // Show credit period month
+        if (creditsData && creditsData.month) {
+            const monthDate = new Date(creditsData.month + 'T00:00:00');
+            const formattedMonth = lang === 'ja'
+                ? `${monthDate.getFullYear()}年${monthDate.getMonth() + 1}月`
+                : monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
             
             document.getElementById(`${lang}-credits-expiry-row`).style.display = 'flex';
-            document.getElementById(`${lang}-credits-expiry`).textContent = formattedExpiry;
+            document.getElementById(`${lang}-credits-expiry`).textContent = formattedMonth;
         }
     });
 }
