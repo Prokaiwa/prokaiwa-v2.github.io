@@ -46,11 +46,31 @@
     .btn-text { transition: opacity 0.2s; }
     .btn-loading .btn-text { opacity: 0; }
     
-    /* Password hint */
-    .password-hint {
-      font-size: 0.85rem;
+    /* Password checklist */
+    .password-hint { display: none; }
+    .pw-checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0 0 0;
+      display: none;
+    }
+    .pw-checklist.visible { display: block; }
+    .pw-checklist li {
+      font-size: 0.82rem;
       color: var(--color-text-muted);
-      margin-top: 0.25rem;
+      padding: 0.15rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s ease;
+    }
+    .pw-checklist li.met {
+      color: #22c55e;
+    }
+    .pw-checklist li .pw-icon {
+      width: 14px;
+      text-align: center;
+      flex-shrink: 0;
     }
     
     /* Page loading overlay */
@@ -125,7 +145,13 @@
                     <div class="form-group">
                         <label for="ja-signup-password">パスワード</label>
                         <input type="password" id="ja-signup-password" required autocomplete="new-password">
-                        <p class="password-hint">※8文字以上、大文字・小文字・数字・記号をそれぞれ1つ以上含めてください</p>
+                        <ul class="pw-checklist" id="ja-pw-checklist">
+                          <li id="ja-pw-length"><span class="pw-icon">○</span>8文字以上</li>
+                          <li id="ja-pw-upper"><span class="pw-icon">○</span>大文字 (A-Z)</li>
+                          <li id="ja-pw-lower"><span class="pw-icon">○</span>小文字 (a-z)</li>
+                          <li id="ja-pw-digit"><span class="pw-icon">○</span>数字 (0-9)</li>
+                          <li id="ja-pw-symbol"><span class="pw-icon">○</span>記号 (!@#$ など)</li>
+                        </ul>
                     </div>
                     <button type="submit" class="cta-button" style="width:100%;">
                         <span class="btn-text">アカウントを作成</span>
@@ -171,7 +197,13 @@
                     <div class="form-group">
                         <label for="en-signup-password">Password</label>
                         <input type="password" id="en-signup-password" required autocomplete="new-password">
-                        <p class="password-hint">Must be at least 8 characters with uppercase, lowercase, number, and symbol</p>
+                        <ul class="pw-checklist" id="en-pw-checklist">
+                          <li id="en-pw-length"><span class="pw-icon">○</span>8+ characters</li>
+                          <li id="en-pw-upper"><span class="pw-icon">○</span>Uppercase (A-Z)</li>
+                          <li id="en-pw-lower"><span class="pw-icon">○</span>Lowercase (a-z)</li>
+                          <li id="en-pw-digit"><span class="pw-icon">○</span>Number (0-9)</li>
+                          <li id="en-pw-symbol"><span class="pw-icon">○</span>Symbol (!@#$ etc.)</li>
+                        </ul>
                     </div>
                     <button type="submit" class="cta-button" style="width:100%;">
                         <span class="btn-text">Create Account</span>
@@ -339,6 +371,35 @@
             }
             return messages.genericError;
         }
+
+        // --- Real-time Password Checklist ---
+        function setupPasswordChecklist(lang) {
+            const input = document.getElementById(`${lang}-signup-password`);
+            const checklist = document.getElementById(`${lang}-pw-checklist`);
+            if (!input || !checklist) return;
+
+            const checks = {
+                length: { el: document.getElementById(`${lang}-pw-length`), test: v => v.length >= 8 },
+                upper:  { el: document.getElementById(`${lang}-pw-upper`),  test: v => /[A-Z]/.test(v) },
+                lower:  { el: document.getElementById(`${lang}-pw-lower`),  test: v => /[a-z]/.test(v) },
+                digit:  { el: document.getElementById(`${lang}-pw-digit`),  test: v => /[0-9]/.test(v) },
+                symbol: { el: document.getElementById(`${lang}-pw-symbol`), test: v => /[^A-Za-z0-9]/.test(v) }
+            };
+
+            input.addEventListener('focus', () => checklist.classList.add('visible'));
+
+            input.addEventListener('input', () => {
+                const val = input.value;
+                for (const key in checks) {
+                    const { el, test } = checks[key];
+                    const passed = test(val);
+                    el.classList.toggle('met', passed);
+                    el.querySelector('.pw-icon').textContent = passed ? '✓' : '○';
+                }
+            });
+        }
+        setupPasswordChecklist('ja');
+        setupPasswordChecklist('en');
 
         // --- Rate Limiter (5 attempts per 15 min window) ---
         const rateLimiter = {
