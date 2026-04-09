@@ -609,8 +609,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 // Resources card
                 // Upgrade card
                 upgradeDesc: '講師と直接話して、さらに上達しませんか？',
-                upgradeCasual: 'カジュアルレッスン ¥3,000',
-                upgradeBusiness: 'ビジネスレッスン ¥5,000',
+                upgradeButton: '1対1ビデオレッスン ¥4,000',
                 addonVideo: '+ ビデオ',
             },
             en: {
@@ -657,8 +656,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 // Resources card
                 // Upgrade card
                 upgradeDesc: 'Want to practice speaking with a teacher directly?',
-                upgradeCasual: 'Casual Lesson ¥3,000',
-                upgradeBusiness: 'Business Lesson ¥5,000',
+                upgradeButton: '1-on-1 Video Lesson ¥4,000',
                 addonVideo: '+ Video',
             }
         };
