@@ -1368,12 +1368,12 @@ langObserver.observe(document.documentElement, { attributes: true, attributeFilt
         name: `${familyName} ${givenName}`,
         given_name_romaji: givenNameRomaji,
         email: email,
-        line_id: lineId,
         plan: selectedPlan,
         level: 'Super Beginner',
         goals: {
           purpose: selectedPurpose,
           how_heard: sources,
+          line_username: lineId,
           social_account: document.getElementById('field-social').value.trim() || 'N/A',
           agreed_to_terms: {
             apps: document.getElementById('chk-agree-apps').checked,
