@@ -2648,7 +2648,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
                 const { data: profile, error: profileError } = await supabase
                     .from('questionnaire_responses')
-                    .select('id, user_id, name, given_name, family_name, given_name_romaji, email, plan, level, goals, line_id, line_connect_token, payment_status, subscription_status, stripe_subscription_id, stripe_customer_id, subscription_period_start, subscription_period_end, next_billing_date, cancelled_at, cancellation_effective_date, dashboard_access_expires_at, had_video_access, addons, updated_at')
+                    .select('id, user_id, name, given_name, family_name, given_name_romaji, email, plan, level, goals, line_id, line_connect_token, payment_status, subscription_status, stripe_subscription_id, stripe_customer_id, subscription_period_start, subscription_period_end, next_billing_date, cancelled_at, cancellation_effective_date, dashboard_access_expires_at, had_video_access, updated_at')
                     .eq('user_id', user.id)
                     .single();
 
