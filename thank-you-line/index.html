@@ -94,6 +94,63 @@
         background-color: var(--color-card-bg);
       }
     }
+    .connect-code-box {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f0f7f7;
+      border-radius: 8px;
+      border: 1px solid #b2dfdf;
+      text-align: center;
+    }
+    .connect-code-label {
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+    .connect-code-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .connect-code {
+      font-family: monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #008080;
+      letter-spacing: 0.05em;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: 1.5px solid #008080;
+      user-select: all;
+    }
+    .copy-btn {
+      background: #008080;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: 'Noto Sans JP', sans-serif;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: #006666; }
+    .connect-code-hint {
+      font-size: 0.8rem;
+      color: #888;
+      margin: 0.25rem 0 0;
+    }
+    @media (prefers-color-scheme: dark) {
+      .connect-code-box { background: #0a2020; border-color: #006666; }
+      .connect-code { background: #1a3a3a; }
+    }
   </style>
 </head>
 <body>
@@ -124,11 +181,19 @@
                 <div class="line-add-box">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://line.me/R/ti/p/@845irjbc" alt="Prokaiwa LINE QRコード">
                     <p>IDで追加する場合: <strong>@845irjbc</strong></p>
-                    <a href="https://line.me/R/ti/p/@845irjbc?from=page&searchId=845irjbc" class="cta-button" target="_blank" rel="noopener noreferrer">LINEで友だち追加</a>
+                    <a id="line-btn-ja" href="https://line.me/R/ti/p/@845irjbc?from=page&searchId=845irjbc" class="cta-button" target="_blank" rel="noopener noreferrer">LINEで友だち追加</a>
+                    <div class="connect-code-box" id="connect-box-ja" style="display:none;">
+                        <p class="connect-code-label">📋 ボタンをタップ → メッセージが自動で入力されます → 送信ボタンをタップするだけ！</p>
+                        <div class="connect-code-row">
+                            <span class="connect-code" id="connect-code-display-ja">読み込み中...</span>
+                            <button class="copy-btn" id="copy-btn-ja" onclick="pkCopyCode('ja')">コピー</button>
+                        </div>
+                        <p class="connect-code-hint">ボタンが使えない場合は、このコードをコピーしてLINEに送ってください</p>
+                    </div>
                 </div>
                 
                 <h3><span class="step-number">2</span>アカウントが自動的に認証されます</h3>
-                <p>友だち追加が完了すると、数秒以内に確認メッセージが届きます。もし届かない場合は、何か簡単なメッセージを送ってください（「Hello」「こんにちは」など）。</p>
+                <p>「LINEで友だち追加」ボタンをタップすると、認証メッセージが自動で入力されます。そのまま送信ボタンをタップしてください。数秒以内にアカウントが有効になります。</p>
 
                 <h3><span class="step-number">3</span>明日の朝9時に最初のプロンプトが届きます</h3>
                 <p>それまでの間、講師に質問や自己紹介を送ることもできます！</p>
@@ -172,11 +237,19 @@
                 <div class="line-add-box">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://line.me/R/ti/p/@845irjbc" alt="Prokaiwa LINE QR Code">
                     <p>Or add by ID: <strong>@845irjbc</strong></p>
-                    <a href="https://line.me/R/ti/p/@845irjbc?from=page&searchId=845irjbc" class="cta-button" target="_blank" rel="noopener noreferrer">Add Friend on LINE</a>
+                    <a id="line-btn-en" href="https://line.me/R/ti/p/@845irjbc?from=page&searchId=845irjbc" class="cta-button" target="_blank" rel="noopener noreferrer">Add Friend on LINE</a>
+                    <div class="connect-code-box" id="connect-box-en" style="display:none;">
+                        <p class="connect-code-label">📋 Tap the button → your connection message is pre-filled → just tap Send!</p>
+                        <div class="connect-code-row">
+                            <span class="connect-code" id="connect-code-display-en">Loading...</span>
+                            <button class="copy-btn" id="copy-btn-en" onclick="pkCopyCode('en')">Copy</button>
+                        </div>
+                        <p class="connect-code-hint">If the button doesn't work, copy this code and send it manually in LINE</p>
+                    </div>
                 </div>
 
                 <h3><span class="step-number">2</span>Your account activates automatically</h3>
-                <p>Once you add us as a friend, you'll receive a confirmation message within seconds. If you don't see it, feel free to send any message (like "Hello" or "Hi").</p>
+                <p>Tap the button above — your connection message will be pre-filled in LINE. Just tap Send and your account activates within seconds.</p>
 
                 <h3><span class="step-number">3</span>Your first prompt arrives tomorrow at 9 AM JST</h3>
                 <p>In the meantime, feel free to message your teacher with questions or introduce yourself!</p>
@@ -199,6 +272,97 @@
 
     <div id="footer-placeholder"></div>
 
+    <script type="module">
+      import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm';
+
+      const SUPABASE_URL = 'https://luyzyzefgintksydmwoh.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg';
+      const LINE_BOT_HANDLE = '845irjbc';
+
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: { persistSession: true, storageKey: 'prokaiwa-supabase-auth' }
+      });
+
+      // Load the student's unique CONNECT token from Supabase and
+      // update the LINE button deep link + code display on both
+      // the Japanese and English sections of the page.
+      async function loadConnectToken() {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) return;
+
+          const { data: profile } = await supabase
+            .from('questionnaire_responses')
+            .select('line_connect_token')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+
+          if (!profile?.line_connect_token) return;
+
+          const token = profile.line_connect_token;
+          const code  = `CONNECT-${token}`;
+
+          // Deep link: opens LINE chat with the CONNECT code pre-filled.
+          // %40 = URL-encoded @
+          // When student taps Send, line-webhook matches them exactly.
+          const deepLink = `https://line.me/R/oaMessage/%40${LINE_BOT_HANDLE}?text=${encodeURIComponent(code)}`;
+
+          // Update buttons
+          ['ja', 'en'].forEach(lang => {
+            const btn  = document.getElementById(`line-btn-${lang}`);
+            const box  = document.getElementById(`connect-box-${lang}`);
+            const disp = document.getElementById(`connect-code-display-${lang}`);
+            if (btn)  btn.href = deepLink;
+            if (disp) disp.textContent = code;
+            if (box)  box.style.display = 'block';
+          });
+
+        } catch (_) {
+          // Silently fail — QR code remains as fallback
+        }
+      }
+
+      // Tap-to-copy handler.
+      // Exposed on window so the inline onclick attributes can call it.
+      window.pkCopyCode = function(lang) {
+        const disp = document.getElementById(`connect-code-display-${lang}`);
+        const btn  = document.getElementById(`copy-btn-${lang}`);
+        if (!disp || !btn) return;
+
+        const code = disp.textContent;
+        const successText = lang === 'ja' ? 'コピーしました ✅' : 'Copied ✅';
+        const originalText = btn.textContent;
+
+        const markCopied = () => {
+          btn.textContent = successText;
+          btn.style.background = '#27ae60';
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.background = '';
+          }, 2000);
+        };
+
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(code).then(markCopied).catch(() => fallbackCopy(disp, markCopied));
+        } else {
+          fallbackCopy(disp, markCopied);
+        }
+      };
+
+      function fallbackCopy(el, callback) {
+        try {
+          const range = document.createRange();
+          range.selectNode(el);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+          document.execCommand('copy');
+          window.getSelection().removeAllRanges();
+          callback();
+        } catch (_) {}
+      }
+
+      document.addEventListener('DOMContentLoaded', loadConnectToken);
+    </script>
     <script src="/assets/js/components.js"></script>
     <script src="/assets/js/script.js"></script>
 </body>

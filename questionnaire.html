@@ -1362,6 +1362,15 @@ langObserver.observe(document.documentElement, { attributes: true, attributeFilt
         if (otherText) sources.push(`Other: ${otherText}`);
       }
 
+      // Generate a unique LINE connection token for this student.
+      // Stored in questionnaire_responses.line_connect_token.
+      // Used on the thank-you page to create a pre-filled LINE deep link
+      // so the LINE bot can match this exact student when they send CONNECT-{token}.
+      const line_connect_token = Array.from(
+        crypto.getRandomValues(new Uint8Array(8)),
+        b => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]
+      ).join('');
+
       const dataToSubmit = {
         user_id: user.id,
         family_name: familyName,
@@ -1382,7 +1391,8 @@ langObserver.observe(document.documentElement, { attributes: true, attributeFilt
             subscriptions: document.getElementById('chk-agree-terms').checked
           }
         },
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        line_connect_token: line_connect_token
       };
 
       try {

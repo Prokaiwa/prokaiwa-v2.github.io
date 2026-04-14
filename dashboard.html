@@ -163,6 +163,27 @@
                         </div>
                     </div>
 
+                    <!-- LINE Connection Banner -->
+                    <!-- Shown by JS when profile.line_id is null -->
+                    <div class="line-connect-banner" id="line-connect-banner" style="display: none;">
+                        <div class="cancellation-banner-header">
+                            <div class="cancellation-banner-icon">📱</div>
+                            <div class="cancellation-banner-content">
+                                <h3 id="line-banner-title">LINEをまだ連携していません</h3>
+                                <p id="line-banner-message">毎日のプロンプトを受け取るにはLINEの連携が必要です。</p>
+                            </div>
+                        </div>
+                        <div class="line-banner-code-row" id="line-banner-code-row" style="display: none;">
+                            <span class="line-banner-code" id="line-banner-code"></span>
+                            <button class="line-banner-copy-btn" id="line-banner-copy-btn" onclick="pkDashboardCopyCode()">コピー</button>
+                        </div>
+                        <div class="cancellation-banner-actions">
+                            <a id="line-banner-btn" href="https://line.me/R/ti/p/@845irjbc?from=page&searchId=845irjbc" class="btn-reactivate" target="_blank" rel="noopener noreferrer">
+                                <i class="fas fa-comment"></i> <span id="line-banner-btn-text">LINEで友だち追加</span>
+                            </a>
+                        </div>
+                    </div>
+
                     <!-- Dashboard Grid -->
                     <div class="dashboard-grid">
                         <!-- Skills Assessment Card -->

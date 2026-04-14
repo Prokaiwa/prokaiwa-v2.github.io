@@ -1017,6 +1017,92 @@
     background: var(--color-bg);
 }
 
+/* ── LINE Connection Banner ── */
+/* Shown when student has not yet linked their LINE account */
+.line-connect-banner {
+    background: linear-gradient(135deg, #e6f2f2 0%, #c8e6e6 100%);
+    border: 2px solid #008080;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 0 0 2rem 0;
+    display: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.line-connect-banner .cancellation-banner-content h3 {
+    color: #004d4d;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+}
+
+.line-connect-banner .cancellation-banner-content p {
+    color: #004d4d;
+    margin: 0.25rem 0;
+    font-size: 0.95rem;
+}
+
+.line-banner-code-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.25rem 0 0.5rem;
+    flex-wrap: wrap;
+}
+
+.line-banner-code {
+    font-family: monospace;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #008080;
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1.5px solid #008080;
+    user-select: all;
+    letter-spacing: 0.05em;
+}
+
+.line-banner-copy-btn {
+    background: #008080;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.line-banner-copy-btn:hover {
+    background: #006666;
+}
+
+@media (max-width: 600px) {
+    .line-banner-code-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .line-connect-banner {
+        background: linear-gradient(135deg, #0a2020 0%, #0f2e2e 100%);
+        border-color: #00a0a0;
+    }
+    .line-connect-banner .cancellation-banner-content h3,
+    .line-connect-banner .cancellation-banner-content p {
+        color: #80d4d4;
+    }
+    .line-banner-code {
+        background: #1a3a3a;
+        color: #80d4d4;
+        border-color: #00a0a0;
+    }
+}
+
 /* Status badge updates */
 .plan-badge.cancelled {
     background: var(--color-primary);  /* Teal instead of yellow */

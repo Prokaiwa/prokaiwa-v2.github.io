@@ -748,6 +748,9 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 }
             }
 
+            // LINE connection banner — update text on language toggle
+            updateLineBanner(lang);
+
             // Progress ring (skip during initial load — scroll observer handles it)
             if (dashboardState.animationsReady) {
                 updateProgressRing(lang, progressPercent);
@@ -1461,6 +1464,48 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
         }
 
         // ── STREAK MODAL ──
+        // Tap-to-copy handler for the LINE connection banner.
+        // Exposed on window so the inline onclick attribute can call it.
+        window.pkDashboardCopyCode = function() {
+            const codeEl = document.getElementById('line-banner-code');
+            const btnEl  = document.getElementById('line-banner-copy-btn');
+            if (!codeEl || !btnEl) return;
+
+            const lang = getCurrentLang ? getCurrentLang() : 'ja';
+            const code = codeEl.textContent;
+            const successText  = lang === 'ja' ? 'コピーしました ✅' : 'Copied ✅';
+            const originalText = btnEl.textContent;
+
+            const markCopied = () => {
+                btnEl.textContent = successText;
+                btnEl.style.background = '#27ae60';
+                setTimeout(() => {
+                    btnEl.textContent = originalText;
+                    btnEl.style.background = '';
+                }, 2000);
+            };
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(code)
+                    .then(markCopied)
+                    .catch(() => _dashFallbackCopy(codeEl, markCopied));
+            } else {
+                _dashFallbackCopy(codeEl, markCopied);
+            }
+        };
+
+        function _dashFallbackCopy(el, callback) {
+            try {
+                const range = document.createRange();
+                range.selectNode(el);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                callback();
+            } catch (_) {}
+        }
+
         window.openStreakModal = function(lang) {
             document.getElementById('streak-modal-title').textContent =
                 lang === 'ja' ? '練習カレンダー' : 'Practice Calendar';
@@ -1838,6 +1883,36 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 greeting: greeting.replace('{name}', name),
                 subtitle: warmPhrase
             };
+        }
+
+        // Updates the LINE connection banner text for the current language.
+        // Called by refreshDynamicText on every language toggle.
+        // Also called once during init to show the banner if needed.
+        function updateLineBanner(lang) {
+            const banner = document.getElementById('line-connect-banner');
+            if (!banner || banner.style.display === 'none') return;
+
+            const profile = dashboardState.profile;
+            if (!profile) return;
+
+            const titleEl   = document.getElementById('line-banner-title');
+            const messageEl = document.getElementById('line-banner-message');
+            const btnText   = document.getElementById('line-banner-btn-text');
+            const copyBtn   = document.getElementById('line-banner-copy-btn');
+
+            if (titleEl) titleEl.textContent = lang === 'ja'
+                ? 'LINEをまだ連携していません'
+                : 'LINE Not Connected Yet';
+
+            if (messageEl) messageEl.textContent = lang === 'ja'
+                ? '毎日のプロンプトを受け取るにはLINEの連携が必要です。下のボタンをタップしてください。'
+                : 'Connect LINE to start receiving your daily English prompts. Tap the button below.';
+
+            if (btnText) btnText.textContent = lang === 'ja'
+                ? 'LINEで友だち追加'
+                : 'Add Friend on LINE';
+
+            if (copyBtn) copyBtn.textContent = lang === 'ja' ? 'コピー' : 'Copy';
         }
 
         function renderHeroPhrase(lang) {
@@ -2518,7 +2593,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
             // Select visible animatable sections
             const animatables = [...contentDiv.querySelectorAll(
-                '.dashboard-hero, .quick-actions, .dashboard-card, .cancellation-banner'
+                '.dashboard-hero, .quick-actions, .dashboard-card, .cancellation-banner, .line-connect-banner'
             )].filter(el => el.style.display !== 'none');
 
             // Apply initial hidden state
@@ -2645,6 +2720,30 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 const hasVideoAddon = profile.addons?.includes('video') || false;
                 const hasVideoAccess = profile.had_video_access || hasVideoAddon;
 
+                // ── LINE connection banner ─────────────────────────────
+                // Show if student has no LINE ID and is on a LINE plan.
+                // Once their LINE is connected the banner stays hidden.
+                const linePlans = ['line', 'power_lite', 'power_pro'];
+                if (!profile.line_id && linePlans.includes(profile.plan)) {
+                    const lineBanner = document.getElementById('line-connect-banner');
+                    if (lineBanner) {
+                        lineBanner.style.display = 'block';
+
+                        // If they have a connect token, show code + update button deep link
+                        if (profile.line_connect_token) {
+                            const _code     = `CONNECT-${profile.line_connect_token}`;
+                            const _deepLink = `https://line.me/R/oaMessage/%40845irjbc?text=${encodeURIComponent(_code)}`;
+                            const _codeEl   = document.getElementById('line-banner-code');
+                            const _codeRow  = document.getElementById('line-banner-code-row');
+                            const _btn      = document.getElementById('line-banner-btn');
+                            if (_codeEl)  _codeEl.textContent = _code;
+                            if (_codeRow) _codeRow.style.display = 'flex';
+                            if (_btn)     _btn.href = _deepLink;
+                        }
+                    }
+                }
+                // ── End LINE banner ────────────────────────────────────
+
                 // Store data for language refresh
                 dashboardState.loaded = true;
                 dashboardState.profile = profile;
@@ -2724,7 +2823,7 @@ if (hasVideoAccess) {
                 // (transitions don't fire on display:none elements, so no flash)
                 if (!prefersReduced) {
                     [...contentDiv.querySelectorAll(
-                        '.dashboard-hero, .quick-actions, .dashboard-card, .cancellation-banner'
+                        '.dashboard-hero, .quick-actions, .dashboard-card, .cancellation-banner, .line-connect-banner'
                     )].filter(el => el.style.display !== 'none')
                       .forEach(el => el.classList.add('card-animate'));
                 }
