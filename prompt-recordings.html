@@ -1132,6 +1132,26 @@
         return;
       }
 
+      // Capture audio duration in milliseconds.
+      // For uploaded files: decode the audio buffer to get exact duration.
+      // For browser recordings: timerSeconds is already tracked.
+      let audioDurationMs = 10000; // safe fallback: 10 seconds
+      try {
+        if (rs && rs.uploadFile) {
+          // Read duration from the uploaded file using AudioContext
+          const arrayBuffer = await blob.arrayBuffer();
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+          audioDurationMs = Math.round(decoded.duration * 1000);
+          audioCtx.close();
+        } else if (rs && rs.timerSeconds && rs.timerSeconds > 0) {
+          // Browser recording — timerSeconds counted during recording
+          audioDurationMs = rs.timerSeconds * 1000;
+        }
+      } catch (durationErr) {
+        console.warn('Could not read audio duration, using fallback:', durationErr);
+      }
+
       // Find prompt to get level, purpose, week
       const prompt = allPrompts.find(p => p.id === promptId);
       if (!prompt) { alert('Prompt not found.'); return; }
@@ -1157,10 +1177,10 @@
           .from('prompt-recordings')
           .getPublicUrl(path);
 
-        // 3. Update prompts.audio_url
+        // 3. Update prompts.audio_url and audio_duration
         const { error: updateError, count } = await supabaseClient
           .from('prompts')
-          .update({ audio_url: publicUrl })
+          .update({ audio_url: publicUrl, audio_duration: audioDurationMs })
           .eq('id', promptId)
           .select();
         if (updateError) throw updateError;
