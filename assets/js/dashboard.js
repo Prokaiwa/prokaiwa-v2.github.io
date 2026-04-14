@@ -1157,8 +1157,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 const { data: progress, error } = await supabase
                     .from('student_progress')
                     .select('current_day, current_week, total_prompts_sent')
-
-                    .single();
+                    .maybeSingle();
 
                 debugLog('student_progress result:', { data: progress, error });
 
@@ -2592,6 +2591,27 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                         : 'Failed to load profile.');
                     return;
                 }
+
+                // ── Subscription access gate ──────────────────────────
+                // Allow: active or trialing subscriptions
+                // Allow: cancelled users whose dashboard access hasn't expired yet
+                // Block: everyone else (pending payment, none, etc.)
+                const _subStatus = profile.subscription_status;
+                const _accessExpiry = profile.dashboard_access_expires_at
+                    ? new Date(profile.dashboard_access_expires_at)
+                    : null;
+                const _now = new Date();
+                const _hasActiveAccess =
+                    _subStatus === 'active' ||
+                    _subStatus === 'trialing' ||
+                    (_subStatus === 'cancelled' && _accessExpiry && _accessExpiry > _now);
+
+                if (!_hasActiveAccess) {
+                    debugLog('No active subscription — redirecting to questionnaire');
+                    window.location.href = 'questionnaire.html';
+                    return;
+                }
+                // ── End access gate ───────────────────────────────────
 
                 const realProgress = await loadRealProgress(user.id, lang);
                 const { current: assessment, previous: previousAssessment } = await loadLatestAssessment(user.id);
