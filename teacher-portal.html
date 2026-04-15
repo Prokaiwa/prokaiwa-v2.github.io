@@ -683,6 +683,33 @@
     @media (max-width: 380px) {
       .stats-grid { grid-template-columns: 1fr; }
     }
+
+    /* Optional Quick Replies */
+    .quick-replies-section {
+      background: var(--color-surface);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      margin-bottom: 2rem; overflow: hidden;
+      border: 1px dashed #cfd8dc;
+    }
+    .quick-replies-header {
+      padding: 1rem 2rem; border-bottom: 1px solid transparent;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; transition: border-color 0.2s; user-select: none;
+    }
+    .quick-replies-header:hover { background: #fafafa; }
+    .quick-replies-header.open { border-bottom-color: var(--color-border); }
+    .quick-replies-header h2 { margin: 0; font-size: 1rem; color: #78909c; }
+    .quick-replies-body { display: none; padding: 1.5rem 2rem; }
+    .quick-replies-body.open { display: block; }
+    .quick-replies-info {
+      background: #f5f5f5; border-radius: 6px;
+      padding: 0.75rem 1rem; margin-bottom: 1.25rem;
+      font-size: 0.85rem; color: #78909c; line-height: 1.5;
+    }
+    .badge-quick { background: #78909c; }
+    .send-btn.quick-btn { background: #78909c; }
+    .send-btn.quick-btn:hover { background: #546e7a; }
   </style>
 </head>
 <body>
@@ -814,6 +841,28 @@
       </div>
       <div class="queue-section-body" id="body-day7">
         <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+      </div>
+    </div>
+
+    <!-- ==================== OPTIONAL QUICK REPLIES ==================== -->
+    <div class="quick-replies-section" id="quick-replies-section" style="display:none;">
+      <div class="quick-replies-header" id="quick-replies-toggle" onclick="toggleQuickReplies()">
+        <h2>
+          💬 Optional Quick Replies
+          <span style="font-size:0.8rem; font-weight:400; color:#90a4ae; margin-left:0.5rem;">(Days 1–4 · LINE Plan)</span>
+        </h2>
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <span class="task-count-badge badge-quick" id="badge-quick">0</span>
+          <i class="fas fa-chevron-down" id="quick-replies-chevron" style="color:var(--color-text-light); transition:transform 0.2s;"></i>
+        </div>
+      </div>
+      <div class="quick-replies-body" id="quick-replies-body">
+        <div class="quick-replies-info">
+          💡 These are self-practice responses from Days 1–4. They don't count as required tasks
+          — but a quick word of encouragement goes a long way!
+          Unacknowledged responses expire at <strong>10PM JST</strong>.
+        </div>
+        <div id="body-quick"></div>
       </div>
     </div>
 
@@ -969,7 +1018,7 @@
   // ============================================================
   let currentTeacher   = null;
   let allStudentsData  = [];
-  let dayQueues        = { day6: [], day5: [], day7other: [] };
+  let dayQueues        = { day6: [], day5: [], day7other: [], day1to4_line: [] };
   let completedToday   = new Set();
   let queueItemsMap    = new Map();
   let currentFilters   = {};
@@ -1068,6 +1117,8 @@ This week's pronunciation focus was [sound/word].
 💡 Practice tip: [Specific advice for this sound, e.g. "Try saying it slowly in front of a mirror"]
 
 You're making progress! 🎯`,
+
+    quick_reply: `Nice work today! 🌟 Keep it up! 💪`,
 
     milestone: `🎉 Congratulations on completing [Week 8 / Week 16]!
 
@@ -1204,7 +1255,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
       }
 
       // Route by prompt type / day number — no plan-based filtering
-      dayQueues  = { day6: [], day5: [], day7other: [] };
+      dayQueues  = { day6: [], day5: [], day7other: [], day1to4_line: [] };
       queueItemsMap.clear();
 
       for (const response of unreviewedResponses) {
@@ -1240,6 +1291,16 @@ I'm proud of your dedication. Let's keep building! 🚀`
           dayQueues.day6.push(qi);
         } else if (promptType === 'Quiz' || dayNumber === 5) {
           dayQueues.day5.push(qi);
+        } else if (qi.plan === 'line' && dayNumber > 0 && dayNumber < 7) {
+          // LINE plan Days 1-4: self-practice, no mandatory teacher action.
+          // Show in Optional Quick Replies if within today's JST window.
+          const today10pm     = getJST10pmUTC(0);
+          const yesterday10pm = getJST10pmUTC(-1);
+          const responseTime  = new Date(qi.responseCreatedAt);
+          if (new Date() < today10pm && responseTime >= yesterday10pm) {
+            dayQueues.day1to4_line.push(qi);
+          }
+          // Outside window: silently discard.
         } else {
           dayQueues.day7other.push(qi);
         }
@@ -1264,13 +1325,14 @@ I'm proud of your dedication. Let's keep building! 🚀`
     renderDay6Section();
     renderDay5Section();
     renderDay7Section();
+    renderDay1to4Section();
   }
 
   function renderDay6Section() {
     const body  = document.getElementById('body-day6');
     const badge = document.getElementById('badge-day6');
     const items   = dayQueues.day6;
-    const pending = items.filter(qi => !completedToday.has(qi.responseId));
+    const pending = items.filter(qi => !completedToday.has(qi.studentId));
     badge.textContent = pending.length;
     if (pending.length === 0 && items.length > 0) {
       badge.className = 'task-count-badge badge-done'; badge.textContent = '✓';
@@ -1289,7 +1351,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
     const body  = document.getElementById('body-day5');
     const badge = document.getElementById('badge-day5');
     const items   = dayQueues.day5;
-    const pending = items.filter(qi => !completedToday.has(qi.responseId));
+    const pending = items.filter(qi => !completedToday.has(qi.studentId));
     badge.textContent = pending.length;
     if (pending.length === 0 && items.length > 0) {
       badge.className = 'task-count-badge badge-done'; badge.textContent = '✓';
@@ -1308,7 +1370,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
     const body  = document.getElementById('body-day7');
     const badge = document.getElementById('badge-day7');
     const items   = dayQueues.day7other;
-    const pending = items.filter(qi => !completedToday.has(qi.responseId));
+    const pending = items.filter(qi => !completedToday.has(qi.studentId));
     badge.textContent = pending.length;
     if (pending.length === 0 && items.length > 0) {
       badge.className = 'task-count-badge badge-done'; badge.textContent = '✓';
@@ -1408,7 +1470,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // DAY 6 CARD
   // ============================================================
   function createDay6Card(qi) {
-    const isDone = completedToday.has(qi.responseId);
+    const isDone = completedToday.has(qi.studentId);
     const ck = qi.responseId;
     return `
       <div class="student-card" id="card-${ck}">
@@ -1487,7 +1549,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // DAY 5 CARD
   // ============================================================
   function createDay5Card(qi) {
-    const isDone = completedToday.has(qi.responseId);
+    const isDone = completedToday.has(qi.studentId);
     const ck = qi.responseId;
     return `
       <div class="student-card" id="card-${ck}">
@@ -1564,7 +1626,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // DAY 7 / OTHER CARD
   // ============================================================
   function createDay7Card(qi) {
-    const isDone     = completedToday.has(qi.responseId);
+    const isDone     = completedToday.has(qi.studentId);
     const ck         = qi.responseId;
     const isWeekEnd  = qi.promptDayNumber === 7;
     const defaultTpl = isWeekEnd ? 'weekly' : 'biweekly';
@@ -1801,7 +1863,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
       const { data: messages, error } = await supabaseClient
         .from('message_log').select('*')
         .eq('user_id', student.user_id)
-        .in('message_type', ['prompt','student_response'])
+        .in('message_type', ['prompt','student_response','activation','welcome_video','audio_prompt','survey_token_sent'])
         .gte('created_at', startDate.toISOString())
         .order('created_at', { ascending: true });
       if (error) throw error;
@@ -1837,11 +1899,36 @@ I'm proud of your dedication. Let's keep building! 🚀`
           <h4 style="color:#666; border-bottom:1px solid #ddd; padding-bottom:0.4rem; font-size:0.9rem;">📅 ${escapeHtml(date)}</h4>`;
         msgs.forEach(msg => {
           const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
-          if (msg._type === 'message' && msg.message_type === 'prompt') {
+          // Onboarding system events
+          if (msg._type === 'message' && msg.message_type === 'activation') {
+            html += `<div style="margin:0.75rem 0; padding:0.6rem 0.75rem; background:#e8eaf6; border-left:3px solid #5c6bc0; border-radius:4px; font-size:0.85rem;">
+              <div style="font-size:0.78rem; color:#666; margin-bottom:0.2rem;">[${time}] 🔗 System</div>
+              <p style="margin:0; color:#444; font-weight:500;">LINE account connected to Prokaiwa.</p>
+            </div>`;
+          } else if (msg._type === 'message' && msg.message_type === 'survey_token_sent') {
+            html += `<div style="margin:0.75rem 0; padding:0.6rem 0.75rem; background:#fff8e1; border-left:3px solid #ffa000; border-radius:4px; font-size:0.85rem;">
+              <div style="font-size:0.78rem; color:#666; margin-bottom:0.2rem;">[${time}] 📋 System</div>
+              <p style="margin:0; color:#444; font-weight:500;">Needs survey link sent to student's LINE.</p>
+            </div>`;
+          } else if (msg._type === 'message' && msg.message_type === 'welcome_video') {
+            html += `<div style="margin:0.75rem 0; padding:0.6rem 0.75rem; background:#fce4ec; border-left:3px solid #ec407a; border-radius:4px; font-size:0.85rem;">
+              <div style="font-size:0.78rem; color:#666; margin-bottom:0.2rem;">[${time}] 🎬 System</div>
+              <p style="margin:0; color:#444; font-weight:500;">Welcome video + self-introduction request sent via LINE.</p>
+            </div>`;
+          } else if (msg._type === 'message' && msg.message_type === 'audio_prompt') {
+            html += `<div style="margin:0.75rem 0; padding:0.6rem 0.75rem; background:#e8f5e9; border-left:3px solid #66bb6a; border-radius:4px; font-size:0.85rem;">
+              <div style="font-size:0.78rem; color:#666; margin-bottom:0.2rem;">[${time}] 🎵 Listening Practice Audio</div>
+              ${msg.message_text
+                ? `<audio controls style="width:100%; max-width:340px; margin-top:0.3rem; border-radius:4px;"><source src="${escapeHtml(msg.message_text)}">Audio not supported.</audio>`
+                : '<p style="margin:0.2rem 0; color:#888; font-style:italic;">Audio URL not recorded.</p>'}
+            </div>`;
+          // Main prompt
+          } else if (msg._type === 'message' && msg.message_type === 'prompt') {
             html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#f0f8ff; border-left:3px solid #4A90E2; border-radius:4px; font-size:0.9rem;">
               <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 🤖 Prompt</div>
               <p style="margin:0; color:#333;">"${escapeHtml(msg.message_text)}"</p>
             </div>`;
+          // Student response
           } else if (msg._type === 'message' && msg.message_type === 'student_response') {
             const sName = escapeHtml(student.given_name_romaji || student.name);
             html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#fff; border:1px solid #e0e0e0; border-radius:4px; font-size:0.9rem;">
@@ -1851,11 +1938,18 @@ I'm proud of your dedication. Let's keep building! 🚀`
             if (msg.media_type === 'video') html += `<video controls style="width:100%; max-width:380px; border-radius:6px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}&token=${mediaAuthToken}">Video not supported.</video>`;
             if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}&token=${mediaAuthToken}" style="max-width:100%; border-radius:6px; margin-top:0.4rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
             html += `</div>`;
+          // Teacher feedback or marked_complete note
           } else if (msg._type === 'feedback') {
-            html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#f0fff0; border-left:3px solid #4caf50; border-radius:4px; font-size:0.9rem;">
-              <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 👨‍🏫 Teacher Feedback</div>
-              <p style="margin:0; color:#333; white-space:pre-wrap;">${escapeHtml(msg.feedback_text)}</p>
-            </div>`;
+            if (msg.feedback_type === 'marked_complete') {
+              html += `<div style="margin:0.5rem 0; padding:0.4rem 0.75rem; background:#f5f5f5; border-left:3px solid #bdbdbd; border-radius:4px; font-size:0.82rem; color:#999;">
+                <span>[${time}] ✓ Marked as reviewed — no feedback sent</span>
+              </div>`;
+            } else {
+              html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#f0fff0; border-left:3px solid #4caf50; border-radius:4px; font-size:0.9rem;">
+                <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 👨‍🏫 Teacher Feedback</div>
+                <p style="margin:0; color:#333; white-space:pre-wrap;">${escapeHtml(msg.feedback_text)}</p>
+              </div>`;
+            }
           }
         });
         html += `</div>`;
@@ -1934,7 +2028,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
       );
       if (!response.ok) throw new Error('Failed to send feedback');
 
-      completedToday.add(cardKey);
+      completedToday.add(qi.studentId);
 
       if (isVoiceMode) {
         discardRecording(cardKey);
@@ -1954,8 +2048,31 @@ I'm proud of your dedication. Let's keep building! 🚀`
   }
 
   async function markComplete(cardKey) {
-    completedToday.add(cardKey);
-    await loadDayTypeQueue();
+    const qi = queueItemsMap.get(cardKey);
+    if (!qi) { alert('Error: could not find this response. Please refresh.'); return; }
+    document.querySelectorAll(`[onclick="markComplete('${cardKey}')"]`)
+      .forEach(b => { b.disabled = true; b.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; });
+    try {
+      // Write to feedback_log so feedbackMap in loadDayTypeQueue permanently excludes
+      // this response across refresh and auto-reload cycles.
+      const { error } = await supabaseClient
+        .from('feedback_log')
+        .insert({
+          student_id:    qi.studentId,
+          teacher_id:    currentTeacher.id,
+          feedback_type: 'marked_complete',
+          feedback_text: '(Marked as reviewed — no feedback sent)',
+          sent_at:       new Date().toISOString()
+        });
+      if (error) throw error;
+      completedToday.add(qi.studentId);
+      await loadDayTypeQueue();
+    } catch(err) {
+      console.error('markComplete:', err);
+      alert('Error marking complete. Please try again.');
+      document.querySelectorAll(`[onclick="markComplete('${cardKey}')"]`)
+        .forEach(b => { b.disabled = false; b.innerHTML = '<i class="fas fa-check"></i> Mark Complete'; });
+    }
   }
 
   async function saveSkillScores(cardKey) {
@@ -2116,12 +2233,12 @@ I'm proud of your dedication. Let's keep building! 🚀`
     const total      = allStudentsData.length;
     const allItems   = [...dayQueues.day6, ...dayQueues.day5, ...dayQueues.day7other];
     const totalTasks = allItems.length;
-    const completed  = allItems.filter(qi => completedToday.has(qi.responseId)).length;
+    const completed  = allItems.filter(qi => completedToday.has(qi.studentId)).length;
 
-    const d6Rem        = dayQueues.day6.filter(qi => !completedToday.has(qi.responseId)).length;
-    const d5Rem        = dayQueues.day5.filter(qi => !completedToday.has(qi.responseId)).length;
-    const d7WeeklyRem  = dayQueues.day7other.filter(qi => !completedToday.has(qi.responseId) && qi.promptDayNumber === 7).length;
-    const d7OtherRem   = dayQueues.day7other.filter(qi => !completedToday.has(qi.responseId) && qi.promptDayNumber !== 7).length;
+    const d6Rem        = dayQueues.day6.filter(qi => !completedToday.has(qi.studentId)).length;
+    const d5Rem        = dayQueues.day5.filter(qi => !completedToday.has(qi.studentId)).length;
+    const d7WeeklyRem  = dayQueues.day7other.filter(qi => !completedToday.has(qi.studentId) && qi.promptDayNumber === 7).length;
+    const d7OtherRem   = dayQueues.day7other.filter(qi => !completedToday.has(qi.studentId) && qi.promptDayNumber !== 7).length;
 
     const etaMinutes = (d6Rem * 2) + (d5Rem * 1.5) + (d7WeeklyRem * 10) + (d7OtherRem * 4);
     const hrs = Math.floor(etaMinutes / 60);
@@ -2132,6 +2249,118 @@ I'm proud of your dedication. Let's keep building! 🚀`
     document.getElementById('completed-today').textContent = `${completed}/${totalTasks}`;
     document.getElementById('estimated-time').textContent  = etaMinutes > 0
       ? (hrs > 0 ? `${hrs}h ${min}m` : `${min}m`) : '0m';
+  }
+
+  // ============================================================
+  // JST 10PM HELPERS
+  // JST = UTC+9.  10PM JST = 13:00 UTC.
+  // offsetDays:  0 = tonight,  -1 = last night
+  // ============================================================
+  function getJST10pmUTC(offsetDays = 0) {
+    const jstNow = new Date(Date.now() + 9 * 3600000);
+    return new Date(Date.UTC(
+      jstNow.getUTCFullYear(), jstNow.getUTCMonth(),
+      jstNow.getUTCDate() + offsetDays,
+      13, 0, 0, 0
+    ));
+  }
+
+  // ============================================================
+  // OPTIONAL QUICK REPLIES — render + toggle
+  // ============================================================
+  function renderDay1to4Section() {
+    const section = document.getElementById('quick-replies-section');
+    const body    = document.getElementById('body-quick');
+    const badge   = document.getElementById('badge-quick');
+    const items   = dayQueues.day1to4_line;
+    if (!items || items.length === 0) {
+      section.style.display = 'none';
+      return;
+    }
+    section.style.display = 'block';
+    badge.textContent = items.length;
+    body.innerHTML = items.map(qi => createDay1to4Card(qi)).join('');
+    addCardListeners(items);
+  }
+
+  function toggleQuickReplies() {
+    const body    = document.getElementById('quick-replies-body');
+    const header  = document.getElementById('quick-replies-toggle');
+    const chevron = document.getElementById('quick-replies-chevron');
+    const isOpen  = body.classList.contains('open');
+    body.classList.toggle('open');
+    header.classList.toggle('open');
+    chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+
+  function createDay1to4Card(qi) {
+    const ck       = qi.responseId;
+    const isDone   = completedToday.has(qi.studentId);
+    const dayLabel = qi.promptType || `Day ${qi.promptDayNumber}`;
+    const promptPreview = qi.promptText
+      ? `<div style="background:#f0f8ff;border-left:3px solid #90caf9;border-radius:4px;padding:0.6rem 0.75rem;margin-bottom:0.75rem;font-size:0.83rem;color:#555;">${escapeHtml(qi.promptText.substring(0,220))}${qi.promptText.length>220?'\u2026':''}</div>`
+      : '';
+    return `
+      <div class="student-card" id="card-${ck}">
+        <div class="student-header" onclick="toggleCard('${ck}')">
+          <div>
+            <div class="student-name">
+              ${escapeHtml(qi.name)} ${planBadgeHtml(qi.plan)}
+              ${isDone ? '<span class="priority-badge done-badge">\u2713 Replied</span>' : ''}
+            </div>
+            <div class="student-meta">Week ${qi.currentWeek||1} \xb7 ${dayLabel} \xb7 Self-practice response</div>
+          </div>
+          <div class="student-actions">
+            <button class="btn-expand" onclick="event.stopPropagation();toggleCard('${ck}')">
+              ${isDone ? 'View' : 'Quick Reply'} \u25bc
+            </button>
+            <button class="btn-profile" onclick="event.stopPropagation();window.location.href='student-detail.html?id=${qi.studentId}'">
+              <i class="fas fa-user"></i>
+            </button>
+          </div>
+        </div>
+        <div class="student-details">
+          ${promptPreview}
+          ${responsePreviewHtml(qi)}
+          <div class="feedback-box">
+            <h3>\U0001f4ac Quick Encouragement</h3>
+            <div class="template-toggle" style="margin-bottom:1rem;">
+              <button class="toggle-pill active" id="pill-text-${ck}"  onclick="setReplyMode('${ck}','text')">\U0001f4ac Text</button>
+              <button class="toggle-pill"        id="pill-voice-${ck}" onclick="setReplyMode('${ck}','voice')">\U0001f399 Voice</button>
+            </div>
+            <div id="text-panel-${ck}">
+              <p class="reply-tip">Keep it short and warm \u2014 one sentence is plenty!</p>
+              <textarea class="feedback-textarea short" id="feedback-${ck}" placeholder="Quick reply...">${feedbackTemplates.quick_reply}</textarea>
+            </div>
+            <div id="voice-panel-${ck}" style="display:none;">
+              <p class="reply-tip">A quick voice message feels personal and motivating!</p>
+              <div class="voice-recorder" id="recorder-widget-${ck}">
+                <button class="rec-btn" id="rec-btn-${ck}" onclick="toggleRecording('${ck}')">
+                  <i class="fas fa-microphone"></i> Start Recording
+                </button>
+                <span class="rec-status" id="rec-status-${ck}">Ready</span>
+                <span id="rec-timer-${ck}" style="font-size:0.8rem;color:#c2185b;font-weight:700;min-width:36px;"></span>
+              </div>
+              <div id="rec-preview-${ck}" style="display:none;margin-top:0.75rem;">
+                <audio id="rec-audio-${ck}" controls style="width:100%;max-width:360px;border-radius:4px;"></audio>
+                <div style="margin-top:0.5rem;font-size:0.8rem;color:var(--color-text-light);">
+                  <span id="rec-format-note-${ck}"></span>
+                </div>
+                <button onclick="discardRecording('${ck}')" style="margin-top:0.5rem;background:none;border:1px solid #ccc;padding:0.3rem 0.75rem;border-radius:4px;cursor:pointer;font-size:0.82rem;color:#666;">
+                  \U0001f5d1 Discard &amp; Re-record
+                </button>
+              </div>
+            </div>
+            <div class="action-buttons">
+              <button class="send-btn quick-btn" id="send-btn-${ck}" ${isDone ? 'disabled' : ''}
+                onclick="sendFeedbackFromCard('${ck}','quick')">
+                <i class="fas fa-paper-plane"></i> Send Quick Reply
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   // ============================================================
