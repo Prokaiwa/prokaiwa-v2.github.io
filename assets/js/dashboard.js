@@ -1169,6 +1169,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                     return null;
                 }
 
+                // No progress row yet — return null gracefully
+                // Dashboard handles null by showing zeroed stats
+                    return null;
+                }
+
                 debugLog('Fetching message_log...');
                 const { data: messages, error: msgError } = await supabase
                     .from('message_log')
