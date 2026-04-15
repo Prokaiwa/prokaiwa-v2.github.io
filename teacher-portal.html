@@ -2298,7 +2298,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
     const isDone   = completedToday.has(qi.studentId);
     const dayLabel = qi.promptType || `Day ${qi.promptDayNumber}`;
     const promptPreview = qi.promptText
-      ? `<div style="background:#f0f8ff;border-left:3px solid #90caf9;border-radius:4px;padding:0.6rem 0.75rem;margin-bottom:0.75rem;font-size:0.83rem;color:#555;">${escapeHtml(qi.promptText.substring(0,220))}${qi.promptText.length>220?'\u2026':''}</div>`
+      ? `<div style="background:#f0f8ff;border-left:3px solid #90caf9;border-radius:4px;padding:0.6rem 0.75rem;margin-bottom:0.75rem;font-size:0.83rem;color:#555;">${escapeHtml(qi.promptText.substring(0,220))}${qi.promptText.length>220?'…':''}</div>`
       : '';
     return `
       <div class="student-card" id="card-${ck}">
@@ -2306,13 +2306,13 @@ I'm proud of your dedication. Let's keep building! 🚀`
           <div>
             <div class="student-name">
               ${escapeHtml(qi.name)} ${planBadgeHtml(qi.plan)}
-              ${isDone ? '<span class="priority-badge done-badge">\u2713 Replied</span>' : ''}
+              ${isDone ? '<span class="priority-badge done-badge">✓ Replied</span>' : ''}
             </div>
-            <div class="student-meta">Week ${qi.currentWeek||1} \xb7 ${dayLabel} \xb7 Self-practice response</div>
+            <div class="student-meta">Week ${qi.currentWeek||1} · ${dayLabel} · Self-practice response</div>
           </div>
           <div class="student-actions">
             <button class="btn-expand" onclick="event.stopPropagation();toggleCard('${ck}')">
-              ${isDone ? 'View' : 'Quick Reply'} \u25bc
+              ${isDone ? 'View' : 'Quick Reply'} ▼
             </button>
             <button class="btn-profile" onclick="event.stopPropagation();window.location.href='student-detail.html?id=${qi.studentId}'">
               <i class="fas fa-user"></i>
@@ -2323,13 +2323,13 @@ I'm proud of your dedication. Let's keep building! 🚀`
           ${promptPreview}
           ${responsePreviewHtml(qi)}
           <div class="feedback-box">
-            <h3>\U0001f4ac Quick Encouragement</h3>
+            <h3>💬 Quick Encouragement</h3>
             <div class="template-toggle" style="margin-bottom:1rem;">
-              <button class="toggle-pill active" id="pill-text-${ck}"  onclick="setReplyMode('${ck}','text')">\U0001f4ac Text</button>
-              <button class="toggle-pill"        id="pill-voice-${ck}" onclick="setReplyMode('${ck}','voice')">\U0001f399 Voice</button>
+              <button class="toggle-pill active" id="pill-text-${ck}"  onclick="setReplyMode('${ck}','text')">💬 Text</button>
+              <button class="toggle-pill"        id="pill-voice-${ck}" onclick="setReplyMode('${ck}','voice')">🎙 Voice</button>
             </div>
             <div id="text-panel-${ck}">
-              <p class="reply-tip">Keep it short and warm \u2014 one sentence is plenty!</p>
+              <p class="reply-tip">Keep it short and warm — one sentence is plenty!</p>
               <textarea class="feedback-textarea short" id="feedback-${ck}" placeholder="Quick reply...">${feedbackTemplates.quick_reply}</textarea>
             </div>
             <div id="voice-panel-${ck}" style="display:none;">
@@ -2347,7 +2347,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
                   <span id="rec-format-note-${ck}"></span>
                 </div>
                 <button onclick="discardRecording('${ck}')" style="margin-top:0.5rem;background:none;border:1px solid #ccc;padding:0.3rem 0.75rem;border-radius:4px;cursor:pointer;font-size:0.82rem;color:#666;">
-                  \U0001f5d1 Discard &amp; Re-record
+                  🗑 Discard &amp; Re-record
                 </button>
               </div>
             </div>
