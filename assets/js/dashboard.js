@@ -1170,7 +1170,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
                 }
 
                 // No progress row yet — return null gracefully
-                // Dashboard handles null by showing zeroed stats
+                if (!progress) {
                     return null;
                 }
 
