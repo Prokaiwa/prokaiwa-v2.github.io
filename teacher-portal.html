@@ -1848,7 +1848,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
         const { data: lastFeedback } = await supabaseClient
           .from('feedback_log').select('sent_at')
           .eq('student_id', studentId)
-          .order('sent_at', { ascending: false }).limit(1).single();
+          .order('sent_at', { ascending: false }).limit(1).maybeSingle();
         if (lastFeedback) {
           const d = new Date(lastFeedback.sent_at); d.setHours(0,0,0,0); startDate = d;
         } else {
