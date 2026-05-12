@@ -1465,6 +1465,14 @@ I'm proud of your dedication. Let's keep building! 🚀`
           pendingCount:      items.length,
         };
 
+        // For LINE plan students: strip Days 1-4 items from mandatory queues.
+        // They show in conversation history but don't count as pending feedback.
+        const isMandatory = hasDay6 || hasDay5 || !allLine14;
+        if (isMandatory && student.plan === 'line') {
+          qi.allPending = items.filter(i => !(i.dayNumber > 0 && i.dayNumber < 5));
+          qi.pendingCount = qi.allPending.length || 1;
+        }
+
         queueItemsMap.set(primary.response.id, qi);
 
         if (hasDay6) {
