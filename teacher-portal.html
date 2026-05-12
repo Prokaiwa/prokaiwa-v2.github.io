@@ -651,6 +651,118 @@
     .admin-recordings-btn:hover { background: #bf360c; }
 
     /* ============================================
+       URGENCY AGE BADGES
+    ============================================ */
+    .age-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.15rem 0.55rem; border-radius: 10px;
+      font-size: 0.72rem; font-weight: 700;
+      margin-left: 0.4rem; vertical-align: middle;
+    }
+    .age-fresh  { background: #c8e6c9; color: #1b5e20; }
+    .age-warn   { background: #ffe0b2; color: #e65100; }
+    .age-late   { background: #ffcdd2; color: #b71c1c; }
+    .age-late .pulse-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #f44336; display: inline-block;
+      animation: agePulse 1.2s infinite;
+    }
+    @keyframes agePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.4)} }
+
+    .pending-count-badge {
+      display: inline-block; background: #ff7043; color: white;
+      padding: 0.1rem 0.5rem; border-radius: 10px;
+      font-size: 0.72rem; font-weight: 700;
+      margin-left: 0.4rem; vertical-align: middle;
+    }
+
+    /* ============================================
+       CONVERSATION BUBBLES (iMessage style)
+    ============================================ */
+    .conv-container {
+      display: flex; flex-direction: column; gap: 0.3rem;
+      max-height: 460px; overflow-y: auto;
+      padding: 1rem; background: #ece5dd;
+      border-radius: 10px; margin-bottom: 1rem;
+      scroll-behavior: smooth;
+    }
+    .conv-date-divider {
+      align-self: center; font-size: 0.7rem; color: #555;
+      background: rgba(255,255,255,0.55); border-radius: 8px;
+      padding: 0.2rem 0.7rem; margin: 0.4rem 0;
+    }
+    .conv-row { display: flex; align-items: flex-end; gap: 0.4rem; margin: 0.1rem 0; }
+    .conv-row.student  { justify-content: flex-start; }
+    .conv-row.teacher  { justify-content: flex-end; }
+    .conv-row.system   { justify-content: center; }
+    .conv-row.prompt-r { justify-content: flex-start; }
+    .conv-bubble {
+      padding: 0.55rem 0.85rem; border-radius: 16px;
+      font-size: 0.87rem; line-height: 1.45;
+      max-width: 74%; word-break: break-word;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .conv-row.student  .conv-bubble { background: #fff;     border-bottom-left-radius:  3px; }
+    .conv-row.teacher  .conv-bubble { background: #dcf8c6; border-bottom-right-radius: 3px; }
+    .conv-row.prompt-r .conv-bubble {
+      background: #e8eaf6; max-width: 88%;
+      border-left: 3px solid #9fa8da; border-radius: 10px;
+      font-size: 0.8rem; color: #444;
+    }
+    .conv-row.system .conv-bubble {
+      background: rgba(0,0,0,0.07); border-radius: 8px;
+      font-size: 0.72rem; color: #666;
+      padding: 0.25rem 0.65rem; max-width: 90%; box-shadow: none;
+    }
+    .conv-time { font-size: 0.67rem; color: rgba(0,0,0,0.35); white-space: nowrap; padding-bottom: 3px; flex-shrink: 0; }
+    .conv-label { display: block; font-size: 0.7rem; color: #888; font-weight: 600; margin-bottom: 0.2rem; }
+    .conv-label.right { text-align: right; color: #2e7d32; }
+    .conv-avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; color: white;
+      flex-shrink: 0; background: var(--color-primary);
+    }
+    .conv-avatar.you { background: #4caf50; }
+    .conv-media { margin-top: 0.35rem; }
+    .conv-media audio { display: block; width: 100%; max-width: 260px; }
+    .conv-media video { display: block; max-width: 240px; border-radius: 6px; }
+    .conv-media img   { display: block; max-width: 200px; border-radius: 8px; cursor: pointer; }
+
+    /* ============================================
+       REFRESH BANNER
+    ============================================ */
+    #refresh-banner {
+      display: none; position: sticky; top: 0; z-index: 200;
+      background: #1565c0; color: white;
+      padding: 0.6rem 1.5rem;
+      align-items: center; justify-content: space-between;
+      font-size: 0.9rem; font-weight: 600;
+      animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0);     opacity: 1; }
+    }
+    #refresh-banner button {
+      background: white; color: #1565c0;
+      border: none; padding: 0.35rem 0.85rem;
+      border-radius: 4px; cursor: pointer;
+      font-weight: 700; font-size: 0.85rem;
+    }
+    #refresh-banner button:hover { background: #e3f2fd; }
+
+    /* contacted students collapsed row */
+    .contacted-toggle {
+      text-align: center; padding: 0.6rem;
+      font-size: 0.82rem; color: #6c757d; cursor: pointer;
+      border-top: 1px dashed #dee2e6; margin-top: 0.5rem;
+    }
+    .contacted-toggle:hover { color: #495057; }
+    .contacted-list { display: none; margin-top: 0.5rem; }
+    .contacted-list.open { display: flex; flex-direction: column; gap: 1rem; }
+
+    /* ============================================
        MOBILE
     ============================================ */
     @media (max-width: 768px) {
@@ -729,6 +841,12 @@
       </div>
     </div>
   </header>
+
+  <!-- ========== SOFT REFRESH BANNER ========== -->
+  <div id="refresh-banner">
+    <span>📬 New responses loaded — save your work first</span>
+    <button onclick="dismissAndRefresh()">Refresh Now</button>
+  </div>
 
   <main class="container">
 
@@ -1044,6 +1162,32 @@
 
     
   // ============================================================
+  // URGENCY HELPERS
+  // ============================================================
+
+  /** Returns an HTML badge showing how old a response is.
+   *  Green < 12h, orange 12-24h, red > 24h (with pulse dot). */
+  function ageBadgeHtml(createdAt) {
+    const diffMs  = Date.now() - new Date(createdAt).getTime();
+    const diffH   = diffMs / (1000 * 60 * 60);
+    const diffD   = Math.floor(diffH / 24);
+    if (diffH < 12) {
+      const h = Math.round(diffH);
+      return `<span class="age-badge age-fresh">${h < 1 ? '< 1h' : h + 'h'} ago</span>`;
+    } else if (diffH < 24) {
+      return `<span class="age-badge age-warn">${Math.round(diffH)}h ago</span>`;
+    } else {
+      return `<span class="age-badge age-late"><span class="pulse-dot"></span>${diffD}d ago</span>`;
+    }
+  }
+
+  /** Returns an HTML badge when a student has >1 pending response. */
+  function pendingBadgeHtml(count) {
+    if (count <= 1) return '';
+    return `<span class="pending-count-badge">${count} pending</span>`;
+  }
+
+  // ============================================================
   // FEEDBACK TEMPLATES
   // ============================================================
   const feedbackTemplates = {
@@ -1254,20 +1398,53 @@ I'm proud of your dedication. Let's keep building! 🚀`
         for (const p of promptData || []) promptMap[p.id] = p;
       }
 
-      // Route by prompt type / day number — no plan-based filtering
+      // ── DEDUPLICATED ROUTING ───────────────────────────────────
+      // Group ALL unreviewed responses by student first.
+      // Each student appears in exactly ONE queue (highest priority).
+      // This prevents Hitomi from appearing in both Day 6 and Day 7.
       dayQueues  = { day6: [], day5: [], day7other: [], day1to4_line: [] };
       queueItemsMap.clear();
+
+      // Step 1: group responses by student
+      const byStudent = new Map();   // studentId → { student, items[] }
 
       for (const response of unreviewedResponses) {
         const student = allStudentsData.find(s => s.user_id === response.user_id);
         if (!student) continue;
 
         const prompt     = response.prompt_id ? promptMap[response.prompt_id] : null;
-        const dayNumber  = prompt?.day_number ?? student.current_day ?? 0;
+        // Never fall back to student.current_day — that caused false positives
+        const dayNumber  = prompt?.day_number ?? 0;
         const promptType = prompt?.type ?? null;
 
+        if (!byStudent.has(student.id)) {
+          byStudent.set(student.id, { student, items: [] });
+        }
+        byStudent.get(student.id).items.push({
+          response, prompt, dayNumber, promptType
+        });
+      }
+
+      // Step 2: route each student group to ONE queue
+      for (const [, group] of byStudent) {
+        const { student, items } = group;
+
+        // Sort items oldest → newest for display
+        items.sort((a,b) => new Date(a.response.created_at) - new Date(b.response.created_at));
+
+        // Earliest unreviewed response drives the card preview
+        const primary = items[0];
+
+        // Priority: Day6/RealTalk > Day5/Quiz > Day7/other > Days1-4/LINE
+        const hasDay6 = items.some(i => i.promptType === 'Real Talk' || i.dayNumber === 6);
+        const hasDay5 = items.some(i => i.promptType === 'Quiz'     || i.dayNumber === 5);
+        const allLine14 = items.every(i =>
+          student.plan === 'line' && i.dayNumber > 0 && i.dayNumber < 5
+        );
+
         const qi = {
-          responseId:        response.id,
+          // Primary response (earliest pending)
+          responseId:        primary.response.id,
           studentId:         student.id,
           studentUserId:     student.user_id,
           name:              student.given_name_romaji || student.name,
@@ -1275,32 +1452,32 @@ I'm proud of your dedication. Let's keep building! 🚀`
           lineId:            student.line_id,
           currentWeek:       student.current_week,
           currentDay:        student.current_day,
-          responseText:      response.message_text,
-          mediaType:         response.media_type || 'text',
-          responseMessageId: response.message_id || response.line_message_id,
-          responseCreatedAt: response.created_at,
-          promptId:          response.prompt_id,
-          promptDayNumber:   dayNumber,
-          promptType:        promptType,
-          promptText:        prompt?.prompt_text || null,
+          responseText:      primary.response.message_text,
+          mediaType:         primary.response.media_type || 'text',
+          responseMessageId: primary.response.message_id || primary.response.line_message_id,
+          responseCreatedAt: primary.response.created_at,
+          promptId:          primary.response.prompt_id,
+          promptDayNumber:   primary.dayNumber,
+          promptType:        primary.promptType,
+          promptText:        primary.prompt?.prompt_text || null,
+          // All pending responses for this student (for display in card)
+          allPending:        items,
+          pendingCount:      items.length,
         };
 
-        queueItemsMap.set(response.id, qi);
+        queueItemsMap.set(primary.response.id, qi);
 
-        if (promptType === 'Real Talk' || dayNumber === 6) {
+        if (hasDay6) {
           dayQueues.day6.push(qi);
-        } else if (promptType === 'Quiz' || dayNumber === 5) {
+        } else if (hasDay5) {
           dayQueues.day5.push(qi);
-        } else if (qi.plan === 'line' && dayNumber > 0 && dayNumber < 7) {
-          // LINE plan Days 1-4: self-practice, no mandatory teacher action.
-          // Show in Optional Quick Replies if within today's JST window.
+        } else if (allLine14) {
           const today10pm     = getJST10pmUTC(0);
           const yesterday10pm = getJST10pmUTC(-1);
-          const responseTime  = new Date(qi.responseCreatedAt);
+          const responseTime  = new Date(primary.response.created_at);
           if (new Date() < today10pm && responseTime >= yesterday10pm) {
             dayQueues.day1to4_line.push(qi);
           }
-          // Outside window: silently discard.
         } else {
           dayQueues.day7other.push(qi);
         }
@@ -1434,14 +1611,36 @@ I'm proud of your dedication. Let's keep building! 🚀`
   }
 
   function responsePreviewHtml(qi) {
-    const when = new Date(qi.responseCreatedAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-    let html = `<div style="background:#f8f8f8; border:1px solid #e0e0e0; border-radius:6px; padding:0.75rem 1rem; margin-bottom:1rem; font-size:0.88rem;">
-      <div style="font-size:0.75rem; color:#888; margin-bottom:0.35rem;">📬 Student response · ${when}</div>`;
-    if (qi.responseText) html += `<p style="margin:0; color:#333;">"${qi.responseText}"</p>`;
-    if (qi.mediaType === 'audio') html += `<audio controls style="width:100%; max-width:360px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${qi.responseMessageId}&token=${mediaAuthToken}">Audio not supported.</audio>`;
-    if (qi.mediaType === 'video') html += `<video controls style="width:100%; max-width:360px; border-radius:4px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${qi.responseMessageId}&token=${mediaAuthToken}">Video not supported.</video>`;
-    if (qi.mediaType === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${qi.responseMessageId}&token=${mediaAuthToken}" style="max-width:100%; max-height:200px; border-radius:4px; margin-top:0.4rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
-    html += `</div>`;
+    // Show ALL pending responses for this student (not just the primary one).
+    const items = qi.allPending || [{
+      response: {
+        message_text:  qi.responseText,
+        media_type:    qi.mediaType,
+        message_id:    qi.responseMessageId,
+        created_at:    qi.responseCreatedAt,
+      },
+      prompt: null
+    }];
+
+    let html = '';
+    for (const item of items) {
+      const r    = item.response;
+      const p    = item.prompt;
+      const when = new Date(r.created_at).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+      const dayLabel = p ? (p.type ? `Day ${p.day_number} · ${p.type}` : `Day ${p.day_number}`) : 'Response';
+      const age  = ageBadgeHtml(r.created_at);
+
+      html += `<div style="background:#f8f8f8; border:1px solid #e0e0e0; border-radius:6px; padding:0.75rem 1rem; margin-bottom:0.6rem; font-size:0.88rem;">
+        <div style="font-size:0.75rem; color:#888; margin-bottom:0.35rem;">
+          📬 ${escapeHtml(dayLabel)} · ${when} ${age}
+        </div>`;
+      if (r.message_text) html += `<p style="margin:0 0 0.3rem; color:#333;">"${escapeHtml(r.message_text)}"</p>`;
+      const mid = encodeURIComponent(r.message_id || r.line_message_id || '');
+      if (r.media_type === 'audio') html += `<audio controls style="width:100%;max-width:360px;margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}">Audio not supported.</audio>`;
+      if (r.media_type === 'video') html += `<video controls style="width:100%;max-width:360px;border-radius:4px;margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}">Video not supported.</video>`;
+      if (r.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}" style="max-width:100%;max-height:200px;border-radius:4px;margin-top:0.4rem;cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
+      html += `</div>`;
+    }
     return html;
   }
 
@@ -1478,7 +1677,8 @@ I'm proud of your dedication. Let's keep building! 🚀`
           <div>
             <div class="student-name">
               ${qi.name} ${planBadgeHtml(qi.plan)}
-              ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ''}
+              ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ageBadgeHtml(qi.responseCreatedAt)}
+              ${pendingBadgeHtml(qi.pendingCount || 1)}
             </div>
             <div class="student-meta">Week ${qi.currentWeek || 1} · Day 6 · Real Talk response received</div>
           </div>
@@ -1557,7 +1757,8 @@ I'm proud of your dedication. Let's keep building! 🚀`
           <div>
             <div class="student-name">
               ${qi.name} ${planBadgeHtml(qi.plan)}
-              ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ''}
+              ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ageBadgeHtml(qi.responseCreatedAt)}
+              ${pendingBadgeHtml(qi.pendingCount || 1)}
             </div>
             <div class="student-meta">Week ${qi.currentWeek || 1} · Day 5 · Quiz response received</div>
           </div>
@@ -1643,7 +1844,8 @@ I'm proud of your dedication. Let's keep building! 🚀`
           <div>
             <div class="student-name">
               ${qi.name} ${planBadgeHtml(qi.plan)}
-              ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ''}
+              ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ageBadgeHtml(qi.responseCreatedAt)}
+              ${pendingBadgeHtml(qi.pendingCount || 1)}
             </div>
             <div class="student-meta">Week ${qi.currentWeek || 1} · ${dayLabel} · ${sectionLabel}</div>
           </div>
@@ -1829,19 +2031,24 @@ I'm proud of your dedication. Let's keep building! 🚀`
   }
 
   // ============================================================
-  // LOAD STUDENT RESPONSES (CONVERSATION HISTORY)
+  // LOAD STUDENT RESPONSES — iMessage-style bubble layout
+  // Chronological: oldest top, newest bottom. Auto-scrolls to bottom.
+  // Student = left (white). Teacher = right (green).
   // ============================================================
   async function loadStudentResponses(studentId, daysFilter = 'recent', cardKey = null) {
     const containerId = cardKey ? `responses-${cardKey}` : `responses-${studentId}`;
     const msgCountId  = cardKey ? `msg-count-${cardKey}` : `msg-count-${studentId}`;
+    const convId      = `conv-${cardKey || studentId}`;
     const container   = document.getElementById(containerId);
     const msgCountEl  = document.getElementById(msgCountId);
     if (!container) return;
-    container.innerHTML = '<p style="text-align:center; padding:1rem; color:#999;"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
+    container.innerHTML = '<div style="text-align:center;padding:1rem;color:#999;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
 
     try {
       const student = allStudentsData.find(s => s.id === studentId);
-      if (!student || !student.user_id) { container.innerHTML = '<p>Error: could not find student.</p>'; return; }
+      if (!student || !student.user_id) { container.innerHTML = '<p>Error: student not found.</p>'; return; }
+
+      const sInit = (student.given_name_romaji || student.name || 'S').charAt(0).toUpperCase();
 
       let startDate;
       if (daysFilter === 'recent') {
@@ -1852,7 +2059,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
         if (lastFeedback) {
           const d = new Date(lastFeedback.sent_at); d.setHours(0,0,0,0); startDate = d;
         } else {
-          startDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+          startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
         }
       } else if (daysFilter === 'all') {
         startDate = new Date('2000-01-01');
@@ -1882,84 +2089,69 @@ I'm proud of your dedication. Let's keep building! 🚀`
       if (msgCountEl) msgCountEl.textContent = `${allMsgs.length} message${allMsgs.length !== 1 ? 's' : ''}`;
 
       if (allMsgs.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding:2rem; color:#999;">No messages in this time range.</p>';
+        container.innerHTML = '<p style="text-align:center;padding:2rem;color:#999;">No messages in this time range.</p>';
         return;
       }
 
-      const byDate = {};
-      allMsgs.forEach(m => {
-        const d = new Date(m.created_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-        if (!byDate[d]) byDate[d] = [];
-        byDate[d].push(m);
-      });
+      let html = `<div class="conv-container" id="${convId}">`;
+      let lastDateStr = '';
 
-      let html = '';
-      Object.entries(byDate).reverse().forEach(([date, msgs]) => {
-        html += `<div style="margin-bottom:1.5rem;">
-          <h4 style="color:#666; border-bottom:1px solid #ddd; padding-bottom:0.4rem; font-size:0.9rem;">📅 ${escapeHtml(date)}</h4>`;
-        msgs.forEach(msg => {
-          const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
-          // Onboarding system events
-          if (msg._type === 'message' && msg.message_type === 'activation') {
-            html += `<div style="margin:0.75rem 0; padding:0.6rem 0.75rem; background:#e8eaf6; border-left:3px solid #5c6bc0; border-radius:4px; font-size:0.85rem;">
-              <div style="font-size:0.78rem; color:#666; margin-bottom:0.2rem;">[${time}] 🔗 System</div>
-              <p style="margin:0; color:#444; font-weight:500;">LINE account connected to Prokaiwa.</p>
-            </div>`;
-          } else if (msg._type === 'message' && msg.message_type === 'survey_token_sent') {
-            html += `<div style="margin:0.75rem 0; padding:0.6rem 0.75rem; background:#fff8e1; border-left:3px solid #ffa000; border-radius:4px; font-size:0.85rem;">
-              <div style="font-size:0.78rem; color:#666; margin-bottom:0.2rem;">[${time}] 📋 System</div>
-              <p style="margin:0; color:#444; font-weight:500;">Needs survey link sent to student's LINE.</p>
-            </div>`;
-          } else if (msg._type === 'message' && msg.message_type === 'welcome_video') {
-            html += `<div style="margin:0.75rem 0; padding:0.6rem 0.75rem; background:#fce4ec; border-left:3px solid #ec407a; border-radius:4px; font-size:0.85rem;">
-              <div style="font-size:0.78rem; color:#666; margin-bottom:0.2rem;">[${time}] 🎬 System</div>
-              <p style="margin:0; color:#444; font-weight:500;">Welcome video + self-introduction request sent via LINE.</p>
-            </div>`;
-          } else if (msg._type === 'message' && msg.message_type === 'audio_prompt') {
-            html += `<div style="margin:0.75rem 0; padding:0.6rem 0.75rem; background:#e8f5e9; border-left:3px solid #66bb6a; border-radius:4px; font-size:0.85rem;">
-              <div style="font-size:0.78rem; color:#666; margin-bottom:0.2rem;">[${time}] 🎵 Listening Practice Audio</div>
-              ${msg.message_text
-                ? `<audio controls style="width:100%; max-width:340px; margin-top:0.3rem; border-radius:4px;"><source src="${escapeHtml(msg.message_text)}">Audio not supported.</audio>`
-                : '<p style="margin:0.2rem 0; color:#888; font-style:italic;">Audio URL not recorded.</p>'}
-            </div>`;
-          // Main prompt
-          } else if (msg._type === 'message' && msg.message_type === 'prompt') {
-            html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#f0f8ff; border-left:3px solid #4A90E2; border-radius:4px; font-size:0.9rem;">
-              <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 🤖 Prompt</div>
-              <p style="margin:0; color:#333;">"${escapeHtml(msg.message_text)}"</p>
-            </div>`;
-          // Student response
-          } else if (msg._type === 'message' && msg.message_type === 'student_response') {
-            const sName = escapeHtml(student.given_name_romaji || student.name);
-            html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#fff; border:1px solid #e0e0e0; border-radius:4px; font-size:0.9rem;">
-              <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 👤 ${sName}</div>`;
-            if (msg.message_text) html += `<p style="margin:0.25rem 0; color:#333;">"${escapeHtml(msg.message_text)}"</p>`;
-            if (msg.media_type === 'audio') html += `<audio controls style="width:100%; max-width:380px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}&token=${mediaAuthToken}">Audio not supported.</audio>`;
-            if (msg.media_type === 'video') html += `<video controls style="width:100%; max-width:380px; border-radius:6px; margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}&token=${mediaAuthToken}">Video not supported.</video>`;
-            if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}&token=${mediaAuthToken}" style="max-width:100%; border-radius:6px; margin-top:0.4rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
-            html += `</div>`;
-          // Teacher feedback or marked_complete note
-          } else if (msg._type === 'feedback') {
-            if (msg.feedback_type === 'marked_complete') {
-              html += `<div style="margin:0.5rem 0; padding:0.4rem 0.75rem; background:#f5f5f5; border-left:3px solid #bdbdbd; border-radius:4px; font-size:0.82rem; color:#999;">
-                <span>[${time}] ✓ Marked as reviewed — no feedback sent</span>
-              </div>`;
-            } else {
-              html += `<div style="margin:0.75rem 0; padding:0.75rem; background:#f0fff0; border-left:3px solid #4caf50; border-radius:4px; font-size:0.9rem;">
-                <div style="font-size:0.8rem; color:#666; margin-bottom:0.3rem;">[${time}] 👨‍🏫 Teacher Feedback</div>
-                <p style="margin:0; color:#333; white-space:pre-wrap;">${escapeHtml(msg.feedback_text)}</p>
-              </div>`;
-            }
+      for (const msg of allMsgs) {
+        const d  = new Date(msg.created_at);
+        const ds = d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+        const ts = d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+
+        if (ds !== lastDateStr) {
+          html += `<div class="conv-date-divider">${escapeHtml(ds)}</div>`;
+          lastDateStr = ds;
+        }
+
+        if (msg._type === 'message') {
+          if (msg.message_type === 'prompt') {
+            const raw     = msg.message_text || '';
+            const preview = raw.length > 200 ? raw.substring(0, 200) + '...' : raw;
+            html += `<div class="conv-row prompt-r"><div class="conv-bubble"><span class="conv-label">🤖 Prompt · ${ts}</span>${escapeHtml(preview)}</div></div>`;
+          } else if (msg.message_type === 'student_response') {
+            const mid = encodeURIComponent(msg.message_id || msg.line_message_id || '');
+            html += `<div class="conv-row student"><div class="conv-avatar">${sInit}</div><div><div class="conv-bubble">`;
+            if (msg.message_text) html += escapeHtml(msg.message_text);
+            if (msg.media_type === 'audio') html += `<div class="conv-media"><audio controls><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}">Audio not supported.</audio></div>`;
+            if (msg.media_type === 'video') html += `<div class="conv-media"><video controls><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}">Video not supported.</video></div>`;
+            if (msg.media_type === 'image') html += `<div class="conv-media"><img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}" onclick="window.open(this.src,'_blank')" alt="Photo"></div>`;
+            html += `</div><div class="conv-time">${ts}</div></div></div>`;
+          } else if (msg.message_type === 'activation') {
+            html += `<div class="conv-row system"><div class="conv-bubble">🔗 LINE connected · ${ts}</div></div>`;
+          } else if (msg.message_type === 'welcome_video') {
+            html += `<div class="conv-row system"><div class="conv-bubble">🎬 Welcome video sent · ${ts}</div></div>`;
+          } else if (msg.message_type === 'survey_token_sent') {
+            html += `<div class="conv-row system"><div class="conv-bubble">📋 Needs survey sent · ${ts}</div></div>`;
+          } else if (msg.message_type === 'audio_prompt') {
+            html += `<div class="conv-row prompt-r"><div class="conv-bubble"><span class="conv-label">🎵 Listening Audio · ${ts}</span>${msg.message_text ? `<div class="conv-media"><audio controls><source src="${escapeHtml(msg.message_text)}">Audio not supported.</audio></div>` : 'Audio URL not recorded.'}</div></div>`;
           }
-        });
-        html += `</div>`;
-      });
+        } else if (msg._type === 'feedback') {
+          if (msg.feedback_type === 'marked_complete') {
+            html += `<div class="conv-row system"><div class="conv-bubble">✓ Marked reviewed (no feedback sent) · ${ts}</div></div>`;
+          } else {
+            const hasAudio = msg.audio_url && msg.feedback_text && msg.feedback_text.startsWith('[Voice message]');
+            html += `<div class="conv-row teacher"><div><div class="conv-bubble"><span class="conv-label right">You · ${ts}</span>`;
+            if (hasAudio) {
+              html += `<div class="conv-media"><audio controls><source src="${escapeHtml(msg.audio_url)}">Audio not supported.</audio></div>`;
+            } else {
+              html += escapeHtml(msg.feedback_text || '');
+            }
+            html += `</div></div><div class="conv-avatar you">D</div></div>`;
+          }
+        }
+      }
 
-      
+      html += '</div>';
       container.innerHTML = html;
+      const convEl = document.getElementById(convId);
+      if (convEl) convEl.scrollTop = convEl.scrollHeight;
+
     } catch(err) {
       console.error('loadStudentResponses:', err);
-      container.innerHTML = '<p style="color:red;">Error loading conversation history.</p>';
+      container.innerHTML = '<p style="color:red;">Error loading conversation. Please try again.</p>';
     }
   }
 
@@ -2377,7 +2569,46 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // AUTO-REFRESH
   // ============================================================
   checkAuth();
-  const autoRefreshInterval = setInterval(() => { loadDayTypeQueue(); loadVideoLessons(); }, 5 * 60 * 1000);
+
+  // ============================================================
+  // SMART AUTO-REFRESH
+  // Blocked while any student card is expanded (you are mid-reply).
+  // Shows a dismissible banner instead; you choose when to reload.
+  // ============================================================
+  let _pendingRefresh = false;
+
+  function safeRefresh() {
+    const hasOpenCard = !!document.querySelector('.student-card.expanded');
+    if (hasOpenCard) {
+      _pendingRefresh = true;
+      const banner = document.getElementById('refresh-banner');
+      if (banner) banner.style.display = 'flex';
+      return;
+    }
+    _pendingRefresh = false;
+    loadDayTypeQueue();
+    loadVideoLessons();
+  }
+
+  function dismissAndRefresh() {
+    _pendingRefresh = false;
+    const banner = document.getElementById('refresh-banner');
+    if (banner) banner.style.display = 'none';
+    loadDayTypeQueue();
+    loadVideoLessons();
+  }
+
+  // When you collapse a card, auto-apply any pending refresh
+  const _origToggleCard = toggleCard;
+  toggleCard = async function(cardKey) {
+    await _origToggleCard(cardKey);
+    setTimeout(() => {
+      const hasOpenCard = !!document.querySelector('.student-card.expanded');
+      if (!hasOpenCard && _pendingRefresh) dismissAndRefresh();
+    }, 300);
+  };
+
+  setInterval(safeRefresh, 5 * 60 * 1000);
 
   // ============================================================
   // ASSESSMENT MODAL
@@ -2563,10 +2794,32 @@ I'm proud of your dedication. Let's keep building! 🚀`
     const noMsg   = document.getElementById('no-cancellations');
     const badge   = document.getElementById('cancellation-count');
     if (!cancellations || cancellations.length === 0) { section.style.display = 'none'; return; }
+
+    // Split into uncontacted (show prominently) vs contacted (collapsed)
+    const uncontacted = cancellations.filter(c => !c.teacher_contacted);
+    const contacted   = cancellations.filter(c =>  c.teacher_contacted);
+
     section.style.display = 'block';
-    badge.textContent = cancellations.length;
-    list.style.display = 'flex'; noMsg.style.display = 'none';
-    list.innerHTML = cancellations.map(s => {
+
+    if (uncontacted.length === 0) {
+      badge.textContent = '✓'; badge.style.background = '#4caf50';
+      list.style.display = 'none'; noMsg.style.display = 'block';
+    } else {
+      badge.textContent = uncontacted.length;
+      list.style.display = 'flex'; noMsg.style.display = 'none';
+    }
+
+    // Remove any stale contacted section from previous renders
+    const staleToggle = list.nextElementSibling;
+    if (staleToggle && staleToggle.classList.contains('contacted-toggle')) {
+      staleToggle.remove();
+    }
+    const staleList = list.nextElementSibling;
+    if (staleList && staleList.classList.contains('contacted-list')) {
+      staleList.remove();
+    }
+
+    const uncontactedHtml = uncontacted.map(s => {
       const cancelDate  = new Date(s.cancelled_at);
       const accessUntil = new Date(s.dashboard_access_expires_at);
       const daysRem = Math.ceil((accessUntil - new Date()) / (1000*60*60*24));
@@ -2605,6 +2858,45 @@ I'm proud of your dedication. Let's keep building! 🚀`
         </div>
       `;
     }).join('');
+
+    list.innerHTML = uncontactedHtml;
+
+    // Contacted students — collapsed below the main list
+    if (contacted.length > 0) {
+      const contactedHtml = contacted.map(s => {
+        const cancelDate = new Date(s.cancelled_at);
+        return `
+          <div class="cancellation-card" style="opacity:0.65;">
+            <div class="cancellation-header">
+              <div class="cancellation-student-info">
+                <h4 class="cancellation-student-name">${s.given_name_romaji || s.name}</h4>
+                <div>
+                  <span class="cancellation-plan-badge">${formatPlanName(s.plan)}</span>
+                  <span class="cancellation-date">Cancelled ${cancelDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+                </div>
+              </div>
+              <div class="cancellation-status-badge contacted">&#10003; Contacted</div>
+            </div>
+          </div>`;
+      }).join('');
+
+      const n = contacted.length;
+      const toggleEl = document.createElement('div');
+      toggleEl.className = 'contacted-toggle';
+      toggleEl.textContent = `▼ Show previously contacted (${n})`;
+      toggleEl.addEventListener('click', () => {
+        const body = toggleEl.nextElementSibling;
+        body.classList.toggle('open');
+        toggleEl.textContent = body.classList.contains('open')
+          ? `▲ Hide previously contacted (${n})`
+          : `▼ Show previously contacted (${n})`;
+      });
+      const bodyEl = document.createElement('div');
+      bodyEl.className = 'contacted-list';
+      bodyEl.innerHTML = contactedHtml;
+      list.after(toggleEl);
+      toggleEl.after(bodyEl);
+    }
   }
 
   function formatReason(r) {
