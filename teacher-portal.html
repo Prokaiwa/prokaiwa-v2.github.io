@@ -1611,37 +1611,19 @@ I'm proud of your dedication. Let's keep building! 🚀`
   }
 
   function responsePreviewHtml(qi) {
-    // Show ALL pending responses for this student (not just the primary one).
-    const items = qi.allPending || [{
-      response: {
-        message_text:  qi.responseText,
-        media_type:    qi.mediaType,
-        message_id:    qi.responseMessageId,
-        created_at:    qi.responseCreatedAt,
-      },
-      prompt: null
-    }];
-
-    let html = '';
-    for (const item of items) {
-      const r    = item.response;
-      const p    = item.prompt;
-      const when = new Date(r.created_at).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-      const dayLabel = p ? (p.type ? `Day ${p.day_number} · ${p.type}` : `Day ${p.day_number}`) : 'Response';
-      const age  = ageBadgeHtml(r.created_at);
-
-      html += `<div style="background:#f8f8f8; border:1px solid #e0e0e0; border-radius:6px; padding:0.75rem 1rem; margin-bottom:0.6rem; font-size:0.88rem;">
-        <div style="font-size:0.75rem; color:#888; margin-bottom:0.35rem;">
-          📬 ${escapeHtml(dayLabel)} · ${when} ${age}
-        </div>`;
-      if (r.message_text) html += `<p style="margin:0 0 0.3rem; color:#333;">"${escapeHtml(r.message_text)}"</p>`;
-      const mid = encodeURIComponent(r.message_id || r.line_message_id || '');
-      if (r.media_type === 'audio') html += `<audio controls style="width:100%;max-width:360px;margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}">Audio not supported.</audio>`;
-      if (r.media_type === 'video') html += `<video controls style="width:100%;max-width:360px;border-radius:4px;margin-top:0.4rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}">Video not supported.</video>`;
-      if (r.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}" style="max-width:100%;max-height:200px;border-radius:4px;margin-top:0.4rem;cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
-      html += `</div>`;
-    }
-    return html;
+    const items  = qi.allPending || [];
+    const count  = qi.pendingCount || 1;
+    const newest = items.length > 0 ? items[items.length-1].response.created_at : qi.responseCreatedAt;
+    const labels = items.map(i => i.prompt ? (i.prompt.type || ('Day ' + i.prompt.day_number)) : 'Response')
+                        .filter((v,i,a) => a.indexOf(v) === i).join(', ');
+    return '<div style="display:flex;align-items:center;gap:0.6rem;background:#f0f4ff;border:1px solid #c5cae9;border-radius:6px;padding:0.6rem 1rem;margin-bottom:1rem;font-size:0.85rem;flex-wrap:wrap;">'
+      + '<span>📬</span>'
+      + '<span style="font-weight:600;color:#333;">' + count + ' pending response' + (count !== 1 ? 's' : '')
+        + (labels ? '<span style="font-weight:400;color:#666;"> &middot; ' + escapeHtml(labels) + '</span>' : '')
+      + '</span>'
+      + ageBadgeHtml(newest)
+      + '<span style="margin-left:auto;font-size:0.75rem;color:#888;">See conversation below</span>'
+      + '</div>';
   }
 
   function filterBarHtml(studentId, cardKey) {
@@ -2109,8 +2091,24 @@ I'm proud of your dedication. Let's keep building! 🚀`
         if (msg._type === 'message') {
           if (msg.message_type === 'prompt') {
             const raw     = msg.message_text || '';
-            const preview = raw.length > 200 ? raw.substring(0, 200) + '...' : raw;
-            html += `<div class="conv-row prompt-r"><div class="conv-bubble"><span class="conv-label">🤖 Prompt · ${ts}</span>${escapeHtml(preview)}</div></div>`;
+            const divider = '〜〜〜〜〜〜〜〜〜〜';
+            const divIdx  = raw.indexOf(divider);
+            const english = (divIdx > -1 ? raw.substring(0, divIdx) : raw).trim();
+            const jpText  = divIdx > -1 ? raw.substring(divIdx).trim() : '';
+            const pid     = 'p' + (msg.id || Math.random().toString(36).substr(2,6));
+            let jpBlock   = '';
+            if (jpText) {
+              jpBlock = '<div id="' + pid + '-jp" style="display:none;margin-top:0.5rem;padding-top:0.5rem;border-top:1px dashed #bbb;font-size:0.78rem;color:#666;white-space:pre-wrap;">'
+                + escapeHtml(jpText) + '</div>'
+                + '<button onclick="var j=document.getElementById(' + "'" + pid + "-jp');"
+                + "j.style.display=j.style.display==='none'?'block':'none';"
+                + "this.textContent=j.style.display==='none'?'▼ Japanese':'▲ Hide'"
+                + '" style="margin-top:0.4rem;background:none;border:1px solid #c5cae9;border-radius:4px;padding:0.2rem 0.6rem;font-size:0.72rem;color:#5c6bc0;cursor:pointer;">▼ Japanese support</button>';
+            }
+            html += '<div class="conv-row prompt-r"><div class="conv-bubble">'
+              + '<span class="conv-label">🤖 Prompt · ' + ts + '</span>'
+              + '<span style="white-space:pre-wrap;">' + escapeHtml(english) + '</span>'
+              + jpBlock + '</div></div>';
           } else if (msg.message_type === 'student_response') {
             const mid = encodeURIComponent(msg.message_id || msg.line_message_id || '');
             html += `<div class="conv-row student"><div class="conv-avatar">${sInit}</div><div><div class="conv-bubble">`;
@@ -2577,17 +2575,29 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // ============================================================
   let _pendingRefresh = false;
 
-  function safeRefresh() {
+  async function safeRefresh() {
     const hasOpenCard = !!document.querySelector('.student-card.expanded');
-    if (hasOpenCard) {
-      _pendingRefresh = true;
-      const banner = document.getElementById('refresh-banner');
-      if (banner) banner.style.display = 'flex';
+    if (!hasOpenCard) {
+      _pendingRefresh = false;
+      await loadDayTypeQueue();
+      loadVideoLessons();
       return;
     }
-    _pendingRefresh = false;
-    loadDayTypeQueue();
-    loadVideoLessons();
+    try {
+      const currentTotal = dayQueues.day6.length + dayQueues.day5.length + dayQueues.day7other.length;
+      const userIds = allStudentsData.map(s => s.user_id).filter(Boolean);
+      if (!userIds.length) return;
+      const { count } = await supabaseClient
+        .from('message_log')
+        .select('id', { count: 'exact', head: true })
+        .in('user_id', userIds)
+        .eq('message_type', 'student_response');
+      if (count !== null && count > currentTotal) {
+        _pendingRefresh = true;
+        const banner = document.getElementById('refresh-banner');
+        if (banner) banner.style.display = 'flex';
+      }
+    } catch(e) {}
   }
 
   function dismissAndRefresh() {
