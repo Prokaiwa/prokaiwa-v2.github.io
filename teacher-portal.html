@@ -1495,6 +1495,19 @@ I'm proud of your dedication. Let's keep building! 🚀`
       renderAllStudents();
       updateStats();
 
+      // Store total response count as baseline for change detection
+      try {
+        const uIds = allStudentsData.map(s => s.user_id).filter(Boolean);
+        if (uIds.length) {
+          const { count: rc } = await supabaseClient
+            .from('message_log')
+            .select('id', { count: 'exact', head: true })
+            .in('user_id', uIds)
+            .eq('message_type', 'student_response');
+          if (rc !== null) _responseCountSnapshot = rc;
+        }
+      } catch(e) {}
+
     } catch(err) {
       console.error('loadDayTypeQueue:', err);
       ['body-day6','body-day5','body-day7'].forEach(id => {
@@ -2582,6 +2595,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // Shows a dismissible banner instead; you choose when to reload.
   // ============================================================
   let _pendingRefresh = false;
+  let _responseCountSnapshot = 0;
 
   async function safeRefresh() {
     const hasOpenCard = !!document.querySelector('.student-card.expanded');
@@ -2600,7 +2614,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
         .select('id', { count: 'exact', head: true })
         .in('user_id', userIds)
         .eq('message_type', 'student_response');
-      if (count !== null && count > currentTotal) {
+      if (count !== null && count > _responseCountSnapshot) {
         _pendingRefresh = true;
         const banner = document.getElementById('refresh-banner');
         if (banner) banner.style.display = 'flex';
