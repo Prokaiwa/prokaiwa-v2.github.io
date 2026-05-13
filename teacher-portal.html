@@ -33,6 +33,16 @@
     }
     .teacher-header h1 { font-size: 1.5rem; color: var(--color-primary); margin: 0; }
     .teacher-info { display: flex; align-items: center; gap: 1rem; }
+    .notif-btn {
+      background: #e8f5e9; color: #2e7d32;
+      padding: 0.5rem 1rem; border: 1.5px solid #a5d6a7;
+      border-radius: 4px; cursor: pointer; font-weight: 600;
+      font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;
+      transition: all 0.2s;
+    }
+    .notif-btn:hover { background: #c8e6c9; }
+    .notif-btn.active { background: #4caf50; color: white; border-color: #4caf50; }
+    .notif-btn.denied { background: #ffebee; color: #c62828; border-color: #ef9a9a; cursor: default; }
     .logout-btn {
       background: var(--color-accent); color: white;
       padding: 0.5rem 1rem; border: none; border-radius: 4px;
@@ -839,6 +849,9 @@
         <a href="prompt-recordings.html" class="admin-recordings-btn" id="admin-recordings-btn">
           <i class="fas fa-microphone-alt"></i> Manage Recordings
         </a>
+        <button class="notif-btn" id="notif-btn" onclick="handleNotifBtn()" style="display:none;">
+          <i class="fas fa-bell"></i> <span id="notif-btn-label">Enable Notifications</span>
+        </button>
         <button class="logout-btn" id="logout-btn">
           <i class="fas fa-sign-out-alt"></i> Logout
         </button>
@@ -2653,8 +2666,46 @@ I'm proud of your dedication. Let's keep building! 🚀`
     return new Uint8Array([...raw].map(c => c.charCodeAt(0)));
   }
 
-  // Register push after auth completes (small delay to let auth settle)
-  setTimeout(registerPush, 2000);
+  // Check current notification state and update button accordingly
+  async function initNotifButton() {
+    const btn = document.getElementById('notif-btn');
+    if (!btn) return;
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    btn.style.display = 'flex';
+    const perm = Notification.permission;
+    if (perm === 'granted') {
+      // Already granted — silently register in background
+      btn.classList.add('active');
+      document.getElementById('notif-btn-label').textContent = 'Notifications On';
+      registerPush();
+    } else if (perm === 'denied') {
+      btn.classList.add('denied');
+      document.getElementById('notif-btn-label').textContent = 'Notifications Blocked';
+    }
+    // If 'default' (not yet asked) — button stays green, waiting for tap
+  }
+
+  async function handleNotifBtn() {
+    if (Notification.permission === 'denied') return;
+    if (Notification.permission === 'granted') {
+      await registerPush();
+      return;
+    }
+    // This is the user gesture — iOS will now show the permission prompt
+    await registerPush();
+    const btn = document.getElementById('notif-btn');
+    if (Notification.permission === 'granted') {
+      btn.classList.add('active');
+      btn.classList.remove('denied');
+      document.getElementById('notif-btn-label').textContent = 'Notifications On';
+    } else if (Notification.permission === 'denied') {
+      btn.classList.add('denied');
+      document.getElementById('notif-btn-label').textContent = 'Notifications Blocked';
+    }
+  }
+
+  // Show notification button after auth (no auto-permission request)
+  setTimeout(initNotifButton, 1500);
 
   // ============================================================
   // SMART AUTO-REFRESH
