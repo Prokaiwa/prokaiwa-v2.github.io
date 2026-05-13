@@ -1,0 +1,17 @@
+{
+  "name": "Prokaiwa Teacher Portal",
+  "short_name": "Prokaiwa",
+  "description": "Prokaiwa teacher dashboard",
+  "start_url": "/teacher-portal.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4A90E2",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/images/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

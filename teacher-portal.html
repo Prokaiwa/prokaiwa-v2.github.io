@@ -8,6 +8,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Prokaiwa">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
@@ -2588,6 +2592,69 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // AUTO-REFRESH
   // ============================================================
   checkAuth();
+
+  // ============================================================
+  // PWA SERVICE WORKER + PUSH NOTIFICATIONS
+  // ============================================================
+  const VAPID_PUBLIC_KEY = 'BPc8ytGzYU_nhcGYMZU66R8rIldbQRM-56XQLdVnNoIXfyjgKfD9pUaB7ieVskkLBSx6YOTmHSVEGClCYyRSFVM';
+
+  async function registerPush() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      console.log('Push not supported on this browser');
+      return;
+    }
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+
+      // Ask permission
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        console.log('Push permission denied');
+        return;
+      }
+
+      // Subscribe
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+
+      const subJson = sub.toJSON();
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) return;
+
+      // Get teacher record
+      const { data: teacher } = await supabaseClient
+        .from('teachers').select('id')
+        .eq('auth_user_id', session.user.id).maybeSingle();
+      if (!teacher) return;
+
+      // Upsert subscription (one row per device)
+      await supabaseClient.from('push_subscriptions').upsert({
+        teacher_id: teacher.id,
+        endpoint:   subJson.endpoint,
+        p256dh:     subJson.keys.p256dh,
+        auth:       subJson.keys.auth,
+        user_agent: navigator.userAgent,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'endpoint' });
+
+      console.log('Push subscription saved');
+    } catch(err) {
+      console.error('registerPush error:', err);
+    }
+  }
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const raw     = atob(base64);
+    return new Uint8Array([...raw].map(c => c.charCodeAt(0)));
+  }
+
+  // Register push after auth completes (small delay to let auth settle)
+  setTimeout(registerPush, 2000);
 
   // ============================================================
   // SMART AUTO-REFRESH
