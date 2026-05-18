@@ -1148,6 +1148,14 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eXp5emVmZ2ludGtzeWRtd29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzYyMDUsImV4cCI6MjA2ODU1MjIwNX0.he5_j99ZtAj4K_zzgm11NEEv7TrbRJYndJXot25s_Kg'
   );
 
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'TOKEN_REFRESHED' && session) {
+      mediaAuthToken = session.access_token;
+    } else if (event === 'SIGNED_OUT') {
+      window.location.href = '/teacher-login.html';
+    }
+  });
+
   // ============================================================
   // STATE
   // ============================================================
@@ -3106,7 +3114,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // ============================================================
   // VIDEO LESSONS
   // ============================================================
-  async function loadVideoLessons() {
+  async function loadVideoLessons(isRetry = false) {
     try {
       const { data: bookings, error } = await supabaseClient
         .from('lesson_bookings')
@@ -3180,6 +3188,12 @@ I'm proud of your dedication. Let's keep building! 🚀`
         `;
       }).join('');
     } catch(err) {
+      if (err?.code === 'PGRST301' && !isRetry) {
+        const { error: refreshErr } = await supabaseClient.auth.refreshSession();
+        if (refreshErr) { window.location.href = '/teacher-login.html'; return; }
+        return loadVideoLessons(true);
+      }
+      if (err?.code === 'PGRST301') { window.location.href = '/teacher-login.html'; return; }
       console.error('loadVideoLessons:', err);
       document.getElementById('video-lessons-list').innerHTML = '<p style="color:#f44336;">Error loading lessons.</p>';
     }
