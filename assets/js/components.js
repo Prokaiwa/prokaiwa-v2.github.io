@@ -26,7 +26,7 @@
     supabase.auth.getSession().then(({ data: { session } }) => {
       const loginLink = document.querySelector('#auth-nav-link');
       if (loginLink) {
-        const isAuthPage = window.location.pathname.includes('dashboard') || 
+        const isAuthPage = window.location.pathname.includes('dashboard') ||
                            window.location.pathname.includes('account-settings') ||
                            window.location.pathname.includes('questionnaire');
         if (session && isAuthPage) {
@@ -49,5 +49,5 @@
         }
       }
     });
-  });
+  }).catch(() => {}); // CDN unreachable on mobile/flaky networks — skip auth nav silently
 })();

@@ -346,9 +346,18 @@
     // Still print to DevTools as normal
     _originalConsoleError.apply(console, args);
 
-    // Also capture it
+    // Also capture it — serialize Error objects via .message/.stack
+    // because JSON.stringify(new Error('...')) always returns "{}"
     const message = args
-      .map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a)))
+      .map(a => {
+        if (a instanceof Error) return a.message || String(a);
+        if (typeof a === 'object' && a !== null) {
+          // Supabase/PostgREST errors expose message as own property
+          if (typeof a.message === 'string') return a.message;
+          try { const s = JSON.stringify(a); return s !== '{}' ? s : String(a); } catch { return String(a); }
+        }
+        return String(a);
+      })
       .join(' ');
     handleError(message, null, 'console_error');
   };
