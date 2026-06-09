@@ -963,6 +963,25 @@ Keep it up! 🌟</textarea>
       ? `<span class="line-status line-connected"><i class="fab fa-line"></i> Connected</span>`
       : `<span class="line-status line-disconnected"><i class="fas fa-times-circle"></i> Not connected</span>`;
 
+    // ── Subscription display + billing actions ──
+    const subActive = s.subscription_status === 'active';
+    const subColor  = subActive ? (s.payment_paused ? '#ff9800' : '#4caf50') : '#f44336';
+    const subText   = subActive
+      ? (s.payment_paused ? 'active · payments paused' : 'active')
+      : (s.subscription_status || 'Unknown');
+    const billingBtn = 'display:inline-flex;align-items:center;gap:0.4rem;border:none;border-radius:6px;padding:0.5rem 0.7rem;font-size:0.78rem;font-weight:600;cursor:pointer;margin:0.3rem 0.3rem 0 0;color:#fff;';
+    let billingActions;
+    if (s.subscription_status === 'cancelled') {
+      billingActions = `<div style="padding:0.6rem 0 0.2rem;color:#999;font-size:0.8rem;"><i class="fas fa-ban"></i> Subscription cancelled</div>`;
+    } else if (s.stripe_subscription_id) {
+      const pauseResume = s.payment_paused
+        ? `<button style="${billingBtn}background:#4caf50;" onclick="manageSubscription('resume')"><i class="fas fa-play"></i> Resume payments</button>`
+        : `<button style="${billingBtn}background:#ff9800;" onclick="manageSubscription('pause')"><i class="fas fa-pause"></i> Pause payments</button>`;
+      billingActions = `<div style="padding:0.6rem 0 0.2rem;">${pauseResume}<button style="${billingBtn}background:#f44336;" onclick="manageSubscription('cancel')"><i class="fas fa-ban"></i> Cancel</button></div>`;
+    } else {
+      billingActions = `<div style="padding:0.6rem 0 0.2rem;color:#999;font-size:0.8rem;">No Stripe subscription to manage</div>`;
+    }
+
     document.getElementById('info-rows').innerHTML = `
       <div class="info-row">
         <span class="info-label">Plan</span>
@@ -994,8 +1013,8 @@ Keep it up! 🌟</textarea>
       </div>
       <div class="info-row">
         <span class="info-label">Subscription</span>
-        <span class="info-value" style="color:${s.subscription_status === 'active' ? '#4caf50' : '#f44336'}">
-          ${escapeHtml(s.subscription_status || 'Unknown')}
+        <span class="info-value" style="color:${subColor}">
+          ${escapeHtml(subText)}
         </span>
       </div>
       ${s.started_at ? `
@@ -1003,7 +1022,44 @@ Keep it up! 🌟</textarea>
         <span class="info-label">Started</span>
         <span class="info-value">${new Date(s.started_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
       </div>` : ''}
+      ${billingActions}
     `;
+  }
+
+  // ============================================================
+  // SUBSCRIPTION MANAGEMENT (cancel / pause / resume)
+  // ============================================================
+  async function manageSubscription(action) {
+    const s = currentStudent;
+    if (!s || !s.stripe_subscription_id) { alert('This student has no Stripe subscription to manage.'); return; }
+    const name = s.given_name_romaji || s.name || 'this student';
+    const prompts = {
+      cancel: `Cancel ${name}'s subscription now?\n\nThis ends billing in Stripe immediately and marks them cancelled. This can't be undone from here.`,
+      pause:  `Pause ${name}'s payments?\n\nThey won't be charged until you resume (Stripe pause, invoices voided). Their account stays active.`,
+      resume: `Resume ${name}'s payments?\n\nNormal billing continues from now.`
+    };
+    if (!confirm(prompts[action])) return;
+
+    try {
+      const res = await fetch(
+        'https://luyzyzefgintksydmwoh.supabase.co/functions/v1/teacher-manage-subscription',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
+          },
+          body: JSON.stringify({ student_id: s.id, action })
+        }
+      );
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Request failed');
+      alert(data.message || 'Done');
+      await loadStudentProfile(String(s.id));
+    } catch (err) {
+      console.error('manageSubscription:', err);
+      alert('Error: ' + err.message);
+    }
   }
 
   // ============================================================
