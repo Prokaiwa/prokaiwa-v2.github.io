@@ -977,7 +977,7 @@ Keep it up! 🌟</textarea>
       const pauseResume = s.payment_paused
         ? `<button style="${billingBtn}background:#4caf50;" onclick="manageSubscription('resume')"><i class="fas fa-play"></i> Resume payments</button>`
         : `<button style="${billingBtn}background:#ff9800;" onclick="manageSubscription('pause')"><i class="fas fa-pause"></i> Pause payments</button>`;
-      billingActions = `<div style="padding:0.6rem 0 0.2rem;">${pauseResume}<button style="${billingBtn}background:#f44336;" onclick="manageSubscription('cancel')"><i class="fas fa-ban"></i> Cancel</button></div>`;
+      billingActions = `<div style="padding:0.6rem 0 0.2rem;">${pauseResume}<button style="${billingBtn}background:#f44336;" onclick="manageSubscription('cancel')"><i class="fas fa-ban"></i> Cancel subscription</button></div>`;
     } else {
       billingActions = `<div style="padding:0.6rem 0 0.2rem;color:#999;font-size:0.8rem;">No Stripe subscription to manage</div>`;
     }
