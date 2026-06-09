@@ -67,6 +67,7 @@ Deno.serve(async (req) => {
       .not('line_id', 'is', null)
       .in('plan', ['line', 'power_lite', 'power_pro'])
       .eq('subscription_status', 'active')
+      .eq('messaging_paused', false)
 
     if (studentsError) throw studentsError
 
