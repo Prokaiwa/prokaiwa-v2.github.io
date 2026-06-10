@@ -40,7 +40,7 @@ serve(async (req) => {
     // ACTION: GET AVAILABLE SLOTS
     // ============================================
     if (action === 'getAvailableSlots') {
-      const { date } = bookingData;
+      const { date, lessonType } = bookingData;
       console.log('📅 Fetching slots for:', date);
       
       // Parse date string as YYYY-MM-DD and create in JST timezone
@@ -67,8 +67,17 @@ serve(async (req) => {
         });
       }
       
+      // Consultation-only windows (e.g. weekday evenings) only offer slots for
+      // the free consultation, not standard 50-min lessons.
+      if (availability.consultation_only && lessonType !== 'consultation') {
+        console.log('🚫 Consultation-only window; no slots for lessonType:', lessonType);
+        return new Response(JSON.stringify({ success: true, slots: [] }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
       console.log('📊 Availability:', availability);
-      
+
       const startHour = parseInt(availability.start_time.split(':')[0]);
       const endHour = parseInt(availability.end_time.split(':')[0]);
       

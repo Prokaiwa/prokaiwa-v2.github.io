@@ -897,7 +897,7 @@ Keep it up! 🌟</textarea>
     mediaAuthToken = session.access_token;
 
     const { data: teacher } = await supabaseClient
-      .from('teachers').select('id, is_active').eq('auth_user_id', session.user.id).single();
+      .from('teachers').select('id, is_active, role').eq('auth_user_id', session.user.id).single();
     if (!teacher || !teacher.is_active) { window.location.href = '/teacher-login.html'; return; }
     currentTeacher = teacher;
 
@@ -982,6 +982,13 @@ Keep it up! 🌟</textarea>
       billingActions = `<div style="padding:0.6rem 0 0.2rem;color:#999;font-size:0.8rem;">No Stripe subscription to manage</div>`;
     }
 
+    const isAdmin = currentTeacher && currentTeacher.role === 'admin';
+    const adminActions = isAdmin
+      ? `<div style="padding:0.4rem 0 0.2rem;margin-top:0.4rem;border-top:1px solid #eee;">
+           <button style="${billingBtn}background:#6a5acd;" onclick="viewAsStudent()"><i class="fas fa-user-secret"></i> View as student</button>
+         </div>`
+      : '';
+
     document.getElementById('info-rows').innerHTML = `
       <div class="info-row">
         <span class="info-label">Plan</span>
@@ -1023,6 +1030,7 @@ Keep it up! 🌟</textarea>
         <span class="info-value">${new Date(s.started_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
       </div>` : ''}
       ${billingActions}
+      ${adminActions}
     `;
   }
 
@@ -1060,6 +1068,67 @@ Keep it up! 🌟</textarea>
       console.error('manageSubscription:', err);
       alert('Error: ' + err.message);
     }
+  }
+
+  // ============================================================
+  // VIEW AS STUDENT (admin-only impersonation via one-time link)
+  // ============================================================
+  async function viewAsStudent() {
+    const s = currentStudent;
+    if (!s) return;
+    const name = s.given_name_romaji || s.name || 'this student';
+    if (!confirm(`Open ${name}'s account to see what they see?\n\nThis creates a one-time login link. Open it in an INCOGNITO window so you don't sign yourself out of the teacher portal.`)) return;
+    try {
+      const res = await fetch('https://luyzyzefgintksydmwoh.supabase.co/functions/v1/admin-impersonate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
+        },
+        body: JSON.stringify({ student_id: s.id })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Request failed');
+      showImpersonationModal(name, data.link);
+    } catch (err) {
+      console.error('viewAsStudent:', err);
+      alert('Error: ' + err.message);
+    }
+  }
+
+  function showImpersonationModal(name, link) {
+    const old = document.getElementById('impersonation-modal');
+    if (old) old.remove();
+    const modal = document.createElement('div');
+    modal.id = 'impersonation-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:1rem;';
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:10px;max-width:540px;width:100%;padding:1.5rem;box-shadow:0 12px 48px rgba(0,0,0,0.35);">
+        <h3 style="margin:0 0 0.5rem;">View as ${escapeHtml(name)}</h3>
+        <p style="color:#555;font-size:0.88rem;line-height:1.5;margin:0 0 0.9rem;">
+          <strong style="color:#c0392b;">⚠️ Open this in an incognito / private window.</strong>
+          Opening it in your normal browser will sign you out of the teacher portal (same site).
+          The link is one-time and expires shortly.
+        </p>
+        <input id="impersonation-link" type="text" readonly value="${escapeHtml(link)}"
+          style="width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;font-size:0.8rem;margin-bottom:0.9rem;box-sizing:border-box;">
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+          <button id="impersonation-copy" style="background:#6a5acd;color:#fff;border:none;border-radius:6px;padding:0.55rem 0.95rem;font-weight:600;cursor:pointer;">Copy link</button>
+          <a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" style="background:#888;color:#fff;border-radius:6px;padding:0.55rem 0.95rem;font-weight:600;text-decoration:none;">Open in new tab</a>
+          <button id="impersonation-close" style="background:none;border:1px solid #ccc;border-radius:6px;padding:0.55rem 0.95rem;cursor:pointer;margin-left:auto;">Close</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    const linkInput = document.getElementById('impersonation-link');
+    linkInput.addEventListener('focus', () => linkInput.select());
+    document.getElementById('impersonation-copy').addEventListener('click', async (e) => {
+      try { await navigator.clipboard.writeText(link); }
+      catch { linkInput.select(); document.execCommand('copy'); }
+      e.target.textContent = 'Copied!';
+      setTimeout(() => { e.target.textContent = 'Copy link'; }, 1500);
+    });
+    document.getElementById('impersonation-close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
   }
 
   // ============================================================

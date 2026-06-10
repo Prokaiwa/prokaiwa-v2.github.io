@@ -3491,6 +3491,7 @@ for (let date = 1; date <= remainingCells; date++) {
 }
 
         async function fetchAvailableSlots(dateStr, lang) {
+            bookingState.selectedDate = dateStr;
             const slotsContainer = document.getElementById(`${lang}-time-slots`);
             if (!slotsContainer) return;
 
@@ -3508,7 +3509,8 @@ for (let date = 1; date <= remainingCells; date++) {
                     body: JSON.stringify({
                         action: 'getAvailableSlots',
                         bookingData: {
-                            date: dateStr
+                            date: dateStr,
+                            lessonType: (document.getElementById(`${lang}-lesson-type`)?.value) || bookingState.selectedLessonType || 'standard'
                         }
                     })
                 });
@@ -3908,6 +3910,10 @@ closeBookingModal();
             if (lessonTypeSelect) {
                 lessonTypeSelect.addEventListener('change', (e) => {
                     bookingState.selectedLessonType = e.target.value;
+                    // Consultation-only windows differ by lesson type — refresh the slots
+                    if (bookingState.selectedDate) {
+                        fetchAvailableSlots(bookingState.selectedDate, lang);
+                    }
                     if (bookingState.selectedTime) {
                         updateBookingSummary(lang);
                     }
