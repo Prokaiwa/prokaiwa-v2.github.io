@@ -145,7 +145,17 @@ serve(async (req) => {
       }
       
       const isFree = lessonType === 'first_time_free';
-      
+
+      // Enforce the one-time, post-14-day free consultation gate
+      if (isFree) {
+        const { data: eligible, error: eligErr } = await supabase
+          .rpc('is_eligible_for_consultation', { p_student_id: studentId });
+        if (eligErr) throw eligErr;
+        if (!eligible) {
+          throw new Error('Not eligible for a free consultation (already used, or the first-time window has not opened yet).');
+        }
+      }
+
       console.log('💰 Use credit:', useCredit, '| Is free:', isFree);
       
       // Create booking
@@ -166,9 +176,18 @@ serve(async (req) => {
         .single();
       
       if (error) throw error;
-      
+
       console.log('✅ Booking created:', data.id);
-      
+
+      // Mark the one-time free consultation as claimed so it can't be re-booked
+      if (isFree) {
+        const { error: claimErr } = await supabase
+          .from('first_time_consultations')
+          .update({ claimed: true, claimed_at: new Date().toISOString(), booking_id: data.id })
+          .eq('student_id', studentId);
+        if (claimErr) console.error('⚠️ Failed to mark consultation claimed:', claimErr);
+      }
+
       // Deduct credit if used
       if (useCredit) {
         console.log('💳 Deducting credit...');

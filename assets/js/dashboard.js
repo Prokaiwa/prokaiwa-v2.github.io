@@ -3174,7 +3174,7 @@ if (hasVideoAccess) {
                     <label for="${lang}-lesson-type">${lang === 'ja' ? 'レッスンタイプ:' : 'Lesson Type:'}</label>
                     <select id="${lang}-lesson-type">
                         <option value="standard">${lang === 'ja' ? '50分 スタンダードレッスン' : '50-min Standard Lesson'}</option>
-                        <option value="consultation">${lang === 'ja' ? '20分 無料相談（初回のみ）' : '20-min Free Consultation (First-time)'}</option>
+                        <option value="consultation" id="${lang}-consultation-option" hidden disabled>${lang === 'ja' ? '20分 無料相談（初回のみ）' : '20-min Free Consultation (First-time)'}</option>
                     </select>
                 </div>
 
@@ -3244,6 +3244,17 @@ if (hasVideoAccess) {
         const consultBadge = document.getElementById(`${lang}-consultation-badge`);
         if (consultBadge) {
             consultBadge.style.display = bookingState.eligibleForConsultation ? 'flex' : 'none';
+        }
+
+        // Only expose the free-consultation option when the student is actually eligible
+        const consultOption = document.getElementById(`${lang}-consultation-option`);
+        if (consultOption) {
+            consultOption.hidden   = !bookingState.eligibleForConsultation;
+            consultOption.disabled = !bookingState.eligibleForConsultation;
+        }
+        const lessonSelect = document.getElementById(`${lang}-lesson-type`);
+        if (lessonSelect && !bookingState.eligibleForConsultation && lessonSelect.value === 'consultation') {
+            lessonSelect.value = 'standard';
         }
 
     } catch (err) {
