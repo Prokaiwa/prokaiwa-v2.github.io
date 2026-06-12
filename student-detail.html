@@ -922,6 +922,11 @@ Keep it up! 🌟</textarea>
         .from('student_progress').select('*').eq('user_id', student.user_id).single();
       if (progress) currentStudent = { ...currentStudent, ...progress };
 
+      // Fetch engagement stats
+      const { data: stats } = await supabaseClient
+        .from('student_response_stats').select('*').eq('student_id', studentId).maybeSingle();
+      currentStudent = { ...currentStudent, _stats: stats || null };
+
       renderSidebar();
       await loadConversationHistory('7');
       await loadAssessmentHistory();
@@ -1014,6 +1019,23 @@ Keep it up! 🌟</textarea>
         <span class="info-label">Total prompts</span>
         <span class="info-value">${s.total_prompts_sent || 0}</span>
       </div>
+      ${s._stats && s._stats.first_prompt_at ? `
+      <div class="info-row">
+        <span class="info-label">Day</span>
+        <span class="info-value">Day ${s._stats.day_number}${s._stats.day_number === 7 ? ' <span style="background:#e74c3c;color:#fff;border-radius:4px;padding:0.1rem 0.45rem;font-weight:700;margin-left:0.4rem;">🎯 DAY 7</span>' : ''}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Answered (7d)</span>
+        <span class="info-value">${s._stats.prompts_answered_7d}/${s._stats.prompts_sent_7d}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Answered (total)</span>
+        <span class="info-value">${s._stats.prompts_answered}/${s._stats.prompts_sent}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Last reply</span>
+        <span class="info-value">${s._stats.last_response_at ? new Date(s._stats.last_response_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}</span>
+      </div>` : ''}
       <div class="info-row">
         <span class="info-label">LINE status</span>
         <span class="info-value">${lineStatus}</span>

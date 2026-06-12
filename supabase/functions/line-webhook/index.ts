@@ -196,24 +196,9 @@ Deno.serve(async (req) => {
         }
 
         if (pendingUser.payment_status !== 'paid') {
-          await supabase
-            .from('questionnaire_responses')
-            .update({ line_id: lineUserId })
-            .eq('user_id', pendingUser.user_id);
-
-          await supabase.from('message_log').insert({
-            user_id: pendingUser.user_id,
-            message_type: 'webhook_activation',
-            message_text: `LINE User ID captured (unpaid): ${lineUserId}`,
-            line_message_id: `activation_unpaid_${Date.now()}`
-          });
-
           await sendLineMessage(
             lineUserId,
-            `${pendingUser.given_name_romaji}さん、友だち追加ありがとうございます！😊\n\n` +
-            `お支払いが完了次第、レッスンを開始できます。\n` +
-            `👉 www.prokaiwa.com\n\n` +
-            `Thank you for adding us, ${pendingUser.given_name_romaji}! Once your payment is complete, your lessons will begin.`
+            `${pendingUser.given_name_romaji}さん、友だち追加ありがとうございます！😊\n\nお支払いの完了後、お申し込み完了ページに表示される認証コード（CONNECT-から始まるコード）をこのLINEに送ってください。それでアカウントが有効になります。\n\nThank you for adding us! After completing payment, please send the CONNECT code shown on your confirmation page to activate your account.`
           );
           continue;
         }
@@ -308,6 +293,80 @@ Deno.serve(async (req) => {
 
         if (studentError || !student) {
           console.log(`Message from unlinked LINE user: ${lineUserId}`);
+          continue;
+        }
+
+        // ── PAUSE / RESUME keyword handler ────────────────────
+        const trimmed = (event.message?.text || '').trim();
+        const upper = trimmed.toUpperCase();
+
+        if (['PAUSE', 'STOP'].includes(upper) || ['一時停止', '休止'].includes(trimmed)) {
+          const { error: pauseUpdateError } = await supabase
+            .from('questionnaire_responses')
+            .update({ messaging_paused: true, updated_at: new Date().toISOString() })
+            .eq('user_id', student.user_id);
+          if (pauseUpdateError) console.error('Failed to set messaging_paused=true:', pauseUpdateError);
+
+          const { error: pauseLogError } = await supabase.from('message_log').insert({
+            user_id: student.user_id,
+            message_type: 'system',
+            message_text: 'PAUSE received via LINE — messaging paused',
+            line_message_id: `pause_${Date.now()}`
+          });
+          if (pauseLogError) console.error('Failed to log PAUSE event:', pauseLogError);
+
+          await sendLineMessage(
+            lineUserId,
+            'かしこまりました。レッスンを一時停止しました🌸\n\n再開したいときは、いつでも「再開」と送ってください。お待ちしています！\n\nYour lessons are paused. Send "再開" or "RESUME" anytime to start again.'
+          );
+
+          fetch(`${SUPABASE_URL}/functions/v1/notify-admin`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
+            },
+            body: JSON.stringify({
+              type: 'student_paused',
+              student_name: student.given_name_romaji || 'Unknown student'
+            })
+          }).catch(e => console.error('notify-admin ping failed:', e));
+
+          continue;
+        }
+
+        if (['RESUME', 'START'].includes(upper) || ['再開'].includes(trimmed)) {
+          const { error: resumeUpdateError } = await supabase
+            .from('questionnaire_responses')
+            .update({ messaging_paused: false, updated_at: new Date().toISOString() })
+            .eq('user_id', student.user_id);
+          if (resumeUpdateError) console.error('Failed to set messaging_paused=false:', resumeUpdateError);
+
+          const { error: resumeLogError } = await supabase.from('message_log').insert({
+            user_id: student.user_id,
+            message_type: 'system',
+            message_text: 'RESUME received via LINE — messaging resumed',
+            line_message_id: `resume_${Date.now()}`
+          });
+          if (resumeLogError) console.error('Failed to log RESUME event:', resumeLogError);
+
+          await sendLineMessage(
+            lineUserId,
+            'おかえりなさい！レッスンを再開しました☀️\n\n明日の朝9時からプロンプトをお届けします。一緒にがんばりましょう💪\n\nWelcome back! Your daily prompts resume tomorrow at 9 AM JST.'
+          );
+
+          fetch(`${SUPABASE_URL}/functions/v1/notify-admin`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
+            },
+            body: JSON.stringify({
+              type: 'student_resumed',
+              student_name: student.given_name_romaji || 'Unknown student'
+            })
+          }).catch(e => console.error('notify-admin ping failed:', e));
+
           continue;
         }
 

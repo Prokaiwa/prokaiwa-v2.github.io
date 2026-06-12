@@ -20,6 +20,12 @@ const supabase = createClient(
 
 
 // =====================================================
+// FEATURE FLAGS
+// =====================================================
+
+const RETENTION_OFFERS_ENABLED = false; // offers disabled until churn volume justifies fixing handle-retention-offer
+
+// =====================================================
 // i18n DICTIONARY (Static HTML text)
 // =====================================================
 
@@ -1915,9 +1921,11 @@ const cancellationState = {
 // =====================================================
 
 function determineOffer(reason, answers) {
+    if (!RETENTION_OFFERS_ENABLED) return null;
+
     const lang = cancellationState.currentLang;
     // console.log('🎯 Determining offer for:', { reason, answers });
-    
+
     switch(reason) {
         case 'expensive':
     // If they said they'd stay for affordable option

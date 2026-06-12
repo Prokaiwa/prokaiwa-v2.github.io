@@ -181,10 +181,51 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ============================================================
+    // PAID-BUT-UNLINKED CHECK — students who paid but never
+    // connected their LINE account after 48 hours
+    // ============================================================
+    let paidUnlinkedCount = 0
+
+    const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()
+
+    const { data: unlinkedRows, error: unlinkedError } = await supabase
+      .from('questionnaire_responses')
+      .select('id, name, given_name_romaji, email, created_at')
+      .eq('payment_status', 'paid')
+      .eq('subscription_status', 'active')
+      .is('line_id', null)
+      .in('plan', ['line', 'power_lite', 'power_pro'])
+      .lt('created_at', fortyEightHoursAgo)
+
+    if (unlinkedError) {
+      console.error('❌ Error fetching paid-unlinked students:', unlinkedError)
+    } else if (unlinkedRows && unlinkedRows.length > 0) {
+      paidUnlinkedCount = unlinkedRows.length
+      console.log(`🚨 Found ${paidUnlinkedCount} paid student(s) without LINE connection`)
+
+      fetch(`${SUPABASE_URL}/functions/v1/notify-admin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
+        },
+        body: JSON.stringify({
+          type: 'paid_unlinked',
+          students: unlinkedRows.map(s => ({
+            name:             s.given_name_romaji || s.name,
+            email:            s.email,
+            days_since_signup: Math.floor((Date.now() - new Date(s.created_at).getTime()) / 86400000)
+          }))
+        })
+      }).catch(e => console.error('Paid-unlinked notify-admin failed:', e))
+    }
+
     const summary = {
       success: true,
       totalStudents: students.length,
       skippedResponded: skipped,
+      paidUnlinked: paidUnlinkedCount,
       reminders: {
         day3: remindersDay3,
         day5: remindersDay5,

@@ -82,6 +82,31 @@ function buildEmailHtml(payload: Record<string, unknown>): { subject: string; ht
     badgeColor = '#8e44ad'
     badgeLabel = 'PAYMENT FAILURE'
     intro = 'A Stripe payment event failed or was abandoned.'
+  } else if (type === 'daily_heartbeat') {
+    const failed = Number(payload.failed || 0)
+    subject = failed > 0
+      ? `⚠️ Daily prompts: ${payload.sent} sent, ${failed} FAILED`
+      : `☀️ Daily prompts: ${payload.sent} sent`
+    badgeColor = failed > 0 ? '#c0392b' : '#27ae60'
+    badgeLabel = 'DAILY HEARTBEAT'
+    intro = failed > 0
+      ? 'The morning prompt run finished WITH FAILURES — check the failed students below.'
+      : 'The morning prompt run completed normally.'
+  } else if (type === 'paid_unlinked') {
+    subject = `🚨 Paying student(s) not connected to LINE`
+    badgeColor = '#c0392b'
+    badgeLabel = 'PAID BUT UNLINKED'
+    intro = 'These students have paid but never linked LINE — they are receiving NOTHING. Reach out to them today.'
+  } else if (type === 'student_paused') {
+    subject = `⏸ ${payload.student_name} paused lessons via LINE`
+    badgeColor = '#e67e22'
+    badgeLabel = 'STUDENT PAUSED'
+    intro = 'A student paused their lessons by sending PAUSE on LINE. This can be a churn signal — consider checking in.'
+  } else if (type === 'student_resumed') {
+    subject = `▶️ ${payload.student_name} resumed lessons`
+    badgeColor = '#27ae60'
+    badgeLabel = 'STUDENT RESUMED'
+    intro = 'A student resumed their lessons via LINE.'
   }
 
   const detailRows = [
@@ -101,6 +126,13 @@ function buildEmailHtml(payload: Record<string, unknown>): { subject: string; ht
     row('Session ID',       payload.session_id         ? String(payload.session_id)   : null),
     row('Stripe Event',     payload.stripe_event_type  ? String(payload.stripe_event_type) : null),
     row('Stripe Customer',  payload.stripe_customer_id ? String(payload.stripe_customer_id) : null),
+    row('Prompts sent',     payload.sent !== undefined ? String(payload.sent) : null),
+    row('Failed',           payload.failed ? String(payload.failed) : null),
+    row('No prompt found',  payload.no_prompt ? String(payload.no_prompt) : null),
+    row('Failed students',  payload.failed_names ? String(payload.failed_names) : null),
+    row('Active students',  payload.active_students !== undefined ? String(payload.active_students) : null),
+    row('Growth note',      (payload.active_students !== undefined && Number(payload.active_students) >= 5) ? '📈 5+ active students — revisit retention offers (currently disabled)' : null),
+    row('Unlinked students', Array.isArray(payload.students) ? payload.students.map((s: any) => `${s.name} (${s.email}) — ${s.days_since_signup} days since signup`).join('<br>') : null),
   ].filter(Boolean).join('')
 
   const html = `

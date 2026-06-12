@@ -1161,6 +1161,7 @@
   // ============================================================
   let currentTeacher   = null;
   let allStudentsData  = [];
+  let responseStats    = {};
   let dayQueues        = { day6: [], day5: [], day7other: [], day1to4_line: [] };
   let completedToday   = new Set();
   let queueItemsMap    = new Map();
@@ -1171,6 +1172,29 @@
   let audioChunks      = [];
   let recordingStudentId = null;
   let draftStore = {};
+
+  // ============================================================
+  // RESPONSE STATS — per-student engagement metrics from view
+  // ============================================================
+  async function loadResponseStats() {
+    try {
+      const { data, error } = await supabaseClient.from('student_response_stats').select('*');
+      if (error) { console.error('loadResponseStats:', error); return; }
+      responseStats = Object.fromEntries((data || []).map(s => [s.student_id, s]));
+    } catch (e) { console.error('loadResponseStats:', e); }
+  }
+
+  function statsStripHtml(studentId) {
+    const st = responseStats[studentId];
+    if (!st || !st.first_prompt_at) return '';
+    const day = st.day_number;
+    const lastReply = st.last_response_at
+      ? Math.floor((Date.now() - new Date(st.last_response_at).getTime()) / 86400000)
+      : null;
+    const lastTxt = lastReply === null ? 'no replies yet' : lastReply === 0 ? 'replied today' : `last reply ${lastReply}d ago`;
+    const day7 = day === 7 ? '<span style="background:#e74c3c;color:#fff;border-radius:4px;padding:0.1rem 0.45rem;font-weight:700;margin-left:0.4rem;">🎯 DAY 7</span>' : '';
+    return `<div style="font-size:0.78rem;color:#777;margin-top:0.25rem;">📅 Day ${day} · ✅ ${st.prompts_answered_7d}/${st.prompts_sent_7d} answered (7d) · ${lastTxt}${day7}</div>`;
+  }
 
   // ============================================================
   // XSS PROTECTION — escapes user-provided strings before innerHTML
@@ -1343,6 +1367,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
     }
 
     await loadCompletedToday();
+    await loadResponseStats();
     await loadDayTypeQueue();
     await loadVideoLessons();
     loadCancellationNotifications();
@@ -1709,6 +1734,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
               ${pendingBadgeHtml(qi.pendingCount || 1)}
             </div>
             <div class="student-meta">Week ${qi.currentWeek || 1} · Day 6 · Real Talk response received</div>
+            ${statsStripHtml(qi.studentId)}
           </div>
           <div class="student-actions">
             <button class="btn-expand" onclick="event.stopPropagation(); toggleCard('${ck}')">
@@ -1789,6 +1815,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
               ${pendingBadgeHtml(qi.pendingCount || 1)}
             </div>
             <div class="student-meta">Week ${qi.currentWeek || 1} · Day 5 · Quiz response received</div>
+            ${statsStripHtml(qi.studentId)}
           </div>
           <div class="student-actions">
             <button class="btn-expand" onclick="event.stopPropagation(); toggleCard('${ck}')">
@@ -1876,6 +1903,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
               ${pendingBadgeHtml(qi.pendingCount || 1)}
             </div>
             <div class="student-meta">Week ${qi.currentWeek || 1} · ${dayLabel} · ${sectionLabel}</div>
+            ${statsStripHtml(qi.studentId)}
           </div>
           <div class="student-actions">
             <button class="btn-expand" onclick="event.stopPropagation(); toggleCard('${ck}')">
@@ -2545,6 +2573,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
               ${isDone ? '<span class="priority-badge done-badge">✓ Replied</span>' : ''}
             </div>
             <div class="student-meta">Week ${qi.currentWeek||1} · ${dayLabel} · Self-practice response</div>
+            ${statsStripHtml(qi.studentId)}
           </div>
           <div class="student-actions">
             <button class="btn-expand" onclick="event.stopPropagation();toggleCard('${ck}')">

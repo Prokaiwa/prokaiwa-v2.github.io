@@ -237,6 +237,27 @@ Deno.serve(async (req) => {
       }
     }
 
+    const sentCount      = results.filter(r => r.status === 'sent').length;
+    const failedCount    = results.filter(r => r.status === 'failed').length;
+    const noPromptCount  = results.filter(r => r.status === 'no_prompt').length;
+    const failedNames    = results.filter(r => r.status === 'failed').map(r => r.student).join(', ');
+
+    fetch(`${SUPABASE_URL}/functions/v1/notify-admin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
+      },
+      body: JSON.stringify({
+        type:            'daily_heartbeat',
+        sent:            sentCount,
+        failed:          failedCount,
+        no_prompt:       noPromptCount,
+        failed_names:    failedNames || null,
+        active_students: responses.length
+      })
+    }).catch(e => console.error('Heartbeat notify-admin failed:', e));
+
     return new Response(
       JSON.stringify({
         success: true,

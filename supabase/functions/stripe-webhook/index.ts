@@ -227,7 +227,7 @@ Deno.serve(async (req) => {
     // Check if user already has a line_id (added LINE before paying)
     const { data: user } = await supabaseAdmin
       .from('questionnaire_responses')
-      .select('line_id, given_name_romaji, plan')
+      .select('line_id, given_name_romaji, plan, line_connect_token, email')
       .eq('user_id', userId)
       .single()
 
@@ -249,6 +249,93 @@ Deno.serve(async (req) => {
         console.log('✅ Welcome message sent via LINE')
       } catch (lineError) {
         console.error('⚠️ LINE welcome message failed:', lineError)
+      }
+    } else if (user && !user.line_id && user.line_connect_token) {
+      // Student paid but has NOT yet linked LINE — email them their CONNECT code
+      try {
+        const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
+        if (!RESEND_API_KEY) {
+          console.error('RESEND_API_KEY not set — cannot send CONNECT email')
+        } else {
+          const recipient = session.customer_details?.email ?? user.email
+          if (!recipient) {
+            console.error('⚠️ No recipient email available — cannot send CONNECT email for user:', userId)
+          } else {
+            const connectCode = `CONNECT-${user.line_connect_token}`
+            const deepLink = `https://line.me/R/oaMessage/%40845irjbc?text=${encodeURIComponent(connectCode)}`
+            const greeting = user.given_name_romaji ? `${user.given_name_romaji}さん、こんにちは！` : 'こんにちは！'
+
+            const htmlBody = `<!DOCTYPE html>
+<html lang="ja">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LINE接続のお願い</title></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;max-width:600px;width:100%;">
+        <tr><td style="background:#06C755;padding:24px 32px;">
+          <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:bold;">Prokaiwa</h1>
+        </td></tr>
+        <tr><td style="padding:32px;">
+          <p style="margin:0 0 16px;font-size:16px;color:#333333;">${greeting}</p>
+          <p style="margin:0 0 24px;font-size:16px;color:#333333;">お支払いありがとうございます！レッスン開始まであと1ステップです。</p>
+
+          <h2 style="margin:0 0 16px;font-size:18px;color:#222222;">LINEとの連携手順</h2>
+          <ol style="margin:0 0 24px;padding-left:20px;color:#333333;font-size:15px;line-height:1.8;">
+            <li>LINEで「Prokaiwa」を友だち追加してください：<br>
+              <a href="${deepLink}" style="color:#06C755;word-break:break-all;">${deepLink}</a><br>
+              <span style="font-size:13px;color:#666666;">（または：<a href="https://line.me/R/ti/p/%40845irjbc" style="color:#06C755;">https://line.me/R/ti/p/%40845irjbc</a>）</span>
+            </li>
+            <li style="margin-top:8px;">下記の認証コードをLINEで送信してください。</li>
+          </ol>
+
+          <div style="background:#f0faf0;border:2px solid #06C755;border-radius:8px;padding:20px;text-align:center;margin:0 0 24px;">
+            <p style="margin:0 0 8px;font-size:13px;color:#666666;">認証コード</p>
+            <p style="margin:0;font-size:28px;font-weight:bold;color:#06C755;letter-spacing:2px;font-family:monospace;">${connectCode}</p>
+          </div>
+
+          <div style="text-align:center;margin:0 0 24px;">
+            <a href="${deepLink}" style="display:inline-block;background:#06C755;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:6px;font-size:16px;font-weight:bold;">「LINEで認証コードを送る」</a>
+          </div>
+
+          <p style="margin:0 0 24px;font-size:14px;color:#555555;">コードを送ると、翌朝9時（日本時間）から毎日の英会話プロンプトが届きます☀️</p>
+
+          <hr style="border:none;border-top:1px solid #eeeeee;margin:24px 0;">
+          <p style="margin:0 0 16px;font-size:14px;color:#666666;">Thank you for your payment! One last step: add Prokaiwa on LINE and send the code above to start your daily lessons.</p>
+
+          <p style="margin:0;font-size:14px;">
+            <a href="https://www.prokaiwa.com/dashboard.html" style="color:#06C755;">ダッシュボードを開く</a>
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+            const resendResp = await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${RESEND_API_KEY}`
+              },
+              body: JSON.stringify({
+                from: 'Prokaiwa <alerts@prokaiwa.com>',
+                to: [recipient],
+                subject: '【Prokaiwa】LINE接続のお願い — あと1ステップでレッスン開始！',
+                html: htmlBody
+              })
+            })
+
+            if (!resendResp.ok) {
+              const resendError = await resendResp.text()
+              console.error('⚠️ Resend API error sending CONNECT email:', resendError)
+            } else {
+              console.log('📧 CONNECT email sent to', recipient)
+            }
+          }
+        }
+      } catch (connectEmailError) {
+        console.error('⚠️ CONNECT email branch threw unexpectedly:', connectEmailError)
       }
     }
   }

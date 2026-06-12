@@ -390,4 +390,18 @@
     text: document.title || window.location.pathname
   });
 
+  // ==========================================================
+  // PAGE VIEW TRACKING
+  // Unlike breadcrumbs (memory-only until an error), every page
+  // view is persisted so we can see real dashboard/page usage.
+  // ==========================================================
+  insertRow('breadcrumb_log', {
+    session_id: SESSION_ID,
+    sequence_number: 0,
+    event_type: 'page_view',
+    element_text: getCurrentUserEmail() || null,
+    page_url: window.location.href,
+    event_timestamp: new Date().toISOString()
+  });
+
 })();
