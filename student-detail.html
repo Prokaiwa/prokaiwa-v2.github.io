@@ -643,6 +643,7 @@
                     <div class="tpl-chip active" onclick="applyTpl(this,'adhoc','blank')">✏️ Blank</div>
                   </div>
                   <textarea class="compose-textarea" id="compose-adhoc" placeholder="Write your message to the student..."></textarea>
+                  <div id="emoji-mount-compose-adhoc"></div>
                 </div>
 
                 <!-- Voice panel -->
@@ -720,6 +721,7 @@
                 <div id="detail-text-panel-day6">
                   <textarea class="compose-textarea" id="compose-day6"
                     placeholder="e.g. Great reaction — that 'Oh no way!' sounded completely natural! 🎉 Try adding a follow-up question next time to keep the conversation going."></textarea>
+                  <div id="emoji-mount-compose-day6"></div>
                 </div>
 
                 <!-- Voice panel -->
@@ -790,6 +792,7 @@
 The answer was [A or B] — [brief reason why].
 
 Your written version was great too. Nice effort! 💪</textarea>
+                <div id="emoji-mount-compose-quiz"></div>
                 <div class="compose-actions">
                   <button class="btn-secondary" onclick="clearCompose('quiz')">Reset Template</button>
                   <button class="btn-send-line" id="send-quiz-btn" onclick="sendComposerMessage('quiz')">
@@ -812,6 +815,7 @@ Your written version was great too. Nice effort! 💪</textarea>
 💡 Quick tip: [One small correction or suggestion]
 
 Keep it up! 🌟</textarea>
+                <div id="emoji-mount-compose-weekly"></div>
                 <div class="compose-actions">
                   <button class="btn-secondary" onclick="clearCompose('weekly')">Clear</button>
                   <button class="btn-send-line" id="send-weekly-btn" onclick="sendComposerMessage('weekly')">
@@ -873,6 +877,40 @@ Keep it up! 🌟</textarea>
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  // ============================================================
+  // EMOJI PICKER HELPERS
+  // ============================================================
+  const EMOJI_SET = ['😊','👏','🎉','💪','🌟','✨','🔥','✅','👍','🙌','❤️','😄','🎯','📝','💡','📚','🗣️','🎧','🎤','❓','❗','🌸','☀️','🚀'];
+
+  function emojiPickerHtml(targetId) {
+    const pickerId = `emoji-picker-${targetId}`;
+    const buttons = EMOJI_SET.map(e =>
+      `<button type="button" onclick="insertEmoji('${targetId}','${e}')" style="border:none;background:none;font-size:1.15rem;cursor:pointer;padding:0.15rem 0.25rem;line-height:1;">${e}</button>`
+    ).join('');
+    return `
+      <div style="margin-top:0.3rem;">
+        <button type="button" onclick="toggleEmojiPicker('${pickerId}')" title="Emoji" style="border:1px solid #ddd;background:#fafafa;border-radius:6px;padding:0.2rem 0.5rem;cursor:pointer;font-size:0.9rem;">😊 ▾</button>
+        <div id="${pickerId}" style="display:none;background:#fff;border:1px solid #ddd;border-radius:8px;padding:0.35rem 0.4rem;margin-top:0.3rem;box-shadow:0 4px 14px rgba(0,0,0,0.12);max-width:340px;flex-wrap:wrap;">${buttons}</div>
+      </div>`;
+  }
+
+  function toggleEmojiPicker(pickerId) {
+    const el = document.getElementById(pickerId);
+    if (!el) return;
+    const open = el.style.display !== 'none';
+    el.style.display = open ? 'none' : 'flex';
+  }
+
+  function insertEmoji(targetId, emoji) {
+    const ta = document.getElementById(targetId);
+    if (!ta) return;
+    const s = ta.selectionStart ?? ta.value.length;
+    const e = ta.selectionEnd ?? s;
+    ta.value = ta.value.slice(0, s) + emoji + ta.value.slice(e);
+    ta.focus();
+    ta.selectionStart = ta.selectionEnd = s + emoji.length;
   }
 
   const feedbackTemplates = {
@@ -2077,8 +2115,20 @@ Keep it up! 🌟</textarea>
     return date.toLocaleDateString('en-US', { month:'short', day:'numeric' });
   }
 
+  // ============================================================
+  // EMOJI PICKER INIT — populate mount divs for static composer panels
+  // ============================================================
+  function initEmojiPickers() {
+    ['compose-adhoc', 'compose-day6', 'compose-quiz', 'compose-weekly'].forEach(targetId => {
+      const mount = document.getElementById(`emoji-mount-${targetId}`);
+      if (!mount) return;
+      mount.innerHTML = emojiPickerHtml(targetId);
+    });
+  }
+
   // Start
   init();
+  initEmojiPickers();
   </script>
 </body>
 </html>

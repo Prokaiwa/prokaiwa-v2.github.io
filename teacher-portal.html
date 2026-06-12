@@ -1215,7 +1215,41 @@
       .replace(/'/g, '&#039;');
   }
 
-    
+  // ============================================================
+  // EMOJI PICKER HELPERS
+  // ============================================================
+  const EMOJI_SET = ['😊','👏','🎉','💪','🌟','✨','🔥','✅','👍','🙌','❤️','😄','🎯','📝','💡','📚','🗣️','🎧','🎤','❓','❗','🌸','☀️','🚀'];
+
+  function emojiPickerHtml(targetId) {
+    const pickerId = `emoji-picker-${targetId}`;
+    const buttons = EMOJI_SET.map(e =>
+      `<button type="button" onclick="insertEmoji('${targetId}','${e}')" style="border:none;background:none;font-size:1.15rem;cursor:pointer;padding:0.15rem 0.25rem;line-height:1;">${e}</button>`
+    ).join('');
+    return `
+      <div style="margin-top:0.3rem;">
+        <button type="button" onclick="toggleEmojiPicker('${pickerId}')" title="Emoji" style="border:1px solid #ddd;background:#fafafa;border-radius:6px;padding:0.2rem 0.5rem;cursor:pointer;font-size:0.9rem;">😊 ▾</button>
+        <div id="${pickerId}" style="display:none;background:#fff;border:1px solid #ddd;border-radius:8px;padding:0.35rem 0.4rem;margin-top:0.3rem;box-shadow:0 4px 14px rgba(0,0,0,0.12);max-width:340px;flex-wrap:wrap;">${buttons}</div>
+      </div>`;
+  }
+
+  function toggleEmojiPicker(pickerId) {
+    const el = document.getElementById(pickerId);
+    if (!el) return;
+    const open = el.style.display !== 'none';
+    el.style.display = open ? 'none' : 'flex';
+  }
+
+  function insertEmoji(targetId, emoji) {
+    const ta = document.getElementById(targetId);
+    if (!ta) return;
+    const s = ta.selectionStart ?? ta.value.length;
+    const e = ta.selectionEnd ?? s;
+    ta.value = ta.value.slice(0, s) + emoji + ta.value.slice(e);
+    ta.focus();
+    ta.selectionStart = ta.selectionEnd = s + emoji.length;
+  }
+
+
   // ============================================================
   // URGENCY HELPERS
   // ============================================================
@@ -1768,6 +1802,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
               <p class="reply-tip">Keep it short and encouraging — 1 to 2 sentences. React to their response, give one tip if needed.</p>
               <textarea class="feedback-textarea short" id="feedback-${ck}"
                 placeholder="e.g. Great reaction — that 'Oh no way!' sounded completely natural! 🎉 Try adding a follow-up question next time to keep the conversation going."></textarea>
+              ${emojiPickerHtml(`feedback-${ck}`)}
             </div>
 
             <!-- Voice panel -->
@@ -1847,6 +1882,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
             <!-- Text panel -->
             <div id="text-panel-${ck}">
               <textarea class="feedback-textarea" id="feedback-${ck}" style="min-height:160px;">${feedbackTemplates.quiz_correction}</textarea>
+              ${emojiPickerHtml(`feedback-${ck}`)}
             </div>
 
             <!-- Voice panel -->
@@ -1950,6 +1986,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
                 <button class="toggle-pill"        id="pill-free-${ck}"     onclick="switchMode('${ck}','free')">✏️ Free Write</button>
               </div>
               <textarea class="feedback-textarea" id="feedback-${ck}" placeholder="Write your assessment here...">${feedbackTemplates[defaultTpl]}</textarea>
+              ${emojiPickerHtml(`feedback-${ck}`)}
               <div class="skills-accordion" id="skills-accordion-${ck}">
                 <div class="skills-accordion-header" onclick="toggleSkillsAccordion('${ck}')">
                   <span>⚙️ Update skill scores (optional)</span>
@@ -2602,6 +2639,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
             <div id="text-panel-${ck}">
               <p class="reply-tip">Keep it short and warm — one sentence is plenty!</p>
               <textarea class="feedback-textarea short" id="feedback-${ck}" placeholder="Quick reply...">${feedbackTemplates.quick_reply}</textarea>
+              ${emojiPickerHtml(`feedback-${ck}`)}
             </div>
             <div id="voice-panel-${ck}" style="display:none;">
               <p class="reply-tip">A quick voice message feels personal and motivating!</p>
