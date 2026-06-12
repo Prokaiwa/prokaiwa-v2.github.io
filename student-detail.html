@@ -880,6 +880,86 @@ Keep it up! 🌟</textarea>
   }
 
   // ============================================================
+  // VOICE PLAYER HELPERS
+  // ============================================================
+  let _vpSeq = 0;
+  const _vpAudios = {};   // playerId → HTMLAudioElement
+  let _vpActive = null;   // playerId currently playing
+
+  function fmtVoiceTime(sec) {
+    if (!isFinite(sec) || isNaN(sec)) return '0:00';
+    const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  function voicePlayerHtml(src) {
+    const id = `vp-${++_vpSeq}`;
+    return `
+    <div id="${id}" data-src="${src.replace(/"/g, '&quot;')}" style="display:flex;align-items:center;gap:0.6rem;background:#fff;border:1px solid #d8dce8;border-radius:999px;padding:0.4rem 0.9rem 0.4rem 0.4rem;max-width:300px;margin-top:0.35rem;">
+      <button type="button" onclick="event.stopPropagation();toggleVoicePlayer('${id}')" style="flex:0 0 auto;width:34px;height:34px;border:none;border-radius:50%;background:#5c6bc0;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.8rem;">
+        <i class="fas fa-play" id="${id}-icon"></i>
+      </button>
+      <div onclick="event.stopPropagation();seekVoicePlayer(event,'${id}')" style="flex:1;height:6px;background:#e8eaf6;border-radius:3px;cursor:pointer;position:relative;">
+        <div id="${id}-fill" style="height:100%;width:0%;background:#5c6bc0;border-radius:3px;"></div>
+      </div>
+      <span id="${id}-time" style="flex:0 0 auto;font-size:0.72rem;color:#888;font-variant-numeric:tabular-nums;">0:00</span>
+    </div>`;
+  }
+
+  function toggleVoicePlayer(playerId) {
+    const el = document.getElementById(playerId);
+    if (!el) return;
+    const icon = document.getElementById(`${playerId}-icon`);
+    let audio = _vpAudios[playerId];
+
+    if (_vpActive && _vpActive !== playerId && _vpAudios[_vpActive]) {
+      _vpAudios[_vpActive].pause();
+    }
+
+    if (!audio) {
+      audio = new Audio(el.dataset.src);
+      _vpAudios[playerId] = audio;
+      icon.className = 'fas fa-spinner fa-spin';
+      audio.addEventListener('loadedmetadata', () => {
+        const t = document.getElementById(`${playerId}-time`);
+        if (t) t.textContent = `0:00 / ${fmtVoiceTime(audio.duration)}`;
+      });
+      audio.addEventListener('timeupdate', () => {
+        const fill = document.getElementById(`${playerId}-fill`);
+        const t = document.getElementById(`${playerId}-time`);
+        if (fill && isFinite(audio.duration) && audio.duration > 0) fill.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
+        if (t) t.textContent = `${fmtVoiceTime(audio.currentTime)} / ${fmtVoiceTime(audio.duration)}`;
+      });
+      audio.addEventListener('play',  () => { icon.className = 'fas fa-pause'; _vpActive = playerId; });
+      audio.addEventListener('pause', () => { if (icon.className !== 'fas fa-spinner fa-spin') icon.className = 'fas fa-play'; });
+      audio.addEventListener('ended', () => {
+        icon.className = 'fas fa-play';
+        const fill = document.getElementById(`${playerId}-fill`);
+        if (fill) fill.style.width = '0%';
+        audio.currentTime = 0;
+      });
+      audio.addEventListener('canplay', () => { if (audio.paused === false || icon.className.includes('spinner')) { /* spinner cleared by play handler */ } });
+      audio.addEventListener('error', () => {
+        icon.className = 'fas fa-exclamation-triangle';
+        const t = document.getElementById(`${playerId}-time`);
+        if (t) t.textContent = 'unavailable';
+      });
+      audio.play().catch(() => {});
+      return;
+    }
+    if (audio.paused) audio.play().catch(() => {}); else audio.pause();
+  }
+
+  function seekVoicePlayer(event, playerId) {
+    const audio = _vpAudios[playerId];
+    if (!audio || !isFinite(audio.duration) || audio.duration <= 0) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
+    audio.currentTime = ratio * audio.duration;
+  }
+
+
+  // ============================================================
   // EMOJI PICKER HELPERS
   // ============================================================
   const EMOJI_SET = ['😊','👏','🎉','💪','🌟','✨','🔥','✅','👍','🙌','❤️','😄','🎯','📝','💡','📚','🗣️','🎧','🎤','❓','❗','🌸','☀️','🚀'];
@@ -1064,8 +1144,8 @@ Keep it up! 🌟</textarea>
         <span class="info-value">Day ${s._stats.day_number} of 7${s._stats.day_number === 7 ? ' <span style="background:#e74c3c;color:#fff;border-radius:4px;padding:0.1rem 0.45rem;font-weight:700;margin-left:0.4rem;">🎯 DECISION DAY</span>' : ''}</span>
       </div>` : ''}
       <div class="info-row">
-        <span class="info-label">Answered, last 7 days</span>
-        <span class="info-value">${s._stats.prompts_answered_7d}/${s._stats.prompts_sent_7d}</span>
+        <span class="info-label">Replied, last 7 days</span>
+        <span class="info-value">${s._stats.response_days_7d}/7 days</span>
       </div>
       <div class="info-row">
         <span class="info-label">Answered (total)</span>
@@ -1268,7 +1348,7 @@ Keep it up! 🌟</textarea>
             html += `<div style="margin:0.6rem 0; padding:0.8rem 1rem; background:white; border:1px solid #e8e8e8; border-radius:6px; font-size:0.88rem; overflow:hidden; word-break:break-word;">
               <div style="font-size:0.75rem; color:#666; margin-bottom:0.3rem;">${time} · 👤 ${sName}</div>`;
             if (msg.message_text) html += `<p style="margin:0.25rem 0; color:#333;">"${escapeHtml(msg.message_text)}"</p>`;
-            if (msg.media_type === 'audio') html += `<audio controls style="width:100%; max-width:340px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}&token=${mediaAuthToken}">Audio not supported.</audio>`;
+            if (msg.media_type === 'audio') { const _audioSrc = 'https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=' + encodeURIComponent(msg.message_id) + '&token=' + mediaAuthToken; html += voicePlayerHtml(_audioSrc); }
             if (msg.media_type === 'video') html += `<video controls style="width:100%; max-width:340px; border-radius:4px; margin-top:0.35rem;"><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}&token=${mediaAuthToken}">Video not supported.</video>`;
             if (msg.media_type === 'image') html += `<img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${encodeURIComponent(msg.message_id)}&token=${mediaAuthToken}" style="max-width:100%; max-height:240px; border-radius:4px; margin-top:0.35rem; cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="Student image">`;
             html += `</div>`;
@@ -1281,9 +1361,7 @@ Keep it up! 🌟</textarea>
               ${isVoice
                 ? `<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
                      <span style="font-size:0.8rem;color:#666;">🎙 Voice message</span>
-                     <audio controls style="height:36px; max-width:100%; border-radius:4px;">
-                       <source src="${escapeHtml(audioUrl)}">
-                     </audio>
+                     ${voicePlayerHtml(audioUrl)}
                    </div>`
                 : `<p style="margin:0; color:#333; white-space:pre-wrap;">${escapeHtml(msg.feedback_text)}</p>`
               }

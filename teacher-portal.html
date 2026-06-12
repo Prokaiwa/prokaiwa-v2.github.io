@@ -1199,7 +1199,7 @@
           ? '<span style="background:#e74c3c;color:#fff;border-radius:4px;padding:0.1rem 0.45rem;font-weight:700;">🎯 TRIAL DAY 7 — decision day</span> · '
           : `🌱 Trial day ${day} · `)
       : '';
-    return `<div style="font-size:0.78rem;color:#777;margin-top:0.25rem;">${trialTxt}✅ answered ${st.prompts_answered_7d} of last ${st.prompts_sent_7d} prompts · ${lastTxt}</div>`;
+    return `<div style="font-size:0.78rem;color:#777;margin-top:0.25rem;">${trialTxt}🗓 replied ${st.response_days_7d} of last 7 days · ${lastTxt}</div>`;
   }
 
   // ============================================================
@@ -1214,6 +1214,86 @@
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
   }
+
+  // ============================================================
+  // VOICE PLAYER HELPERS
+  // ============================================================
+  let _vpSeq = 0;
+  const _vpAudios = {};   // playerId → HTMLAudioElement
+  let _vpActive = null;   // playerId currently playing
+
+  function fmtVoiceTime(sec) {
+    if (!isFinite(sec) || isNaN(sec)) return '0:00';
+    const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  function voicePlayerHtml(src) {
+    const id = `vp-${++_vpSeq}`;
+    return `
+    <div id="${id}" data-src="${src.replace(/"/g, '&quot;')}" style="display:flex;align-items:center;gap:0.6rem;background:#fff;border:1px solid #d8dce8;border-radius:999px;padding:0.4rem 0.9rem 0.4rem 0.4rem;max-width:300px;margin-top:0.35rem;">
+      <button type="button" onclick="event.stopPropagation();toggleVoicePlayer('${id}')" style="flex:0 0 auto;width:34px;height:34px;border:none;border-radius:50%;background:#5c6bc0;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.8rem;">
+        <i class="fas fa-play" id="${id}-icon"></i>
+      </button>
+      <div onclick="event.stopPropagation();seekVoicePlayer(event,'${id}')" style="flex:1;height:6px;background:#e8eaf6;border-radius:3px;cursor:pointer;position:relative;">
+        <div id="${id}-fill" style="height:100%;width:0%;background:#5c6bc0;border-radius:3px;"></div>
+      </div>
+      <span id="${id}-time" style="flex:0 0 auto;font-size:0.72rem;color:#888;font-variant-numeric:tabular-nums;">0:00</span>
+    </div>`;
+  }
+
+  function toggleVoicePlayer(playerId) {
+    const el = document.getElementById(playerId);
+    if (!el) return;
+    const icon = document.getElementById(`${playerId}-icon`);
+    let audio = _vpAudios[playerId];
+
+    if (_vpActive && _vpActive !== playerId && _vpAudios[_vpActive]) {
+      _vpAudios[_vpActive].pause();
+    }
+
+    if (!audio) {
+      audio = new Audio(el.dataset.src);
+      _vpAudios[playerId] = audio;
+      icon.className = 'fas fa-spinner fa-spin';
+      audio.addEventListener('loadedmetadata', () => {
+        const t = document.getElementById(`${playerId}-time`);
+        if (t) t.textContent = `0:00 / ${fmtVoiceTime(audio.duration)}`;
+      });
+      audio.addEventListener('timeupdate', () => {
+        const fill = document.getElementById(`${playerId}-fill`);
+        const t = document.getElementById(`${playerId}-time`);
+        if (fill && isFinite(audio.duration) && audio.duration > 0) fill.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
+        if (t) t.textContent = `${fmtVoiceTime(audio.currentTime)} / ${fmtVoiceTime(audio.duration)}`;
+      });
+      audio.addEventListener('play',  () => { icon.className = 'fas fa-pause'; _vpActive = playerId; });
+      audio.addEventListener('pause', () => { if (icon.className !== 'fas fa-spinner fa-spin') icon.className = 'fas fa-play'; });
+      audio.addEventListener('ended', () => {
+        icon.className = 'fas fa-play';
+        const fill = document.getElementById(`${playerId}-fill`);
+        if (fill) fill.style.width = '0%';
+        audio.currentTime = 0;
+      });
+      audio.addEventListener('canplay', () => { if (audio.paused === false || icon.className.includes('spinner')) { /* spinner cleared by play handler */ } });
+      audio.addEventListener('error', () => {
+        icon.className = 'fas fa-exclamation-triangle';
+        const t = document.getElementById(`${playerId}-time`);
+        if (t) t.textContent = 'unavailable';
+      });
+      audio.play().catch(() => {});
+      return;
+    }
+    if (audio.paused) audio.play().catch(() => {}); else audio.pause();
+  }
+
+  function seekVoicePlayer(event, playerId) {
+    const audio = _vpAudios[playerId];
+    if (!audio || !isFinite(audio.duration) || audio.duration <= 0) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
+    audio.currentTime = ratio * audio.duration;
+  }
+
 
   // ============================================================
   // EMOJI PICKER HELPERS
@@ -2230,7 +2310,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
             const mid = encodeURIComponent(msg.message_id || msg.line_message_id || '');
             html += `<div class="conv-row student"><div class="conv-avatar">${sInit}</div><div><div class="conv-bubble">`;
             if (msg.message_text) html += escapeHtml(msg.message_text);
-            if (msg.media_type === 'audio') html += `<div class="conv-media"><audio controls><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}">Audio not supported.</audio></div>`;
+            if (msg.media_type === 'audio') { const _audioSrc1 = 'https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=' + mid + '&token=' + mediaAuthToken; html += `<div class="conv-media">${voicePlayerHtml(_audioSrc1)}</div>`; }
             if (msg.media_type === 'video') html += `<div class="conv-media"><video controls><source src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}">Video not supported.</video></div>`;
             if (msg.media_type === 'image') html += `<div class="conv-media"><img src="https://luyzyzefgintksydmwoh.supabase.co/functions/v1/get-line-media?messageId=${mid}&token=${mediaAuthToken}" onclick="window.open(this.src,'_blank')" alt="Photo"></div>`;
             html += `</div><div class="conv-time">${ts}</div></div></div>`;
@@ -2241,7 +2321,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
           } else if (msg.message_type === 'survey_token_sent') {
             html += `<div class="conv-row system"><div class="conv-bubble">📋 Needs survey sent · ${ts}</div></div>`;
           } else if (msg.message_type === 'audio_prompt') {
-            html += `<div class="conv-row prompt-r"><div class="conv-bubble"><span class="conv-label">🎵 Listening Audio · ${ts}</span>${msg.message_text ? `<div class="conv-media"><audio controls><source src="${escapeHtml(msg.message_text)}">Audio not supported.</audio></div>` : 'Audio URL not recorded.'}</div></div>`;
+            html += `<div class="conv-row prompt-r"><div class="conv-bubble"><span class="conv-label">🎵 Listening Audio · ${ts}</span>${msg.message_text ? `<div class="conv-media">${voicePlayerHtml(msg.message_text)}</div>` : 'Audio URL not recorded.'}</div></div>`;
           }
         } else if (msg._type === 'feedback') {
           if (msg.feedback_type === 'marked_complete') {
@@ -2250,7 +2330,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
             const hasAudio = msg.audio_url && msg.feedback_text && msg.feedback_text.startsWith('[Voice message]');
             html += `<div class="conv-row teacher"><div><div class="conv-bubble"><span class="conv-label right">You · ${ts}</span>`;
             if (hasAudio) {
-              html += `<div class="conv-media"><audio controls><source src="${escapeHtml(msg.audio_url)}">Audio not supported.</audio></div>`;
+              html += `<div class="conv-media">${voicePlayerHtml(msg.audio_url)}</div>`;
             } else {
               html += escapeHtml(msg.feedback_text || '');
             }
