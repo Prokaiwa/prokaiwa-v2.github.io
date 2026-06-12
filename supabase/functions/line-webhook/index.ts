@@ -7,6 +7,8 @@ const LINE_CHANNEL_SECRET = Deno.env.get('LINE_CHANNEL_SECRET')!;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+declare const EdgeRuntime: any;
+
 // ============================================================
 // SIGNATURE VERIFICATION
 // ============================================================
@@ -50,6 +52,36 @@ async function sendLineMessage(userId: string, message: string) {
     return false;
   }
   return true;
+}
+
+// ============================================================
+// ARCHIVE MEDIA TO STORAGE
+// Copies LINE-hosted media (audio/video/image) to Supabase Storage
+// before LINE expires it. Always called in the background.
+// ============================================================
+async function archiveMediaToStorage(messageId: string, mediaType: string) {
+  try {
+    const resp = await fetch(`https://api-data.line.me/v2/bot/message/${messageId}/content`, {
+      headers: { 'Authorization': `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}` }
+    });
+    if (!resp.ok) {
+      console.error(`📦 Archive failed for ${messageId}: LINE returned ${resp.status}`);
+      return;
+    }
+    const contentType = resp.headers.get('content-type')
+      || (mediaType === 'audio' ? 'audio/mpeg' : mediaType === 'video' ? 'video/mp4' : 'image/jpeg');
+    const buffer = await resp.arrayBuffer();
+    const { error } = await supabase.storage
+      .from('student-media')
+      .upload(messageId, buffer, { contentType, upsert: true });
+    if (error) {
+      console.error(`📦 Storage upload failed for ${messageId}:`, error.message);
+    } else {
+      console.log(`📦 Archived ${mediaType} ${messageId} (${buffer.byteLength} bytes)`);
+    }
+  } catch (err) {
+    console.error(`📦 archiveMediaToStorage error for ${messageId}:`, err);
+  }
 }
 
 // ============================================================
@@ -445,6 +477,19 @@ Deno.serve(async (req) => {
               plan:            student.plan
             })
           }).catch(e => console.error('send-push-notification failed:', e));
+
+          // ── ARCHIVE MEDIA ──────────────────────────────────
+          // Copy LINE-hosted media to Supabase Storage before LINE
+          // expires it. Runs in the background — never delays response.
+          if (mediaType !== 'text' && messageId) {
+            const archivePromise = archiveMediaToStorage(messageId, mediaType);
+            // Run in background so the webhook responds to LINE immediately
+            if (typeof EdgeRuntime !== 'undefined' && (EdgeRuntime as any)?.waitUntil) {
+              (EdgeRuntime as any).waitUntil(archivePromise);
+            } else {
+              archivePromise.catch(() => {});
+            }
+          }
         }
 
         // Confirm receipt for audio and video responses

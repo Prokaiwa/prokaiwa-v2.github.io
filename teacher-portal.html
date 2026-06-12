@@ -1191,9 +1191,15 @@
     const lastReply = st.last_response_at
       ? Math.floor((Date.now() - new Date(st.last_response_at).getTime()) / 86400000)
       : null;
-    const lastTxt = lastReply === null ? 'no replies yet' : lastReply === 0 ? 'replied today' : `last reply ${lastReply}d ago`;
-    const day7 = day === 7 ? '<span style="background:#e74c3c;color:#fff;border-radius:4px;padding:0.1rem 0.45rem;font-weight:700;margin-left:0.4rem;">🎯 DAY 7</span>' : '';
-    return `<div style="font-size:0.78rem;color:#777;margin-top:0.25rem;">📅 Day ${day} · ✅ ${st.prompts_answered_7d}/${st.prompts_sent_7d} answered (7d) · ${lastTxt}${day7}</div>`;
+    const lastTxt = lastReply === null ? 'no replies yet' : lastReply === 0 ? 'replied today' : `last reply ${lastReply} days ago`;
+    // "Trial day N" = days since their FIRST prompt (not the curriculum Day
+    // shown above it). Only shown for the first 14 days — noise after that.
+    const trialTxt = day <= 14
+      ? (day === 7
+          ? '<span style="background:#e74c3c;color:#fff;border-radius:4px;padding:0.1rem 0.45rem;font-weight:700;">🎯 TRIAL DAY 7 — decision day</span> · '
+          : `🌱 Trial day ${day} · `)
+      : '';
+    return `<div style="font-size:0.78rem;color:#777;margin-top:0.25rem;">${trialTxt}✅ answered ${st.prompts_answered_7d} of last ${st.prompts_sent_7d} prompts · ${lastTxt}</div>`;
   }
 
   // ============================================================
