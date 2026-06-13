@@ -39,6 +39,38 @@ SEED_KANJI = (
     "飛笑泣怒喜幸残念全部半毎週回度番緒計画終始開閉持取渡送届着脱洗掃除料理野菜肉魚卵"
     "米茶酒水牛乳果物"
 )
+
+# -----------------------------------------------------------------------
+# 1b. DYNAMIC kanji harvest — scan actual content sources so the subset
+#     always covers what we really render. Re-run this script whenever
+#     seed content is added (ig_words / ig_dialogues top-ups).
+# -----------------------------------------------------------------------
+import glob
+CONTENT_FILES = (
+    glob.glob("/Users/davidscantee/Desktop/prokaiwa-v2/supabase/seeds/*.sql")
+    + ["/Users/davidscantee/Desktop/prokaiwa-v2/supabase/functions/ig-post-generator/index.ts",
+       "/Users/davidscantee/Desktop/prokaiwa-v2/supabase/functions/ig-post-generator/CHARACTERS.md",
+       "/Users/davidscantee/Desktop/prokaiwa-v2/supabase/functions/ig-render/index.ts"]
+)
+harvested = set()
+for f in CONTENT_FILES:
+    try:
+        for ch in open(f, encoding="utf-8").read():
+            if 0x4E00 <= ord(ch) <= 0x9FFF:
+                harvested.add(ch)
+    except FileNotFoundError:
+        pass
+
+# Kanji currently present in the live `phrases` table (queried 2026-06-13)
+DB_KANJI = "一中乱予事京人今休会伝何元全最出分切別利割助単可合同向問変大天始嬉存完定家尋年度当待後必思意感慮憩手択拶挨教敵新族日明時更月本来楽機次止気混点理用由申白着知確祈祝視私窓簡素終絡練習考聞職能良行要見親言詫話認説謝議質転返連遅過違遠選都開間限面頃食高"
+
+# Everyday-buffer for future content (common conversational kanji)
+BUFFER_KANJI = "実際納豆偶然解決整正直丸太森杯汁噌探枚弁準備趣切疲様無横結局昨皿情興奮緊張安心驚配慮迷惑邪魔遠慮我慢得意苦痛快適面倒退屈夢中熱心冷静焦燥晩御飯麺丼鍋甘辛酸苦塩濃薄温冷氷熱忙暇散財節約貯偉凄怖嬉悲寂恥誇照憧羨妬頑張諦挑戦失敗成功経験成長変化挑続伝統文化祭典花火温泉神社寺城島海山川湖空星雲虹朝晩昨明後毎晩遊泊乗降運転歩通勤通学引越掃片付捨拾貸借返忘覚思出予定約束遅刻早退欠席出席参加不参加連絡相談報告説明紹介案内招招待訪問迎見送別離再会久"
+# Rendered punctuation/symbols outside earlier ranges
+EXTRA_CODEPOINTS = [0x00E9, 0x2013, 0x2014, 0x2026, 0x2192, 0x2208, 0x2248, 0x2264, 0x26A0] + list(range(0x2460, 0x2469 + 1))
+jp_ranges.extend(EXTRA_CODEPOINTS)
+SEED_KANJI = SEED_KANJI + DB_KANJI + BUFFER_KANJI + "".join(sorted(harvested))
+
 for c in SEED_KANJI:
     cp = ord(c)
     if 0x4E00 <= cp <= 0x9FFF:
