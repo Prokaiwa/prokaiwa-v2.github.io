@@ -1,6 +1,9 @@
 -- ig_dialogues — Friday carousel scripts (Mimi = boke with ears, Ten = tsukkomi with arms)
 -- lines: array of {speaker, en, ja, pose}. Lines 1-3 = setup (slides 2-4),
--- last 2 lines = punchline exchange (slide 5). Keep en ≤ ~30 chars (no wrapping).
+-- last 2 lines = punchline exchange (slide 5): [setup, punch]. The punch line
+-- (either character) gets the big teal treatment. Keep en <= ~30 chars.
+-- Comedy is varied on purpose: deadpan, witty toppers, sweet turns, smug
+-- reversals, self-owns — only 2 of 12 end on the classic ALL-CAPS yell.
 
 CREATE TABLE IF NOT EXISTS public.ig_dialogues (
   id serial PRIMARY KEY,
@@ -14,101 +17,131 @@ ALTER TABLE public.ig_dialogues ENABLE ROW LEVEL SECURITY;
 
 INSERT INTO public.ig_dialogues (title_en, title_ja, location_ja, lines) VALUES
 
+-- 1 — sweet turn (Mimi lands it warm, no yell)
 ('Long time no see!', 'ひさしぶり！', 'カフェにて ', '[
- {"speaker":"ten",  "en":"Long time no see!",            "ja":"ひさしぶり！",               "pose":"(„ᵔ ֊ ᵔ„)"},
- {"speaker":"mimi", "en":"Yes!! So long!",                "ja":"うん！！すっごく久しぶり！",  "pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
- {"speaker":"ten",  "en":"...We met yesterday.",          "ja":"…昨日会ったよね。",          "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"It felt like years. I was hungry.", "ja":"何年にも感じた。お腹すいてたから。", "pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
- {"speaker":"ten",  "en":"That changes time?!",           "ja":"それで時間変わる！？",        "pose":"(„⊙ ֊ ⊙„)!!"}
+ {"speaker":"mimi","en":"Long time no see!","ja":"ひさしぶり！","pose":"૮₍˶ •. • ⑅₎ა"},
+ {"speaker":"ten","en":"We met yesterday.","ja":"昨日会ったよね。","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"It feels like years!","ja":"何年も会ってない気がする！","pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
+ {"speaker":"ten","en":"You''re so dramatic.","ja":"大げさだなあ。","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"mimi","en":"I missed you, though.","ja":"でも会いたかったよ。","pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"}
 ]'::jsonb),
 
+-- 2 — deadpan resignation (Ten, quiet)
 ('I''m full.', 'お腹いっぱい。', 'レストランにて ', '[
- {"speaker":"ten",  "en":"How was the pasta?",            "ja":"パスタどうだった？",          "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"I''m full. So full.",           "ja":"お腹いっぱい。ほんとに。",     "pose":"૮₍˶ ×. × ⑅₎ა"},
- {"speaker":"ten",  "en":"Then let''s get the check.",    "ja":"じゃあお会計しよう。",        "pose":"(„ᵔ ֊ ᵔ„)"},
- {"speaker":"mimi", "en":"Wait. One cake. Cake is different.", "ja":"待って。ケーキひとつ。ケーキは別。", "pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
- {"speaker":"ten",  "en":"Different HOW?!",               "ja":"何が別なの！？",             "pose":"(„⊙ ֊ ⊙„)!!"}
+ {"speaker":"ten","en":"How was the pasta?","ja":"パスタどうだった？","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"Amazing. I''m so full.","ja":"最高。お腹いっぱい。","pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
+ {"speaker":"ten","en":"Great, let''s get the check.","ja":"じゃあお会計しようか。","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"mimi","en":"Wait — one more cake.","ja":"待って、ケーキもうひとつ。","pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
+ {"speaker":"ten","en":"...There''s no saving you.","ja":"…もう手に負えない。","pose":"(„• ֊ •„)"}
 ]'::jsonb),
 
+-- 3 — smug reveal (Mimi wins, lazy)
 ('I''m on my way!', '今向かってる！', '電話にて ', '[
- {"speaker":"ten",  "en":"Where are you?",                "ja":"今どこ？",                  "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"I''m on my way!",               "ja":"今向かってる！",             "pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
- {"speaker":"ten",  "en":"Great! See you soon!",          "ja":"よかった！もうすぐだね！",    "pose":"(„ᵔ ֊ ᵔ„)"},
- {"speaker":"mimi", "en":"...My way starts from my bed.", "ja":"…ベッドから向かい始めるところ。", "pose":"૮₍˶ -. - ⑅₎ა"},
- {"speaker":"ten",  "en":"You haven''t LEFT?!",           "ja":"まだ出てないの！？",          "pose":"(„⊙ ֊ ⊙„)!!"}
+ {"speaker":"ten","en":"Where are you? It''s starting.","ja":"今どこ？始まるよ。","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"Relax, I''m on my way!","ja":"大丈夫、今向かってる！","pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
+ {"speaker":"ten","en":"Great, see you soon!","ja":"よかった、もうすぐだね！","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"ten","en":"...Is that your pillow?","ja":"…それ枕じゃない？","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"My way starts after a nap.","ja":"昼寝のあとに出発するの。","pose":"૮₍˶ -. - ⑅₎ა"}
 ]'::jsonb),
 
+-- 4 — non-sequitur (Mimi, deadpan)
 ('Let''s split the bill.', '割り勘にしよう。', 'レジの前で ', '[
- {"speaker":"ten",  "en":"Let''s split the bill.",        "ja":"割り勘にしよう。",           "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"Good idea. Half and half.",     "ja":"いいね。半分こ。",           "pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
- {"speaker":"ten",  "en":"You ate nine plates...",        "ja":"9皿食べたよね…",            "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"Friendship has no calories.",   "ja":"友情にカロリーはないの。",     "pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
- {"speaker":"ten",  "en":"That''s not the POINT!",        "ja":"そういう話じゃない！",        "pose":"(„x ֊ x„)"}
+ {"speaker":"mimi","en":"Let''s split the bill!","ja":"割り勘にしよう！","pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
+ {"speaker":"ten","en":"Sure, sounds fair.","ja":"いいよ、公平だね。","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"mimi","en":"You had water, right?","ja":"あなたお水だけだよね？","pose":"૮₍˶ •. • ⑅₎ა"},
+ {"speaker":"ten","en":"...And you had nine plates.","ja":"…で、9皿食べたよね。","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"Friendship has no calories.","ja":"友情にカロリーはないの。","pose":"૮₍˶ ˘ ³˘ ⑅₎ა"}
 ]'::jsonb),
 
+-- 5 — witty topper (Ten caps it, no yell)
 ('I slept like a log.', 'ぐっすり眠った。', '朝の公園で ', '[
- {"speaker":"ten",  "en":"You look happy today!",         "ja":"今日うれしそうだね！",        "pose":"(„ᵔ ֊ ᵔ„)"},
- {"speaker":"mimi", "en":"I slept like a log!",           "ja":"丸太みたいにぐっすり寝た！",   "pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
- {"speaker":"ten",  "en":"Nice! How many hours?",         "ja":"いいね！何時間？",           "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"Fourteen. I was a forest.",     "ja":"14時間。もはや森だった。",    "pose":"૮₍˶ -. - ⑅₎ა"},
- {"speaker":"ten",  "en":"A FOREST?!",                    "ja":"森！？",                    "pose":"(„⊙ ֊ ⊙„)!!"}
+ {"speaker":"ten","en":"You look great today!","ja":"今日元気そうだね！","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"mimi","en":"I slept like a log!","ja":"丸太みたいに寝たよ！","pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
+ {"speaker":"ten","en":"Nice! How many hours?","ja":"いいね！何時間？","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"Fourteen. I became a forest.","ja":"14時間。森になってた。","pose":"૮₍˶ -. - ⑅₎ა"},
+ {"speaker":"ten","en":"That''s hibernation, not sleep.","ja":"それ睡眠じゃなくて冬眠。","pose":"(„ᵔ ֊ ᵔ„)"}
 ]'::jsonb),
 
+-- 6 — deadpan metaphor (Mimi)
 ('Can I get a refill?', 'おかわりください。', 'ファミレスにて ', '[
- {"speaker":"mimi", "en":"Can I get a refill?",           "ja":"おかわりもらえますか？",      "pose":"૮₍˶ •. • ⑅₎ა"},
- {"speaker":"ten",  "en":"Sure! Coffee?",                 "ja":"もちろん！コーヒー？",        "pose":"(„ᵔ ֊ ᵔ„)"},
- {"speaker":"mimi", "en":"No. Miso soup.",                "ja":"ううん。お味噌汁。",          "pose":"૮₍˶ •. • ⑅₎ა"},
- {"speaker":"mimi", "en":"...This is my eighth bowl.",    "ja":"…これで8杯目。",             "pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
- {"speaker":"ten",  "en":"EIGHTH?!",                      "ja":"8杯！？",                   "pose":"(„⊙ ֊ ⊙„)!!"}
+ {"speaker":"mimi","en":"Can I get a refill?","ja":"おかわりもらえますか？","pose":"૮₍˶ •. • ⑅₎ა"},
+ {"speaker":"ten","en":"Of course! More coffee?","ja":"もちろん！コーヒー？","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"mimi","en":"No, miso soup, please.","ja":"ううん、お味噌汁で。","pose":"૮₍˶ •. • ⑅₎ა"},
+ {"speaker":"ten","en":"...That''s your eighth bowl.","ja":"…もう8杯目だよ。","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"Breakfast is a marathon.","ja":"朝食はマラソンなの。","pose":"૮₍˶ ˘ ³˘ ⑅₎ა"}
 ]'::jsonb),
 
+-- 7 — dry correction (Ten, deadpan)
 ('I''m just looking, thanks.', '見てるだけです。', 'パン屋にて ', '[
- {"speaker":"ten",  "en":"Welcome! Need any help?",       "ja":"いらっしゃいませ！お探しですか？", "pose":"(„ᵔ ֊ ᵔ„)"},
- {"speaker":"mimi", "en":"I''m just looking, thanks.",    "ja":"見てるだけです、ありがとう。",  "pose":"૮₍˶ •. • ⑅₎ა"},
- {"speaker":"ten",  "en":"...You''re holding five trays.", "ja":"…トレー5枚持ってますよ。",    "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"Looking with my hands.",        "ja":"手で見てるの。",             "pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
- {"speaker":"ten",  "en":"That''s called SHOPPING!",      "ja":"それは買い物って言うの！",     "pose":"(„⊙ ֊ ⊙„)!!"}
+ {"speaker":"ten","en":"Welcome! Can I help you?","ja":"いらっしゃいませ！お手伝いします？","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"mimi","en":"I''m just looking, thanks.","ja":"見てるだけです、どうも。","pose":"૮₍˶ •. • ⑅₎ა"},
+ {"speaker":"ten","en":"...You''re holding five boxes.","ja":"…箱を5つ持ってますよ。","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"I look with my hands.","ja":"手で見るタイプなんです。","pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
+ {"speaker":"ten","en":"That''s literally shopping.","ja":"それ普通に買い物です。","pose":"(„ᵔ ֊ ᵔ„)"}
 ]'::jsonb),
 
+-- 8 — classic tsukkomi yell (kept for rhythm)
 ('I can''t wait!', '楽しみ！', '前の日の夜 ', '[
- {"speaker":"ten",  "en":"Picnic tomorrow at ten!",       "ja":"明日10時にピクニックね！",     "pose":"(„ᵔ ֊ ᵔ„)"},
- {"speaker":"mimi", "en":"I can''t wait!!",               "ja":"待ちきれない！！",            "pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
- {"speaker":"ten",  "en":"Did you pack the bento?",       "ja":"お弁当は準備した？",          "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"I couldn''t wait. I ate it.",   "ja":"待ちきれなくて。食べちゃった。", "pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
- {"speaker":"ten",  "en":"It''s for TOMORROW!",           "ja":"明日の分でしょ！？",          "pose":"(„x ֊ x„)"}
+ {"speaker":"ten","en":"Picnic tomorrow at ten!","ja":"明日10時にピクニック！","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"mimi","en":"I can''t wait!","ja":"楽しみすぎる！","pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
+ {"speaker":"ten","en":"Did you pack the sandwiches?","ja":"サンドイッチ作った？","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"I couldn''t wait. I ate them.","ja":"待てなくて、食べちゃった。","pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
+ {"speaker":"ten","en":"It''s for TOMORROW!","ja":"明日の分だよ！？","pose":"(„⊙ ֊ ⊙„)!!"}
 ]'::jsonb),
 
+-- 9 — charm + quiet sigh (Ten, no caps)
 ('Could you say that again?', 'もう一度言ってもらえますか？', '道ばたで ', '[
- {"speaker":"ten",  "en":"The station is that way.",      "ja":"駅はあっちだよ。",            "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"Could you say that again?",     "ja":"もう一度言ってもらえる？",     "pose":"૮₍˶ •. • ⑅₎ა"},
- {"speaker":"ten",  "en":"The station is THAT way.",      "ja":"駅は「あっち」だよ。",        "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"One more. Your voice is nice.", "ja":"もう一回。いい声だから。",     "pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
- {"speaker":"ten",  "en":"That''s not LISTENING practice!", "ja":"それリスニング練習じゃない！", "pose":"(„⊙ ֊ ⊙„)!!"}
+ {"speaker":"ten","en":"The station is that way.","ja":"駅はあっちだよ。","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"Could you say that again?","ja":"もう一度いいですか？","pose":"૮₍˶ •. • ⑅₎ა"},
+ {"speaker":"ten","en":"It''s right over there.","ja":"すぐそこだってば。","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"One more — your voice is nice.","ja":"もう一回。声が好きで。","pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
+ {"speaker":"ten","en":"This isn''t a listening test.","ja":"リスニングテストじゃないよ。","pose":"(„ᵔ ֊ ᵔ„)"}
 ]'::jsonb),
 
+-- 10 — witty topper (Ten)
 ('What do you do?', 'お仕事は何ですか？', '初対面の会話 ', '[
- {"speaker":"ten",  "en":"So, what do you do?",           "ja":"お仕事は何してるの？",        "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"I''m a professional.",          "ja":"プロです。",                 "pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
- {"speaker":"ten",  "en":"A professional... what?",       "ja":"プロの…何？",               "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"Napper. Three naps a day.",     "ja":"お昼寝のプロ。1日3回。",      "pose":"૮₍˶ -. - ⑅₎ა"},
- {"speaker":"ten",  "en":"That''s a HOBBY!",              "ja":"それは趣味！",               "pose":"(„⊙ ֊ ⊙„)!!"}
+ {"speaker":"ten","en":"So, what do you do?","ja":"お仕事は何ですか？","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"I''m a professional.","ja":"プロなんです。","pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
+ {"speaker":"ten","en":"A professional... what?","ja":"何の…プロ？","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"Napper. Three a day.","ja":"お昼寝の。1日3回。","pose":"૮₍˶ -. - ⑅₎ა"},
+ {"speaker":"ten","en":"That''s a lifestyle, not a job.","ja":"それ職業じゃなくて生き方。","pose":"(„ᵔ ֊ ᵔ„)"}
 ]'::jsonb),
 
+-- 11 — self-own reversal (Ten realizes HE pays)
 ('It''s on me.', 'ここは私のおごり。', 'カフェのレジで ', '[
- {"speaker":"mimi", "en":"It''s on me today!",            "ja":"今日は私のおごり！",          "pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
- {"speaker":"ten",  "en":"Wow, really? Thank you!",       "ja":"えっ、ほんと？ありがとう！",   "pose":"(„ᵔ ֊ ᵔ„)"},
- {"speaker":"mimi", "en":"Of course! I have a coupon.",   "ja":"もちろん！クーポンあるし。",   "pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
- {"speaker":"mimi", "en":"...It expired in 2019.",        "ja":"…2019年に切れてた。",        "pose":"૮₍˶ ⊙ o ⊙ ⑅₎ა"},
- {"speaker":"ten",  "en":"So it''s on ME!",               "ja":"結局私のおごり！？",          "pose":"(„x ֊ x„)"}
+ {"speaker":"mimi","en":"Lunch is on me today!","ja":"今日のランチは私のおごり！","pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
+ {"speaker":"ten","en":"Wow, thank you!","ja":"わあ、ありがとう！","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"mimi","en":"I''ve got a coupon!","ja":"クーポンあるから！","pose":"૮₍˶ •. • ⑅₎ა"},
+ {"speaker":"mimi","en":"...It expired in 2019.","ja":"…2019年に切れてた。","pose":"૮₍˶ ⊙ o ⊙ ⑅₎ა"},
+ {"speaker":"ten","en":"So it''s on me.","ja":"結局、僕のおごりか。","pose":"(„ᵔ ֊ ᵔ„)"}
 ]'::jsonb),
 
+-- 12 — literal interpretation + yell (kept for rhythm)
 ('Take it easy.', '無理しないでね。', '仕事終わりに ', '[
- {"speaker":"ten",  "en":"You worked hard. Take it easy!", "ja":"お疲れさま。無理しないでね！", "pose":"(„ᵔ ֊ ᵔ„)"},
- {"speaker":"mimi", "en":"Okay! Taking it easy now.",     "ja":"わかった！今から無理しない。",  "pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
- {"speaker":"ten",  "en":"...Why are you lying down here?", "ja":"…なんでここで横になるの？",   "pose":"(„• ֊ •„)"},
- {"speaker":"mimi", "en":"You said take it easy. This is easy.", "ja":"無理しないでって言ったから。これが一番楽。", "pose":"૮₍˶ -. - ⑅₎ა"},
- {"speaker":"ten",  "en":"Not on the SIDEWALK!",          "ja":"歩道ではダメ！",             "pose":"(„⊙ ֊ ⊙„)!!"}
+ {"speaker":"ten","en":"Take it easy, you earned it!","ja":"お疲れさま。無理しないでね！","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"mimi","en":"Okay! Taking it easy!","ja":"はーい、無理しなーい！","pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
+ {"speaker":"ten","en":"...Why are you lying down?","ja":"…なんで寝転んでるの？","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"You said take it easy.","ja":"無理しないでって言ったでしょ。","pose":"૮₍˶ -. - ⑅₎ა"},
+ {"speaker":"ten","en":"Not on the SIDEWALK!","ja":"歩道はダメ！","pose":"(„⊙ ֊ ⊙„)!!"}
+]'::jsonb),
+
+-- 13 — models the answer (line 2), ends smug (Mimi)
+('How have you been?', '元気にしてた？', '久しぶりの再会 ', '[
+ {"speaker":"ten","en":"How have you been?","ja":"元気にしてた？","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"Pretty good! You?","ja":"まあまあ元気！そっちは？","pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
+ {"speaker":"ten","en":"Good! Been keeping busy?","ja":"いいね！忙しくしてた？","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"ten","en":"...Are you napping right now?","ja":"…今、昼寝してない？","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"I''ve been resting. Professionally.","ja":"プロ級に休んでたの。","pose":"૮₍˶ -. - ⑅₎ა"}
+]'::jsonb),
+
+-- 14 — deadpan summary (Ten)
+('Any plans for the rest of the day?', '今日この後の予定は？', 'お昼休みに ', '[
+ {"speaker":"ten","en":"Any plans for the rest of the day?","ja":"今日この後の予定は？","pose":"(„• ֊ •„)"},
+ {"speaker":"mimi","en":"Big plans!","ja":"予定たっぷり！","pose":"૮₍˶ ᵔ ᵕ ᵔ ⑅₎ა"},
+ {"speaker":"ten","en":"Nice — like what?","ja":"いいね、何するの？","pose":"(„ᵔ ֊ ᵔ„)"},
+ {"speaker":"mimi","en":"Lunch, then planning dinner.","ja":"お昼食べて、晩ごはんの計画。","pose":"૮₍˶ ˘ ³˘ ⑅₎ა"},
+ {"speaker":"ten","en":"...So, just meals.","ja":"…つまり、ごはんだけ。","pose":"(„• ֊ •„)"}
 ]'::jsonb);
 
--- 12 dialogues = 12 Fridays (~3 months). Top up before the pool runs dry —
+-- 14 dialogues = 14 Fridays (~3.5 months). Top up before the pool runs dry —
 -- the generator emails an alert when it exhausts.

@@ -20,15 +20,18 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 // -----------------------------------------------------------------------
 // Layout constants — all tuning lives here
 // -----------------------------------------------------------------------
-const CARD_SIZE        = 1080
+// 4:5 portrait (Instagram's recommended feed size). The profile grid crops
+// to 3:4, trimming ~34px off each side — so keep content within SAFE_X.
+const CARD_W           = 1080
+const CARD_H           = 1350
 const BG_COLOR         = '#FFF8F0'
 const BORDER_COLOR     = '#008080'
 const BORDER_WIDTH     = 10          // stroke width (spec: ~10px)
 const BORDER_INSET     = 28          // gap from card edge to border (spec: ~28px)
 const SAFE_X_MIN       = 110         // content must stay inside x∈[110,970]
 const SAFE_X_MAX       = 970
-const SAFE_Y_MIN       = 110         // content must stay inside y∈[110,950]
-const SAFE_Y_MAX       = 950
+const SAFE_Y_MIN       = 130         // content must stay inside y∈[130,1220]
+const SAFE_Y_MAX       = 1220
 const CONTENT_CX       = 540         // horizontal centre
 const TEXT_DARK        = '#333333'
 const TEXT_MID         = '#666666'
@@ -84,6 +87,17 @@ let wasmReady    = false
 let fontBuffers: Uint8Array[] = []
 let logoDataUri  = ''          // data:image/png;base64,…
 
+// btoa(String.fromCharCode(...bytes)) overflows the call stack on large
+// buffers — encode in chunks so a 512×512 PNG can't blow the argument limit.
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = ''
+  const CHUNK = 0x8000
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK))
+  }
+  return btoa(binary)
+}
+
 async function ensureReady(): Promise<void> {
   if (wasmReady) return
 
@@ -108,8 +122,7 @@ async function ensureReady(): Promise<void> {
   const logoRes = await fetch(LOGO_URL)
   if (!logoRes.ok) throw new Error(`[logo-fetch] HTTP ${logoRes.status}`)
   const logoBuf = await logoRes.arrayBuffer()
-  const logoB64 = btoa(String.fromCharCode(...new Uint8Array(logoBuf)))
-  logoDataUri = `data:image/png;base64,${logoB64}`
+  logoDataUri = `data:image/png;base64,${bytesToBase64(new Uint8Array(logoBuf))}`
 
   wasmReady = true
 }
@@ -145,23 +158,49 @@ function textEl(l: TextLine): string {
   return `<text x="${l.x}" y="${l.y}" font-size="${l.fontSize}" font-weight="${weight}" font-family="${escapeXml(family)}" fill="${fill}" text-anchor="${anchor}">${escapeXml(l.text)}</text>`
 }
 
+/** Shrink a font size proportionally when text exceeds maxChars, clamped to min. */
+function fitFont(text: string, base: number, maxChars: number, min: number): number {
+  if (text.length <= maxChars) return base
+  return Math.max(min, Math.floor((base * maxChars) / text.length))
+}
+
+// Card headers alternate language by ISO-week parity: even weeks Japanese,
+// odd weeks English — so a returning follower's feed never feels samey.
+const HEADERS = {
+  word:     { ja: '今日の単語 ☆',   en: 'Word of the Day ☆' },
+  phrase:   { ja: '今日のフレーズ ☆', en: 'Phrase of the Day ☆' },
+  dialogue: { ja: '今日の会話 ♪',   en: "Today's Conversation ♪" },
+}
+
+function jstWeekParity(): number {
+  const now   = new Date(Date.now() + 9 * 60 * 60 * 1000)   // JST
+  const start = new Date(Date.UTC(now.getUTCFullYear(), 0, 1))
+  const days  = Math.floor((now.getTime() - start.getTime()) / 86_400_000)
+  const week  = Math.floor((days + start.getUTCDay()) / 7)
+  return week % 2
+}
+
+function headerFor(style: 'word' | 'phrase' | 'dialogue'): string {
+  return jstWeekParity() === 0 ? HEADERS[style].ja : HEADERS[style].en
+}
+
 /** Shared card shell: background + teal frame + logo chip */
 function cardShell(): string[] {
   const bx = BORDER_INSET
   const by = BORDER_INSET
-  const bw = CARD_SIZE - BORDER_INSET * 2
-  const bh = CARD_SIZE - BORDER_INSET * 2
+  const bw = CARD_W - BORDER_INSET * 2
+  const bh = CARD_H - BORDER_INSET * 2
 
-  // Logo chip: circle-clipped at bottom-right (centre 920,920, radius 52)
+  // Logo chip: circle-clipped at bottom-right
   const logoId    = 'logoClip'
-  const logoCx    = 920
-  const logoCy    = 920
+  const logoCx    = 915
+  const logoCy    = 1185
   const logoR     = 52
   const logoSize  = logoR * 2
 
   return [
     // Background
-    `<rect width="${CARD_SIZE}" height="${CARD_SIZE}" fill="${BG_COLOR}"/>`,
+    `<rect width="${CARD_W}" height="${CARD_H}" fill="${BG_COLOR}"/>`,
     // Teal border frame
     `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="none" stroke="${BORDER_COLOR}" stroke-width="${BORDER_WIDTH}" rx="16"/>`,
     // Logo clip definition
@@ -176,8 +215,8 @@ function cardShell(): string[] {
 function wrapSvg(innerLines: string[]): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-     width="${CARD_SIZE}" height="${CARD_SIZE}"
-     viewBox="0 0 ${CARD_SIZE} ${CARD_SIZE}">
+     width="${CARD_W}" height="${CARD_H}"
+     viewBox="0 0 ${CARD_W} ${CARD_H}">
   ${innerLines.join('\n  ')}
 </svg>`
 }
@@ -234,25 +273,25 @@ interface WordRow { id: number; word: string; word_ja: string; example_en: strin
 function buildWordCardSvg(row: WordRow): string {
   const lines: string[] = [...cardShell()]
 
-  // Title: 今日の単語 ☆
-  lines.push(textEl({ text: '今日の単語 ☆', x: CONTENT_CX, y: 190, fontSize: FS_TITLE, fontWeight: 'bold', fill: TEAL, textAnchor: 'middle' }))
+  // Title (alternates JP / EN by week)
+  lines.push(textEl({ text: headerFor('word'), x: CONTENT_CX, y: 230, fontSize: FS_TITLE, fontWeight: 'bold', fill: TEAL, textAnchor: 'middle' }))
 
   // Divider
-  lines.push(`<line x1="${SAFE_X_MIN}" y1="215" x2="${SAFE_X_MAX}" y2="215" stroke="${TEAL}" stroke-width="2.5"/>`)
+  lines.push(`<line x1="${SAFE_X_MIN}" y1="262" x2="${SAFE_X_MAX}" y2="262" stroke="${TEAL}" stroke-width="2.5"/>`)
 
   // Hero English word
-  lines.push(textEl({ text: row.word, x: CONTENT_CX, y: 360, fontSize: FS_WORD_HERO, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
+  lines.push(textEl({ text: row.word, x: CONTENT_CX, y: 490, fontSize: FS_WORD_HERO, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
 
   // word_ja
-  lines.push(textEl({ text: row.word_ja, x: CONTENT_CX, y: 430, fontSize: FS_WORD_JA, fill: TEXT_MID, textAnchor: 'middle' }))
+  lines.push(textEl({ text: row.word_ja, x: CONTENT_CX, y: 565, fontSize: FS_WORD_JA, fill: TEXT_MID, textAnchor: 'middle' }))
 
   // Box bubble with example lines
-  const bubbleTop = 480
+  const bubbleTop = 680
   const bubbleEls = buildBoxBubble(row.example_en, row.example_ja, bubbleTop)
   lines.push(...bubbleEls)
 
-  // P-kun pose beneath the bubble (bubbleTop + 4 rows * 46 + 28 padding)
-  const pkunY = bubbleTop + 4 * (FS_BOX_BODY + 12) + 60
+  // P-kun pose beneath the bubble
+  const pkunY = bubbleTop + 4 * (FS_BOX_BODY + 12) + 95
   lines.push(textEl({ text: 'p(´∇｀)q', x: CONTENT_CX, y: pkunY, fontSize: FS_PKUN, textAnchor: 'middle' }))
 
   return wrapSvg(lines)
@@ -266,33 +305,27 @@ interface PhraseRow { id: number; phrase_en: string; phrase_ja: string; example_
 function buildPhraseCardSvg(row: PhraseRow): string {
   const lines: string[] = [...cardShell()]
 
-  // Title: 今日のフレーズ ☆
-  lines.push(textEl({ text: '今日のフレーズ ☆', x: CONTENT_CX, y: 190, fontSize: FS_TITLE, fontWeight: 'bold', fill: TEAL, textAnchor: 'middle' }))
-  lines.push(`<line x1="${SAFE_X_MIN}" y1="215" x2="${SAFE_X_MAX}" y2="215" stroke="${TEAL}" stroke-width="2.5"/>`)
+  // Title (alternates JP / EN by week)
+  lines.push(textEl({ text: headerFor('phrase'), x: CONTENT_CX, y: 230, fontSize: FS_TITLE, fontWeight: 'bold', fill: TEAL, textAnchor: 'middle' }))
+  lines.push(`<line x1="${SAFE_X_MIN}" y1="262" x2="${SAFE_X_MAX}" y2="262" stroke="${TEAL}" stroke-width="2.5"/>`)
 
-  // Classic speech-bubble AA style:
-  // ＿＿＿＿＿＿＿＿＿ (top flat line)
-  // ｜ phrase_en
-  // ｜ phrase_ja
-  // ￣￣Ｙ￣￣ (tail)
-  // P-kun below tail
+  // Hero phrase, centred and shrunk to fit the safe width
+  const heroSize = fitFont(row.phrase_en, FS_PHRASE_HERO, 18, 34)
+  lines.push(textEl({ text: row.phrase_en, x: CONTENT_CX, y: 470, fontSize: heroSize, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
+  lines.push(textEl({ text: row.phrase_ja, x: CONTENT_CX, y: 545, fontSize: FS_WORD_JA, fill: TEXT_MID, textAnchor: 'middle' }))
 
-  const bubbleStartY = 300
-  const rowH         = FS_PHRASE_HERO + 16   // 68px
+  // Example inside a centred box bubble (en line shrinks if long)
+  const bubbleTop = 680
+  const lineH     = FS_BOX_BODY + 12
+  const exEnSize  = row.example_en.length > 30 ? 28 : FS_BOX_BODY
+  lines.push(textEl({ text: BOX_TOP, x: CONTENT_CX, y: bubbleTop, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
+  lines.push(textEl({ text: row.example_en, x: CONTENT_CX, y: bubbleTop + lineH, fontSize: exEnSize, fill: TEXT_DARK, textAnchor: 'middle' }))
+  lines.push(textEl({ text: row.example_ja, x: CONTENT_CX, y: bubbleTop + lineH * 2, fontSize: FS_BOX_BODY, fill: TEXT_MID, textAnchor: 'middle' }))
+  lines.push(textEl({ text: BOX_BOT, x: CONTENT_CX, y: bubbleTop + lineH * 3, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
 
-  lines.push(textEl({ text: '＿＿＿＿＿＿＿＿＿＿＿', x: CONTENT_CX, y: bubbleStartY, fontSize: FS_PHRASE_HERO, textAnchor: 'middle' }))
-  lines.push(textEl({ text: `｜ ${row.phrase_en}`, x: CONTENT_CX - 180, y: bubbleStartY + rowH, fontSize: FS_PHRASE_HERO, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'start' }))
-  lines.push(textEl({ text: `｜ ${row.phrase_ja}`, x: CONTENT_CX - 180, y: bubbleStartY + rowH * 2, fontSize: FS_PHRASE_HERO - 8, fill: TEXT_MID, textAnchor: 'start' }))
-  lines.push(textEl({ text: '￣￣￣Ｙ￣￣￣', x: CONTENT_CX, y: bubbleStartY + rowH * 3, fontSize: FS_PHRASE_HERO, textAnchor: 'middle' }))
-
-  // P-kun below tail
-  const pkunY = bubbleStartY + rowH * 3 + 70
-  lines.push(textEl({ text: 'p(・ω・)q', x: CONTENT_CX, y: pkunY, fontSize: FS_PKUN, textAnchor: 'middle' }))
-
-  // Example lines below P-kun
-  const exY = pkunY + 80
-  lines.push(textEl({ text: row.example_en, x: CONTENT_CX, y: exY, fontSize: FS_BOX_BODY + 2, fill: TEXT_DARK, textAnchor: 'middle' }))
-  lines.push(textEl({ text: row.example_ja, x: CONTENT_CX, y: exY + 46, fontSize: FS_BOX_BODY, fill: TEXT_MID, textAnchor: 'middle' }))
+  // P-kun below the bubble
+  const pkunY = bubbleTop + 4 * lineH + 60
+  lines.push(textEl({ text: 'p(｀・ω・´)q', x: CONTENT_CX, y: pkunY, fontSize: FS_PKUN, textAnchor: 'middle' }))
 
   return wrapSvg(lines)
 }
@@ -320,27 +353,30 @@ function buildDialogueSvgs(row: DialogueRow): string[] {
     // Slide counter top-right inside frame
     lines.push(textEl({ text: slideCounter(1, 5), x: SAFE_X_MAX - 20, y: SAFE_Y_MIN + 42, fontSize: FS_COUNTER, fill: TEAL, textAnchor: 'end' }))
 
-    // Title header
-    lines.push(textEl({ text: '今日の会話 ♪', x: CONTENT_CX, y: 200, fontSize: FS_TITLE, fontWeight: 'bold', fill: TEAL, textAnchor: 'middle' }))
-    lines.push(`<line x1="${SAFE_X_MIN}" y1="225" x2="${SAFE_X_MAX}" y2="225" stroke="${TEAL}" stroke-width="2.5"/>`)
+    // Title header (alternates JP / EN by week)
+    lines.push(textEl({ text: headerFor('dialogue'), x: CONTENT_CX, y: 230, fontSize: FS_TITLE, fontWeight: 'bold', fill: TEAL, textAnchor: 'middle' }))
+    lines.push(`<line x1="${SAFE_X_MIN}" y1="262" x2="${SAFE_X_MAX}" y2="262" stroke="${TEAL}" stroke-width="2.5"/>`)
 
-    // title_en hero
-    lines.push(textEl({ text: row.title_en, x: CONTENT_CX, y: 320, fontSize: FS_DIALOGUE_HERO, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
-    lines.push(textEl({ text: row.title_ja, x: CONTENT_CX, y: 380, fontSize: FS_DIALOGUE_JA, fill: TEXT_MID, textAnchor: 'middle' }))
-    lines.push(textEl({ text: row.location_ja, x: CONTENT_CX, y: 428, fontSize: FS_DIALOGUE_JA - 6, fill: TEAL, textAnchor: 'middle' }))
+    // title_en hero (shrinks to fit long titles)
+    lines.push(textEl({ text: row.title_en, x: CONTENT_CX, y: 410, fontSize: fitFont(row.title_en, FS_DIALOGUE_HERO, 22, 36), fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
+    lines.push(textEl({ text: row.title_ja, x: CONTENT_CX, y: 475, fontSize: FS_DIALOGUE_JA, fill: TEXT_MID, textAnchor: 'middle' }))
+    lines.push(textEl({ text: row.location_ja, x: CONTENT_CX, y: 530, fontSize: FS_DIALOGUE_JA - 6, fill: TEAL, textAnchor: 'middle' }))
 
     // Both characters' neutral poses side by side
     const mimiNeutral = '૮₍˶ •. • ⑅₎ა'
     const tenNeutral  = '(„• ֊ •„)'
-    const charY       = 570
-    const mimiX       = CONTENT_CX - 160
-    const tenX        = CONTENT_CX + 160
-    lines.push(textEl({ text: mimiNeutral, x: mimiX, y: charY, fontSize: FS_CHAR, textAnchor: 'middle' }))
-    lines.push(textEl({ text: tenNeutral,  x: tenX,  y: charY, fontSize: FS_CHAR, textAnchor: 'middle' }))
+    const charY       = 780
+    const mimiX       = CONTENT_CX - 200
+    const tenX        = CONTENT_CX + 200
+    lines.push(textEl({ text: mimiNeutral, x: mimiX, y: charY, fontSize: FS_CHAR_PUNCH, textAnchor: 'middle' }))
+    lines.push(textEl({ text: tenNeutral,  x: tenX,  y: charY, fontSize: FS_CHAR_PUNCH, textAnchor: 'middle' }))
 
     // Accent decorations
-    lines.push(textEl({ text: '☆', x: mimiX - 90, y: charY - 30, fontSize: 36, fill: TEAL, textAnchor: 'middle' }))
-    lines.push(textEl({ text: '♪', x: tenX  + 90, y: charY - 30, fontSize: 36, fill: TEAL, textAnchor: 'middle' }))
+    lines.push(textEl({ text: '☆', x: mimiX - 110, y: charY - 40, fontSize: 40, fill: TEAL, textAnchor: 'middle' }))
+    lines.push(textEl({ text: '♪', x: tenX  + 110, y: charY - 40, fontSize: 40, fill: TEAL, textAnchor: 'middle' }))
+
+    // Swipe hint to fill the lower area
+    lines.push(textEl({ text: 'スワイプしてね ♪', x: CONTENT_CX, y: 1010, fontSize: FS_DIALOGUE_JA - 4, fill: TEXT_MID, textAnchor: 'middle' }))
 
     results.push(wrapSvg(lines))
   }
@@ -378,89 +414,83 @@ function buildDialogueSvgs(row: DialogueRow): string[] {
       continue
     }
 
-    // If two mini-bubbles stacked (merged slide)
+    // If two mini-bubbles stacked (merged slide): two centred bubbles,
+    // each with its speaker's pose nudged above to the speaker's side.
     if (group.length === 2) {
-      let bubbleY = 160
+      let top = 340
       for (const dl of group) {
-        const isLeft  = dl.speaker === 'mimi'
-        const poseX   = isLeft ? SAFE_X_MIN + 60 : SAFE_X_MAX - 60
-        const anchor  = isLeft ? 'start' as const : 'end' as const
-        const bubbleX = isLeft ? SAFE_X_MIN + 140 : CONTENT_CX
+        const isLeft = dl.speaker === 'mimi'
+        const poseX  = isLeft ? CONTENT_CX - 230 : CONTENT_CX + 230
+        const lh     = FS_BOX_BODY - 2
+        const enSize = fitFont(dl.en, FS_BOX_BODY - 2, 26, 22)
 
-        lines.push(textEl({ text: dl.pose, x: poseX, y: bubbleY + 44, fontSize: FS_CHAR_BIG - 10, textAnchor: anchor }))
+        lines.push(textEl({ text: dl.pose, x: poseX, y: top - 12, fontSize: FS_CHAR_BIG - 14, textAnchor: 'middle' }))
+        lines.push(textEl({ text: BOX_TOP, x: CONTENT_CX, y: top + 28, fontSize: FS_BOX_BORDER - 2, textAnchor: 'middle' }))
+        lines.push(textEl({ text: dl.en, x: CONTENT_CX, y: top + 28 + lh + 6, fontSize: enSize, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
+        lines.push(textEl({ text: dl.ja, x: CONTENT_CX, y: top + 28 + (lh + 6) * 2, fontSize: lh - 4, fill: TEXT_MID, textAnchor: 'middle' }))
+        lines.push(textEl({ text: BOX_BOT, x: CONTENT_CX, y: top + 28 + (lh + 6) * 3, fontSize: FS_BOX_BORDER - 2, textAnchor: 'middle' }))
 
-        // Compact box bubble for merged slide
-        const bTop = BOX_TOP
-        const bBot = BOX_BOT
-        const lh   = FS_BOX_BODY - 4
-        lines.push(textEl({ text: bTop, x: bubbleX + 120, y: bubbleY, fontSize: lh, textAnchor: 'middle' }))
-        lines.push(textEl({ text: dl.en, x: bubbleX + 120, y: bubbleY + lh + 8, fontSize: lh, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
-        lines.push(textEl({ text: dl.ja, x: bubbleX + 120, y: bubbleY + (lh + 8) * 2, fontSize: lh - 4, fill: TEXT_MID, textAnchor: 'middle' }))
-        lines.push(textEl({ text: bBot, x: bubbleX + 120, y: bubbleY + (lh + 8) * 3, fontSize: lh, textAnchor: 'middle' }))
-
-        bubbleY += (lh + 8) * 4 + 50
+        top += 430
       }
       results.push(wrapSvg(lines))
       continue
     }
 
-    // Single line — full treatment
+    // Single line — pose stacked above a centred bubble, vertically balanced.
     const dl      = group[0]
     const isLeft  = dl.speaker === 'mimi'
-    const poseX   = isLeft ? SAFE_X_MIN + 70 : SAFE_X_MAX - 70
-    const anchor  = isLeft ? 'start' as const : 'end' as const
+    const poseX   = isLeft ? CONTENT_CX - 220 : CONTENT_CX + 220
+    const lineH   = FS_BOX_BODY + 12
+    const bubbleTop = 660
+    const enSize  = fitFont(dl.en, FS_BOX_BODY, 30, 24)
 
-    // Character pose large
-    lines.push(textEl({ text: dl.pose, x: poseX, y: 360, fontSize: FS_CHAR_BIG, textAnchor: anchor }))
-
-    // Box bubble centred on card
-    const bubbleEls = buildBoxBubble(dl.en, dl.ja, 450)
-    // Make en bold by building a custom version
-    const lineH     = FS_BOX_BODY + 12
-    lines.push(textEl({ text: BOX_TOP, x: CONTENT_CX, y: 450, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
-    lines.push(textEl({ text: dl.en,   x: CONTENT_CX, y: 450 + lineH, fontSize: FS_BOX_BODY, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
-    lines.push(textEl({ text: dl.ja,   x: CONTENT_CX, y: 450 + lineH * 2, fontSize: FS_BOX_BODY, fill: TEXT_MID, textAnchor: 'middle' }))
-    lines.push(textEl({ text: BOX_BOT, x: CONTENT_CX, y: 450 + lineH * 3, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
-
-    void bubbleEls // buildBoxBubble result unused here; we built it manually above
+    lines.push(textEl({ text: dl.pose, x: poseX, y: 560, fontSize: FS_CHAR_BIG, textAnchor: 'middle' }))
+    lines.push(textEl({ text: BOX_TOP, x: CONTENT_CX, y: bubbleTop, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
+    lines.push(textEl({ text: dl.en,   x: CONTENT_CX, y: bubbleTop + lineH, fontSize: enSize, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
+    lines.push(textEl({ text: dl.ja,   x: CONTENT_CX, y: bubbleTop + lineH * 2, fontSize: FS_BOX_BODY, fill: TEXT_MID, textAnchor: 'middle' }))
+    lines.push(textEl({ text: BOX_BOT, x: CONTENT_CX, y: bubbleTop + lineH * 3, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
 
     results.push(wrapSvg(lines))
   }
 
   // ── Slide 5: Punchline ───────────────────────────────────────────────
   {
-    const [mimiLine, tenLine] = punchLines.length === 2
-      ? punchLines
-      : [punchLines[0], punchLines[0]]
+    // setupLine = the feed; punchLine = the button (gets the big teal
+    // treatment). Either character can deliver either — pose sits on the
+    // speaker's own side, so the final beat isn't always "Ten on the right".
+    const setupLine = punchLines[0]
+    const punchLine = punchLines[1] ?? punchLines[0]
 
     const lines: string[] = [...cardShell()]
 
     // Slide counter
     lines.push(textEl({ text: slideCounter(5, 5), x: SAFE_X_MAX - 20, y: SAFE_Y_MIN + 42, fontSize: FS_COUNTER, fill: TEAL, textAnchor: 'end' }))
 
-    // Mimi spotlight — her pose big on the left
-    const mimiPose = mimiLine.pose
-    lines.push(textEl({ text: mimiPose, x: SAFE_X_MIN + 80, y: 280, fontSize: FS_CHAR_PUNCH, textAnchor: 'start' }))
-
-    // Mimi's line bubble — bold, prominent
     const lh = FS_BOX_BODY + 12
-    lines.push(textEl({ text: BOX_TOP,    x: CONTENT_CX + 40, y: 200, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
-    lines.push(textEl({ text: mimiLine.en, x: CONTENT_CX + 40, y: 200 + lh, fontSize: FS_BOX_BODY + 2, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
-    lines.push(textEl({ text: mimiLine.ja, x: CONTENT_CX + 40, y: 200 + lh * 2, fontSize: FS_BOX_BODY, fill: TEXT_MID, textAnchor: 'middle' }))
-    lines.push(textEl({ text: BOX_BOT,    x: CONTENT_CX + 40, y: 200 + lh * 3, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
+    const sideX = (l: DialogueLine) => l.speaker === 'mimi' ? CONTENT_CX - 220 : CONTENT_CX + 220
 
-    // Ten's reaction pose + line
-    const tenPose = tenLine.pose
-    lines.push(textEl({ text: tenPose,   x: SAFE_X_MAX - 80, y: 580, fontSize: FS_CHAR_BIG, textAnchor: 'end' }))
-    lines.push(textEl({ text: BOX_TOP,   x: CONTENT_CX - 40, y: 500, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
-    lines.push(textEl({ text: tenLine.en, x: CONTENT_CX - 40, y: 500 + lh, fontSize: FS_BOX_BODY, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
-    lines.push(textEl({ text: tenLine.ja, x: CONTENT_CX - 40, y: 500 + lh * 2, fontSize: FS_BOX_BODY, fill: TEXT_MID, textAnchor: 'middle' }))
-    lines.push(textEl({ text: BOX_BOT,   x: CONTENT_CX - 40, y: 500 + lh * 3, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
+    // — Setup line (top half): pose above a centred bubble —
+    lines.push(textEl({ text: setupLine.pose, x: sideX(setupLine), y: 300, fontSize: FS_CHAR_BIG, textAnchor: 'middle' }))
+    const mTop  = 350
+    const mEn   = fitFont(setupLine.en, FS_BOX_BODY + 2, 28, 24)
+    lines.push(textEl({ text: BOX_TOP,      x: CONTENT_CX, y: mTop, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
+    lines.push(textEl({ text: setupLine.en, x: CONTENT_CX, y: mTop + lh, fontSize: mEn, fontWeight: 'bold', fill: TEXT_DARK, textAnchor: 'middle' }))
+    lines.push(textEl({ text: setupLine.ja, x: CONTENT_CX, y: mTop + lh * 2, fontSize: FS_BOX_BODY, fill: TEXT_MID, textAnchor: 'middle' }))
+    lines.push(textEl({ text: BOX_BOT,      x: CONTENT_CX, y: mTop + lh * 3, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
+
+    // — Punch line (lower half): bigger pose above a centred teal bubble —
+    lines.push(textEl({ text: punchLine.pose, x: sideX(punchLine), y: 680, fontSize: FS_CHAR_PUNCH, textAnchor: 'middle' }))
+    const tTop  = 730
+    const tEn   = fitFont(punchLine.en, FS_BOX_BODY + 2, 28, 24)
+    lines.push(textEl({ text: BOX_TOP,      x: CONTENT_CX, y: tTop, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
+    lines.push(textEl({ text: punchLine.en, x: CONTENT_CX, y: tTop + lh, fontSize: tEn, fontWeight: 'bold', fill: TEAL, textAnchor: 'middle' }))
+    lines.push(textEl({ text: punchLine.ja, x: CONTENT_CX, y: tTop + lh * 2, fontSize: FS_BOX_BODY, fill: TEXT_MID, textAnchor: 'middle' }))
+    lines.push(textEl({ text: BOX_BOT,      x: CONTENT_CX, y: tTop + lh * 3, fontSize: FS_BOX_BORDER, textAnchor: 'middle' }))
 
     // Key phrase recap strip — separating line then recap text
-    const recapY = SAFE_Y_MAX - 100
-    lines.push(`<line x1="${SAFE_X_MIN}" y1="${recapY - 20}" x2="${SAFE_X_MAX}" y2="${recapY - 20}" stroke="${TEAL}" stroke-width="1.5" stroke-dasharray="6,4"/>`)
-    lines.push(textEl({ text: row.title_en, x: CONTENT_CX, y: recapY, fontSize: FS_RECAP + 2, fontWeight: 'bold', fill: TEAL, textAnchor: 'middle' }))
+    const recapY = SAFE_Y_MAX - 120
+    lines.push(`<line x1="${SAFE_X_MIN}" y1="${recapY - 46}" x2="${SAFE_X_MAX}" y2="${recapY - 46}" stroke="${TEAL}" stroke-width="1.5" stroke-dasharray="6,4"/>`)
+    lines.push(textEl({ text: row.title_en, x: CONTENT_CX, y: recapY, fontSize: fitFont(row.title_en, FS_RECAP + 2, 28, 22), fontWeight: 'bold', fill: TEAL, textAnchor: 'middle' }))
     lines.push(textEl({ text: row.title_ja, x: CONTENT_CX, y: recapY + 38, fontSize: FS_RECAP, fill: TEXT_MID, textAnchor: 'middle' }))
 
     results.push(wrapSvg(lines))
@@ -519,6 +549,23 @@ function jstDateString(): string {
   const mm    = String(d.getUTCMonth() + 1).padStart(2, '0')
   const dd    = String(d.getUTCDate()).padStart(2, '0')
   return `${yyyy}-${mm}-${dd}`
+}
+
+// -----------------------------------------------------------------------
+// Unused-content selection
+// -----------------------------------------------------------------------
+// supabase-js has no subquery support, so we can't pass a builder to
+// .not('id','in', …). Fetch the already-used content_ids for this style
+// first, then exclude them with a literal in-list (skipped when empty).
+// deno-lint-ignore no-explicit-any
+async function usedContentIds(supabase: any, style: Style): Promise<number[]> {
+  const { data } = await supabase
+    .from('ig_posts')
+    .select('content_id')
+    .eq('style', style)
+  return (data ?? [])
+    .map((r: { content_id: number | null }) => r.content_id)
+    .filter((v: number | null): v is number => v != null)
 }
 
 // -----------------------------------------------------------------------
@@ -608,15 +655,14 @@ Deno.serve(async (req: Request) => {
 
   try {
     if (style === 'word') {
-      const { data, error } = await supabase
+      const usedIds = await usedContentIds(supabase, 'word')
+      let q = supabase
         .from('ig_words')
         .select('id, word, word_ja, example_en, example_ja')
-        .not('id', 'in',
-          supabase.from('ig_posts').select('content_id').eq('style', 'word')
-        )
         .order('id')
         .limit(1)
-        .single()
+      if (usedIds.length) q = q.not('id', 'in', `(${usedIds.join(',')})`)
+      const { data, error } = await q.single()
 
       if (error || !data) {
         // Pool exhausted
@@ -645,15 +691,14 @@ Deno.serve(async (req: Request) => {
       svgStrings = [buildWordCardSvg(row)]
 
     } else if (style === 'phrase') {
-      const { data, error } = await supabase
+      const usedIds = await usedContentIds(supabase, 'phrase')
+      let q = supabase
         .from('phrases')
         .select('id, phrase_en, phrase_ja, example_en, example_ja')
-        .not('id', 'in',
-          supabase.from('ig_posts').select('content_id').eq('style', 'phrase')
-        )
         .order('id')
         .limit(1)
-        .single()
+      if (usedIds.length) q = q.not('id', 'in', `(${usedIds.join(',')})`)
+      const { data, error } = await q.single()
 
       if (error || !data) {
         if (resendKey) {
@@ -682,15 +727,14 @@ Deno.serve(async (req: Request) => {
 
     } else {
       // dialogue
-      const { data, error } = await supabase
+      const usedIds = await usedContentIds(supabase, 'dialogue')
+      let q = supabase
         .from('ig_dialogues')
         .select('id, title_en, title_ja, location_ja, lines')
-        .not('id', 'in',
-          supabase.from('ig_posts').select('content_id').eq('style', 'dialogue')
-        )
         .order('id')
         .limit(1)
-        .single()
+      if (usedIds.length) q = q.not('id', 'in', `(${usedIds.join(',')})`)
+      const { data, error } = await q.single()
 
       if (error || !data) {
         if (resendKey) {
