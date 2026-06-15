@@ -502,7 +502,9 @@ function buildDialogueSvgs(row: DialogueRow): string[] {
 // -----------------------------------------------------------------------
 // Caption templates
 // -----------------------------------------------------------------------
-const HASHTAGS = '#英会話 #英語学習 #毎日英語 #英語フレーズ #日常英会話 #英会話初心者 #英語の勉強 #英単語 #learnenglish #englishstudy #japaneselearners #prokaiwa'
+// Instagram's best-practice is 3-5 hashtags. 3 JP (reach with the target
+// audience) + 2 EN (discoverability + owned brand tag).
+const HASHTAGS = '#英会話 #英語学習 #日常英会話 #learnenglish #prokaiwa'
 
 function wordCaption(row: WordRow): string {
   return `【今日の単語】${row.word} ＝ ${row.word_ja}\n\n${row.example_en}\n（${row.example_ja}）\n\n毎日ひとつ、使える英語を p(´∇｀)q\n\n${HASHTAGS}`
