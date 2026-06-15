@@ -2236,6 +2236,51 @@ I'm proud of your dedication. Let's keep building! 🚀`
     draftStore[cardKey].templateText = newTpl;
   }
 
+  // ============================================================
+  // TEMPLATE PLACEHOLDERS — "click to type over"
+  // Keep the [bracketed] examples in templates, but let the teacher
+  // click one (or press Tab) to auto-select the whole token so they
+  // just start typing — no manual deleting each time.
+  // ============================================================
+  const PLACEHOLDER_RE = /\[[^\]]+?\]/g;
+
+  function selectNextPlaceholder(ta, fromPos) {
+    PLACEHOLDER_RE.lastIndex = 0;
+    let m, first = null, next = null;
+    while ((m = PLACEHOLDER_RE.exec(ta.value)) !== null) {
+      const span = [m.index, m.index + m[0].length];
+      if (first === null) first = span;
+      if (m.index >= fromPos) { next = span; break; }
+    }
+    const target = next || first;          // wrap back to the first
+    if (target) { ta.focus(); ta.setSelectionRange(target[0], target[1]); return true; }
+    return false;
+  }
+
+  // Click inside a [token] → select that whole token.
+  document.addEventListener('click', (e) => {
+    const ta = e.target;
+    if (!ta.classList || !ta.classList.contains('feedback-textarea')) return;
+    const pos = ta.selectionStart;
+    PLACEHOLDER_RE.lastIndex = 0;
+    let m;
+    while ((m = PLACEHOLDER_RE.exec(ta.value)) !== null) {
+      const start = m.index, end = m.index + m[0].length;
+      if (pos >= start && pos <= end) { ta.setSelectionRange(start, end); return; }
+    }
+  });
+
+  // Tab → jump to & select the next [token] (only when one exists).
+  document.addEventListener('keydown', (e) => {
+    const ta = e.target;
+    if (e.key !== 'Tab' || e.shiftKey) return;
+    if (!ta.classList || !ta.classList.contains('feedback-textarea')) return;
+    PLACEHOLDER_RE.lastIndex = 0;
+    if (PLACEHOLDER_RE.test(ta.value)) {
+      if (selectNextPlaceholder(ta, ta.selectionEnd)) e.preventDefault();
+    }
+  });
+
   function toggleSkillsAccordion(cardKey) {
     const body    = document.getElementById(`skills-body-${cardKey}`);
     const chevron = document.getElementById(`skills-chevron-${cardKey}`);
