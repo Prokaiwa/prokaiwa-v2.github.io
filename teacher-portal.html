@@ -1162,6 +1162,7 @@
   let currentTeacher   = null;
   let allStudentsData  = [];
   let responseStats    = {};
+  let weekThemes       = {};   // { level: { purpose: { week_number: theme } } }
   let dayQueues        = { day6: [], day5: [], day7other: [], day1to4_line: [] };
   let completedToday   = new Set();
   let queueItemsMap    = new Map();
@@ -1182,6 +1183,23 @@
       if (error) { console.error('loadResponseStats:', error); return; }
       responseStats = Object.fromEntries((data || []).map(s => [s.student_id, s]));
     } catch (e) { console.error('loadResponseStats:', e); }
+  }
+
+  // Curriculum themes by level → purpose → week, so the Weekly Assessment
+  // template can auto-fill next week's theme. One theme per week per track.
+  async function loadWeekThemes() {
+    try {
+      const { data, error } = await supabaseClient
+        .from('prompts').select('level, purpose, week_number, theme');
+      if (error) { console.error('loadWeekThemes:', error); return; }
+      weekThemes = {};
+      for (const p of data || []) {
+        if (!p.theme) continue;
+        if (!weekThemes[p.level]) weekThemes[p.level] = {};
+        if (!weekThemes[p.level][p.purpose]) weekThemes[p.level][p.purpose] = {};
+        weekThemes[p.level][p.purpose][p.week_number] = p.theme;
+      }
+    } catch (e) { console.error('loadWeekThemes:', e); }
   }
 
   function statsStripHtml(studentId) {
@@ -1488,6 +1506,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
 
     await loadCompletedToday();
     await loadResponseStats();
+    await loadWeekThemes();
     await loadDayTypeQueue();
     await loadVideoLessons();
     loadCancellationNotifications();
@@ -1512,7 +1531,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
     try {
       const { data: assignments, error: assignError } = await supabaseClient
         .from('student_teacher_assignments')
-        .select(`student_id, questionnaire_responses(id, user_id, given_name_romaji, name, line_id, plan)`)
+        .select(`student_id, questionnaire_responses(id, user_id, given_name_romaji, name, line_id, plan, level, goals)`)
         .eq('teacher_id', currentTeacher.id);
       if (assignError) throw assignError;
 
@@ -1629,6 +1648,8 @@ I'm proud of your dedication. Let's keep building! 🚀`
           promptId:          primary.response.prompt_id,
           promptDayNumber:   primary.dayNumber,
           promptWeekNumber:  primary.prompt?.week_number ?? null,
+          level:             student.level,
+          purpose:           student.goals?.purpose || 'Hobby',
           promptType:        primary.promptType,
           promptText:        primary.prompt?.prompt_text || null,
           // All pending responses for this student (for display in card)
@@ -2025,9 +2046,17 @@ I'm proud of your dedication. Let's keep building! 🚀`
     const done = (st.prompts_answered_7d != null) ? st.prompts_answered_7d
                : (st.response_days_7d   != null) ? st.response_days_7d
                : '[X]';
-    return feedbackTemplates.weekly
+    let out = feedbackTemplates.weekly
       .replace('Week [X] Review', `Week ${wk} Review`)
       .replace('[X]/7 prompts', `${done}/7 prompts`);
+    // Auto-fill next week's curriculum theme (loops back to week 1 at the
+    // end of the track, matching daily-prompt-sender). Left as [Preview
+    // theme] for manual fill if the lookup misses.
+    const track  = weekThemes[qi?.level]?.[qi?.purpose];
+    const nextWk = (qi?.promptWeekNumber || qi?.currentWeek || 1) + 1;
+    const theme  = track ? (track[nextWk] || track[1]) : null;
+    if (theme) out = out.replace('[Preview theme]', theme);
+    return out;
   }
 
   function createDay7Card(qi) {
