@@ -1563,7 +1563,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
       if (promptIds.length > 0) {
         const { data: promptData } = await supabaseClient
           .from('prompts')
-          .select('id, day_number, type, prompt_text')
+          .select('id, day_number, week_number, type, prompt_text')
           .in('id', promptIds);
         for (const p of promptData || []) promptMap[p.id] = p;
       }
@@ -1628,6 +1628,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
           responseCreatedAt: primary.response.created_at,
           promptId:          primary.response.prompt_id,
           promptDayNumber:   primary.dayNumber,
+          promptWeekNumber:  primary.prompt?.week_number ?? null,
           promptType:        primary.promptType,
           promptText:        primary.prompt?.prompt_text || null,
           // All pending responses for this student (for display in card)
@@ -2003,16 +2004,48 @@ I'm proud of your dedication. Let's keep building! 🚀`
   // ============================================================
   // DAY 7 / OTHER CARD
   // ============================================================
+  // How overdue an assessment is, measured from when the student answered
+  // the day-7 prompt (that's when the weekly assessment became due).
+  function dueSinceText(createdAt) {
+    if (!createdAt) return '';
+    const d = Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000);
+    const dateStr = new Date(createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (d <= 0)  return `due today (${dateStr})`;
+    if (d === 1) return `due since yesterday (${dateStr})`;
+    if (d < 7)   return `due ${d} days ago (${dateStr})`;
+    const wks = Math.floor(d / 7);
+    return `⚠️ due ${wks} week${wks > 1 ? 's' : ''}+ ago (${dateStr})`;
+  }
+
+  // Fills the static weekly template with the assessment's real week number
+  // and how many prompts the student actually completed this week.
+  function buildWeeklyTemplate(qi) {
+    const st   = responseStats[qi?.studentId] || {};
+    const wk   = qi?.promptWeekNumber || qi?.currentWeek || 1;
+    const done = (st.prompts_answered_7d != null) ? st.prompts_answered_7d
+               : (st.response_days_7d   != null) ? st.response_days_7d
+               : '[X]';
+    return feedbackTemplates.weekly
+      .replace('Week [X] Review', `Week ${wk} Review`)
+      .replace('[X]/7 prompts', `${done}/7 prompts`);
+  }
+
   function createDay7Card(qi) {
     const isDone     = completedToday.has(qi.studentId);
     const ck         = qi.responseId;
     const isWeekEnd  = qi.promptDayNumber === 7;
     const defaultTpl = isWeekEnd ? 'weekly' : 'biweekly';
     const dayLabel   = qi.promptType || `Day ${qi.promptDayNumber}`;
-    const sectionLabel = isWeekEnd ? '📋 Weekly Assessment' : `✨ Check-in (${dayLabel})`;
+    const assessWeek = qi.promptWeekNumber || qi.currentWeek || 1;
+    const sectionLabel = isWeekEnd
+      ? `📋 Week ${assessWeek} Assessment · ${dueSinceText(qi.responseCreatedAt)}`
+      : `✨ Check-in (${dayLabel})`;
 
     if (!draftStore[ck]) {
-      draftStore[ck] = { templateText: feedbackTemplates[defaultTpl], freeText: '' };
+      draftStore[ck] = {
+        templateText: isWeekEnd ? buildWeeklyTemplate(qi) : feedbackTemplates[defaultTpl],
+        freeText: ''
+      };
     }
 
     return `
@@ -2024,7 +2057,7 @@ I'm proud of your dedication. Let's keep building! 🚀`
               ${isDone ? '<span class="priority-badge done-badge">✓ Done</span>' : ageBadgeHtml(qi.responseCreatedAt)}
               ${pendingBadgeHtml(qi.pendingCount || 1)}
             </div>
-            <div class="student-meta">Week ${qi.currentWeek || 1} · ${dayLabel} · ${sectionLabel}</div>
+            <div class="student-meta">${isWeekEnd ? `${dayLabel} · ${sectionLabel}` : `Week ${qi.currentWeek || 1} · ${dayLabel} · ${sectionLabel}`}</div>
             ${statsStripHtml(qi.studentId)}
           </div>
           <div class="student-actions">
@@ -2193,7 +2226,9 @@ I'm proud of your dedication. Let's keep building! 🚀`
   function onTemplateSelect(cardKey, tplKey) {
     const textarea = document.getElementById(`feedback-${cardKey}`);
     if (!draftStore[cardKey]) draftStore[cardKey] = { templateText: '', freeText: '' };
-    const newTpl = feedbackTemplates[tplKey] || '';
+    const newTpl = tplKey === 'weekly'
+      ? buildWeeklyTemplate(queueItemsMap.get(cardKey))
+      : (feedbackTemplates[tplKey] || '');
     if (textarea.value && textarea.value !== draftStore[cardKey].templateText) {
       if (!confirm('Replace your current text with the template?')) return;
     }
